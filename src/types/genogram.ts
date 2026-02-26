@@ -8,6 +8,8 @@ export interface FamilyMember {
   profession: string;
   gender: 'male' | 'female';
   isTransgender?: boolean;
+  isGay?: boolean;
+  isBisexual?: boolean;
   x: number;
   y: number;
   pathologies: string[];
