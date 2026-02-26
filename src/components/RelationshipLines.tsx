@@ -9,8 +9,20 @@ interface RelationshipLinesProps {
 const RelationshipLines: React.FC<RelationshipLinesProps> = ({ members, relationships }) => {
   const getMember = (id: string) => members.find(m => m.id === id);
 
-  const getCenterX = (m: FamilyMember) => m.x + 80;
-  const getCenterY = (m: FamilyMember) => m.y + 25;
+  const CARD_W = 160;
+  const CARD_H = 56;
+
+  const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') => {
+    switch (side) {
+      case 'top': return { x: m.x + CARD_W / 2, y: m.y };
+      case 'bottom': return { x: m.x + CARD_W / 2, y: m.y + CARD_H };
+      case 'left': return { x: m.x, y: m.y + CARD_H / 2 };
+      case 'right': return { x: m.x + CARD_W, y: m.y + CARD_H / 2 };
+    }
+  };
+
+  const getCenterX = (m: FamilyMember) => m.x + CARD_W / 2;
+  const getCenterY = (m: FamilyMember) => m.y + CARD_H / 2;
 
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
@@ -24,20 +36,28 @@ const RelationshipLines: React.FC<RelationshipLinesProps> = ({ members, relation
         const x2 = getCenterX(to);
         const y2 = getCenterY(to);
 
+        // For couple lines, use left/right anchors
+        const coupleFrom = from.x < to.x
+          ? getAnchor(from, 'right')
+          : getAnchor(from, 'left');
+        const coupleTo = from.x < to.x
+          ? getAnchor(to, 'left')
+          : getAnchor(to, 'right');
+
         if (rel.type === 'couple') {
           return (
             <g key={rel.id}>
               <line
-                x1={x1} y1={y1} x2={x2} y2={y2}
+                x1={coupleFrom.x} y1={coupleFrom.y}
+                x2={coupleTo.x} y2={coupleTo.y}
                 stroke="hsl(var(--foreground))"
                 strokeWidth={2}
                 strokeOpacity={0.3}
               />
-              {/* Marriage/divorce annotation */}
               {(rel.marriageYear || rel.divorceYear) && (
                 <text
-                  x={(x1 + x2) / 2}
-                  y={(y1 + y2) / 2 + 20}
+                  x={(coupleFrom.x + coupleTo.x) / 2}
+                  y={(coupleFrom.y + coupleTo.y) / 2 + 20}
                   textAnchor="middle"
                   className="fill-muted-foreground text-[10px]"
                 >
@@ -49,12 +69,14 @@ const RelationshipLines: React.FC<RelationshipLinesProps> = ({ members, relation
           );
         }
 
-        // Parent-child: vertical then horizontal
-        const midY = y1 + (y2 - y1) * 0.6;
+        // Parent-child: from bottom of parent to top of child
+        const parentAnchor = getAnchor(from, 'bottom');
+        const childAnchor = getAnchor(to, 'top');
+        const midY = parentAnchor.y + (childAnchor.y - parentAnchor.y) * 0.5;
         return (
           <g key={rel.id}>
             <path
-              d={`M ${x1} ${y1 + 25} V ${midY} H ${x2} V ${y2 - 5}`}
+              d={`M ${parentAnchor.x} ${parentAnchor.y} V ${midY} H ${childAnchor.x} V ${childAnchor.y}`}
               fill="none"
               stroke="hsl(var(--foreground))"
               strokeWidth={1.5}
