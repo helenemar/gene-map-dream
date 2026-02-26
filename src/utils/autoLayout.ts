@@ -7,9 +7,9 @@
  *   3. Orthogonal comb: horizontal rail + vertical drops (zero crossings)
  *
  * Gap hierarchy:
- *   COUPLE_GAP  = 40   (between partners)
- *   SIBLING_GAP = 50   (between siblings of same union)
- *   BLOCK_GAP   = 100  (between unrelated members at same generation)
+ *   COUPLE_GAP  = 30   (between partners)
+ *   SIBLING_GAP = 35   (between siblings of same union)
+ *   BLOCK_GAP   = 70   (between unrelated members at same generation)
  */
 
 import dagre from '@dagrejs/dagre';
@@ -17,10 +17,10 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 
 const CARD_W = 186;
 const CARD_H = 64;
-const LEVEL_SPACING = 350;
-const COUPLE_GAP = 40;
-const SIBLING_GAP = 50;
-const BLOCK_GAP = 100;
+const LEVEL_SPACING = 250;
+const COUPLE_GAP = 30;
+const SIBLING_GAP = 35;
+const BLOCK_GAP = 70;
 
 interface LayoutResult {
   positions: Map<string, { x: number; y: number }>;
