@@ -1,211 +1,450 @@
+/**
+ * Sugiyama-based auto-layout for genograms.
+ *
+ * Phases:
+ *   1. Build directed graph from unions (parent → child edges)
+ *   2. Layer assignment (topological / longest-path)
+ *   3. Crossing minimization (barycenter heuristic, iterated)
+ *   4. Coordinate assignment with genogram constraints:
+ *      - Couples side-by-side (male left, female right)
+ *      - Children centered under parent couple midpoint
+ *      - Rail-safe spacing (nodeSpacing ≥ 100px)
+ */
+
 import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 
+// ── Layout constants ──
 const CARD_W = 186;
 const CARD_H = 64;
-const GENERATION_GAP = 300;
-const BASE_SIBLING_GAP = 80; // Increased from 60 to accommodate rail corridors
-const COUPLE_GAP = 120;
-const BRANCH_GAP = 160; // Increased from 140 for more breathing room
-const MIN_OVERLAP_PAD = 40; // Increased from 30 for rail safety
-const UNION_CORRIDOR = 50; // Extra corridor when child has own union
-const RAIL_GAP = 20; // Minimum gap between parallel descent rails
+const NODE_SPACING = 100;   // horizontal gap between sibling cards
+const LEVEL_SPACING = 300;  // vertical gap between generations
+const COUPLE_GAP = 80;      // gap between couple partners (inside pair)
 
 interface LayoutResult {
   positions: Map<string, { x: number; y: number }>;
 }
 
-interface SubTreeBox {
-  width: number;
-  positions: Map<string, { x: number; y: number }>;
+// ── Phase 0: Build graph structures ──
+
+interface GraphNode {
+  id: string;
+  layer: number;
+  order: number;   // position within layer (for crossing minimization)
+  x: number;
+  y: number;
+  unionIds: string[];  // unions this member participates in
 }
 
-function buildUnionIndex(unions: Union[]) {
-  const parentToUnions = new Map<string, Union[]>();
+interface CoupleConstraint {
+  unionId: string;
+  leftId: string;   // male or partner1
+  rightId: string;   // female or partner2
+}
+
+/**
+ * Identify generation layers using BFS from root nodes.
+ * Root = any member who is NOT a child in any union.
+ */
+function assignLayers(
+  members: FamilyMember[],
+  unions: Union[],
+): Map<string, number> {
+  const layers = new Map<string, number>();
+  const allChildren = new Set<string>();
+  const parentToChildren = new Map<string, string[]>();  // parentId → childIds
+  const childToParents = new Map<string, string[]>();
+
   for (const u of unions) {
-    for (const pid of [u.partner1, u.partner2]) {
-      if (!parentToUnions.has(pid)) parentToUnions.set(pid, []);
-      parentToUnions.get(pid)!.push(u);
-    }
-  }
-  return parentToUnions;
-}
-
-/**
- * Compute dynamic sibling gap based on rail requirements.
- * More children = wider gap to prevent descent line overlap.
- */
-function computeSiblingGap(
-  childId: string,
-  nextChildId: string | null,
-  parentToUnions: Map<string, Union[]>,
-  visited: Set<string>,
-  totalSiblings: number,
-): number {
-  let gap = BASE_SIBLING_GAP;
-
-  // Add corridor for children with unions
-  const childUnions = (parentToUnions.get(childId) ?? []).filter(u => !visited.has(u.id));
-  const nextUnions = nextChildId ? (parentToUnions.get(nextChildId) ?? []).filter(u => !visited.has(u.id)) : [];
-  if (childUnions.length > 0 || nextUnions.length > 0) {
-    gap += UNION_CORRIDOR;
-  }
-
-  // For large families (>5 children), increase gap proportionally to ensure rail spacing
-  if (totalSiblings > 5) {
-    gap += (totalSiblings - 5) * RAIL_GAP;
-  }
-
-  return gap;
-}
-
-/**
- * Order children to minimize edge crossings.
- * Children with subtrees go to edges; leaf children fill center.
- */
-function orderChildrenToMinimizeCrossings(
-  children: string[],
-  parentToUnions: Map<string, Union[]>,
-  visited: Set<string>,
-): string[] {
-  if (children.length <= 2) return children;
-
-  // Separate children with unions (heavy) from leaf children
-  const heavy: string[] = [];
-  const light: string[] = [];
-
-  for (const cid of children) {
-    const unions = (parentToUnions.get(cid) ?? []).filter(u => !visited.has(u.id));
-    if (unions.length > 0) {
-      heavy.push(cid);
-    } else {
-      light.push(cid);
+    for (const cid of u.children) {
+      allChildren.add(cid);
+      // Both partners are parents of these children
+      for (const pid of [u.partner1, u.partner2]) {
+        if (!parentToChildren.has(pid)) parentToChildren.set(pid, []);
+        parentToChildren.get(pid)!.push(cid);
+        if (!childToParents.has(cid)) childToParents.set(cid, []);
+        childToParents.get(cid)!.push(pid);
+      }
     }
   }
 
-  // Place heavy subtrees at edges, light children in center
-  // This minimizes crossings since subtree descent lines stay on the outside
-  const result: string[] = [];
-  let hi = 0, li = 0;
-  let leftSide = true;
+  // Roots: members who are never children
+  const roots = members.filter(m => !allChildren.has(m.id));
+  // If no roots found (cyclic?), pick all members
+  const effectiveRoots = roots.length > 0 ? roots : members;
 
-  // Alternate placing heavy children on left and right edges
-  const leftHeavy: string[] = [];
-  const rightHeavy: string[] = [];
-  for (let i = 0; i < heavy.length; i++) {
-    if (i % 2 === 0) leftHeavy.push(heavy[i]);
-    else rightHeavy.push(heavy[i]);
+  // BFS layer assignment (longest path from any root)
+  const queue: { id: string; layer: number }[] = [];
+  for (const r of effectiveRoots) {
+    queue.push({ id: r.id, layer: 0 });
   }
 
-  return [...leftHeavy, ...light, ...rightHeavy.reverse()];
+  while (queue.length > 0) {
+    const { id, layer } = queue.shift()!;
+    // Keep the deepest layer assignment (longest path)
+    if (layers.has(id) && layers.get(id)! >= layer) continue;
+    layers.set(id, layer);
+
+    const children = parentToChildren.get(id) ?? [];
+    for (const cid of children) {
+      queue.push({ id: cid, layer: layer + 1 });
+    }
+  }
+
+  // Assign layer 0 to any unplaced member
+  for (const m of members) {
+    if (!layers.has(m.id)) layers.set(m.id, 0);
+  }
+
+  // Enforce couple constraint: partners in a union must be on the same layer
+  for (const u of unions) {
+    const l1 = layers.get(u.partner1) ?? 0;
+    const l2 = layers.get(u.partner2) ?? 0;
+    const maxLayer = Math.min(l1, l2); // Use the higher (earlier) generation
+    layers.set(u.partner1, maxLayer);
+    layers.set(u.partner2, maxLayer);
+  }
+
+  return layers;
 }
 
-function layoutSubTree(
-  union: Union,
-  generation: number,
-  allUnions: Union[],
-  parentToUnions: Map<string, Union[]>,
-  visited: Set<string>,
-  memberMap: Map<string, FamilyMember>,
-): SubTreeBox {
-  visited.add(union.id);
+/**
+ * Phase 2: Crossing minimization using barycenter heuristic.
+ * Returns ordered member IDs per layer.
+ */
+function minimizeCrossings(
+  layerMap: Map<string, number>,
+  unions: Union[],
+  members: FamilyMember[],
+  coupleConstraints: CoupleConstraint[],
+): Map<number, string[]> {
+  // Build layer → members
+  const layers = new Map<number, string[]>();
+  for (const [id, layer] of layerMap) {
+    if (!layers.has(layer)) layers.set(layer, []);
+    layers.get(layer)!.push(id);
+  }
 
-  const positions = new Map<string, { x: number; y: number }>();
-  const y = generation * GENERATION_GAP;
+  // Build parent→child adjacency for barycenter
+  const parentOf = new Map<string, string[]>();  // child → parent IDs
+  for (const u of unions) {
+    for (const cid of u.children) {
+      if (!parentOf.has(cid)) parentOf.set(cid, []);
+      parentOf.get(cid)!.push(u.partner1, u.partner2);
+    }
+  }
 
-  // Sort children by birth year first
-  const childrenByBirth = union.children
-    .filter(cid => memberMap.has(cid))
-    .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
+  // Couple lookup: which IDs must be adjacent
+  const coupleMap = new Map<string, CoupleConstraint>();
+  for (const cc of coupleConstraints) {
+    coupleMap.set(cc.leftId, cc);
+    coupleMap.set(cc.rightId, cc);
+  }
 
-  // Optimize order to minimize crossings
-  const children = orderChildrenToMinimizeCrossings(childrenByBirth, parentToUnions, visited);
+  // Sort layers by key
+  const sortedLayerKeys = [...layers.keys()].sort((a, b) => a - b);
 
-  const childBlocks: { childId: string; width: number; subPositions: Map<string, { x: number; y: number }> }[] = [];
+  // Initial order: sort by birth year within each layer
+  const memberMap = new Map(members.map(m => [m.id, m]));
+  for (const key of sortedLayerKeys) {
+    const row = layers.get(key)!;
+    row.sort((a, b) => (memberMap.get(a)?.birthYear ?? 0) - (memberMap.get(b)?.birthYear ?? 0));
+  }
 
-  for (const childId of children) {
-    const childUnions = (parentToUnions.get(childId) ?? []).filter(u => !visited.has(u.id));
+  // Barycenter iterations (top-down then bottom-up)
+  const ITERATIONS = 4;
+  for (let iter = 0; iter < ITERATIONS; iter++) {
+    // Top-down sweep
+    for (let li = 1; li < sortedLayerKeys.length; li++) {
+      const layerKey = sortedLayerKeys[li];
+      const row = layers.get(layerKey)!;
+      const prevRow = layers.get(sortedLayerKeys[li - 1])!;
+      const prevIndex = new Map(prevRow.map((id, i) => [id, i]));
 
-    if (childUnions.length === 0) {
-      childBlocks.push({
-        childId,
-        width: CARD_W,
-        subPositions: new Map(),
-      });
-    } else {
-      let totalWidth = 0;
-      const mergedSub = new Map<string, { x: number; y: number }>();
-
-      for (let ui = 0; ui < childUnions.length; ui++) {
-        const cu = childUnions[ui];
-        const sub = layoutSubTree(cu, generation + 1, allUnions, parentToUnions, visited, memberMap);
-
-        for (const [id, pos] of sub.positions) {
-          mergedSub.set(id, { x: pos.x + totalWidth, y: pos.y });
+      // Compute barycenter for each node
+      const barycenters = new Map<string, number>();
+      for (const id of row) {
+        const parents = parentOf.get(id) ?? [];
+        if (parents.length === 0) {
+          barycenters.set(id, Infinity); // no constraint, put at end
+          continue;
         }
-        totalWidth += sub.width;
-        if (ui < childUnions.length - 1) totalWidth += BRANCH_GAP;
+        const positions = parents
+          .map(pid => prevIndex.get(pid))
+          .filter((p): p is number => p !== undefined);
+        if (positions.length === 0) {
+          barycenters.set(id, Infinity);
+          continue;
+        }
+        barycenters.set(id, positions.reduce((s, v) => s + v, 0) / positions.length);
       }
 
-      childBlocks.push({
-        childId,
-        width: Math.max(CARD_W, totalWidth),
-        subPositions: mergedSub,
-      });
+      // Sort by barycenter
+      row.sort((a, b) => (barycenters.get(a) ?? 0) - (barycenters.get(b) ?? 0));
+
+      // Enforce couple adjacency: insert partner next to their pair
+      enforceCoupleOrder(row, coupleConstraints, memberMap);
+    }
+
+    // Bottom-up sweep
+    const childOf = new Map<string, string[]>(); // parent → children
+    for (const u of unions) {
+      for (const pid of [u.partner1, u.partner2]) {
+        if (!childOf.has(pid)) childOf.set(pid, []);
+        childOf.get(pid)!.push(...u.children);
+      }
+    }
+
+    for (let li = sortedLayerKeys.length - 2; li >= 0; li--) {
+      const layerKey = sortedLayerKeys[li];
+      const row = layers.get(layerKey)!;
+      const nextRow = layers.get(sortedLayerKeys[li + 1])!;
+      const nextIndex = new Map(nextRow.map((id, i) => [id, i]));
+
+      const barycenters = new Map<string, number>();
+      for (const id of row) {
+        const children = childOf.get(id) ?? [];
+        if (children.length === 0) {
+          barycenters.set(id, Infinity);
+          continue;
+        }
+        const positions = children
+          .map(cid => nextIndex.get(cid))
+          .filter((p): p is number => p !== undefined);
+        if (positions.length === 0) {
+          barycenters.set(id, Infinity);
+          continue;
+        }
+        barycenters.set(id, positions.reduce((s, v) => s + v, 0) / positions.length);
+      }
+
+      row.sort((a, b) => (barycenters.get(a) ?? 0) - (barycenters.get(b) ?? 0));
+      enforceCoupleOrder(row, coupleConstraints, memberMap);
     }
   }
 
-  // Compute total children row width with dynamic gaps
-  let childrenTotalWidth = 0;
-  for (let i = 0; i < childBlocks.length; i++) {
-    childrenTotalWidth += childBlocks[i].width;
-    if (i < childBlocks.length - 1) {
-      const gap = computeSiblingGap(
-        childBlocks[i].childId,
-        childBlocks[i + 1]?.childId ?? null,
-        parentToUnions,
-        visited,
-        children.length,
-      );
-      childrenTotalWidth += gap;
-    }
-  }
-
-  const coupleWidth = CARD_W + COUPLE_GAP + CARD_W;
-  const totalWidth = Math.max(coupleWidth, childrenTotalWidth);
-
-  // Center couple above children
-  const coupleStartX = (totalWidth - coupleWidth) / 2;
-  positions.set(union.partner1, { x: coupleStartX, y });
-  positions.set(union.partner2, { x: coupleStartX + CARD_W + COUPLE_GAP, y });
-
-  // Place children centered under the couple with dynamic gaps
-  const childRowStartX = (totalWidth - childrenTotalWidth) / 2;
-  let cx = childRowStartX;
-  const childY = y + GENERATION_GAP;
-
-  for (let i = 0; i < childBlocks.length; i++) {
-    const block = childBlocks[i];
-    const childCenterX = cx + block.width / 2 - CARD_W / 2;
-    positions.set(block.childId, { x: childCenterX, y: childY });
-
-    for (const [id, pos] of block.subPositions) {
-      positions.set(id, { x: cx + pos.x, y: pos.y });
-    }
-
-    cx += block.width;
-    if (i < childBlocks.length - 1) {
-      cx += computeSiblingGap(
-        block.childId,
-        childBlocks[i + 1]?.childId ?? null,
-        parentToUnions,
-        visited,
-        children.length,
-      );
-    }
-  }
-
-  return { width: totalWidth, positions };
+  return layers;
 }
+
+/**
+ * Enforce couple constraints in a layer ordering:
+ * Male on left, female on right, always adjacent.
+ */
+function enforceCoupleOrder(
+  row: string[],
+  constraints: CoupleConstraint[],
+  memberMap: Map<string, FamilyMember>,
+) {
+  for (const cc of constraints) {
+    const li = row.indexOf(cc.leftId);
+    const ri = row.indexOf(cc.rightId);
+    if (li === -1 || ri === -1) continue; // not in this layer
+
+    // Remove both, insert left then right at the earlier position
+    const minPos = Math.min(li, ri);
+    const filtered = row.filter(id => id !== cc.leftId && id !== cc.rightId);
+    filtered.splice(minPos, 0, cc.leftId, cc.rightId);
+
+    // Copy back
+    row.length = 0;
+    row.push(...filtered);
+  }
+}
+
+/**
+ * Phase 3: Coordinate assignment.
+ * - Couples: side by side with COUPLE_GAP
+ * - Children: centered under parent couple midpoint
+ * - Minimum NODE_SPACING between non-coupled nodes
+ */
+function assignCoordinates(
+  orderedLayers: Map<number, string[]>,
+  unions: Union[],
+  memberMap: Map<string, FamilyMember>,
+  coupleConstraints: CoupleConstraint[],
+): Map<string, { x: number; y: number }> {
+  const positions = new Map<string, { x: number; y: number }>();
+  const sortedLayerKeys = [...orderedLayers.keys()].sort((a, b) => a - b);
+
+  // Build couple lookup
+  const coupleOf = new Map<string, CoupleConstraint>();
+  for (const cc of coupleConstraints) {
+    coupleOf.set(cc.leftId, cc);
+    coupleOf.set(cc.rightId, cc);
+  }
+
+  // Build union lookup: union → children
+  const unionChildren = new Map<string, string[]>();
+  const unionPartners = new Map<string, [string, string]>();
+  for (const u of unions) {
+    unionChildren.set(u.id, u.children);
+    unionPartners.set(u.id, [u.partner1, u.partner2]);
+  }
+
+  // Child → union ID
+  const childToUnion = new Map<string, string>();
+  for (const u of unions) {
+    for (const cid of u.children) {
+      childToUnion.set(cid, u.id);
+    }
+  }
+
+  // First pass: assign X coordinates layer by layer (simple left-to-right)
+  for (const layerKey of sortedLayerKeys) {
+    const row = orderedLayers.get(layerKey)!;
+    const y = layerKey * LEVEL_SPACING;
+    let x = 0;
+    const placed = new Set<string>();
+
+    for (let i = 0; i < row.length; i++) {
+      const id = row[i];
+      if (placed.has(id)) continue;
+
+      const cc = coupleOf.get(id);
+      if (cc && row.includes(cc.leftId) && row.includes(cc.rightId) && !placed.has(cc.leftId) && !placed.has(cc.rightId)) {
+        // Place couple together
+        positions.set(cc.leftId, { x, y });
+        positions.set(cc.rightId, { x: x + CARD_W + COUPLE_GAP, y });
+        placed.add(cc.leftId);
+        placed.add(cc.rightId);
+        x += CARD_W + COUPLE_GAP + CARD_W + NODE_SPACING;
+      } else {
+        positions.set(id, { x, y });
+        placed.add(id);
+        x += CARD_W + NODE_SPACING;
+      }
+    }
+  }
+
+  // Second pass: center children under their parent couple midpoint
+  // Process layers top-down
+  for (const layerKey of sortedLayerKeys) {
+    const row = orderedLayers.get(layerKey)!;
+
+    // Group children by their parent union
+    const unionGroups = new Map<string, string[]>();
+    for (const id of row) {
+      const uid = childToUnion.get(id);
+      if (!uid) continue;
+      if (!unionGroups.has(uid)) unionGroups.set(uid, []);
+      unionGroups.get(uid)!.push(id);
+    }
+
+    for (const [uid, children] of unionGroups) {
+      const partners = unionPartners.get(uid);
+      if (!partners) continue;
+
+      const p1Pos = positions.get(partners[0]);
+      const p2Pos = positions.get(partners[1]);
+      if (!p1Pos || !p2Pos) continue;
+
+      // Parent couple midpoint
+      const parentMidX = (p1Pos.x + p2Pos.x + CARD_W) / 2;
+
+      // Current children span
+      const childPositions = children.map(cid => positions.get(cid)!);
+      if (childPositions.some(p => !p)) continue;
+
+      const childMinX = Math.min(...childPositions.map(p => p.x));
+      const childMaxX = Math.max(...childPositions.map(p => p.x + CARD_W));
+      const childMidX = (childMinX + childMaxX) / 2;
+
+      // Shift all children to center under parent midpoint
+      const shift = parentMidX - childMidX;
+      for (const cid of children) {
+        const pos = positions.get(cid)!;
+        pos.x += shift;
+      }
+    }
+  }
+
+  // Third pass: resolve overlaps within each layer
+  for (const layerKey of sortedLayerKeys) {
+    const row = orderedLayers.get(layerKey)!;
+    const rowPositions = row
+      .map(id => ({ id, pos: positions.get(id)! }))
+      .filter(r => r.pos)
+      .sort((a, b) => a.pos.x - b.pos.x);
+
+    for (let i = 1; i < rowPositions.length; i++) {
+      const prev = rowPositions[i - 1];
+      const curr = rowPositions[i];
+
+      // Check if they're a couple (closer spacing allowed)
+      const cc = coupleOf.get(prev.id);
+      const isCouple = cc && ((cc.leftId === prev.id && cc.rightId === curr.id) ||
+                               (cc.rightId === prev.id && cc.leftId === curr.id));
+      const minGap = isCouple ? COUPLE_GAP : NODE_SPACING;
+      const minX = prev.pos.x + CARD_W + minGap;
+
+      if (curr.pos.x < minX) {
+        const shift = minX - curr.pos.x;
+        // Shift this and all subsequent nodes
+        for (let j = i; j < rowPositions.length; j++) {
+          rowPositions[j].pos.x += shift;
+        }
+      }
+    }
+  }
+
+  // Final: re-center children after overlap resolution (second centering pass)
+  for (const layerKey of sortedLayerKeys) {
+    const row = orderedLayers.get(layerKey)!;
+    const unionGroups = new Map<string, string[]>();
+    for (const id of row) {
+      const uid = childToUnion.get(id);
+      if (!uid) continue;
+      if (!unionGroups.has(uid)) unionGroups.set(uid, []);
+      unionGroups.get(uid)!.push(id);
+    }
+
+    for (const [uid, children] of unionGroups) {
+      const partners = unionPartners.get(uid);
+      if (!partners) continue;
+      const p1Pos = positions.get(partners[0]);
+      const p2Pos = positions.get(partners[1]);
+      if (!p1Pos || !p2Pos) continue;
+
+      const parentMidX = (p1Pos.x + p2Pos.x + CARD_W) / 2;
+      const childPositions = children.map(cid => positions.get(cid)!).filter(Boolean);
+      if (childPositions.length === 0) continue;
+
+      const childMinX = Math.min(...childPositions.map(p => p.x));
+      const childMaxX = Math.max(...childPositions.map(p => p.x + CARD_W));
+      const childMidX = (childMinX + childMaxX) / 2;
+      const shift = parentMidX - childMidX;
+
+      for (const cid of children) {
+        const pos = positions.get(cid);
+        if (pos) pos.x += shift;
+      }
+    }
+  }
+
+  return positions;
+}
+
+/**
+ * Center the entire layout around (0, 0).
+ */
+function centerLayout(positions: Map<string, { x: number; y: number }>) {
+  if (positions.size === 0) return;
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const pos of positions.values()) {
+    minX = Math.min(minX, pos.x);
+    minY = Math.min(minY, pos.y);
+    maxX = Math.max(maxX, pos.x + CARD_W);
+    maxY = Math.max(maxY, pos.y + CARD_H);
+  }
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+  for (const pos of positions.values()) {
+    pos.x -= cx;
+    pos.y -= cy;
+  }
+}
+
+// ── Main entry point ──
 
 export function computeAutoLayout(
   members: FamilyMember[],
@@ -215,88 +454,46 @@ export function computeAutoLayout(
   if (members.length === 0) return { positions: new Map() };
 
   const memberMap = new Map(members.map(m => [m.id, m]));
-  const parentToUnions = buildUnionIndex(unions);
-  const allChildren = new Set(unions.flatMap(u => u.children));
 
-  const rootUnions = unions.filter(u =>
-    !allChildren.has(u.partner1) || !allChildren.has(u.partner2)
-  );
+  // Phase 1: Layer assignment
+  const layerMap = assignLayers(members, unions);
 
-  const effectiveRoots = rootUnions.length > 0 ? rootUnions : unions;
-  const visited = new Set<string>();
-  const globalPositions = new Map<string, { x: number; y: number }>();
-  let globalX = 0;
-
-  for (let i = 0; i < effectiveRoots.length; i++) {
-    const rootUnion = effectiveRoots[i];
-    if (visited.has(rootUnion.id)) continue;
-
-    const subTree = layoutSubTree(rootUnion, 0, unions, parentToUnions, visited, memberMap);
-
-    for (const [id, pos] of subTree.positions) {
-      globalPositions.set(id, { x: pos.x + globalX, y: pos.y });
-    }
-
-    globalX += subTree.width + BRANCH_GAP;
-  }
-
-  // Place disconnected members
-  const placed = new Set(globalPositions.keys());
-  const disconnected = members.filter(m => !placed.has(m.id));
-  for (const m of disconnected) {
-    globalPositions.set(m.id, { x: globalX, y: 0 });
-    globalX += CARD_W + BASE_SIBLING_GAP;
-  }
-
-  // Resolve overlaps with increased padding
-  resolveOverlaps(globalPositions, memberMap);
-
-  // Center around (0,0)
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  for (const pos of globalPositions.values()) {
-    minX = Math.min(minX, pos.x);
-    minY = Math.min(minY, pos.y);
-    maxX = Math.max(maxX, pos.x + CARD_W);
-    maxY = Math.max(maxY, pos.y + CARD_H);
-  }
-  const centerX = (minX + maxX) / 2;
-  const centerY = (minY + maxY) / 2;
-  for (const pos of globalPositions.values()) {
-    pos.x -= centerX;
-    pos.y -= centerY;
-  }
-
-  return { positions: globalPositions };
-}
-
-function resolveOverlaps(
-  positions: Map<string, { x: number; y: number }>,
-  _memberMap: Map<string, FamilyMember>,
-) {
-  const byY = new Map<number, { id: string; x: number }[]>();
-  for (const [id, pos] of positions) {
-    const key = Math.round(pos.y);
-    if (!byY.has(key)) byY.set(key, []);
-    byY.get(key)!.push({ id, x: pos.x });
-  }
-
-  for (const [, row] of byY) {
-    if (row.length < 2) continue;
-    row.sort((a, b) => a.x - b.x);
-
-    for (let i = 1; i < row.length; i++) {
-      const prev = row[i - 1];
-      const curr = row[i];
-      const minX = prev.x + CARD_W + MIN_OVERLAP_PAD;
-      if (curr.x < minX) {
-        const shift = minX - curr.x;
-        curr.x = minX;
-        positions.get(curr.id)!.x = curr.x;
-        for (let j = i + 1; j < row.length; j++) {
-          row[j].x += shift;
-          positions.get(row[j].id)!.x = row[j].x;
-        }
+  // Build couple constraints (male left, female right)
+  const coupleConstraints: CoupleConstraint[] = unions.map(u => {
+    const m1 = memberMap.get(u.partner1);
+    const m2 = memberMap.get(u.partner2);
+    // Male on left, female on right; if same gender, use partner order
+    let leftId = u.partner1;
+    let rightId = u.partner2;
+    if (m1 && m2) {
+      if (m1.gender === 'female' && m2.gender === 'male') {
+        leftId = u.partner2;
+        rightId = u.partner1;
       }
     }
+    return { unionId: u.id, leftId, rightId };
+  });
+
+  // Phase 2: Crossing minimization
+  const orderedLayers = minimizeCrossings(layerMap, unions, members, coupleConstraints);
+
+  // Phase 3: Coordinate assignment
+  const positions = assignCoordinates(orderedLayers, unions, memberMap, coupleConstraints);
+
+  // Place any missing members
+  let maxX = 0;
+  for (const pos of positions.values()) {
+    maxX = Math.max(maxX, pos.x + CARD_W);
   }
+  for (const m of members) {
+    if (!positions.has(m.id)) {
+      positions.set(m.id, { x: maxX + NODE_SPACING, y: 0 });
+      maxX += CARD_W + NODE_SPACING;
+    }
+  }
+
+  // Center
+  centerLayout(positions);
+
+  return { positions };
 }
