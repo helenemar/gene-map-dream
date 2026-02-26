@@ -9,6 +9,7 @@ interface MemberCardProps {
   member: FamilyMember;
   isSelected?: boolean;
   isAnimating?: boolean;
+  isColliding?: boolean;
   state?: MemberCardState;
   onSelect?: (id: string) => void;
   onDragStart?: (id: string, e: React.MouseEvent) => void;
@@ -21,6 +22,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   member,
   isSelected,
   isAnimating = false,
+  isColliding = false,
   state = 'default',
   onSelect,
   onDragStart,
@@ -69,7 +71,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       <div
         className={`
           relative flex items-center gap-3 rounded-xl p-2 bg-card border shadow-card transition-all cursor-grab active:cursor-grabbing
-          ${showRing ? 'border-primary ring-2 ring-primary/30' : 'border-border'}
+          ${isColliding ? 'border-destructive ring-2 ring-destructive/30' : showRing ? 'border-primary ring-2 ring-primary/30' : 'border-border'}
         `}
       >
         {/* Icon with pathology fills */}

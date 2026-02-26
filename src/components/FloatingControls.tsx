@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pencil, Plus, ZoomIn, ZoomOut, Link, Maximize, Wand2 } from 'lucide-react';
+import { Pencil, Plus, ZoomIn, ZoomOut, Link, Maximize, Wand2, Magnet } from 'lucide-react';
 
 interface FloatingControlsProps {
   onZoomIn?: () => void;
@@ -9,10 +9,12 @@ interface FloatingControlsProps {
   zoom?: number;
   mode?: 'select' | 'link';
   onToggleMode?: () => void;
+  snapToGrid?: boolean;
+  onToggleSnap?: () => void;
 }
 
 const FloatingControls: React.FC<FloatingControlsProps> = ({
-  onZoomIn, onZoomOut, onFitToScreen, onAutoLayout, zoom = 1, mode = 'select', onToggleMode,
+  onZoomIn, onZoomOut, onFitToScreen, onAutoLayout, zoom = 1, mode = 'select', onToggleMode, snapToGrid = false, onToggleSnap,
 }) => {
   const zoomPercent = Math.round(zoom * 100);
 
@@ -37,6 +39,15 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
           title="Réorganiser l'arbre"
         >
           <Wand2 className="w-4 h-4 text-foreground" />
+        </button>
+        <button
+          onClick={onToggleSnap}
+          className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+            snapToGrid ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'
+          }`}
+          title={snapToGrid ? 'Magnétisme activé (20px)' : 'Activer le magnétisme'}
+        >
+          <Magnet className="w-4 h-4" />
         </button>
         <button className="w-10 h-10 rounded-full bg-primary flex items-center justify-center hover:bg-primary/80 transition-colors">
           <Plus className="w-4 h-4 text-primary-foreground" />
