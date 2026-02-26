@@ -1,251 +1,118 @@
 import { FamilyMember, Relationship, EmotionalLink, Union } from '@/types/genogram';
 
 export const SAMPLE_MEMBERS: FamilyMember[] = [
-  // ── Generation 0 (Grands-parents) ──
+  // ── Génération 0 (Grands-parents) ──
   {
-    id: 'gp1', firstName: 'Henri', lastName: 'Margary',
-    birthYear: 1930, deathYear: 1998, age: 68, profession: 'Notaire',
-    gender: 'male', x: 100, y: 0, pathologies: ['cardiovascular'],
+    id: 'gp-m', firstName: 'Robert', lastName: 'Duval',
+    birthYear: 1940, deathYear: 2015, age: 75, profession: 'Instituteur',
+    gender: 'male', x: 0, y: 0, pathologies: ['cardiovascular'],
   },
   {
-    id: 'gp2', firstName: 'Madeleine', lastName: 'Beaumont',
-    birthYear: 1934, deathYear: 2010, age: 76, profession: 'Institutrice',
-    gender: 'female', x: 400, y: 0, pathologies: ['cancer'],
-  },
-  {
-    id: 'gp3', firstName: 'Jean', lastName: 'Jouanolle',
-    birthYear: 1928, deathYear: 2005, age: 77, profession: 'Médecin',
-    gender: 'male', x: 800, y: 0, pathologies: ['diabetes'],
-  },
-  {
-    id: 'gp4', firstName: 'Suzanne', lastName: 'Moreau',
-    birthYear: 1932, age: 93, profession: 'Pharmacienne',
-    gender: 'female', x: 1100, y: 0, pathologies: ['neurodegeneration'],
+    id: 'gp-f', firstName: 'Jeanne', lastName: 'Martin',
+    birthYear: 1942, age: 83, profession: 'Infirmière',
+    gender: 'female', x: 300, y: 0, pathologies: [],
   },
 
-  // ── Stress-test grands-parents (8-children family) ──
+  // ── Génération 1 (Parents — 3 enfants) ──
   {
-    id: 'sgp1', firstName: 'Georges', lastName: 'Fontaine',
-    birthYear: 1925, deathYear: 1990, age: 65, profession: 'Agriculteur',
-    gender: 'male', x: 1800, y: 0, pathologies: ['cardiovascular'],
+    id: 'p1', firstName: 'Michel', lastName: 'Duval',
+    birthYear: 1965, age: 60, profession: 'Architecte',
+    gender: 'male', x: 0, y: 350, pathologies: [],
   },
   {
-    id: 'sgp2', firstName: 'Odette', lastName: 'Girard',
-    birthYear: 1928, age: 97, profession: 'Sage-femme',
-    gender: 'female', x: 2100, y: 0, pathologies: [],
-  },
-
-  // ── Generation 1 (Parents) ──
-  {
-    id: '1', firstName: 'Philippe', lastName: 'Margary',
-    birthYear: 1963, deathYear: 2018, age: 58, profession: 'Dentiste',
-    gender: 'male', x: 100, y: 300, pathologies: ['cardiovascular'],
+    id: 'p1-w', firstName: 'Claire', lastName: 'Berger',
+    birthYear: 1967, age: 58, profession: 'Avocate',
+    gender: 'female', x: 250, y: 350, pathologies: ['depression'],
   },
   {
-    id: '2', firstName: 'Elisabeth', lastName: 'Jouanolle',
-    birthYear: 1962, age: 63, profession: 'Psychologue',
-    gender: 'female', x: 400, y: 300, pathologies: [],
+    id: 'p2', firstName: 'Anne', lastName: 'Duval',
+    birthYear: 1968, age: 57, profession: 'Médecin',
+    gender: 'female', x: 500, y: 350, pathologies: [],
   },
   {
-    id: '8', firstName: 'Marc', lastName: 'Dupont',
-    birthYear: 1958, age: 67, profession: 'Architecte',
-    gender: 'male', x: 700, y: 300, pathologies: ['diabetes'],
+    id: 'p2-h', firstName: 'Laurent', lastName: 'Petit',
+    birthYear: 1966, age: 59, profession: 'Ingénieur',
+    gender: 'male', x: 750, y: 350, pathologies: ['diabetes'],
   },
   {
-    id: 'p4', firstName: 'Catherine', lastName: 'Jouanolle',
-    birthYear: 1965, age: 60, profession: 'Avocate',
-    gender: 'female', x: 1000, y: 300, pathologies: [],
-  },
-  {
-    id: 'p5', firstName: 'Bernard', lastName: 'Leroy',
-    birthYear: 1960, deathYear: 2022, age: 62, profession: 'Professeur',
-    gender: 'male', x: 1300, y: 300, pathologies: ['depression'],
+    id: 'p3', firstName: 'Pierre', lastName: 'Duval',
+    birthYear: 1972, age: 53, profession: 'Professeur',
+    gender: 'male', x: 1000, y: 350, pathologies: ['addiction'],
   },
 
-  // ── Stress-test: 8 children of Georges & Odette ──
+  // ── Génération 2 (Petits-enfants — 3 enfants de Michel, 2 d'Anne) ──
   {
-    id: 'sf1', firstName: 'André', lastName: 'Fontaine',
-    birthYear: 1950, age: 75, profession: 'Menuisier',
-    gender: 'male', x: 1600, y: 300, pathologies: [],
+    id: 'c1', firstName: 'Emma', lastName: 'Duval',
+    birthYear: 1992, age: 33, profession: 'Designer',
+    gender: 'female', x: 0, y: 700, pathologies: [],
   },
   {
-    id: 'sf2', firstName: 'Brigitte', lastName: 'Fontaine',
-    birthYear: 1952, age: 73, profession: 'Infirmière',
-    gender: 'female', x: 1800, y: 300, pathologies: ['cancer'],
+    id: 'c2', firstName: 'Lucas', lastName: 'Duval',
+    birthYear: 1995, age: 30, profession: 'Développeur',
+    gender: 'male', x: 250, y: 700, pathologies: [],
   },
   {
-    id: 'sf3', firstName: 'Claude', lastName: 'Fontaine',
-    birthYear: 1954, age: 71, profession: 'Comptable',
-    gender: 'male', x: 2000, y: 300, pathologies: ['diabetes'],
+    id: 'c3', firstName: 'Chloé', lastName: 'Duval',
+    birthYear: 1998, age: 27, profession: 'Étudiante',
+    gender: 'female', x: 500, y: 700, pathologies: ['bipolar'],
   },
   {
-    id: 'sf4', firstName: 'Danielle', lastName: 'Fontaine',
-    birthYear: 1956, age: 69, profession: 'Enseignante',
-    gender: 'female', x: 2200, y: 300, pathologies: [],
+    id: 'c4', firstName: 'Hugo', lastName: 'Petit',
+    birthYear: 1994, age: 31, profession: 'Chirurgien',
+    gender: 'male', x: 750, y: 700, pathologies: [],
   },
   {
-    id: 'sf5', firstName: 'Étienne', lastName: 'Fontaine',
-    birthYear: 1958, age: 67, profession: 'Ingénieur',
-    gender: 'male', x: 2400, y: 300, pathologies: ['cardiovascular'],
-  },
-  {
-    id: 'sf6', firstName: 'Françoise', lastName: 'Fontaine',
-    birthYear: 1960, age: 65, profession: 'Artiste',
-    gender: 'female', x: 2600, y: 300, pathologies: ['depression'],
-  },
-  {
-    id: 'sf7', firstName: 'Gérard', lastName: 'Fontaine',
-    birthYear: 1962, deathYear: 2020, age: 58, profession: 'Militaire',
-    gender: 'male', x: 2800, y: 300, pathologies: ['addiction'],
-  },
-  {
-    id: 'sf8', firstName: 'Héloise', lastName: 'Fontaine',
-    birthYear: 1965, age: 60, profession: 'Pharmacienne',
-    gender: 'female', x: 3000, y: 300, pathologies: [],
+    id: 'c5', firstName: 'Léa', lastName: 'Petit',
+    birthYear: 1997, age: 28, profession: 'Journaliste',
+    gender: 'female', x: 1000, y: 700, pathologies: [],
   },
 
-  // ── Stress-test: spouses for 2 of the 8 children ──
+  // ── Génération 3 (Arrière-petits-enfants — 2 enfants d'Emma) ──
   {
-    id: 'sf1s', firstName: 'Marie-Claire', lastName: 'Petit',
-    birthYear: 1953, age: 72, profession: 'Couturière',
-    gender: 'female', x: 1600, y: 300, pathologies: [],
+    id: 'gc1', firstName: 'Théo', lastName: 'Moreau',
+    birthYear: 2020, age: 5, profession: '',
+    gender: 'male', x: 0, y: 1050, pathologies: [],
   },
   {
-    id: 'sf5s', firstName: 'Nathalie', lastName: 'Blanc',
-    birthYear: 1961, age: 64, profession: 'Médecin',
-    gender: 'female', x: 2400, y: 300, pathologies: [],
-  },
-
-  // ── Stress-test: grandchildren of André ──
-  {
-    id: 'sgc1', firstName: 'Julien', lastName: 'Fontaine',
-    birthYear: 1978, age: 47, profession: 'Développeur',
-    gender: 'male', x: 1600, y: 600, pathologies: [],
-  },
-  {
-    id: 'sgc2', firstName: 'Sophie', lastName: 'Fontaine',
-    birthYear: 1981, age: 44, profession: 'Architecte',
-    gender: 'female', x: 1800, y: 600, pathologies: [],
-  },
-
-  // ── Stress-test: grandchildren of Étienne ──
-  {
-    id: 'sgc3', firstName: 'Maxime', lastName: 'Fontaine',
-    birthYear: 1985, age: 40, profession: 'Avocat',
-    gender: 'male', x: 2400, y: 600, pathologies: [],
-  },
-
-  // ── Generation 2 (Enfants Margary/Jouanolle) ──
-  {
-    id: '3', firstName: 'François', lastName: 'Margary',
-    birthYear: 1989, age: 36, profession: 'Ingénieur',
-    gender: 'male', x: 0, y: 600, pathologies: [],
-  },
-  {
-    id: '4', firstName: 'Hélène', lastName: 'Margary',
-    birthYear: 1992, age: 33, profession: 'Product Designer',
-    gender: 'female', x: 200, y: 600, pathologies: [],
-  },
-  {
-    id: '5', firstName: 'Jona', lastName: 'Machicote',
-    birthYear: 1996, age: 28, profession: 'Psychologue',
-    gender: 'female', x: 400, y: 600, pathologies: [],
-  },
-  {
-    id: '6', firstName: 'Pierre', lastName: 'Margary',
-    birthYear: 1996, age: 29, profession: 'Analyste',
-    gender: 'male', x: 600, y: 600, pathologies: [],
-  },
-  {
-    id: '7', firstName: 'Paul', lastName: 'Margary',
-    birthYear: 1998, age: 26, profession: 'Data-Scientist',
-    gender: 'male', x: 800, y: 600, pathologies: ['addiction'],
-  },
-  {
-    id: '9', firstName: 'Léa', lastName: 'Dupont',
-    birthYear: 2005, age: 20, profession: 'Étudiante',
-    gender: 'female', x: 1000, y: 600, pathologies: [],
-  },
-  {
-    id: 'c7', firstName: 'Thomas', lastName: 'Leroy',
-    birthYear: 1990, age: 35, profession: 'Chirurgien',
-    gender: 'male', x: 1200, y: 600, pathologies: [],
-  },
-  {
-    id: 'c8', firstName: 'Marie', lastName: 'Leroy',
-    birthYear: 1993, age: 32, profession: 'Journaliste',
-    gender: 'female', x: 1400, y: 600, pathologies: ['depression'],
-  },
-  {
-    id: 'c9', firstName: 'Lucas', lastName: 'Leroy',
-    birthYear: 1997, age: 28, profession: 'Musicien',
-    gender: 'male', x: 1600, y: 600, pathologies: ['addiction', 'bipolar'],
+    id: 'gc2', firstName: 'Jade', lastName: 'Moreau',
+    birthYear: 2022, age: 3, profession: '',
+    gender: 'female', x: 250, y: 1050, pathologies: [],
   },
 ];
 
-/** Union-based model — all 5 statuses + stress-test family */
 export const SAMPLE_UNIONS: Union[] = [
-  // Gen 0 unions
+  // Gen 0: Robert + Jeanne → 3 enfants
   {
-    id: 'u-gp1', partner1: 'gp1', partner2: 'gp2',
-    status: 'widowed', marriageYear: 1955,
-    children: ['1'],
+    id: 'u-gp', partner1: 'gp-m', partner2: 'gp-f',
+    status: 'widowed', marriageYear: 1963,
+    children: ['p1', 'p2', 'p3'],
   },
+  // Gen 1: Michel + Claire → 3 enfants
   {
-    id: 'u-gp2', partner1: 'gp3', partner2: 'gp4',
-    status: 'married', marriageYear: 1958,
-    children: ['2', 'p4'],
+    id: 'u-p1', partner1: 'p1', partner2: 'p1-w',
+    status: 'married', marriageYear: 1990,
+    children: ['c1', 'c2', 'c3'],
   },
-  // Stress-test: 8 children
+  // Gen 1: Laurent + Anne → 2 enfants
   {
-    id: 'u-sgp', partner1: 'sgp1', partner2: 'sgp2',
-    status: 'widowed', marriageYear: 1948,
-    children: ['sf1', 'sf2', 'sf3', 'sf4', 'sf5', 'sf6', 'sf7', 'sf8'],
+    id: 'u-p2', partner1: 'p2-h', partner2: 'p2',
+    status: 'divorced', marriageYear: 1992, divorceYear: 2010,
+    children: ['c4', 'c5'],
   },
-  // Gen 1 unions
+  // Gen 2: Emma + conjoint implicite → 2 enfants
   {
-    id: 'u1', partner1: '1', partner2: '2',
-    status: 'divorced', marriageYear: 1981, divorceYear: 2018,
-    children: ['3', '4', '5', '6', '7'],
-  },
-  {
-    id: 'u2', partner1: '2', partner2: '8',
-    status: 'common_law', marriageYear: 2020,
-    children: ['9'],
-  },
-  {
-    id: 'u3', partner1: 'p4', partner2: 'p5',
-    status: 'separated', marriageYear: 1988, divorceYear: 2015,
-    children: ['c7', 'c8', 'c9'],
-  },
-  // Stress-test child unions (André & Étienne married)
-  {
-    id: 'u-sf1', partner1: 'sf1', partner2: 'sf1s',
-    status: 'married', marriageYear: 1975,
-    children: ['sgc1', 'sgc2'],
-  },
-  {
-    id: 'u-sf5', partner1: 'sf5', partner2: 'sf5s',
-    status: 'married', marriageYear: 1983,
-    children: ['sgc3'],
+    id: 'u-c1', partner1: 'c2', partner2: 'c1',
+    status: 'common_law', marriageYear: 2018,
+    children: ['gc1', 'gc2'],
   },
 ];
 
-/** @deprecated — kept for backward compatibility */
+/** @deprecated */
 export const SAMPLE_RELATIONSHIPS: Relationship[] = [];
 
 export const SAMPLE_EMOTIONAL_LINKS: EmotionalLink[] = [
-  { id: 'e1', from: '1', to: '2', type: 'fusional' },
-  { id: 'e2', from: '3', to: '4', type: 'distant' },
-  { id: 'e3', from: '5', to: '6', type: 'conflictual' },
-  { id: 'e4', from: '4', to: '5', type: 'ambivalent' },
-  { id: 'e5', from: '7', to: 'c9', type: 'violence' },
-  { id: 'e6', from: 'gp1', to: '1', type: 'fusional' },
-  { id: 'e7', from: 'p4', to: 'p5', type: 'cutoff' },
-  { id: 'e8', from: 'c7', to: 'c8', type: 'fusional' },
-  { id: 'e9', from: '2', to: 'p4', type: 'distant' },
-  // Stress-test emotional links crossing filiation lines
-  { id: 'e10', from: 'sf1', to: 'sf5', type: 'fusional' },
-  { id: 'e11', from: 'sf2', to: 'sf7', type: 'conflictual' },
-  { id: 'e12', from: 'sf3', to: 'sf6', type: 'distant' },
+  { id: 'e1', from: 'p1', to: 'p2', type: 'fusional' },
+  { id: 'e2', from: 'c1', to: 'c3', type: 'conflictual' },
+  { id: 'e3', from: 'p3', to: 'gp-m', type: 'distant' },
+  { id: 'e4', from: 'c4', to: 'c5', type: 'fusional' },
 ];
