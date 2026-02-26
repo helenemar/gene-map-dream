@@ -1,4 +1,4 @@
-import { FamilyMember, Relationship, EmotionalLink } from '@/types/genogram';
+import { FamilyMember, Relationship, EmotionalLink, Union } from '@/types/genogram';
 
 export const SAMPLE_MEMBERS: FamilyMember[] = [
   {
@@ -22,7 +22,7 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
     age: 63,
     profession: 'Psychologue',
     gender: 'female',
-    x: 550,
+    x: 600,
     y: 120,
     pathologies: [],
   },
@@ -35,7 +35,7 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
     profession: 'Ingénieur',
     gender: 'male',
     x: 200,
-    y: 320,
+    y: 350,
     pathologies: [],
   },
   {
@@ -46,8 +46,8 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
     age: 33,
     profession: 'Product Designer',
     gender: 'female',
-    x: 380,
-    y: 340,
+    x: 400,
+    y: 350,
     pathologies: [],
   },
   {
@@ -58,8 +58,8 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
     age: 28,
     profession: 'Psychologue',
     gender: 'female',
-    x: 530,
-    y: 340,
+    x: 600,
+    y: 350,
     pathologies: [],
   },
   {
@@ -70,8 +70,8 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
     age: 29,
     profession: 'Analyste',
     gender: 'male',
-    x: 680,
-    y: 340,
+    x: 800,
+    y: 350,
     pathologies: [],
   },
   {
@@ -82,12 +82,26 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
     age: 26,
     profession: 'Data-Scientist',
     gender: 'male',
-    x: 830,
-    y: 340,
+    x: 1000,
+    y: 350,
     pathologies: [],
   },
 ];
 
+/** New Union-based model */
+export const SAMPLE_UNIONS: Union[] = [
+  {
+    id: 'u1',
+    partner1: '1',
+    partner2: '2',
+    status: 'divorced',
+    marriageYear: 1981,
+    divorceYear: 2018,
+    children: ['3', '4', '5', '6', '7'],
+  },
+];
+
+/** @deprecated — kept for backward compatibility */
 export const SAMPLE_RELATIONSHIPS: Relationship[] = [
   {
     id: 'r1',
