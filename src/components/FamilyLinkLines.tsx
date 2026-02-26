@@ -165,9 +165,8 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
         // Child top anchors
         const childAnchors = childMembers.map(c => getAnchor(c, 'top'));
 
-        // Comb Y: exactly halfway between union line and children top
-        const topChildY = Math.min(...childAnchors.map(a => a.y));
-        const combY = unionLineY + (topChildY - unionLineY) * 0.5;
+        // Comb Y: fixed 60px descent from union line
+        const combY = unionLineY + 60;
 
         // Each child's drop X = child's own center X (straight vertical, no offset)
         const childDropXs = childAnchors.map(a => a.x);
