@@ -124,7 +124,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
   const getMember = (id: string) => members.find(m => m.id === id);
 
   return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0, overflow: 'visible' }}>
+    <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
       {unions.map(union => {
         const p1 = getMember(union.partner1);
         const p2 = getMember(union.partner2);
