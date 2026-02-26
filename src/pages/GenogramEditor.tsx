@@ -7,9 +7,13 @@ import FloatingControls from '@/components/FloatingControls';
 import { SAMPLE_MEMBERS, SAMPLE_RELATIONSHIPS } from '@/data/sampleData';
 import { FamilyMember } from '@/types/genogram';
 
+type EditorMode = 'select' | 'link';
+
 const GenogramEditor: React.FC = () => {
   const [members, setMembers] = useState<FamilyMember[]>(SAMPLE_MEMBERS);
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
+  const [hoveredMember, setHoveredMember] = useState<string | null>(null);
+  const [mode, setMode] = useState<EditorMode>('select');
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
@@ -49,6 +53,38 @@ const GenogramEditor: React.FC = () => {
     }
   }, []);
 
+  const handleSelect = useCallback((id: string) => {
+    if (mode === 'link') {
+      // In link mode, clicking a member would create a link (future feature)
+      // For now just select
+      setSelectedMember(prev => prev === id ? null : id);
+    } else {
+      setSelectedMember(prev => prev === id ? null : id);
+    }
+  }, [mode]);
+
+  const getMemberState = useCallback((memberId: string) => {
+    if (mode === 'link') return 'linkable';
+    if (selectedMember === memberId) return 'edition';
+    if (hoveredMember === memberId) return 'hover';
+    return 'default';
+  }, [mode, selectedMember, hoveredMember]);
+
+  const handleToggleMode = useCallback(() => {
+    setMode(prev => prev === 'select' ? 'link' : 'select');
+    setSelectedMember(null);
+  }, []);
+
+  const handleCreateRelated = useCallback((id: string) => {
+    // Future: open creation modal
+    console.log('Create related member for', id);
+  }, []);
+
+  const handleEdit = useCallback((id: string) => {
+    // Future: open edit panel
+    console.log('Edit member', id);
+  }, []);
+
   return (
     <div className="flex flex-col h-screen bg-background">
       <EditorHeader />
@@ -77,8 +113,12 @@ const GenogramEditor: React.FC = () => {
                 key={member.id}
                 member={member}
                 isSelected={selectedMember === member.id}
-                onSelect={setSelectedMember}
+                state={getMemberState(member.id)}
+                onSelect={handleSelect}
                 onDragStart={handleDragStart}
+                onCreateRelated={handleCreateRelated}
+                onEdit={handleEdit}
+                onHover={setHoveredMember}
               />
             ))}
           </div>
@@ -86,6 +126,8 @@ const GenogramEditor: React.FC = () => {
           <FloatingControls
             onZoomIn={() => setZoom(z => Math.min(z + 0.1, 2))}
             onZoomOut={() => setZoom(z => Math.max(z - 0.1, 0.3))}
+            mode={mode}
+            onToggleMode={handleToggleMode}
           />
         </div>
       </div>
