@@ -8,6 +8,7 @@ export type MemberCardState = 'default' | 'hover' | 'edition' | 'linkable';
 interface MemberCardProps {
   member: FamilyMember;
   isSelected?: boolean;
+  isAnimating?: boolean;
   state?: MemberCardState;
   onSelect?: (id: string) => void;
   onDragStart?: (id: string, e: React.MouseEvent) => void;
@@ -19,6 +20,7 @@ interface MemberCardProps {
 const MemberCard: React.FC<MemberCardProps> = ({
   member,
   isSelected,
+  isAnimating = false,
   state = 'default',
   onSelect,
   onDragStart,
@@ -39,7 +41,12 @@ const MemberCard: React.FC<MemberCardProps> = ({
   return (
     <div
       className="absolute select-none"
-      style={{ left: member.x, top: member.y, zIndex: 2 }}
+      style={{
+        left: member.x,
+        top: member.y,
+        zIndex: 2,
+        transition: isAnimating ? 'left 0.6s cubic-bezier(0.22, 1, 0.36, 1), top 0.6s cubic-bezier(0.22, 1, 0.36, 1)' : 'none',
+      }}
       onMouseDown={(e) => {
         e.stopPropagation();
         onDragStart?.(member.id, e);
