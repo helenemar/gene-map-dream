@@ -227,9 +227,11 @@ const GenogramEditor: React.FC = () => {
       setIsPanning(true);
       return;
     }
-    // Regular click on empty canvas → deselect
-    if (e.target === canvasRef.current || (e.target as HTMLElement).classList.contains('canvas-bg')) {
+    // Left-click on empty canvas → pan
+    if (e.button === 0 && (e.target === canvasRef.current || (e.target as HTMLElement).classList.contains('canvas-bg'))) {
+      setIsPanning(true);
       setSelectedMember(null);
+      return;
     }
   }, [isSpaceDown]);
 
