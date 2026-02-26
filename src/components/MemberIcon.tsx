@@ -182,8 +182,8 @@ function buildFillRects(
     case 0:
       return [];
     case 1:
-      // Bottom half
-      return [{ x, y: midY, w, h: halfH, color: colors[0] }];
+      // Bottom-right quadrant only
+      return [{ x: midX, y: midY, w: halfW, h: halfH, color: colors[0] }];
     case 2:
       // Bottom-left [0], bottom-right [1]
       return [
