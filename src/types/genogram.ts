@@ -26,11 +26,16 @@ export interface Relationship {
   divorceYear?: number;
 }
 
+export type EmotionalLinkType = 
+  | 'fusional' | 'distant' | 'conflictual' | 'ambivalent' 
+  | 'cutoff' | 'violence' | 'emotional_abuse' | 'physical_violence' 
+  | 'sexual_abuse' | 'neglect' | 'controlling';
+
 export interface EmotionalLink {
   id: string;
   from: string;
   to: string;
-  type: 'fusional' | 'distant' | 'conflictual' | 'ambivalent' | 'negligent' | 'coercive' | 'cutoff' | 'violence';
+  type: EmotionalLinkType;
 }
 
 export interface Pathology {
@@ -57,13 +62,16 @@ export const FAMILY_LINK_TYPES = [
   { id: 'liaison', label: 'Liaison', icon: '♡' },
 ];
 
-export const EMOTIONAL_LINK_TYPES = [
-  { id: 'fusional', label: 'Fusionnel', color: 'link-fusional' },
+export const EMOTIONAL_LINK_TYPES: { id: EmotionalLinkType; label: string; color: string }[] = [
+  { id: 'fusional', label: 'Fusionnel (VeryClose)', color: 'link-fusional' },
   { id: 'distant', label: 'Distant', color: 'link-distant' },
-  { id: 'conflictual', label: 'Conflictuel', color: 'link-conflictual' },
+  { id: 'conflictual', label: 'Conflit', color: 'link-conflictual' },
   { id: 'ambivalent', label: 'Ambivalent', color: 'link-ambivalent' },
-  { id: 'negligent', label: 'Négligent', color: 'link-negligent' },
-  { id: 'coercive', label: 'Contrôlant', color: 'link-coercive' },
-  { id: 'cutoff', label: 'Lien rompu', color: 'link-cutoff' },
+  { id: 'cutoff', label: 'Lien rompu (CutOff)', color: 'link-cutoff' },
   { id: 'violence', label: 'Violence', color: 'link-violence' },
+  { id: 'emotional_abuse', label: 'Abus émotionnel', color: 'link-emotional-abuse' },
+  { id: 'physical_violence', label: 'Violence physique', color: 'link-physical-violence' },
+  { id: 'sexual_abuse', label: 'Abus sexuel', color: 'link-sexual-abuse' },
+  { id: 'neglect', label: 'Négligence', color: 'link-neglect' },
+  { id: 'controlling', label: 'Contrôlant', color: 'link-controlling' },
 ];

@@ -58,11 +58,14 @@
     --link-fusional: 150 60% 45%;
     --link-distant: 0 55% 60%;
     --link-conflictual: 0 70% 55%;
-    --link-ambivalent: 280 50% 50%;
-    --link-negligent: 210 40% 55%;
-    --link-coercive: 0 60% 45%;
+    --link-ambivalent: 150 60% 45%;
     --link-cutoff: 0 70% 50%;
     --link-violence: 0 80% 40%;
+    --link-emotional-abuse: 220 60% 55%;
+    --link-physical-violence: 220 70% 35%;
+    --link-sexual-abuse: 270 60% 55%;
+    --link-neglect: 220 60% 55%;
+    --link-controlling: 0 70% 55%;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 224 20% 14%;

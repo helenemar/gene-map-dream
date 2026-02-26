@@ -3,8 +3,9 @@ import EditorHeader from '@/components/EditorHeader';
 import EditorSidebar from '@/components/EditorSidebar';
 import MemberCard from '@/components/MemberCard';
 import RelationshipLines from '@/components/RelationshipLines';
+import EmotionalLinkLine from '@/components/EmotionalLinkLine';
 import FloatingControls from '@/components/FloatingControls';
-import { SAMPLE_MEMBERS, SAMPLE_RELATIONSHIPS } from '@/data/sampleData';
+import { SAMPLE_MEMBERS, SAMPLE_RELATIONSHIPS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sampleData';
 import { FamilyMember } from '@/types/genogram';
 
 type EditorMode = 'select' | 'link';
@@ -108,6 +109,25 @@ const GenogramEditor: React.FC = () => {
             }}
           >
             <RelationshipLines members={members} relationships={SAMPLE_RELATIONSHIPS} />
+            {/* Emotional links SVG overlay */}
+            <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1, pointerEvents: 'none' }}>
+              <g style={{ pointerEvents: 'auto' }}>
+                {SAMPLE_EMOTIONAL_LINKS.map(link => {
+                  const from = members.find(m => m.id === link.from);
+                  const to = members.find(m => m.id === link.to);
+                  if (!from || !to) return null;
+                  return (
+                    <EmotionalLinkLine
+                      key={link.id}
+                      x1={from.x + 80} y1={from.y + 25}
+                      x2={to.x + 80} y2={to.y + 25}
+                      type={link.type}
+                      onClick={() => console.log('Edit emotional link', link.id)}
+                    />
+                  );
+                })}
+              </g>
+            </svg>
             {members.map(member => (
               <MemberCard
                 key={member.id}

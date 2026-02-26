@@ -1,4 +1,4 @@
-import { FamilyMember, Relationship } from '@/types/genogram';
+import { FamilyMember, Relationship, EmotionalLink } from '@/types/genogram';
 
 export const SAMPLE_MEMBERS: FamilyMember[] = [
   {
@@ -104,4 +104,11 @@ export const SAMPLE_RELATIONSHIPS: Relationship[] = [
   { id: 'r5', from: '2', to: '5', type: 'parent-child' },
   { id: 'r6', from: '1', to: '6', type: 'parent-child' },
   { id: 'r7', from: '2', to: '7', type: 'parent-child' },
+];
+
+export const SAMPLE_EMOTIONAL_LINKS: EmotionalLink[] = [
+  { id: 'e1', from: '1', to: '2', type: 'fusional' },
+  { id: 'e2', from: '3', to: '4', type: 'distant' },
+  { id: 'e3', from: '5', to: '6', type: 'conflictual' },
+  { id: 'e4', from: '4', to: '5', type: 'ambivalent' },
 ];
