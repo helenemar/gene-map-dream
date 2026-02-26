@@ -45,6 +45,21 @@ function getEdgeAnchors(
       }
     }
   }
+
+  // Inset both endpoints by GAP px along the line direction
+  const GAP = 6;
+  const dx = best.x2 - best.x1;
+  const dy = best.y2 - best.y1;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  if (len > GAP * 3) {
+    const ux = dx / len;
+    const uy = dy / len;
+    best.x1 += ux * GAP;
+    best.y1 += uy * GAP;
+    best.x2 -= ux * GAP;
+    best.y2 -= uy * GAP;
+  }
+
   return best;
 }
 
