@@ -372,24 +372,42 @@ const GenogramEditor: React.FC = () => {
             }}
           >
             <FamilyLinkLines members={members} unions={SAMPLE_UNIONS} />
-            {/* Emotional links SVG overlay — z-index 0 so cards render above */}
+            {/* Emotional links SVG overlay — z-index 1 so cards render above */}
             <svg className="absolute pointer-events-none" style={{ zIndex: 1, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
               <g style={{ pointerEvents: 'auto' }}>
-                {SAMPLE_EMOTIONAL_LINKS.map(link => {
-                  const from = members.find(m => m.id === link.from);
-                  const to = members.find(m => m.id === link.to);
-                  if (!from || !to) return null;
-                  const anchors = getDirectionalAnchors(from, to);
-                  return (
-                    <EmotionalLinkLine
-                      key={link.id}
-                      x1={anchors.x1} y1={anchors.y1}
-                      x2={anchors.x2} y2={anchors.y2}
-                      type={link.type}
-                      onClick={() => console.log('Edit emotional link', link.id)}
-                    />
-                  );
-                })}
+                {(() => {
+                  // Build card rects for collision avoidance
+                  const cardRects = members.map(m => ({ id: m.id, x: m.x, y: m.y, w: CARD_W, h: CARD_H }));
+                  // Group links by pair for "onion" offset
+                  const pairMap = new Map<string, number[]>();
+                  SAMPLE_EMOTIONAL_LINKS.forEach((link, i) => {
+                    const key = [link.from, link.to].sort().join('|');
+                    if (!pairMap.has(key)) pairMap.set(key, []);
+                    pairMap.get(key)!.push(i);
+                  });
+                  return SAMPLE_EMOTIONAL_LINKS.map((link, globalIdx) => {
+                    const from = members.find(m => m.id === link.from);
+                    const to = members.find(m => m.id === link.to);
+                    if (!from || !to) return null;
+                    const anchors = getDirectionalAnchors(from, to);
+                    const key = [link.from, link.to].sort().join('|');
+                    const group = pairMap.get(key)!;
+                    const linkIndex = group.indexOf(globalIdx);
+                    return (
+                      <EmotionalLinkLine
+                        key={link.id}
+                        x1={anchors.x1} y1={anchors.y1}
+                        x2={anchors.x2} y2={anchors.y2}
+                        type={link.type}
+                        linkIndex={linkIndex}
+                        linkCount={group.length}
+                        cardRects={cardRects}
+                        excludeIds={[link.from, link.to]}
+                        onClick={() => console.log('Edit emotional link', link.id)}
+                      />
+                    );
+                  });
+                })()}
               </g>
             </svg>
             {members.map(member => (
