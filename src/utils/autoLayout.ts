@@ -185,8 +185,8 @@ export function computeAutoLayout(
 
     for (let childIdx = 0; childIdx < children.length; childIdx++) {
       const cid = children[childIdx];
-      // Staggered X-offset: each sibling gets an additional STAGGER_OFFSET
-      const stagger = childIdx * STAGGER_OFFSET;
+      // Staggered X-offset: each sibling after the first gets STAGGER_OFFSET extra
+      const stagger = childIdx > 0 ? STAGGER_OFFSET : 0;
 
       // Ensure no overlap at child gen
       childCursor = Math.max(childCursor + stagger, getRightEdge(childGen) + SIBLING_GAP);
