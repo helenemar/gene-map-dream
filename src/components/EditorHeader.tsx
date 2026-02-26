@@ -27,7 +27,7 @@ const EditorHeader: React.FC = () => {
           <input
             type="text"
             placeholder="Rechercher un membre, une pathologie, un lien, etc..."
-            className="w-full pl-9 pr-4 py-2 text-sm bg-muted/50 border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-ring/20 placeholder:text-muted-foreground/60"
+            className="w-full pl-9 pr-4 py-2 text-sm bg-muted/50 border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-ring/20 placeholder:text-muted-foreground/50"
           />
         </div>
       </div>
@@ -38,7 +38,7 @@ const EditorHeader: React.FC = () => {
           <Download className="w-3.5 h-3.5" />
           Exporter en PDF
         </Button>
-        <Button size="sm" className="gap-2 rounded-full text-xs bg-primary text-primary-foreground hover:bg-primary/90">
+        <Button variant="brand" size="sm" className="gap-2 text-xs">
           <Share2 className="w-3.5 h-3.5" />
           Partager
         </Button>

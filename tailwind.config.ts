@@ -12,7 +12,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
+        sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -58,6 +58,10 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        brand: {
+          orange: "hsl(var(--brand-orange))",
+          "orange-foreground": "hsl(var(--brand-orange-foreground))",
+        },
         pathology: {
           depression: "hsl(var(--pathology-depression))",
           cancer: "hsl(var(--pathology-cancer))",
@@ -68,13 +72,30 @@ export default {
           psychogenic: "hsl(var(--pathology-psychogenic))",
           neurodegeneration: "hsl(var(--pathology-neurodegeneration))",
         },
+        link: {
+          fusional: "hsl(var(--link-fusional))",
+          distant: "hsl(var(--link-distant))",
+          conflictual: "hsl(var(--link-conflictual))",
+          ambivalent: "hsl(var(--link-ambivalent))",
+          negligent: "hsl(var(--link-negligent))",
+          coercive: "hsl(var(--link-coercive))",
+          cutoff: "hsl(var(--link-cutoff))",
+          violence: "hsl(var(--link-violence))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
         xl: "calc(var(--radius) + 4px)",
-        "2xl": "calc(var(--radius) + 8px)",
+        "2xl": "1rem",
+        "3xl": "1.25rem",
+      },
+      boxShadow: {
+        soft: "0 2px 8px 0 rgba(0,0,0,0.04), 0 1px 2px 0 rgba(0,0,0,0.03)",
+        modal: "0 8px 32px -4px rgba(0,0,0,0.08), 0 4px 16px -2px rgba(0,0,0,0.04)",
+        card: "0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px 0 rgba(0,0,0,0.02)",
+        float: "0 4px 16px -2px rgba(0,0,0,0.08)",
       },
       keyframes: {
         "accordion-down": {
