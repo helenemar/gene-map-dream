@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Share2, Plus, UserPlus, Pencil, ZoomIn, ZoomOut, X, Search, ChevronDown, ChevronUp, ArrowLeft, Settings } from 'lucide-react';
 import { PATHOLOGIES, FAMILY_LINK_TYPES, EMOTIONAL_LINK_TYPES } from '@/types/genogram';
+import MemberIcon from '@/components/MemberIcon';
 
 /* ============================================================
    Design System – Genogy
@@ -477,58 +478,72 @@ const DesignSystemPage: React.FC = () => {
            ============================================================ */}
         <SectionTitle>3. Organismes (Spécifiques à Genogy)</SectionTitle>
 
-        {/* Member Card */}
+        {/* Member Icon - All Combinations */}
+        <SubSection title="Icône Membre — Toutes les combinaisons">
+          <p className="text-sm text-muted-foreground mb-4">
+            Grille exhaustive des 16 combinaisons par genre. <strong>Cercle</strong> = femme, <strong>Carré</strong> = homme. 
+            Triangle inversé = Gay, Triangle pointillé = Bisexuel, Forme intérieure opposée = Transgenre, Croix = Décédé.
+          </p>
+
+          {/* Female grid */}
+          <h4 className="text-sm font-semibold text-foreground mb-3 mt-6">Femme (Cercle)</h4>
+          <div className="grid grid-cols-4 gap-4 mb-8">
+            {generateCombinations('female').map((combo, i) => (
+              <div key={i} className="bg-card rounded-xl border border-border p-4 flex flex-col items-center gap-3">
+                <MemberIcon
+                  gender="female"
+                  isGay={combo.gay}
+                  isBisexual={combo.bisexual}
+                  isTransgender={combo.transgender}
+                  isDead={combo.dead}
+                  size={56}
+                  className="text-foreground"
+                />
+                <div className="text-[10px] text-muted-foreground text-center space-y-0.5">
+                  <div>Gay: <strong>{combo.gay ? 'True' : 'False'}</strong></div>
+                  <div>Trans: <strong>{combo.transgender ? 'True' : 'False'}</strong></div>
+                  <div>Bi: <strong>{combo.bisexual ? 'True' : 'False'}</strong></div>
+                  <div>Dead: <strong>{combo.dead ? 'True' : 'False'}</strong></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Male grid */}
+          <h4 className="text-sm font-semibold text-foreground mb-3">Homme (Carré)</h4>
+          <div className="grid grid-cols-4 gap-4 mb-8">
+            {generateCombinations('male').map((combo, i) => (
+              <div key={i} className="bg-card rounded-xl border border-border p-4 flex flex-col items-center gap-3">
+                <MemberIcon
+                  gender="male"
+                  isGay={combo.gay}
+                  isBisexual={combo.bisexual}
+                  isTransgender={combo.transgender}
+                  isDead={combo.dead}
+                  size={56}
+                  className="text-foreground"
+                />
+                <div className="text-[10px] text-muted-foreground text-center space-y-0.5">
+                  <div>Gay: <strong>{combo.gay ? 'True' : 'False'}</strong></div>
+                  <div>Trans: <strong>{combo.transgender ? 'True' : 'False'}</strong></div>
+                  <div>Bi: <strong>{combo.bisexual ? 'True' : 'False'}</strong></div>
+                  <div>Dead: <strong>{combo.dead ? 'True' : 'False'}</strong></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SubSection>
+
+        {/* Member Card with Icon */}
         <SubSection title="Carte Membre (MemberCard / Node)">
-          <p className="text-sm text-muted-foreground mb-4">Icône dynamique : carré = homme, cercle = femme. Les quadrants de l'icône se remplissent avec les couleurs des pathologies.</p>
+          <p className="text-sm text-muted-foreground mb-4">Composant complet avec MemberIcon + infos. L'icône change selon genre, orientation, identité et statut vital.</p>
           <div className="dot-grid rounded-2xl border border-border p-8">
-            <div className="flex flex-wrap gap-12 items-start">
-              {/* Male - no pathology */}
-              <MemberCardDemo
-                name="François"
-                age={39}
-                birthYear={1889}
-                profession="Ingénieur"
-                gender="male"
-                pathologies={[]}
-              />
-              {/* Female - no pathology */}
-              <MemberCardDemo
-                name="Hélène"
-                age={33}
-                birthYear={1992}
-                profession="Product Designer"
-                gender="female"
-                pathologies={[]}
-              />
-              {/* Male deceased with pathologies */}
-              <MemberCardDemo
-                name="Philippe"
-                age={58}
-                birthYear={1963}
-                deathYear={2018}
-                profession="Dentiste"
-                gender="male"
-                pathologies={['cardiovascular', 'depression']}
-              />
-              {/* Female with pathology */}
-              <MemberCardDemo
-                name="Elisabeth"
-                age={63}
-                birthYear={1962}
-                profession="Psychologue"
-                gender="female"
-                pathologies={['cancer']}
-              />
-              {/* Selected state */}
-              <MemberCardDemo
-                name="Jona"
-                age={28}
-                birthYear={1996}
-                profession="Psychologue"
-                gender="female"
-                pathologies={[]}
-                selected
-              />
+            <div className="flex flex-wrap gap-8 items-start">
+              <MemberCardDemo name="François" age={39} birthYear={1889} profession="Ingénieur" gender="male" pathologies={[]} />
+              <MemberCardDemo name="Hélène" age={33} birthYear={1992} profession="Product Designer" gender="female" pathologies={[]} />
+              <MemberCardDemo name="Philippe" age={58} birthYear={1963} deathYear={2018} profession="Dentiste" gender="male" pathologies={['cardiovascular', 'depression']} isDead />
+              <MemberCardDemo name="Elisabeth" age={63} birthYear={1962} profession="Psychologue" gender="female" pathologies={['cancer']} isTransgender />
+              <MemberCardDemo name="Jona" age={28} birthYear={1996} profession="Psychologue" gender="female" pathologies={[]} selected isGay />
             </div>
           </div>
         </SubSection>
@@ -754,6 +769,24 @@ const DesignSystemPage: React.FC = () => {
   );
 };
 
+// ================== Helpers ==================
+
+function generateCombinations(_gender: 'male' | 'female') {
+  const bools = [false, true];
+  const combos: { gay: boolean; transgender: boolean; bisexual: boolean; dead: boolean }[] = [];
+  for (const gay of bools) {
+    for (const transgender of bools) {
+      for (const bisexual of bools) {
+        for (const dead of bools) {
+          if (gay && bisexual) continue;
+          combos.push({ gay, transgender, bisexual, dead });
+        }
+      }
+    }
+  }
+  return combos;
+}
+
 // ================== Sub-components for the DS page ==================
 
 const MemberCardDemo: React.FC<{
@@ -765,37 +798,29 @@ const MemberCardDemo: React.FC<{
   gender: 'male' | 'female';
   pathologies: string[];
   selected?: boolean;
-}> = ({ name, age, birthYear, deathYear, profession, gender, pathologies, selected }) => {
-  const shapeClass = gender === 'male' ? 'rounded-sm' : 'rounded-full';
-  const isDeceased = !!deathYear;
+  isDead?: boolean;
+  isGay?: boolean;
+  isBisexual?: boolean;
+  isTransgender?: boolean;
+}> = ({ name, age, birthYear, deathYear, profession, gender, pathologies, selected, isDead, isGay, isBisexual, isTransgender }) => {
+  const isDeceased = !!deathYear || isDead;
   const matchedPathologies = PATHOLOGIES.filter(p => pathologies.includes(p.id));
 
   return (
     <div className="flex flex-col items-center gap-2">
       <div className={`flex items-center gap-3 ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''} rounded-xl p-2 bg-card border border-border shadow-card transition-shadow`}>
-        {/* Shape */}
-        <div className={`relative w-12 h-12 border-2 flex items-center justify-center shrink-0 ${shapeClass} ${isDeceased ? 'border-foreground/40' : 'border-foreground/20'} bg-card overflow-hidden`}>
+        <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
+          <MemberIcon gender={gender} isGay={isGay} isBisexual={isBisexual} isTransgender={isTransgender} isDead={isDeceased} size={48} className="text-foreground" />
           {matchedPathologies.length > 0 && (
-            <div className={`absolute inset-0.5 overflow-hidden ${shapeClass}`}>
+            <div className={`absolute inset-1 overflow-hidden pointer-events-none ${gender === 'male' ? 'rounded-sm' : 'rounded-full'}`}>
               {matchedPathologies.map((p, i) => (
-                <div
-                  key={p.id}
-                  className="absolute"
-                  style={{
-                    backgroundColor: `hsl(var(--pathology-${p.id}))`,
-                    width: '50%',
-                    height: '50%',
-                    top: i < 2 ? 0 : '50%',
-                    left: i % 2 === 0 ? 0 : '50%',
-                  }}
-                />
+                <div key={p.id} className="absolute opacity-30" style={{
+                  backgroundColor: `hsl(var(--pathology-${p.id}))`,
+                  width: '50%', height: '50%',
+                  top: i < 2 ? 0 : '50%',
+                  left: i % 2 === 0 ? 0 : '50%',
+                }} />
               ))}
-            </div>
-          )}
-          {isDeceased && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-full h-[2px] bg-foreground/40 rotate-45 absolute" />
-              <div className="w-full h-[2px] bg-foreground/40 -rotate-45 absolute" />
             </div>
           )}
         </div>
@@ -811,8 +836,8 @@ const MemberCardDemo: React.FC<{
       <span className="text-[10px] text-muted-foreground">
         {gender === 'male' ? '♂ Homme' : '♀ Femme'}
         {isDeceased ? ' · Décédé' : ''}
+        {isGay ? ' · Gay' : ''}{isBisexual ? ' · Bi' : ''}{isTransgender ? ' · Trans' : ''}
         {selected ? ' · Sélectionné' : ''}
-        {pathologies.length > 0 ? ` · ${pathologies.length} pathologie(s)` : ''}
       </span>
     </div>
   );
