@@ -5,19 +5,19 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
   {
     id: 'gp-m', firstName: 'Henri', lastName: 'Lefèvre',
     birthYear: 1945, deathYear: 2020, age: 75, profession: 'Menuisier',
-    gender: 'male', x: 0, y: 0, pathologies: ['cardiovascular'],
+    gender: 'male', x: 0, y: 0, pathologies: ['cardiovascular', 'diabetes'],
   },
   {
     id: 'gp-f', firstName: 'Madeleine', lastName: 'Roux',
     birthYear: 1948, age: 78, profession: 'Couturière',
-    gender: 'female', x: 300, y: 0, pathologies: [],
+    gender: 'female', x: 300, y: 0, pathologies: ['cancer'],
   },
 
   // ── Génération 1 (Parents — 2 enfants) ──
   {
     id: 'p1', firstName: 'Philippe', lastName: 'Lefèvre',
     birthYear: 1970, age: 56, profession: 'Comptable',
-    gender: 'male', x: 0, y: 350, pathologies: [],
+    gender: 'male', x: 0, y: 350, pathologies: ['addiction'],
   },
   {
     id: 'p1-w', firstName: 'Nathalie', lastName: 'Girard',
@@ -27,14 +27,14 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
   {
     id: 'p2', firstName: 'Sylvie', lastName: 'Lefèvre',
     birthYear: 1974, age: 52, profession: 'Pharmacienne',
-    gender: 'female', x: 500, y: 350, pathologies: [],
+    gender: 'female', x: 500, y: 350, pathologies: ['neurodegeneration', 'depression'],
   },
 
   // ── Génération 2 (Petits-enfants — 3 enfants de Philippe) ──
   {
     id: 'c1', firstName: 'Julien', lastName: 'Lefèvre',
     birthYear: 1998, age: 28, profession: 'Kinésithérapeute',
-    gender: 'male', x: 0, y: 700, pathologies: [],
+    gender: 'male', x: 0, y: 700, pathologies: ['bipolar'],
   },
   {
     id: 'c2', firstName: 'Camille', lastName: 'Lefèvre',
@@ -44,7 +44,7 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
   {
     id: 'c3', firstName: 'Raphaël', lastName: 'Lefèvre',
     birthYear: 2004, age: 22, profession: 'Étudiant',
-    gender: 'male', x: 500, y: 700, pathologies: [],
+    gender: 'male', x: 500, y: 700, pathologies: ['psychogenic'],
   },
 ];
 
