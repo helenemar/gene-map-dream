@@ -373,7 +373,7 @@ const GenogramEditor: React.FC = () => {
           >
             <FamilyLinkLines members={members} unions={SAMPLE_UNIONS} />
             {/* Emotional links SVG overlay — z-index 0 so cards render above */}
-            <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0, pointerEvents: 'none', overflow: 'visible' }}>
+            <svg className="absolute pointer-events-none" style={{ zIndex: 1, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
               <g style={{ pointerEvents: 'auto' }}>
                 {SAMPLE_EMOTIONAL_LINKS.map(link => {
                   const from = members.find(m => m.id === link.from);
