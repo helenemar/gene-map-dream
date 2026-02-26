@@ -51,8 +51,8 @@ function computeControlPoint(
   const dy = y2 - y1;
   const dist = Math.sqrt(dx * dx + dy * dy);
 
-  // Base curvature — scales gently with distance
-  let baseCurvature = 0.15 + Math.min(dist * 0.0001, 0.1);
+  // Base curvature — scales gently with distance for elegant arcs
+  let baseCurvature = 0.2 + Math.min(dist * 0.00015, 0.15);
 
   // Collision check: does segment A→B pass through any card?
   const hasCollision = cardRects.some(r => {
