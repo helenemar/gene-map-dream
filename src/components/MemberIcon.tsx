@@ -55,7 +55,7 @@ const MemberIcon: React.FC<MemberIconProps> = ({
   const triPoints = `${triLeft},${triTopY} ${triRight},${triTopY} ${cx},${triBottomY}`;
 
   const mainStroke = 'currentColor';
-  const transStroke = 'hsl(var(--muted-foreground) / 0.5)';
+  const transStroke = 'hsl(var(--muted-foreground) / 0.85)';
 
   // Unique ID for clipPath (needed when multiple icons on same page)
   const clipId = React.useId();
