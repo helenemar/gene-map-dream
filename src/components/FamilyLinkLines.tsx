@@ -5,7 +5,7 @@ import RelationshipBadge from './RelationshipBadge';
 const CARD_W = 186;
 const CARD_H = 64;
 const MARGIN = 5;
-const RAIL_GAP = 20; // Minimum gap between parallel descent rails
+const RAIL_OFFSET = 20; // Offset for parallel rail conflict resolution
 
 interface FamilyLinkLinesProps {
   members: FamilyMember[];
@@ -23,19 +23,15 @@ const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') =
 
 /**
  * UnionLine: ALWAYS horizontal.
- * Even if partners are at different Y, we force horizontal at the average Y.
  */
 const UnionLine: React.FC<{
   x1: number; y1: number; x2: number; y2: number;
   status: UnionStatus;
 }> = ({ x1, y1, x2, y2, status }) => {
-  // Force horizontal: use average Y
   const lineY = (y1 + y2) / 2;
   const midX = (x1 + x2) / 2;
   const stroke = 'hsl(var(--foreground))';
   const opacity = 0.5;
-
-  // If partners are NOT at the same Y, draw orthogonal connectors
   const needsConnectors = Math.abs(y1 - y2) > 1;
 
   const renderStatusMark = () => {
@@ -82,11 +78,9 @@ const UnionLine: React.FC<{
 
   return (
     <g>
-      {/* Horizontal union line */}
       <line x1={x1} y1={lineY} x2={x2} y2={lineY}
         stroke={stroke} strokeWidth={2} strokeOpacity={opacity}
         strokeDasharray={dashArray} />
-      {/* Vertical connectors if partners are misaligned */}
       {needsConnectors && (
         <>
           <line x1={x1} y1={y1} x2={x1} y2={lineY}
@@ -101,18 +95,20 @@ const UnionLine: React.FC<{
 };
 
 /**
- * FamilyLinkLines — Strictly orthogonal (90° only) family links.
+ * FamilyLinkLines — MyHeritage-style orthogonal comb routing.
  *
  * Structure for each union with children:
  *   1. Horizontal union line between partners (forced horizontal)
- *   2. Vertical stem from union midpoint down to comb Y
+ *   2. Vertical stem from union midpoint down to comb rail Y
  *   3. Horizontal comb bar spanning all children
  *   4. Vertical drops from comb straight down to each child's top
  *
+ * Rail conflict resolution:
+ *   If two combs would overlap on the same Y, offset by RAIL_OFFSET (20px).
+ *
  * Rules:
- *   - ZERO diagonal lines. Every segment is H or V.
- *   - Drops go straight down from the child's center X on the comb to the child.
- *   - No rail offset needed when drops align with children — just straight vertical.
+ *   - ZERO diagonal lines. Every segment is strictly H or V.
+ *   - Drops go straight down from the child's center X.
  */
 const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) => {
   const getMember = (id: string) => members.find(m => m.id === id);
@@ -121,6 +117,73 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
   const opacity = 0.3;
   const sw = 1.5;
 
+  // ─── Rail conflict resolution ───
+  // Compute comb Y for each union, then offset overlapping rails
+  interface CombInfo {
+    unionId: string;
+    baseY: number; // midpoint between parent bottom and child top
+    leftX: number;
+    rightX: number;
+    finalY: number;
+  }
+
+  const combInfos: CombInfo[] = [];
+
+  for (const union of unions) {
+    const p1 = getMember(union.partner1);
+    const p2 = getMember(union.partner2);
+    if (!p1 || !p2) continue;
+
+    const childMembers = union.children
+      .map(getMember)
+      .filter((m): m is FamilyMember => !!m)
+      .sort((a, b) => a.x - b.x);
+
+    if (childMembers.length === 0) continue;
+
+    const [left, right] = p1.x < p2.x ? [p1, p2] : [p2, p1];
+    const leftAnchor = getAnchor(left, 'right');
+    const rightAnchor = getAnchor(right, 'left');
+    const unionLineY = (leftAnchor.y + rightAnchor.y) / 2;
+    const unionMidX = (leftAnchor.x + rightAnchor.x) / 2;
+
+    const childAnchors = childMembers.map(c => getAnchor(c, 'top'));
+    const childDropXs = childAnchors.map(a => a.x);
+
+    // Base comb Y: midpoint between parent bottom and first child top
+    const parentBottom = unionLineY;
+    const childTop = Math.min(...childAnchors.map(a => a.y));
+    const baseY = parentBottom + (childTop - parentBottom) / 2;
+
+    const combLeftX = Math.min(unionMidX, ...childDropXs);
+    const combRightX = Math.max(unionMidX, ...childDropXs);
+
+    combInfos.push({
+      unionId: union.id,
+      baseY,
+      leftX: combLeftX,
+      rightX: combRightX,
+      finalY: baseY,
+    });
+  }
+
+  // Detect and resolve rail overlaps: if two combs share similar Y and overlap in X, offset
+  combInfos.sort((a, b) => a.baseY - b.baseY);
+  for (let i = 0; i < combInfos.length; i++) {
+    for (let j = i + 1; j < combInfos.length; j++) {
+      const a = combInfos[i];
+      const b = combInfos[j];
+      // Check Y proximity and X overlap
+      if (Math.abs(a.finalY - b.finalY) < RAIL_OFFSET &&
+          a.leftX < b.rightX && b.leftX < a.rightX) {
+        // Offset the second rail down
+        b.finalY = a.finalY + RAIL_OFFSET;
+      }
+    }
+  }
+
+  const combYMap = new Map(combInfos.map(c => [c.unionId, c.finalY]));
+
   return (
     <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
       {unions.map(union => {
@@ -128,16 +191,12 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
         const p2 = getMember(union.partner2);
         if (!p1 || !p2) return null;
 
-        // Determine left/right partners
         const [left, right] = p1.x < p2.x ? [p1, p2] : [p2, p1];
         const leftAnchor = getAnchor(left, 'right');
         const rightAnchor = getAnchor(right, 'left');
-
-        // Union line Y: forced horizontal at average Y
         const unionLineY = (leftAnchor.y + rightAnchor.y) / 2;
         const unionMidX = (leftAnchor.x + rightAnchor.x) / 2;
 
-        // Get children sorted left to right
         const childMembers = union.children
           .map(getMember)
           .filter((m): m is FamilyMember => !!m)
@@ -162,14 +221,11 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
           );
         }
 
-        // Child top anchors
         const childAnchors = childMembers.map(c => getAnchor(c, 'top'));
-
-        // Comb Y: fixed 60px descent from union line
-        const combY = unionLineY + 60;
-
-        // Each child's drop X = child's own center X (straight vertical, no offset)
         const childDropXs = childAnchors.map(a => a.x);
+
+        // Use resolved comb Y (with rail offset if needed)
+        const combY = combYMap.get(union.id) ?? unionLineY + 60;
 
         const combLeftX = Math.min(unionMidX, ...childDropXs);
         const combRightX = Math.max(unionMidX, ...childDropXs);
@@ -190,7 +246,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
               onClick={() => console.log('Edit union', union.id)}
             />
 
-            {/* 2. Vertical stem: union midpoint straight down to comb Y */}
+            {/* 2. Vertical stem: union midpoint → comb Y */}
             <line
               x1={unionMidX} y1={unionLineY}
               x2={unionMidX} y2={combY}
@@ -206,7 +262,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
               />
             )}
 
-            {/* 4. Vertical drops: straight down from comb to each child */}
+            {/* 4. Vertical drops: comb → each child */}
             {childAnchors.map((anchor, i) => (
               <line
                 key={i}
@@ -216,7 +272,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
               />
             ))}
 
-            {/* Single child: horizontal connector from stem to child if needed */}
+            {/* Single child: horizontal connector from stem to child if offset */}
             {childMembers.length === 1 && Math.abs(unionMidX - childDropXs[0]) > 1 && (
               <line
                 x1={unionMidX} y1={combY}
