@@ -16,6 +16,7 @@ const LEVEL_SPACING = 350;
 const COUPLE_GAP = 30;
 const SIBLING_GAP = 40;
 const BLOCK_GAP = 80;
+const STAGGER_OFFSET = 40; // Progressive X-offset per sibling for "escalier" effect
 
 interface LayoutResult {
   positions: Map<string, { x: number; y: number }>;
@@ -160,7 +161,14 @@ export function computeAutoLayout(
     const gen = generation.get(union.partner1) ?? 0;
     const childGen = gen + 1;
 
-    const children = union.children.filter(cid => memberMap.has(cid));
+    // ─── Sort children chronologically (oldest → youngest = left → right) ───
+    const children = union.children
+      .filter(cid => memberMap.has(cid))
+      .sort((a, b) => {
+        const ma = memberMap.get(a)!;
+        const mb = memberMap.get(b)!;
+        return (ma.birthYear ?? 0) - (mb.birthYear ?? 0);
+      });
 
     if (children.length === 0) {
       // Childless couple
@@ -175,9 +183,13 @@ export function computeAutoLayout(
     let childCursor = Math.max(startX, getRightEdge(childGen) + BLOCK_GAP);
     const childXPositions: { id: string; left: number; right: number }[] = [];
 
-    for (const cid of children) {
+    for (let childIdx = 0; childIdx < children.length; childIdx++) {
+      const cid = children[childIdx];
+      // Staggered X-offset: each sibling gets an additional STAGGER_OFFSET
+      const stagger = childIdx * STAGGER_OFFSET;
+
       // Ensure no overlap at child gen
-      childCursor = Math.max(childCursor, getRightEdge(childGen) + SIBLING_GAP);
+      childCursor = Math.max(childCursor + stagger, getRightEdge(childGen) + SIBLING_GAP);
       
       // Check if this child has their own sub-family
       const childSubUnions = getParentingUnions(cid).filter(u => !processedUnions.has(u.id));
