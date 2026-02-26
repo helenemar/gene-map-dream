@@ -13,6 +13,7 @@ interface MemberCardProps {
   onDragStart?: (id: string, e: React.MouseEvent) => void;
   onCreateRelated?: (id: string) => void;
   onEdit?: (id: string) => void;
+  onHover?: (id: string | null) => void;
 }
 
 const MemberCard: React.FC<MemberCardProps> = ({
@@ -23,6 +24,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onDragStart,
   onCreateRelated,
   onEdit,
+  onHover,
 }) => {
   const isDeceased = !!member.deathYear;
   const memberPathologies = PATHOLOGIES.filter(p => member.pathologies.includes(p.id));
@@ -43,6 +45,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
         onDragStart?.(member.id, e);
       }}
       onClick={() => onSelect?.(member.id)}
+      onMouseEnter={() => onHover?.(member.id)}
+      onMouseLeave={() => onHover?.(null)}
     >
       {/* Anchor points */}
       {showAnchors && (
