@@ -5,6 +5,7 @@ import RelationshipBadge from './RelationshipBadge';
 const CARD_W = 186;
 const CARD_H = 64;
 const MARGIN = 5;
+const RAIL_MIN_GAP = 20; // Minimum 20px between parallel vertical descent lines
 
 interface FamilyLinkLinesProps {
   members: FamilyMember[];
@@ -21,7 +22,89 @@ const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') =
 };
 
 /**
+ * Check if a vertical segment from (x, y1) to (x, y2) intersects a card bounding box.
+ * Returns the card if intersection found.
+ */
+function findCardIntersection(
+  x: number, y1: number, y2: number,
+  members: FamilyMember[],
+  excludeIds: Set<string>,
+): FamilyMember | null {
+  const minY = Math.min(y1, y2);
+  const maxY = Math.max(y1, y2);
+  for (const m of members) {
+    if (excludeIds.has(m.id)) continue;
+    // Card bounding box with margin
+    const cardLeft = m.x - MARGIN;
+    const cardRight = m.x + CARD_W + MARGIN;
+    const cardTop = m.y - MARGIN;
+    const cardBottom = m.y + CARD_H + MARGIN;
+    // Check if vertical line at x passes through card
+    if (x >= cardLeft && x <= cardRight && maxY >= cardTop && minY <= cardBottom) {
+      return m;
+    }
+  }
+  return null;
+}
+
+/**
+ * Generate Manhattan-routed orthogonal path from (x1,y1) to (x2,y2),
+ * routing around any card obstacles.
+ */
+function manhattanRoute(
+  x1: number, y1: number, x2: number, y2: number,
+  members: FamilyMember[],
+  excludeIds: Set<string>,
+): string {
+  // Simple case: straight vertical
+  if (Math.abs(x1 - x2) < 1) {
+    const obstacle = findCardIntersection(x1, y1, y2, members, excludeIds);
+    if (!obstacle) {
+      return `M ${x1} ${y1} L ${x1} ${y2}`;
+    }
+    // Route around the obstacle
+    const cardLeft = obstacle.x - MARGIN * 2;
+    const cardRight = obstacle.x + CARD_W + MARGIN * 2;
+    const detourX = (Math.abs(x1 - cardLeft) < Math.abs(x1 - cardRight))
+      ? cardLeft - RAIL_MIN_GAP
+      : cardRight + RAIL_MIN_GAP;
+    const cardTop = obstacle.y - MARGIN;
+    const cardBottom = obstacle.y + CARD_H + MARGIN;
+    return `M ${x1} ${y1} L ${x1} ${cardTop} L ${detourX} ${cardTop} L ${detourX} ${cardBottom} L ${x1} ${cardBottom} L ${x1} ${y2}`;
+  }
+  // Orthogonal L-route: go vertical to midpoint, then horizontal, then vertical
+  const midY = (y1 + y2) / 2;
+  return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
+}
+
+/**
+ * Apply rail spacing: ensure parallel vertical descent lines maintain minimum gap.
+ * Returns adjusted X positions for each child drop.
+ */
+function computeRails(childXs: number[]): number[] {
+  if (childXs.length <= 1) return [...childXs];
+  const rails = childXs.map((x, i) => ({ x, idx: i }));
+  rails.sort((a, b) => a.x - b.x);
+
+  // Enforce minimum gap
+  for (let i = 1; i < rails.length; i++) {
+    const gap = rails[i].x - rails[i - 1].x;
+    if (gap < RAIL_MIN_GAP) {
+      rails[i].x = rails[i - 1].x + RAIL_MIN_GAP;
+    }
+  }
+
+  // Map back to original indices
+  const result = new Array(childXs.length);
+  for (const r of rails) {
+    result[r.idx] = r.x;
+  }
+  return result;
+}
+
+/**
  * Render the union line between two partners based on status.
+ * Strictly orthogonal (horizontal only for union lines).
  */
 const UnionLine: React.FC<{
   x1: number; y1: number; x2: number; y2: number;
@@ -73,6 +156,7 @@ const UnionLine: React.FC<{
   };
 
   const renderLine = () => {
+    // Union lines are always horizontal (orthogonal)
     switch (status) {
       case 'common_law':
         return (
@@ -97,13 +181,16 @@ const UnionLine: React.FC<{
 };
 
 /**
- * FamilyLinkLines renders orthogonal (right-angle) family links:
+ * FamilyLinkLines renders strictly orthogonal (right-angle) family links:
  * 1. Union lines (horizontal) between partners
  * 2. Descent stem (vertical) from union midpoint
  * 3. Sibling comb (horizontal bar) connecting children
  * 4. Individual drops from comb to each child's top anchor
  *
- * All paths use strict orthogonal routing (no diagonals).
+ * Features:
+ * - Rail system: parallel descent lines maintain ≥20px spacing
+ * - Manhattan routing: stems avoid card obstacles
+ * - All segments are strictly 90° (no diagonals)
  */
 const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) => {
   const getMember = (id: string) => members.find(m => m.id === id);
@@ -120,7 +207,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
         const leftAnchor = getAnchor(left, 'right');
         const rightAnchor = getAnchor(right, 'left');
 
-        // Union midpoint
+        // Union midpoint (on horizontal line)
         const unionMidX = (leftAnchor.x + rightAnchor.x) / 2;
         const unionMidY = (leftAnchor.y + rightAnchor.y) / 2;
 
@@ -151,21 +238,33 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
 
         const childAnchors = childMembers.map(c => getAnchor(c, 'top'));
 
-        // Orthogonal comb Y: fixed midpoint between union and top of children
+        // Orthogonal comb Y: midpoint between union and top of children
         const topChildY = Math.min(...childAnchors.map(a => a.y));
         const combY = unionMidY + (topChildY - unionMidY) * 0.5;
 
-        const combLeftX = childAnchors[0].x;
-        const combRightX = childAnchors[childAnchors.length - 1].x;
+        // Apply rail spacing to descent line X positions
+        const rawChildXs = childAnchors.map(a => a.x);
+        const railXs = computeRails(rawChildXs);
+
+        const combLeftX = Math.min(...railXs);
+        const combRightX = Math.max(...railXs);
 
         const stroke = 'hsl(var(--foreground))';
         const opacity = 0.3;
         const sw = 1.5;
 
-        // Build orthogonal path segments
+        // Exclude union partners and their children from obstacle detection
+        const excludeIds = new Set([union.partner1, union.partner2, ...union.children]);
+
+        // Compute stem path with Manhattan routing (avoids cards)
+        const stemPath = manhattanRoute(unionMidX, unionMidY, unionMidX, combY, members, excludeIds);
+
+        // If stem doesn't land on the comb, connect with horizontal segment
+        const stemNeedsCombConnect = Math.abs(unionMidX - combLeftX) > 1 || Math.abs(unionMidX - combRightX) > 1;
+
         return (
           <g key={union.id}>
-            {/* Union line */}
+            {/* Union line (horizontal, orthogonal) */}
             <UnionLine
               x1={leftAnchor.x} y1={leftAnchor.y}
               x2={rightAnchor.x} y2={rightAnchor.y}
@@ -179,9 +278,9 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
               onClick={() => console.log('Edit union', union.id)}
             />
 
-            {/* Descent stem: vertical from union midpoint down to comb Y */}
+            {/* Descent stem: vertical from union midpoint down to comb Y (Manhattan routed) */}
             <path
-              d={`M ${unionMidX} ${unionMidY} L ${unionMidX} ${combY}`}
+              d={stemPath}
               stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} fill="none"
             />
 
@@ -193,19 +292,35 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
               />
             )}
 
-            {/* Orthogonal drops: vertical from combY to each child top anchor */}
-            {childAnchors.map((anchor, i) => (
-              <path
-                key={i}
-                d={`M ${anchor.x} ${combY} L ${anchor.x} ${anchor.y}`}
-                stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} fill="none"
-              />
-            ))}
+            {/* Orthogonal drops: from comb rail position down, then horizontal to child anchor */}
+            {childAnchors.map((anchor, i) => {
+              const railX = railXs[i];
+              const needsHorizontal = Math.abs(railX - anchor.x) > 1;
 
-            {/* Single child: connect stem directly */}
+              if (needsHorizontal) {
+                // Rail was offset: go vertical on rail, then horizontal to child, then vertical to child
+                return (
+                  <path
+                    key={i}
+                    d={`M ${railX} ${combY} L ${railX} ${anchor.y - RAIL_MIN_GAP} L ${anchor.x} ${anchor.y - RAIL_MIN_GAP} L ${anchor.x} ${anchor.y}`}
+                    stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} fill="none"
+                  />
+                );
+              }
+              // Direct vertical drop
+              return (
+                <path
+                  key={i}
+                  d={`M ${railX} ${combY} L ${railX} ${anchor.y}`}
+                  stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} fill="none"
+                />
+              );
+            })}
+
+            {/* Single child: connect stem to child via comb */}
             {childAnchors.length === 1 && (
               <path
-                d={`M ${unionMidX} ${combY} L ${childAnchors[0].x} ${combY}`}
+                d={`M ${unionMidX} ${combY} L ${railXs[0]} ${combY}`}
                 stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} fill="none"
               />
             )}

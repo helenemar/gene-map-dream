@@ -3,12 +3,12 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 const CARD_W = 186;
 const CARD_H = 64;
 const GENERATION_GAP = 300;
-const BASE_SIBLING_GAP = 60;
+const BASE_SIBLING_GAP = 80; // Increased from 60 to accommodate rail corridors
 const COUPLE_GAP = 120;
-const BRANCH_GAP = 140;
-const MIN_OVERLAP_PAD = 30;
-/** Extra horizontal corridor when a child has their own union, to prevent descent lines from crossing sibling union lines */
-const UNION_CORRIDOR = 40;
+const BRANCH_GAP = 160; // Increased from 140 for more breathing room
+const MIN_OVERLAP_PAD = 40; // Increased from 30 for rail safety
+const UNION_CORRIDOR = 50; // Extra corridor when child has own union
+const RAIL_GAP = 20; // Minimum gap between parallel descent rails
 
 interface LayoutResult {
   positions: Map<string, { x: number; y: number }>;
@@ -31,62 +31,72 @@ function buildUnionIndex(unions: Union[]) {
 }
 
 /**
- * Compute dynamic sibling gap: larger when siblings have their own unions
- * to create corridors for filiation lines.
+ * Compute dynamic sibling gap based on rail requirements.
+ * More children = wider gap to prevent descent line overlap.
  */
 function computeSiblingGap(
   childId: string,
   nextChildId: string | null,
   parentToUnions: Map<string, Union[]>,
   visited: Set<string>,
+  totalSiblings: number,
 ): number {
   let gap = BASE_SIBLING_GAP;
+
+  // Add corridor for children with unions
   const childUnions = (parentToUnions.get(childId) ?? []).filter(u => !visited.has(u.id));
   const nextUnions = nextChildId ? (parentToUnions.get(nextChildId) ?? []).filter(u => !visited.has(u.id)) : [];
-  // If either adjacent sibling has a union, add corridor
   if (childUnions.length > 0 || nextUnions.length > 0) {
     gap += UNION_CORRIDOR;
   }
+
+  // For large families (>5 children), increase gap proportionally to ensure rail spacing
+  if (totalSiblings > 5) {
+    gap += (totalSiblings - 5) * RAIL_GAP;
+  }
+
   return gap;
 }
 
 /**
- * Minimize edge crossings by ordering children optimally.
- * Heuristic: children with the most descendants go to the edges,
- * children with fewer descendants go to the center.
- * Also: children who are partners in unions are placed adjacent to their partner's subtree side.
+ * Order children to minimize edge crossings.
+ * Children with subtrees go to edges; leaf children fill center.
  */
 function orderChildrenToMinimizeCrossings(
   children: string[],
   parentToUnions: Map<string, Union[]>,
   visited: Set<string>,
-  memberMap: Map<string, FamilyMember>,
 ): string[] {
   if (children.length <= 2) return children;
 
-  // Count descendant weight for each child
-  const weights = new Map<string, number>();
+  // Separate children with unions (heavy) from leaf children
+  const heavy: string[] = [];
+  const light: string[] = [];
+
   for (const cid of children) {
     const unions = (parentToUnions.get(cid) ?? []).filter(u => !visited.has(u.id));
-    let w = 0;
-    for (const u of unions) {
-      w += u.children.length + 1; // +1 for partner
+    if (unions.length > 0) {
+      heavy.push(cid);
+    } else {
+      light.push(cid);
     }
-    weights.set(cid, w);
   }
 
-  // Sort: heaviest subtrees at edges, lightest in center
-  const sorted = [...children].sort((a, b) => (weights.get(b) ?? 0) - (weights.get(a) ?? 0));
-  const result: string[] = new Array(sorted.length);
-  let left = 0, right = sorted.length - 1;
-  for (let i = 0; i < sorted.length; i++) {
-    if (i % 2 === 0) {
-      result[left++] = sorted[i];
-    } else {
-      result[right--] = sorted[i];
-    }
+  // Place heavy subtrees at edges, light children in center
+  // This minimizes crossings since subtree descent lines stay on the outside
+  const result: string[] = [];
+  let hi = 0, li = 0;
+  let leftSide = true;
+
+  // Alternate placing heavy children on left and right edges
+  const leftHeavy: string[] = [];
+  const rightHeavy: string[] = [];
+  for (let i = 0; i < heavy.length; i++) {
+    if (i % 2 === 0) leftHeavy.push(heavy[i]);
+    else rightHeavy.push(heavy[i]);
   }
-  return result;
+
+  return [...leftHeavy, ...light, ...rightHeavy.reverse()];
 }
 
 function layoutSubTree(
@@ -107,8 +117,8 @@ function layoutSubTree(
     .filter(cid => memberMap.has(cid))
     .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
 
-  // Then optimize order to minimize crossings
-  const children = orderChildrenToMinimizeCrossings(childrenByBirth, parentToUnions, visited, memberMap);
+  // Optimize order to minimize crossings
+  const children = orderChildrenToMinimizeCrossings(childrenByBirth, parentToUnions, visited);
 
   const childBlocks: { childId: string; width: number; subPositions: Map<string, { x: number; y: number }> }[] = [];
 
@@ -154,6 +164,7 @@ function layoutSubTree(
         childBlocks[i + 1]?.childId ?? null,
         parentToUnions,
         visited,
+        children.length,
       );
       childrenTotalWidth += gap;
     }
@@ -188,6 +199,7 @@ function layoutSubTree(
         childBlocks[i + 1]?.childId ?? null,
         parentToUnions,
         visited,
+        children.length,
       );
     }
   }
@@ -236,7 +248,7 @@ export function computeAutoLayout(
     globalX += CARD_W + BASE_SIBLING_GAP;
   }
 
-  // Resolve overlaps
+  // Resolve overlaps with increased padding
   resolveOverlaps(globalPositions, memberMap);
 
   // Center around (0,0)
