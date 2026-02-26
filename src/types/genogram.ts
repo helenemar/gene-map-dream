@@ -16,6 +16,23 @@ export interface FamilyMember {
   avatar?: string;
 }
 
+export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed';
+
+/**
+ * A Union represents a couple relationship between two members.
+ * Children are linked to the union, not to individual parents.
+ */
+export interface Union {
+  id: string;
+  partner1: string;
+  partner2: string;
+  status: UnionStatus;
+  marriageYear?: number;
+  divorceYear?: number;
+  children: string[]; // member IDs
+}
+
+/** @deprecated — use Union instead */
 export interface Relationship {
   id: string;
   from: string;
@@ -55,11 +72,12 @@ export const PATHOLOGIES: Pathology[] = [
   { id: 'neurodegeneration', name: 'Maladies neurodégénératives', color: 'pathology-neurodegeneration' },
 ];
 
-export const FAMILY_LINK_TYPES = [
-  { id: 'divorce', label: 'Divorce', icon: '⊘' },
-  { id: 'separation', label: 'Séparation', icon: '∕' },
-  { id: 'widowed', label: 'Veuf(ve)', icon: '✕' },
-  { id: 'liaison', label: 'Liaison', icon: '♡' },
+export const FAMILY_LINK_TYPES: { id: UnionStatus; label: string; icon: string }[] = [
+  { id: 'married', label: 'Mariage', icon: '═' },
+  { id: 'common_law', label: 'Union libre', icon: '┄' },
+  { id: 'separated', label: 'Séparation', icon: '∕' },
+  { id: 'divorced', label: 'Divorce', icon: '⊘' },
+  { id: 'widowed', label: 'Veuvage', icon: '✕' },
 ];
 
 export const EMOTIONAL_LINK_TYPES: { id: EmotionalLinkType; label: string; color: string }[] = [

@@ -2,10 +2,10 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import EditorHeader from '@/components/EditorHeader';
 import EditorSidebar from '@/components/EditorSidebar';
 import MemberCard from '@/components/MemberCard';
-import RelationshipLines from '@/components/RelationshipLines';
+import FamilyLinkLines from '@/components/FamilyLinkLines';
 import EmotionalLinkLine from '@/components/EmotionalLinkLine';
 import FloatingControls from '@/components/FloatingControls';
-import { SAMPLE_MEMBERS, SAMPLE_RELATIONSHIPS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sampleData';
+import { SAMPLE_MEMBERS, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sampleData';
 import { FamilyMember } from '@/types/genogram';
 
 type EditorMode = 'select' | 'link';
@@ -300,7 +300,7 @@ const GenogramEditor: React.FC = () => {
               willChange: 'transform',
             }}
           >
-            <RelationshipLines members={members} relationships={SAMPLE_RELATIONSHIPS} />
+            <FamilyLinkLines members={members} unions={SAMPLE_UNIONS} />
             {/* Emotional links SVG overlay — z-index 0 so cards render above */}
             <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0, pointerEvents: 'none', overflow: 'visible' }}>
               <g style={{ pointerEvents: 'auto' }}>

@@ -4,6 +4,7 @@ import { Download, Share2, Plus, UserPlus, Pencil, ZoomIn, ZoomOut, X, Search, C
 import { PATHOLOGIES, FAMILY_LINK_TYPES, EMOTIONAL_LINK_TYPES } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
 import { EmotionalLinkPreview } from '@/components/EmotionalLinkLine';
+import { FamilyLinkPreview } from '@/components/FamilyLinkLines';
 import type { MemberCardState } from '@/components/MemberCard';
 
 /* ============================================================
@@ -342,133 +343,32 @@ const DesignSystemPage: React.FC = () => {
           </div>
         </SubSection>
 
-        {/* Relationship Lines (SVG) */}
-        <SubSection title="Lignes de relation (SVG)">
-          <p className="text-sm text-muted-foreground mb-4">Chaque style de ligne utilisé dans le canevas pour représenter les liens.</p>
+        {/* Family Links (Structural SVG) */}
+        <SubSection title="Liens familiaux (Structurels)">
+          <p className="text-sm text-muted-foreground mb-4">Lignes noires solides définissant la parenté. Chaque variante indique le statut de l'union.</p>
           <div className="bg-card rounded-2xl border border-border p-8">
-            <div className="space-y-6">
-              {/* Standard / Couple */}
-              <div className="flex items-center gap-6">
-                <svg width="120" height="24" className="shrink-0">
-                  <line x1="0" y1="12" x2="120" y2="12" stroke="hsl(var(--foreground))" strokeWidth="2" strokeOpacity="0.3" />
-                </svg>
-                <div>
-                  <span className="text-sm font-semibold text-foreground">Continue (standard)</span>
-                  <p className="text-xs text-muted-foreground">Couple / Relation</p>
+            <div className="space-y-5">
+              {FAMILY_LINK_TYPES.map(link => (
+                <div key={link.id} className="flex items-center gap-6">
+                  <FamilyLinkPreview status={link.id} width={200} height={32} />
+                  <div>
+                    <span className="text-sm font-semibold text-foreground">{link.label}</span>
+                    <p className="text-xs text-muted-foreground font-mono">{link.id}</p>
+                  </div>
                 </div>
-              </div>
-
-              {/* Parent-child */}
+              ))}
+              {/* Descent / Sibling comb */}
               <div className="flex items-center gap-6">
-                <svg width="120" height="40" className="shrink-0">
-                  <path d="M 10 5 V 20 H 110 V 35" fill="none" stroke="hsl(var(--foreground))" strokeWidth="1.5" strokeOpacity="0.2" />
+                <svg width="200" height="60" className="shrink-0">
+                  <line x1="100" y1="5" x2="100" y2="25" stroke="hsl(var(--foreground))" strokeWidth="1.5" strokeOpacity="0.3" />
+                  <line x1="30" y1="25" x2="170" y2="25" stroke="hsl(var(--foreground))" strokeWidth="1.5" strokeOpacity="0.3" />
+                  <line x1="30" y1="25" x2="30" y2="55" stroke="hsl(var(--foreground))" strokeWidth="1.5" strokeOpacity="0.3" />
+                  <line x1="100" y1="25" x2="100" y2="55" stroke="hsl(var(--foreground))" strokeWidth="1.5" strokeOpacity="0.3" />
+                  <line x1="170" y1="25" x2="170" y2="55" stroke="hsl(var(--foreground))" strokeWidth="1.5" strokeOpacity="0.3" />
                 </svg>
                 <div>
-                  <span className="text-sm font-semibold text-foreground">Angle droit (parent-enfant)</span>
-                  <p className="text-xs text-muted-foreground">Filiation verticale puis horizontale</p>
-                </div>
-              </div>
-
-              {/* Fusional */}
-              <div className="flex items-center gap-6">
-                <svg width="120" height="24" className="shrink-0">
-                  <line x1="0" y1="10" x2="120" y2="10" stroke="hsl(var(--link-fusional))" strokeWidth="3" />
-                  <line x1="0" y1="14" x2="120" y2="14" stroke="hsl(var(--link-fusional))" strokeWidth="3" />
-                </svg>
-                <div>
-                  <span className="text-sm font-semibold text-foreground">Double trait vert (fusionnel)</span>
-                  <p className="text-xs text-muted-foreground">Relation fusionnelle</p>
-                </div>
-              </div>
-
-              {/* Distant */}
-              <div className="flex items-center gap-6">
-                <svg width="120" height="24" className="shrink-0">
-                  <line x1="0" y1="12" x2="120" y2="12" stroke="hsl(var(--link-distant))" strokeWidth="2" strokeDasharray="6 4" />
-                </svg>
-                <div>
-                  <span className="text-sm font-semibold text-foreground">Pointillé rouge (distant)</span>
-                  <p className="text-xs text-muted-foreground">Relation distante</p>
-                </div>
-              </div>
-
-              {/* Conflictual */}
-              <div className="flex items-center gap-6">
-                <svg width="120" height="24" className="shrink-0">
-                  <line x1="0" y1="8" x2="120" y2="8" stroke="hsl(var(--link-conflictual))" strokeWidth="2" />
-                  <line x1="0" y1="16" x2="120" y2="16" stroke="hsl(var(--link-conflictual))" strokeWidth="2" />
-                  <line x1="55" y1="2" x2="65" y2="22" stroke="hsl(var(--link-conflictual))" strokeWidth="2" />
-                </svg>
-                <div>
-                  <span className="text-sm font-semibold text-foreground">Double trait rouge barré (conflictuel)</span>
-                  <p className="text-xs text-muted-foreground">Relation conflictuelle</p>
-                </div>
-              </div>
-
-              {/* Ambivalent / Zigzag */}
-              <div className="flex items-center gap-6">
-                <svg width="120" height="24" className="shrink-0">
-                  <polyline
-                    points="0,12 10,4 20,20 30,4 40,20 50,4 60,20 70,4 80,20 90,4 100,20 110,4 120,12"
-                    fill="none"
-                    stroke="hsl(var(--link-ambivalent))"
-                    strokeWidth="2"
-                  />
-                </svg>
-                <div>
-                  <span className="text-sm font-semibold text-foreground">Zigzag / Wavy (ambivalent)</span>
-                  <p className="text-xs text-muted-foreground">Tension / Ambivalence</p>
-                </div>
-              </div>
-
-              {/* Negligent */}
-              <div className="flex items-center gap-6">
-                <svg width="120" height="24" className="shrink-0">
-                  <line x1="0" y1="12" x2="120" y2="12" stroke="hsl(var(--link-negligent))" strokeWidth="2" />
-                </svg>
-                <div>
-                  <span className="text-sm font-semibold text-foreground">Ligne bleue (négligent)</span>
-                  <p className="text-xs text-muted-foreground">Relation négligente</p>
-                </div>
-              </div>
-
-              {/* Coercive */}
-              <div className="flex items-center gap-6">
-                <svg width="120" height="24" className="shrink-0">
-                  <line x1="0" y1="12" x2="100" y2="12" stroke="hsl(var(--link-coercive))" strokeWidth="2" />
-                  <polygon points="100,6 120,12 100,18" fill="hsl(var(--link-coercive))" />
-                </svg>
-                <div>
-                  <span className="text-sm font-semibold text-foreground">Ligne avec flèche (contrôlant)</span>
-                  <p className="text-xs text-muted-foreground">Relation de contrôle / coercition</p>
-                </div>
-              </div>
-
-              {/* Cut-off */}
-              <div className="flex items-center gap-6">
-                <svg width="120" height="24" className="shrink-0">
-                  <line x1="0" y1="12" x2="50" y2="12" stroke="hsl(var(--link-cutoff))" strokeWidth="3" />
-                  <line x1="45" y1="4" x2="55" y2="20" stroke="hsl(var(--link-cutoff))" strokeWidth="2" />
-                  <line x1="50" y1="4" x2="60" y2="20" stroke="hsl(var(--link-cutoff))" strokeWidth="2" />
-                  <line x1="65" y1="12" x2="120" y2="12" stroke="hsl(var(--link-cutoff))" strokeWidth="3" />
-                </svg>
-                <div>
-                  <span className="text-sm font-semibold text-foreground">Barres parallèles (lien rompu)</span>
-                  <p className="text-xs text-muted-foreground">Coupure relationnelle</p>
-                </div>
-              </div>
-
-              {/* Violence */}
-              <div className="flex items-center gap-6">
-                <svg width="120" height="24" className="shrink-0">
-                  <line x1="0" y1="12" x2="120" y2="12" stroke="hsl(var(--link-violence))" strokeWidth="3" />
-                  <line x1="35" y1="4" x2="45" y2="20" stroke="hsl(var(--link-violence))" strokeWidth="2" />
-                  <line x1="55" y1="4" x2="65" y2="20" stroke="hsl(var(--link-violence))" strokeWidth="2" />
-                  <line x1="75" y1="4" x2="85" y2="20" stroke="hsl(var(--link-violence))" strokeWidth="2" />
-                </svg>
-                <div>
-                  <span className="text-sm font-semibold text-foreground">Triple barré (violence)</span>
-                  <p className="text-xs text-muted-foreground">Violence dans la relation</p>
+                  <span className="text-sm font-semibold text-foreground">Peigne de fratrie</span>
+                  <p className="text-xs text-muted-foreground">Tige de descente + barre horizontale + gouttes individuelles</p>
                 </div>
               </div>
             </div>
