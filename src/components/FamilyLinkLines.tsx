@@ -4,7 +4,6 @@ import RelationshipBadge from './RelationshipBadge';
 
 const CARD_W = 186;
 const CARD_H = 64;
-const MARGIN = 5;
 const RAIL_OFFSET = 20; // Offset for parallel rail conflict resolution
 
 interface FamilyLinkLinesProps {
@@ -12,12 +11,13 @@ interface FamilyLinkLinesProps {
   unions: Union[];
 }
 
+/** Snap exactly to card border — zero gap */
 const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') => {
   switch (side) {
-    case 'top': return { x: m.x + CARD_W / 2, y: m.y - MARGIN };
-    case 'bottom': return { x: m.x + CARD_W / 2, y: m.y + CARD_H + MARGIN };
-    case 'left': return { x: m.x - MARGIN, y: m.y + CARD_H / 2 };
-    case 'right': return { x: m.x + CARD_W + MARGIN, y: m.y + CARD_H / 2 };
+    case 'top': return { x: m.x + CARD_W / 2, y: m.y };
+    case 'bottom': return { x: m.x + CARD_W / 2, y: m.y + CARD_H };
+    case 'left': return { x: m.x, y: m.y + CARD_H / 2 };
+    case 'right': return { x: m.x + CARD_W, y: m.y + CARD_H / 2 };
   }
 };
 

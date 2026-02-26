@@ -37,13 +37,13 @@ function cardCorners(m: FamilyMember): { corner: Corner; x: number; y: number }[
   ];
 }
 
-/** Side anchors (center of edges) — used only by family links */
+/** Side anchors (center of edges) — snap exactly to card border, zero gap */
 function cardAnchors(m: FamilyMember): AnchorPoint[] {
   return [
-    { x: m.x + CARD_W / 2, y: m.y - MARGIN, side: 'top' },
-    { x: m.x + CARD_W / 2, y: m.y + CARD_H + MARGIN, side: 'bottom' },
-    { x: m.x - MARGIN, y: m.y + CARD_H / 2, side: 'left' },
-    { x: m.x + CARD_W + MARGIN, y: m.y + CARD_H / 2, side: 'right' },
+    { x: m.x + CARD_W / 2, y: m.y, side: 'top' },
+    { x: m.x + CARD_W / 2, y: m.y + CARD_H, side: 'bottom' },
+    { x: m.x, y: m.y + CARD_H / 2, side: 'left' },
+    { x: m.x + CARD_W, y: m.y + CARD_H / 2, side: 'right' },
   ];
 }
 
