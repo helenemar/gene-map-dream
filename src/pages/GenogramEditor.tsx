@@ -10,57 +10,86 @@ import { FamilyMember } from '@/types/genogram';
 
 type EditorMode = 'select' | 'link';
 
-// Card approximate dimensions (matches MemberCard layout: p-2, icon 48px, gap-3, text)
-const CARD_W = 160;
-const CARD_H = 56;
+// Card bounding box — measured from MemberCard layout
+// p-2(8) + icon w-12(48) + gap-3(12) + text(~110) + p-2(8) ≈ 186px
+// p-2(8) + icon h-12(48) + p-2(8) ≈ 64px
+const CARD_W = 186;
+const CARD_H = 64;
+const MARGIN = 5; // safety margin from card edge
+
+type Side = 'top' | 'bottom' | 'left' | 'right';
+
+interface AnchorPoint {
+  x: number;
+  y: number;
+  side: Side;
+}
 
 /**
- * Edge-to-Edge anchor algorithm.
- * For each card, compute 4 anchor points (mid-top, mid-bottom, mid-left, mid-right).
- * Select the pair (one from each card) with the shortest distance.
+ * Compute the 4 anchor points on a card's bounding box, already inset by MARGIN.
  */
-function getEdgeAnchors(
+function cardAnchors(m: FamilyMember): AnchorPoint[] {
+  return [
+    { x: m.x + CARD_W / 2, y: m.y - MARGIN,            side: 'top' },
+    { x: m.x + CARD_W / 2, y: m.y + CARD_H + MARGIN,   side: 'bottom' },
+    { x: m.x - MARGIN,              y: m.y + CARD_H / 2, side: 'left' },
+    { x: m.x + CARD_W + MARGIN,     y: m.y + CARD_H / 2, side: 'right' },
+  ];
+}
+
+/**
+ * Directional anchor selection:
+ * - Determine the dominant axis between two card centers
+ * - Select the appropriate anchor pair (top/bottom or left/right)
+ * - Returns anchor points with side info for path routing
+ */
+function getDirectionalAnchors(
   from: FamilyMember,
   to: FamilyMember
-): { x1: number; y1: number; x2: number; y2: number } {
-  const anchorsOf = (m: FamilyMember) => [
-    { x: m.x + CARD_W / 2, y: m.y },                // top
-    { x: m.x + CARD_W / 2, y: m.y + CARD_H },       // bottom
-    { x: m.x,              y: m.y + CARD_H / 2 },    // left
-    { x: m.x + CARD_W,     y: m.y + CARD_H / 2 },    // right
-  ];
+): { x1: number; y1: number; x2: number; y2: number; fromSide: Side; toSide: Side } {
+  const fromCx = from.x + CARD_W / 2;
+  const fromCy = from.y + CARD_H / 2;
+  const toCx = to.x + CARD_W / 2;
+  const toCy = to.y + CARD_H / 2;
 
-  const fromAnchors = anchorsOf(from);
-  const toAnchors = anchorsOf(to);
+  const dx = toCx - fromCx;
+  const dy = toCy - fromCy;
 
-  let best = { x1: 0, y1: 0, x2: 0, y2: 0 };
-  let bestDist = Infinity;
+  const absDx = Math.abs(dx);
+  const absDy = Math.abs(dy);
 
-  for (const a of fromAnchors) {
-    for (const b of toAnchors) {
-      const d = (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
-      if (d < bestDist) {
-        bestDist = d;
-        best = { x1: a.x, y1: a.y, x2: b.x, y2: b.y };
-      }
-    }
+  const fromAnchors = cardAnchors(from);
+  const toAnchors = cardAnchors(to);
+
+  let fromSide: Side;
+  let toSide: Side;
+
+  // Check if cards overlap on one axis — if so, use the other axis
+  const overlapX = from.x < to.x + CARD_W && to.x < from.x + CARD_W;
+  const overlapY = from.y < to.y + CARD_H && to.y < from.y + CARD_H;
+
+  if (overlapY && !overlapX) {
+    // Side by side — use left/right
+    fromSide = dx > 0 ? 'right' : 'left';
+    toSide = dx > 0 ? 'left' : 'right';
+  } else if (overlapX && !overlapY) {
+    // Stacked vertically — use top/bottom
+    fromSide = dy > 0 ? 'bottom' : 'top';
+    toSide = dy > 0 ? 'top' : 'bottom';
+  } else if (absDx > absDy) {
+    // Dominant horizontal
+    fromSide = dx > 0 ? 'right' : 'left';
+    toSide = dx > 0 ? 'left' : 'right';
+  } else {
+    // Dominant vertical
+    fromSide = dy > 0 ? 'bottom' : 'top';
+    toSide = dy > 0 ? 'top' : 'bottom';
   }
 
-  // Inset both endpoints by GAP px along the line direction
-  const GAP = 6;
-  const dx = best.x2 - best.x1;
-  const dy = best.y2 - best.y1;
-  const len = Math.sqrt(dx * dx + dy * dy);
-  if (len > GAP * 3) {
-    const ux = dx / len;
-    const uy = dy / len;
-    best.x1 += ux * GAP;
-    best.y1 += uy * GAP;
-    best.x2 -= ux * GAP;
-    best.y2 -= uy * GAP;
-  }
+  const fa = fromAnchors.find(a => a.side === fromSide)!;
+  const ta = toAnchors.find(a => a.side === toSide)!;
 
-  return best;
+  return { x1: fa.x, y1: fa.y, x2: ta.x, y2: ta.y, fromSide, toSide };
 }
 
 const GenogramEditor: React.FC = () => {
@@ -162,14 +191,14 @@ const GenogramEditor: React.FC = () => {
             }}
           >
             <RelationshipLines members={members} relationships={SAMPLE_RELATIONSHIPS} />
-            {/* Emotional links SVG overlay */}
-            <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1, pointerEvents: 'none' }}>
+            {/* Emotional links SVG overlay — z-index 0 so cards render above */}
+            <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0, pointerEvents: 'none' }}>
               <g style={{ pointerEvents: 'auto' }}>
                 {SAMPLE_EMOTIONAL_LINKS.map(link => {
                   const from = members.find(m => m.id === link.from);
                   const to = members.find(m => m.id === link.to);
                   if (!from || !to) return null;
-                  const anchors = getEdgeAnchors(from, to);
+                  const anchors = getDirectionalAnchors(from, to);
                   return (
                     <EmotionalLinkLine
                       key={link.id}

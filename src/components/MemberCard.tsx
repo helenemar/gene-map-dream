@@ -39,7 +39,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   return (
     <div
       className="absolute select-none"
-      style={{ left: member.x, top: member.y }}
+      style={{ left: member.x, top: member.y, zIndex: 2 }}
       onMouseDown={(e) => {
         e.stopPropagation();
         onDragStart?.(member.id, e);
