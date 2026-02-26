@@ -1,5 +1,6 @@
 import React from 'react';
 import { FamilyMember, Union, UnionStatus } from '@/types/genogram';
+import RelationshipBadge from './RelationshipBadge';
 
 const CARD_W = 186;
 const CARD_H = 64;
@@ -25,9 +26,7 @@ const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') =
 const UnionLine: React.FC<{
   x1: number; y1: number; x2: number; y2: number;
   status: UnionStatus;
-  marriageYear?: number;
-  divorceYear?: number;
-}> = ({ x1, y1, x2, y2, status, marriageYear, divorceYear }) => {
+}> = ({ x1, y1, x2, y2, status }) => {
   const midX = (x1 + x2) / 2;
   const midY = (y1 + y2) / 2;
   const stroke = 'hsl(var(--foreground))';
@@ -93,16 +92,6 @@ const UnionLine: React.FC<{
     <g>
       {renderLine()}
       {renderStatusMark()}
-      {(marriageYear || divorceYear) && (
-        <text
-          x={midX} y={midY + 18}
-          textAnchor="middle"
-          className="fill-muted-foreground text-[10px]"
-        >
-          {marriageYear && `m. ${marriageYear}`}
-          {divorceYear && ` · div. ${divorceYear}`}
-        </text>
-      )}
     </g>
   );
 };
@@ -148,8 +137,13 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
                 x1={leftAnchor.x} y1={leftAnchor.y}
                 x2={rightAnchor.x} y2={rightAnchor.y}
                 status={union.status}
-                marriageYear={union.marriageYear}
-                divorceYear={union.divorceYear}
+              />
+              <RelationshipBadge
+                union={union}
+                x={unionMidX}
+                y={unionMidY}
+                offsetForMark={union.status === 'divorced' || union.status === 'separated'}
+                onClick={() => console.log('Edit union', union.id)}
               />
             </g>
           );
@@ -176,8 +170,13 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
               x1={leftAnchor.x} y1={leftAnchor.y}
               x2={rightAnchor.x} y2={rightAnchor.y}
               status={union.status}
-              marriageYear={union.marriageYear}
-              divorceYear={union.divorceYear}
+            />
+            <RelationshipBadge
+              union={union}
+              x={unionMidX}
+              y={unionMidY}
+              offsetForMark={union.status === 'divorced' || union.status === 'separated'}
+              onClick={() => console.log('Edit union', union.id)}
             />
 
             {/* Descent stem: vertical from union midpoint down to comb Y */}
