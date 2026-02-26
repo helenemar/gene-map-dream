@@ -11,13 +11,14 @@ export interface MemberIconProps {
 }
 
 /**
- * Dynamic genogram member icon.
- * - Male = square, Female = circle
- * - Gay = solid inverted triangle inside
- * - Bisexual = dashed inverted triangle inside
- * - Transgender = smaller opposite shape inside (circle in square, square in circle)
- * - Dead = X cross over everything
- * All flags combine.
+ * Dynamic genogram member icon — pixel-perfect per reference grid.
+ * 
+ * Male = square base. Female = circle base (handled externally or here).
+ * Transgender = large inner opposite shape (circle in square, square in circle), drawn in lighter gray.
+ * Gay = solid inverted triangle (pointe vers le bas).
+ * Bisexual = dashed inverted triangle.
+ * Dead = X cross corner-to-corner.
+ * All flags stack/combine.
  */
 const MemberIcon: React.FC<MemberIconProps> = ({
   gender,
@@ -29,27 +30,33 @@ const MemberIcon: React.FC<MemberIconProps> = ({
   className,
 }) => {
   const s = size;
+  const sw = s * 0.04; // stroke width scales with size
+  const half = sw / 2;
+
+  // Square bounds (inset by half stroke so it doesn't clip)
+  const sqX = half;
+  const sqY = half;
+  const sqW = s - sw;
+  const sqH = s - sw;
+
   const cx = s / 2;
   const cy = s / 2;
-  const pad = 2; // padding from edge
-  const strokeColor = 'currentColor';
-  const sw = 1.5; // stroke width
 
-  // Outer shape dimensions
-  const outerR = s / 2 - pad; // circle radius
-  const sqInset = pad + 1; // square inset
+  // Circle for female outer or male transgender inner
+  const circleR = sqW / 2; // touches square edges
 
-  // Inner transgender shape
-  const innerScale = 0.45;
-  const innerR = outerR * innerScale;
-  const innerSqHalf = (s - sqInset * 2) * innerScale / 2;
+  // Triangle sizing — centered, ~60% of the square width
+  const triW = sqW * 0.55;
+  const triH = sqH * 0.45;
+  const triTopY = cy - triH * 0.35;
+  const triBottomY = cy + triH * 0.65;
+  const triLeft = cx - triW / 2;
+  const triRight = cx + triW / 2;
+  const triPoints = `${triLeft},${triTopY} ${triRight},${triTopY} ${cx},${triBottomY}`;
 
-  // Triangle (inverted) for gay/bisexual
-  const triPad = s * 0.22;
-  const triTop = cy + outerR * 0.05;
-  const triBottom = cy + outerR * 0.65;
-  const triLeft = cx - outerR * 0.45;
-  const triRight = cx + outerR * 0.45;
+  // Colors
+  const mainStroke = 'currentColor';
+  const transStroke = 'hsl(var(--muted-foreground) / 0.5)'; // lighter gray for transgender shape
 
   return (
     <svg
@@ -60,78 +67,57 @@ const MemberIcon: React.FC<MemberIconProps> = ({
       className={className}
       style={{ display: 'block' }}
     >
-      {/* Outer shape */}
+      {/* Layer 1: Outer shape */}
       {gender === 'female' ? (
-        <circle cx={cx} cy={cy} r={outerR} stroke={strokeColor} strokeWidth={sw} />
+        <circle cx={cx} cy={cy} r={circleR} stroke={mainStroke} strokeWidth={sw} />
       ) : (
-        <rect
-          x={sqInset}
-          y={sqInset}
-          width={s - sqInset * 2}
-          height={s - sqInset * 2}
-          stroke={strokeColor}
-          strokeWidth={sw}
-        />
+        <rect x={sqX} y={sqY} width={sqW} height={sqH} stroke={mainStroke} strokeWidth={sw} />
       )}
 
-      {/* Transgender: inner opposite shape */}
+      {/* Layer 2: Transgender — large inner opposite shape in lighter gray */}
       {isTransgender && (
         gender === 'male' ? (
-          // Small circle inside square
-          <circle cx={cx} cy={cy} r={innerR} stroke={strokeColor} strokeWidth={sw} />
+          <circle cx={cx} cy={cy} r={circleR * 0.82} stroke={transStroke} strokeWidth={sw} />
         ) : (
-          // Small square inside circle
           <rect
-            x={cx - innerSqHalf}
-            y={cy - innerSqHalf}
-            width={innerSqHalf * 2}
-            height={innerSqHalf * 2}
-            stroke={strokeColor}
+            x={cx - sqW * 0.38}
+            y={cy - sqH * 0.38}
+            width={sqW * 0.76}
+            height={sqH * 0.76}
+            stroke={transStroke}
             strokeWidth={sw}
           />
         )
       )}
 
-      {/* Gay: solid inverted triangle */}
+      {/* Layer 3: Gay — solid inverted triangle */}
       {isGay && !isBisexual && (
         <polygon
-          points={`${cx},${triBottom} ${triLeft},${triTop} ${triRight},${triTop}`}
-          stroke={strokeColor}
+          points={triPoints}
+          stroke={isDead ? transStroke : mainStroke}
           strokeWidth={sw}
+          strokeLinejoin="miter"
           fill="none"
         />
       )}
 
-      {/* Bisexual: dashed inverted triangle */}
+      {/* Layer 3: Bisexual — dashed inverted triangle */}
       {isBisexual && (
         <polygon
-          points={`${cx},${triBottom} ${triLeft},${triTop} ${triRight},${triTop}`}
-          stroke={strokeColor}
+          points={triPoints}
+          stroke={isDead ? transStroke : mainStroke}
           strokeWidth={sw}
-          strokeDasharray="3 2"
+          strokeDasharray={`${s * 0.07} ${s * 0.05}`}
+          strokeLinejoin="miter"
           fill="none"
         />
       )}
 
-      {/* Dead: X cross */}
+      {/* Layer 4 (top): Dead — X cross corner to corner */}
       {isDead && (
         <>
-          <line
-            x1={pad + 1}
-            y1={pad + 1}
-            x2={s - pad - 1}
-            y2={s - pad - 1}
-            stroke={strokeColor}
-            strokeWidth={sw}
-          />
-          <line
-            x1={s - pad - 1}
-            y1={pad + 1}
-            x2={pad + 1}
-            y2={s - pad - 1}
-            stroke={strokeColor}
-            strokeWidth={sw}
-          />
+          <line x1={sqX} y1={sqY} x2={sqX + sqW} y2={sqY + sqH} stroke={mainStroke} strokeWidth={sw} />
+          <line x1={sqX + sqW} y1={sqY} x2={sqX} y2={sqY + sqH} stroke={mainStroke} strokeWidth={sw} />
         </>
       )}
     </svg>

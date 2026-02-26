@@ -478,56 +478,59 @@ const DesignSystemPage: React.FC = () => {
            ============================================================ */}
         <SectionTitle>3. Organismes (Spécifiques à Genogy)</SectionTitle>
 
-        {/* Member Icon - All Combinations */}
-        <SubSection title="Icône Membre — Toutes les combinaisons">
+        {/* Member Icon - Male 12 Variants (Reference Grid) */}
+        <SubSection title="Icône Homme — Grille de référence (12 variantes)">
           <p className="text-sm text-muted-foreground mb-4">
-            Grille exhaustive des 16 combinaisons par genre. <strong>Cercle</strong> = femme, <strong>Carré</strong> = homme. 
-            Triangle inversé = Gay, Triangle pointillé = Bisexuel, Forme intérieure opposée = Transgenre, Croix = Décédé.
+            Grille 4×3 exacte de la référence. <strong>Carré</strong> = homme. 
+            Cercle intérieur (gris) = Transgenre, Triangle inversé = Gay, Triangle pointillé = Bisexuel, Croix = Décédé.
           </p>
-
-          {/* Female grid */}
-          <h4 className="text-sm font-semibold text-foreground mb-3 mt-6">Femme (Cercle)</h4>
-          <div className="grid grid-cols-4 gap-4 mb-8">
-            {generateCombinations('female').map((combo, i) => (
-              <div key={i} className="bg-card rounded-xl border border-border p-4 flex flex-col items-center gap-3">
-                <MemberIcon
-                  gender="female"
-                  isGay={combo.gay}
-                  isBisexual={combo.bisexual}
-                  isTransgender={combo.transgender}
-                  isDead={combo.dead}
-                  size={56}
-                  className="text-foreground"
-                />
-                <div className="text-[10px] text-muted-foreground text-center space-y-0.5">
-                  <div>Gay: <strong>{combo.gay ? 'True' : 'False'}</strong></div>
-                  <div>Trans: <strong>{combo.transgender ? 'True' : 'False'}</strong></div>
-                  <div>Bi: <strong>{combo.bisexual ? 'True' : 'False'}</strong></div>
-                  <div>Dead: <strong>{combo.dead ? 'True' : 'False'}</strong></div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Male grid */}
-          <h4 className="text-sm font-semibold text-foreground mb-3">Homme (Carré)</h4>
-          <div className="grid grid-cols-4 gap-4 mb-8">
-            {generateCombinations('male').map((combo, i) => (
-              <div key={i} className="bg-card rounded-xl border border-border p-4 flex flex-col items-center gap-3">
+          <div className="grid grid-cols-4 gap-5 mb-8">
+            {MALE_REFERENCE_GRID.map((combo, i) => (
+              <div key={i} className="bg-card rounded-xl border border-border p-5 flex flex-col items-center gap-3">
                 <MemberIcon
                   gender="male"
                   isGay={combo.gay}
                   isBisexual={combo.bisexual}
                   isTransgender={combo.transgender}
                   isDead={combo.dead}
-                  size={56}
+                  size={72}
                   className="text-foreground"
                 />
+                <div className="text-[10px] text-muted-foreground text-center leading-relaxed">
+                  {combo.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </SubSection>
+
+        {/* All combinations systematic */}
+        <SubSection title="Icône Membre — Toutes les combinaisons">
+          <p className="text-sm text-muted-foreground mb-4">
+            Grille exhaustive par genre. Triangle inversé = Gay, Triangle pointillé = Bisexuel, Forme intérieure = Transgenre, Croix = Décédé.
+          </p>
+
+          <h4 className="text-sm font-semibold text-foreground mb-3">Homme (Carré)</h4>
+          <div className="grid grid-cols-4 gap-4 mb-8">
+            {generateCombinations('male').map((combo, i) => (
+              <div key={i} className="bg-card rounded-xl border border-border p-4 flex flex-col items-center gap-3">
+                <MemberIcon gender="male" isGay={combo.gay} isBisexual={combo.bisexual} isTransgender={combo.transgender} isDead={combo.dead} size={56} className="text-foreground" />
                 <div className="text-[10px] text-muted-foreground text-center space-y-0.5">
-                  <div>Gay: <strong>{combo.gay ? 'True' : 'False'}</strong></div>
-                  <div>Trans: <strong>{combo.transgender ? 'True' : 'False'}</strong></div>
-                  <div>Bi: <strong>{combo.bisexual ? 'True' : 'False'}</strong></div>
-                  <div>Dead: <strong>{combo.dead ? 'True' : 'False'}</strong></div>
+                  <div>Gay: <strong>{combo.gay ? 'T' : 'F'}</strong> · Trans: <strong>{combo.transgender ? 'T' : 'F'}</strong></div>
+                  <div>Bi: <strong>{combo.bisexual ? 'T' : 'F'}</strong> · Dead: <strong>{combo.dead ? 'T' : 'F'}</strong></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <h4 className="text-sm font-semibold text-foreground mb-3">Femme (Cercle)</h4>
+          <div className="grid grid-cols-4 gap-4 mb-8">
+            {generateCombinations('female').map((combo, i) => (
+              <div key={i} className="bg-card rounded-xl border border-border p-4 flex flex-col items-center gap-3">
+                <MemberIcon gender="female" isGay={combo.gay} isBisexual={combo.bisexual} isTransgender={combo.transgender} isDead={combo.dead} size={56} className="text-foreground" />
+                <div className="text-[10px] text-muted-foreground text-center space-y-0.5">
+                  <div>Gay: <strong>{combo.gay ? 'T' : 'F'}</strong> · Trans: <strong>{combo.transgender ? 'T' : 'F'}</strong></div>
+                  <div>Bi: <strong>{combo.bisexual ? 'T' : 'F'}</strong> · Dead: <strong>{combo.dead ? 'T' : 'F'}</strong></div>
                 </div>
               </div>
             ))}
@@ -768,6 +771,22 @@ const DesignSystemPage: React.FC = () => {
     </div>
   );
 };
+
+// Reference grid: exact 12 variants from the screenshot (4 cols × 3 rows)
+const MALE_REFERENCE_GRID = [
+  { gay: false, transgender: false, bisexual: false, dead: false, label: 'Base' },
+  { gay: false, transgender: true,  bisexual: false, dead: false, label: 'Transgenre' },
+  { gay: false, transgender: false, bisexual: false, dead: true,  label: 'Décédé' },
+  { gay: false, transgender: true,  bisexual: false, dead: true,  label: 'Trans + Décédé' },
+  { gay: true,  transgender: false, bisexual: false, dead: false, label: 'Gay' },
+  { gay: true,  transgender: true,  bisexual: false, dead: false, label: 'Gay + Trans' },
+  { gay: true,  transgender: false, bisexual: false, dead: true,  label: 'Gay + Décédé' },
+  { gay: true,  transgender: true,  bisexual: false, dead: true,  label: 'Gay + Trans + Décédé' },
+  { gay: false, transgender: false, bisexual: true,  dead: false, label: 'Bisexuel' },
+  { gay: false, transgender: true,  bisexual: true,  dead: false, label: 'Bi + Trans' },
+  { gay: false, transgender: false, bisexual: true,  dead: true,  label: 'Bi + Décédé' },
+  { gay: false, transgender: true,  bisexual: true,  dead: true,  label: 'Bi + Trans + Décédé' },
+];
 
 // ================== Helpers ==================
 
