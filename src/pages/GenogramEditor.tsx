@@ -302,7 +302,7 @@ const GenogramEditor: React.FC = () => {
     setTimeout(() => {
       setIsAnimating(false);
       handleFitToScreen();
-    }, 650);
+    }, 900); // Match spring animation duration
   }, [members, handleFitToScreen]);
 
   // ─── Button zoom (centered on viewport center) ───
