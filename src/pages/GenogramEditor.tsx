@@ -26,6 +26,18 @@ type Side = 'top' | 'bottom' | 'left' | 'right';
 
 interface AnchorPoint { x: number; y: number; side: Side; }
 
+/** Corner anchors for emotional links — corners only, never center/sides */
+type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+function cardCorners(m: FamilyMember): { corner: Corner; x: number; y: number }[] {
+  return [
+    { corner: 'top-left',     x: m.x,          y: m.y },
+    { corner: 'top-right',    x: m.x + CARD_W, y: m.y },
+    { corner: 'bottom-left',  x: m.x,          y: m.y + CARD_H },
+    { corner: 'bottom-right', x: m.x + CARD_W, y: m.y + CARD_H },
+  ];
+}
+
+/** Side anchors (center of edges) — used only by family links */
 function cardAnchors(m: FamilyMember): AnchorPoint[] {
   return [
     { x: m.x + CARD_W / 2, y: m.y - MARGIN, side: 'top' },
@@ -35,6 +47,67 @@ function cardAnchors(m: FamilyMember): AnchorPoint[] {
   ];
 }
 
+/**
+ * Corner-based anchor selection for emotional links.
+ * Picks the pair of corners (one per card) that:
+ *  1. Minimises the total distance
+ *  2. Avoids routing the line through either card's bounding box
+ */
+function getEmotionalAnchors(from: FamilyMember, to: FamilyMember) {
+  const fromCorners = cardCorners(from);
+  const toCorners = cardCorners(to);
+
+  let best = { x1: 0, y1: 0, x2: 0, y2: 0, dist: Infinity };
+
+  for (const fc of fromCorners) {
+    for (const tc of toCorners) {
+      const dx = tc.x - fc.x;
+      const dy = tc.y - fc.y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+
+      // Reject if the straight line passes through either card
+      const crossesFrom = linePassesThroughCard(fc.x, fc.y, tc.x, tc.y, from);
+      const crossesTo   = linePassesThroughCard(fc.x, fc.y, tc.x, tc.y, to);
+
+      const penalty = (crossesFrom ? 10000 : 0) + (crossesTo ? 10000 : 0);
+      const score = d + penalty;
+
+      if (score < best.dist) {
+        best = { x1: fc.x, y1: fc.y, x2: tc.x, y2: tc.y, dist: score };
+      }
+    }
+  }
+
+  return { x1: best.x1, y1: best.y1, x2: best.x2, y2: best.y2 };
+}
+
+/** Check if a segment passes through a card's interior (with small inset) */
+function linePassesThroughCard(ax: number, ay: number, bx: number, by: number, m: FamilyMember): boolean {
+  const inset = 4; // shrink rect slightly so corner-touching doesn't count
+  const rx = m.x + inset;
+  const ry = m.y + inset;
+  const rw = CARD_W - inset * 2;
+  const rh = CARD_H - inset * 2;
+  if (rw <= 0 || rh <= 0) return false;
+  // Liang–Barsky
+  const dx = bx - ax;
+  const dy = by - ay;
+  const p = [-dx, dx, -dy, dy];
+  const q = [ax - rx, rx + rw - ax, ay - ry, ry + rh - ay];
+  let u0 = 0, u1 = 1;
+  for (let i = 0; i < 4; i++) {
+    if (Math.abs(p[i]) < 1e-9) {
+      if (q[i] < 0) return false;
+    } else {
+      const t = q[i] / p[i];
+      if (p[i] < 0) { if (t > u0) u0 = t; }
+      else { if (t < u1) u1 = t; }
+    }
+  }
+  return u0 < u1; // strict: the line actually enters the rect interior
+}
+
+/** Legacy side-based anchors for any non-emotional usage */
 function getDirectionalAnchors(from: FamilyMember, to: FamilyMember) {
   const fromCx = from.x + CARD_W / 2;
   const fromCy = from.y + CARD_H / 2;
@@ -389,7 +462,7 @@ const GenogramEditor: React.FC = () => {
                     const from = members.find(m => m.id === link.from);
                     const to = members.find(m => m.id === link.to);
                     if (!from || !to) return null;
-                    const anchors = getDirectionalAnchors(from, to);
+                    const anchors = getEmotionalAnchors(from, to);
                     const key = [link.from, link.to].sort().join('|');
                     const group = pairMap.get(key)!;
                     const linkIndex = group.indexOf(globalIdx);
