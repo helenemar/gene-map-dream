@@ -86,6 +86,30 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
     y: 350,
     pathologies: [],
   },
+  {
+    id: '8',
+    firstName: 'Marc',
+    lastName: 'Dupont',
+    birthYear: 1958,
+    age: 67,
+    profession: 'Architecte',
+    gender: 'male',
+    x: 900,
+    y: 120,
+    pathologies: ['diabetes'],
+  },
+  {
+    id: '9',
+    firstName: 'Léa',
+    lastName: 'Dupont',
+    birthYear: 2005,
+    age: 20,
+    profession: 'Étudiante',
+    gender: 'female',
+    x: 1200,
+    y: 350,
+    pathologies: [],
+  },
 ];
 
 /** New Union-based model */
@@ -98,6 +122,14 @@ export const SAMPLE_UNIONS: Union[] = [
     marriageYear: 1981,
     divorceYear: 2018,
     children: ['3', '4', '5', '6', '7'],
+  },
+  {
+    id: 'u2',
+    partner1: '2',
+    partner2: '8',
+    status: 'married',
+    marriageYear: 2020,
+    children: ['9'],
   },
 ];
 
