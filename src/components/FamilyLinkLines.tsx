@@ -37,7 +37,6 @@ const UnionLine: React.FC<{
     const markSize = 6;
     switch (status) {
       case 'separated':
-        // Single oblique slash
         return (
           <line
             x1={midX - markSize} y1={midY + markSize}
@@ -46,7 +45,6 @@ const UnionLine: React.FC<{
           />
         );
       case 'divorced':
-        // Two parallel oblique slashes
         return (
           <>
             <line
@@ -62,7 +60,6 @@ const UnionLine: React.FC<{
           </>
         );
       case 'widowed':
-        // Cross mark at deceased partner side
         return (
           <>
             <line x1={midX - 5} y1={midY - 5} x2={midX + 5} y2={midY + 5}
@@ -79,14 +76,12 @@ const UnionLine: React.FC<{
   const renderLine = () => {
     switch (status) {
       case 'common_law':
-        // Dashed line
         return (
           <line x1={x1} y1={y1} x2={x2} y2={y2}
             stroke={stroke} strokeWidth={2} strokeOpacity={opacity}
             strokeDasharray="8 4" />
         );
       default:
-        // Solid line for married, separated, divorced, widowed
         return (
           <line x1={x1} y1={y1} x2={x2} y2={y2}
             stroke={stroke} strokeWidth={2} strokeOpacity={opacity} />
@@ -98,7 +93,6 @@ const UnionLine: React.FC<{
     <g>
       {renderLine()}
       {renderStatusMark()}
-      {/* Year annotations */}
       {(marriageYear || divorceYear) && (
         <text
           x={midX} y={midY + 18}
@@ -114,11 +108,13 @@ const UnionLine: React.FC<{
 };
 
 /**
- * FamilyLinkLines renders:
+ * FamilyLinkLines renders orthogonal (right-angle) family links:
  * 1. Union lines (horizontal) between partners
  * 2. Descent stem (vertical) from union midpoint
  * 3. Sibling comb (horizontal bar) connecting children
  * 4. Individual drops from comb to each child's top anchor
+ *
+ * All paths use strict orthogonal routing (no diagonals).
  */
 const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) => {
   const getMember = (id: string) => members.find(m => m.id === id);
@@ -135,15 +131,15 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
         const leftAnchor = getAnchor(left, 'right');
         const rightAnchor = getAnchor(right, 'left');
 
-        // Union midpoint (where descent stem starts)
+        // Union midpoint
         const unionMidX = (leftAnchor.x + rightAnchor.x) / 2;
         const unionMidY = (leftAnchor.y + rightAnchor.y) / 2;
 
-        // Get children members
+        // Get children sorted left to right
         const childMembers = union.children
           .map(getMember)
           .filter((m): m is FamilyMember => !!m)
-          .sort((a, b) => a.x - b.x); // sort left to right
+          .sort((a, b) => a.x - b.x);
 
         if (childMembers.length === 0) {
           return (
@@ -159,14 +155,12 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
           );
         }
 
-        // Child anchors (top of each child card)
         const childAnchors = childMembers.map(c => getAnchor(c, 'top'));
 
-        // Comb Y = midpoint between union line and topmost child
+        // Orthogonal comb Y: fixed midpoint between union and top of children
         const topChildY = Math.min(...childAnchors.map(a => a.y));
         const combY = unionMidY + (topChildY - unionMidY) * 0.5;
 
-        // Comb horizontal span (from leftmost to rightmost child)
         const combLeftX = childAnchors[0].x;
         const combRightX = childAnchors[childAnchors.length - 1].x;
 
@@ -174,9 +168,10 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
         const opacity = 0.3;
         const sw = 1.5;
 
+        // Build orthogonal path segments
         return (
           <g key={union.id}>
-            {/* 1. Union line (horizontal between partners) */}
+            {/* Union line */}
             <UnionLine
               x1={leftAnchor.x} y1={leftAnchor.y}
               x2={rightAnchor.x} y2={rightAnchor.y}
@@ -185,29 +180,36 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
               divorceYear={union.divorceYear}
             />
 
-            {/* 2. Descent stem (vertical from union midpoint down to comb) */}
-            <line
-              x1={unionMidX} y1={unionMidY}
-              x2={unionMidX} y2={combY}
-              stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+            {/* Descent stem: vertical from union midpoint down to comb Y */}
+            <path
+              d={`M ${unionMidX} ${unionMidY} L ${unionMidX} ${combY}`}
+              stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} fill="none"
             />
 
-            {/* 3. Sibling comb (horizontal bar) */}
-            <line
-              x1={combLeftX} y1={combY}
-              x2={combRightX} y2={combY}
-              stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-            />
+            {/* Sibling comb: horizontal bar at combY */}
+            {childAnchors.length > 1 && (
+              <path
+                d={`M ${combLeftX} ${combY} L ${combRightX} ${combY}`}
+                stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} fill="none"
+              />
+            )}
 
-            {/* 4. Individual drops from comb to each child */}
+            {/* Orthogonal drops: vertical from combY to each child top anchor */}
             {childAnchors.map((anchor, i) => (
-              <line
+              <path
                 key={i}
-                x1={anchor.x} y1={combY}
-                x2={anchor.x} y2={anchor.y}
-                stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                d={`M ${anchor.x} ${combY} L ${anchor.x} ${anchor.y}`}
+                stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} fill="none"
               />
             ))}
+
+            {/* Single child: connect stem directly */}
+            {childAnchors.length === 1 && (
+              <path
+                d={`M ${unionMidX} ${combY} L ${childAnchors[0].x} ${combY}`}
+                stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} fill="none"
+              />
+            )}
           </g>
         );
       })}
@@ -218,7 +220,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
 export default FamilyLinkLines;
 
 /**
- * Static preview for design system — renders union line samples.
+ * Static preview for design system
  */
 export const FamilyLinkPreview: React.FC<{ status: UnionStatus; width?: number; height?: number }> = ({
   status, width = 200, height = 32,
