@@ -1,8 +1,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Share2, Plus, UserPlus, Pencil, ZoomIn, ZoomOut, X, Search, ChevronDown, ChevronUp, ArrowLeft, Settings } from 'lucide-react';
+import { Download, Share2, Plus, UserPlus, Pencil, ZoomIn, ZoomOut, X, Search, ChevronDown, ChevronUp, ArrowLeft, Link } from 'lucide-react';
 import { PATHOLOGIES, FAMILY_LINK_TYPES, EMOTIONAL_LINK_TYPES } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
+import type { MemberCardState } from '@/components/MemberCard';
 
 /* ============================================================
    Design System – Genogy
@@ -551,6 +552,36 @@ const DesignSystemPage: React.FC = () => {
           </div>
         </SubSection>
 
+        {/* Member Card States */}
+        <SubSection title="Carte Membre — États interactifs (States)">
+          <p className="text-sm text-muted-foreground mb-4">
+            Chaque carte possède 4 états UI : <strong>Default</strong>, <strong>Hover</strong> (bordure violette),
+            <strong> Edition</strong> (ancres + boutons flottants) et <strong>Linkable</strong> (ancres + icône chaînage).
+          </p>
+          <div className="dot-grid rounded-2xl border border-border p-12">
+            <div className="grid grid-cols-2 gap-x-16 gap-y-20">
+              {(['default', 'hover', 'edition', 'linkable'] as const).map(st => (
+                <div key={st} className="flex flex-col items-start gap-2">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                    State: {st}
+                  </span>
+                  <MemberCardStatic
+                    name="Firstname"
+                    age={24}
+                    birthYear={1962}
+                    deathYear={1998}
+                    profession="Data analyste"
+                    gender="male"
+                    pathologies={['depression']}
+                    isTransgender
+                    state={st}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </SubSection>
+
         {/* Lateralsheet */}
         <SubSection title="Lateralsheet (Panneau latéral droit)">
           <p className="text-sm text-muted-foreground mb-4">Panneau contextuel qui s'ouvre à droite pour éditer un membre. Ombre douce, border-radius large.</p>
@@ -858,6 +889,89 @@ const MemberCardDemo: React.FC<{
         {isGay ? ' · Gay' : ''}{isBisexual ? ' · Bi' : ''}{isTransgender ? ' · Trans' : ''}
         {selected ? ' · Sélectionné' : ''}
       </span>
+    </div>
+  );
+};
+
+// Static MemberCard with state rendering (for design system showcase — not positioned absolute)
+const MemberCardStatic: React.FC<{
+  name: string;
+  age: number;
+  birthYear: number;
+  deathYear?: number;
+  profession: string;
+  gender: 'male' | 'female';
+  pathologies: string[];
+  isDead?: boolean;
+  isGay?: boolean;
+  isBisexual?: boolean;
+  isTransgender?: boolean;
+  state?: MemberCardState;
+}> = ({ name, age, birthYear, deathYear, profession, gender, pathologies, isDead, isGay, isBisexual, isTransgender, state = 'default' }) => {
+  const isDeceased = !!deathYear || isDead;
+  const matchedPathologies = PATHOLOGIES.filter(p => pathologies.includes(p.id));
+
+  const showRing = state === 'hover' || state === 'edition' || state === 'linkable';
+  const showAnchors = state === 'edition' || state === 'linkable';
+  const showActions = state === 'edition';
+  const showLinkIcon = state === 'linkable';
+
+  return (
+    <div className="relative inline-block">
+      {/* Anchor points */}
+      {showAnchors && (
+        <>
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-card z-10" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-card z-10" />
+          <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-card z-10" />
+          <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-card z-10" />
+        </>
+      )}
+
+      {/* Card body */}
+      <div className={`relative flex items-center gap-3 rounded-xl p-2 bg-card border shadow-card transition-all ${showRing ? 'border-primary ring-2 ring-primary/30' : 'border-border'}`}>
+        <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
+          <MemberIcon gender={gender} isGay={isGay} isBisexual={isBisexual} isTransgender={isTransgender} isDead={isDeceased} size={48} className="text-foreground" />
+          {matchedPathologies.length > 0 && (
+            <div className={`absolute inset-1 overflow-hidden pointer-events-none ${gender === 'male' ? 'rounded-sm' : 'rounded-full'}`}>
+              {matchedPathologies.map((p, i) => (
+                <div key={p.id} className="absolute opacity-30" style={{
+                  backgroundColor: `hsl(var(--pathology-${p.id}))`,
+                  width: '50%', height: '50%',
+                  top: i < 2 ? 0 : '50%',
+                  left: i % 2 === 0 ? 0 : '50%',
+                }} />
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="whitespace-nowrap">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-sm text-foreground">{name}</span>
+            <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">{age} ans</span>
+          </div>
+          <div className="text-xs text-muted-foreground">{birthYear}{deathYear ? ` - ${deathYear}` : ' -'}</div>
+          <div className="text-xs text-muted-foreground">{profession}</div>
+        </div>
+        {showLinkIcon && (
+          <div className="ml-1 w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0">
+            <Link className="w-3.5 h-3.5 text-muted-foreground" />
+          </div>
+        )}
+      </div>
+
+      {/* Floating action buttons */}
+      {showActions && (
+        <div className="flex items-center gap-2 justify-center mt-2">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors">
+            <Plus className="w-3.5 h-3.5" />
+            Create related member
+          </button>
+          <button className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors">
+            <Pencil className="w-3.5 h-3.5 text-foreground" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
