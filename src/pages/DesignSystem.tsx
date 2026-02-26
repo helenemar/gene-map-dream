@@ -538,6 +538,54 @@ const DesignSystemPage: React.FC = () => {
           </div>
         </SubSection>
 
+        {/* Pathology Fill Grid */}
+        <SubSection title="Icône Membre — Remplissage Pathologies (0 à 4)">
+          <p className="text-sm text-muted-foreground mb-4">
+            Grille de démonstration du remplissage par quadrants selon le nombre de pathologies.
+            Ordre : Bas-Gauche[0], Bas-Droit[1], Haut-Gauche[2], Haut-Droit[3].
+          </p>
+
+          <h4 className="text-sm font-semibold text-foreground mb-3">Homme (Carré)</h4>
+          <div className="flex flex-wrap gap-6 mb-8">
+            {PATHOLOGY_FILL_DEMOS.map((demo, i) => (
+              <div key={`m-${i}`} className="flex flex-col items-center gap-2 bg-card rounded-xl border border-border p-4">
+                <MemberIcon gender="male" pathologyColors={demo.colors} size={64} className="text-foreground" />
+                <span className="text-[10px] text-muted-foreground font-medium">{demo.colors.length} pathologie{demo.colors.length !== 1 ? 's' : ''}</span>
+              </div>
+            ))}
+          </div>
+
+          <h4 className="text-sm font-semibold text-foreground mb-3">Femme (Cercle)</h4>
+          <div className="flex flex-wrap gap-6 mb-8">
+            {PATHOLOGY_FILL_DEMOS.map((demo, i) => (
+              <div key={`f-${i}`} className="flex flex-col items-center gap-2 bg-card rounded-xl border border-border p-4">
+                <MemberIcon gender="female" pathologyColors={demo.colors} size={64} className="text-foreground" />
+                <span className="text-[10px] text-muted-foreground font-medium">{demo.colors.length} pathologie{demo.colors.length !== 1 ? 's' : ''}</span>
+              </div>
+            ))}
+          </div>
+
+          <h4 className="text-sm font-semibold text-foreground mb-3">Combiné avec symboles</h4>
+          <div className="flex flex-wrap gap-6">
+            <div className="flex flex-col items-center gap-2 bg-card rounded-xl border border-border p-4">
+              <MemberIcon gender="male" isTransgender pathologyColors={[PATHO_COLORS[0]]} size={64} className="text-foreground" />
+              <span className="text-[10px] text-muted-foreground">Trans + 1 patho</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 bg-card rounded-xl border border-border p-4">
+              <MemberIcon gender="male" isTransgender pathologyColors={[PATHO_COLORS[2], PATHO_COLORS[0]]} size={64} className="text-foreground" />
+              <span className="text-[10px] text-muted-foreground">Trans + 2 patho</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 bg-card rounded-xl border border-border p-4">
+              <MemberIcon gender="female" isTransgender isBisexual pathologyColors={[PATHO_COLORS[2], PATHO_COLORS[0]]} size={64} className="text-foreground" />
+              <span className="text-[10px] text-muted-foreground">Trans+Bi + 2 patho</span>
+            </div>
+            <div className="flex flex-col items-center gap-2 bg-card rounded-xl border border-border p-4">
+              <MemberIcon gender="female" isTransgender isBisexual isDead pathologyColors={[PATHO_COLORS[2], PATHO_COLORS[0]]} size={64} className="text-foreground" />
+              <span className="text-[10px] text-muted-foreground">Trans+Bi+Dead + 2</span>
+            </div>
+          </div>
+        </SubSection>
+
         {/* Member Card with Icon */}
         <SubSection title="Carte Membre (MemberCard / Node)">
           <p className="text-sm text-muted-foreground mb-4">Composant complet avec MemberIcon + infos. L'icône change selon genre, orientation, identité et statut vital.</p>
@@ -803,6 +851,22 @@ const DesignSystemPage: React.FC = () => {
   );
 };
 
+// Pathology hex colors for demo grids
+const PATHO_COLORS = [
+  'hsl(var(--pathology-depression))',   // violet
+  'hsl(var(--pathology-cancer))',       // blue
+  'hsl(var(--pathology-addiction))',     // green
+  'hsl(var(--pathology-bipolar))',      // orange
+];
+
+const PATHOLOGY_FILL_DEMOS = [
+  { colors: [] as string[] },
+  { colors: [PATHO_COLORS[1]] },
+  { colors: [PATHO_COLORS[0], PATHO_COLORS[1]] },
+  { colors: [PATHO_COLORS[3], PATHO_COLORS[0], PATHO_COLORS[1]] },
+  { colors: [PATHO_COLORS[3], PATHO_COLORS[2], PATHO_COLORS[0], PATHO_COLORS[1]] },
+];
+
 // Reference grid: exact 12 variants from the screenshot (4 cols × 3 rows)
 const MALE_REFERENCE_GRID = [
   { gay: false, transgender: false, bisexual: false, dead: false, label: 'Base' },
@@ -860,19 +924,7 @@ const MemberCardDemo: React.FC<{
     <div className="flex flex-col items-center gap-2">
       <div className={`flex items-center gap-3 ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''} rounded-xl p-2 bg-card border border-border shadow-card transition-shadow`}>
         <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
-          <MemberIcon gender={gender} isGay={isGay} isBisexual={isBisexual} isTransgender={isTransgender} isDead={isDeceased} size={48} className="text-foreground" />
-          {matchedPathologies.length > 0 && (
-            <div className={`absolute inset-1 overflow-hidden pointer-events-none ${gender === 'male' ? 'rounded-sm' : 'rounded-full'}`}>
-              {matchedPathologies.map((p, i) => (
-                <div key={p.id} className="absolute opacity-30" style={{
-                  backgroundColor: `hsl(var(--pathology-${p.id}))`,
-                  width: '50%', height: '50%',
-                  top: i < 2 ? 0 : '50%',
-                  left: i % 2 === 0 ? 0 : '50%',
-                }} />
-              ))}
-            </div>
-          )}
+          <MemberIcon gender={gender} isGay={isGay} isBisexual={isBisexual} isTransgender={isTransgender} isDead={isDeceased} pathologyColors={matchedPathologies.map(p => `hsl(var(--pathology-${p.id}))`)} size={48} className="text-foreground" />
         </div>
         <div className="whitespace-nowrap">
           <div className="flex items-center gap-2">
@@ -931,19 +983,7 @@ const MemberCardStatic: React.FC<{
       {/* Card body */}
       <div className={`relative flex items-center gap-3 rounded-xl p-2 bg-card border shadow-card transition-all ${showRing ? 'border-primary ring-2 ring-primary/30' : 'border-border'}`}>
         <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
-          <MemberIcon gender={gender} isGay={isGay} isBisexual={isBisexual} isTransgender={isTransgender} isDead={isDeceased} size={48} className="text-foreground" />
-          {matchedPathologies.length > 0 && (
-            <div className={`absolute inset-1 overflow-hidden pointer-events-none ${gender === 'male' ? 'rounded-sm' : 'rounded-full'}`}>
-              {matchedPathologies.map((p, i) => (
-                <div key={p.id} className="absolute opacity-30" style={{
-                  backgroundColor: `hsl(var(--pathology-${p.id}))`,
-                  width: '50%', height: '50%',
-                  top: i < 2 ? 0 : '50%',
-                  left: i % 2 === 0 ? 0 : '50%',
-                }} />
-              ))}
-            </div>
-          )}
+          <MemberIcon gender={gender} isGay={isGay} isBisexual={isBisexual} isTransgender={isTransgender} isDead={isDeceased} pathologyColors={matchedPathologies.map(p => `hsl(var(--pathology-${p.id}))`)} size={48} className="text-foreground" />
         </div>
         <div className="whitespace-nowrap">
           <div className="flex items-center gap-2">

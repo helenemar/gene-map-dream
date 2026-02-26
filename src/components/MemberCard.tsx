@@ -69,26 +69,10 @@ const MemberCard: React.FC<MemberCardProps> = ({
             isBisexual={member.isBisexual}
             isTransgender={member.isTransgender}
             isDead={isDeceased}
+            pathologyColors={memberPathologies.map(p => `hsl(var(--pathology-${p.id}))`)}
             size={48}
             className="text-foreground"
           />
-          {memberPathologies.length > 0 && (
-            <div className={`absolute inset-1 overflow-hidden pointer-events-none ${member.gender === 'male' ? 'rounded-sm' : 'rounded-full'}`}>
-              {memberPathologies.map((p, i) => (
-                <div
-                  key={p.id}
-                  className="absolute opacity-30"
-                  style={{
-                    backgroundColor: `hsl(var(--pathology-${p.id}))`,
-                    width: '50%',
-                    height: '50%',
-                    top: i < 2 ? 0 : '50%',
-                    left: i % 2 === 0 ? 0 : '50%',
-                  }}
-                />
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Info */}
