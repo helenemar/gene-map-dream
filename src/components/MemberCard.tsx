@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { FamilyMember, PATHOLOGIES } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
 import { Plus, Pencil, Link } from 'lucide-react';
@@ -41,14 +42,17 @@ const MemberCard: React.FC<MemberCardProps> = ({
   const showLinkIcon = activeState === 'linkable';
 
   return (
-    <div
+    <motion.div
       className="absolute select-none"
-      style={{
+      animate={{
         left: member.x,
         top: member.y,
-        zIndex: 2,
-        transition: isAnimating ? 'left 0.6s cubic-bezier(0.22, 1, 0.36, 1), top 0.6s cubic-bezier(0.22, 1, 0.36, 1)' : 'none',
       }}
+      transition={isAnimating
+        ? { type: 'spring', stiffness: 80, damping: 18, mass: 0.8 }
+        : { duration: 0 }
+      }
+      style={{ zIndex: 2 }}
       onMouseDown={(e) => {
         e.stopPropagation();
         onDragStart?.(member.id, e);
@@ -128,7 +132,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           </button>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
