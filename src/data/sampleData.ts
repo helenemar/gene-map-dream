@@ -3,107 +3,63 @@ import { FamilyMember, Relationship, EmotionalLink, Union } from '@/types/genogr
 export const SAMPLE_MEMBERS: FamilyMember[] = [
   // ── Génération 0 (Grands-parents) ──
   {
-    id: 'gp-m', firstName: 'Robert', lastName: 'Duval',
-    birthYear: 1940, deathYear: 2015, age: 75, profession: 'Instituteur',
+    id: 'gp-m', firstName: 'Henri', lastName: 'Lefèvre',
+    birthYear: 1945, deathYear: 2020, age: 75, profession: 'Menuisier',
     gender: 'male', x: 0, y: 0, pathologies: ['cardiovascular'],
   },
   {
-    id: 'gp-f', firstName: 'Jeanne', lastName: 'Martin',
-    birthYear: 1942, age: 83, profession: 'Infirmière',
+    id: 'gp-f', firstName: 'Madeleine', lastName: 'Roux',
+    birthYear: 1948, age: 78, profession: 'Couturière',
     gender: 'female', x: 300, y: 0, pathologies: [],
   },
 
-  // ── Génération 1 (Parents — 3 enfants) ──
+  // ── Génération 1 (Parents — 2 enfants) ──
   {
-    id: 'p1', firstName: 'Michel', lastName: 'Duval',
-    birthYear: 1965, age: 60, profession: 'Architecte',
+    id: 'p1', firstName: 'Philippe', lastName: 'Lefèvre',
+    birthYear: 1970, age: 56, profession: 'Comptable',
     gender: 'male', x: 0, y: 350, pathologies: [],
   },
   {
-    id: 'p1-w', firstName: 'Claire', lastName: 'Berger',
-    birthYear: 1967, age: 58, profession: 'Avocate',
+    id: 'p1-w', firstName: 'Nathalie', lastName: 'Girard',
+    birthYear: 1972, age: 54, profession: 'Enseignante',
     gender: 'female', x: 250, y: 350, pathologies: ['depression'],
   },
   {
-    id: 'p2', firstName: 'Anne', lastName: 'Duval',
-    birthYear: 1968, age: 57, profession: 'Médecin',
+    id: 'p2', firstName: 'Sylvie', lastName: 'Lefèvre',
+    birthYear: 1974, age: 52, profession: 'Pharmacienne',
     gender: 'female', x: 500, y: 350, pathologies: [],
   },
-  {
-    id: 'p2-h', firstName: 'Laurent', lastName: 'Petit',
-    birthYear: 1966, age: 59, profession: 'Ingénieur',
-    gender: 'male', x: 750, y: 350, pathologies: ['diabetes'],
-  },
-  {
-    id: 'p3', firstName: 'Pierre', lastName: 'Duval',
-    birthYear: 1972, age: 53, profession: 'Professeur',
-    gender: 'male', x: 1000, y: 350, pathologies: ['addiction'],
-  },
 
-  // ── Génération 2 (Petits-enfants — 3 enfants de Michel, 2 d'Anne) ──
+  // ── Génération 2 (Petits-enfants — 3 enfants de Philippe) ──
   {
-    id: 'c1', firstName: 'Emma', lastName: 'Duval',
-    birthYear: 1992, age: 33, profession: 'Designer',
-    gender: 'female', x: 0, y: 700, pathologies: [],
+    id: 'c1', firstName: 'Julien', lastName: 'Lefèvre',
+    birthYear: 1998, age: 28, profession: 'Kinésithérapeute',
+    gender: 'male', x: 0, y: 700, pathologies: [],
   },
   {
-    id: 'c2', firstName: 'Lucas', lastName: 'Duval',
-    birthYear: 1995, age: 30, profession: 'Développeur',
-    gender: 'male', x: 250, y: 700, pathologies: [],
+    id: 'c2', firstName: 'Camille', lastName: 'Lefèvre',
+    birthYear: 2001, age: 25, profession: 'Graphiste',
+    gender: 'female', x: 250, y: 700, pathologies: [],
   },
   {
-    id: 'c3', firstName: 'Chloé', lastName: 'Duval',
-    birthYear: 1998, age: 27, profession: 'Étudiante',
-    gender: 'female', x: 500, y: 700, pathologies: ['bipolar'],
-  },
-  {
-    id: 'c4', firstName: 'Hugo', lastName: 'Petit',
-    birthYear: 1994, age: 31, profession: 'Chirurgien',
-    gender: 'male', x: 750, y: 700, pathologies: [],
-  },
-  {
-    id: 'c5', firstName: 'Léa', lastName: 'Petit',
-    birthYear: 1997, age: 28, profession: 'Journaliste',
-    gender: 'female', x: 1000, y: 700, pathologies: [],
-  },
-
-  // ── Génération 3 (Arrière-petits-enfants — 2 enfants d'Emma) ──
-  {
-    id: 'gc1', firstName: 'Théo', lastName: 'Moreau',
-    birthYear: 2020, age: 5, profession: '',
-    gender: 'male', x: 0, y: 1050, pathologies: [],
-  },
-  {
-    id: 'gc2', firstName: 'Jade', lastName: 'Moreau',
-    birthYear: 2022, age: 3, profession: '',
-    gender: 'female', x: 250, y: 1050, pathologies: [],
+    id: 'c3', firstName: 'Raphaël', lastName: 'Lefèvre',
+    birthYear: 2004, age: 22, profession: 'Étudiant',
+    gender: 'male', x: 500, y: 700, pathologies: [],
   },
 ];
 
 export const SAMPLE_UNIONS: Union[] = [
-  // Gen 0: Robert + Jeanne → 3 enfants
+  // Gen 0: Henri + Madeleine → 2 enfants
   {
     id: 'u-gp', partner1: 'gp-m', partner2: 'gp-f',
-    status: 'widowed', marriageYear: 1963,
-    children: ['p1', 'p2', 'p3'],
+    status: 'widowed', marriageYear: 1968,
+    children: ['p1', 'p2'],
   },
-  // Gen 1: Michel + Claire → 3 enfants
+  // Gen 1: Philippe + Nathalie → 3 enfants
   {
     id: 'u-p1', partner1: 'p1', partner2: 'p1-w',
-    status: 'married', marriageYear: 1990,
+    status: 'married', marriageYear: 1996,
     children: ['c1', 'c2', 'c3'],
-  },
-  // Gen 1: Laurent + Anne → 2 enfants
-  {
-    id: 'u-p2', partner1: 'p2-h', partner2: 'p2',
-    status: 'divorced', marriageYear: 1992, divorceYear: 2010,
-    children: ['c4', 'c5'],
-  },
-  // Gen 2: Emma + conjoint implicite → 2 enfants
-  {
-    id: 'u-c1', partner1: 'c2', partner2: 'c1',
-    status: 'common_law', marriageYear: 2018,
-    children: ['gc1', 'gc2'],
   },
 ];
 
@@ -113,6 +69,4 @@ export const SAMPLE_RELATIONSHIPS: Relationship[] = [];
 export const SAMPLE_EMOTIONAL_LINKS: EmotionalLink[] = [
   { id: 'e1', from: 'p1', to: 'p2', type: 'fusional' },
   { id: 'e2', from: 'c1', to: 'c3', type: 'conflictual' },
-  { id: 'e3', from: 'p3', to: 'gp-m', type: 'distant' },
-  { id: 'e4', from: 'c4', to: 'c5', type: 'fusional' },
 ];
