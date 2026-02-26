@@ -1,17 +1,18 @@
 import React from 'react';
-import { Pencil, Plus, ZoomIn, ZoomOut, Link, Maximize } from 'lucide-react';
+import { Pencil, Plus, ZoomIn, ZoomOut, Link, Maximize, Wand2 } from 'lucide-react';
 
 interface FloatingControlsProps {
   onZoomIn?: () => void;
   onZoomOut?: () => void;
   onFitToScreen?: () => void;
+  onAutoLayout?: () => void;
   zoom?: number;
   mode?: 'select' | 'link';
   onToggleMode?: () => void;
 }
 
 const FloatingControls: React.FC<FloatingControlsProps> = ({
-  onZoomIn, onZoomOut, onFitToScreen, zoom = 1, mode = 'select', onToggleMode,
+  onZoomIn, onZoomOut, onFitToScreen, onAutoLayout, zoom = 1, mode = 'select', onToggleMode,
 }) => {
   const zoomPercent = Math.round(zoom * 100);
 
@@ -29,6 +30,13 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
         </button>
         <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-accent transition-colors">
           <Pencil className="w-4 h-4 text-foreground" />
+        </button>
+        <button
+          onClick={onAutoLayout}
+          className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
+          title="Réorganiser l'arbre"
+        >
+          <Wand2 className="w-4 h-4 text-foreground" />
         </button>
         <button className="w-10 h-10 rounded-full bg-primary flex items-center justify-center hover:bg-primary/80 transition-colors">
           <Plus className="w-4 h-4 text-primary-foreground" />

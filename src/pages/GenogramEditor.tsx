@@ -7,6 +7,7 @@ import EmotionalLinkLine from '@/components/EmotionalLinkLine';
 import FloatingControls from '@/components/FloatingControls';
 import { SAMPLE_MEMBERS, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sampleData';
 import { FamilyMember } from '@/types/genogram';
+import { computeAutoLayout } from '@/utils/autoLayout';
 
 type EditorMode = 'select' | 'link';
 
@@ -72,6 +73,7 @@ const GenogramEditor: React.FC = () => {
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
   const [mode, setMode] = useState<EditorMode>('select');
+  const [isAnimating, setIsAnimating] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
@@ -203,6 +205,7 @@ const GenogramEditor: React.FC = () => {
     console.log('Edit member', id);
   }, []);
 
+
   // ─── Fit to screen: compute bounding box of all members and center ───
   const handleFitToScreen = useCallback(() => {
     const canvas = canvasRef.current;
@@ -233,6 +236,20 @@ const GenogramEditor: React.FC = () => {
     setZoom(newZoom);
     setPan({ x: newPanX, y: newPanY });
   }, [members]);
+
+  // ─── Auto-layout: reorganize tree ───
+  const handleAutoLayout = useCallback(() => {
+    const result = computeAutoLayout(members, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS);
+    setIsAnimating(true);
+    setMembers(prev => prev.map(m => {
+      const pos = result.positions.get(m.id);
+      return pos ? { ...m, x: pos.x, y: pos.y } : m;
+    }));
+    setTimeout(() => {
+      setIsAnimating(false);
+      handleFitToScreen();
+    }, 650);
+  }, [members, handleFitToScreen]);
 
   // ─── Button zoom (centered on viewport center) ───
   const handleZoomIn = useCallback(() => {
@@ -326,6 +343,7 @@ const GenogramEditor: React.FC = () => {
                 key={member.id}
                 member={member}
                 isSelected={selectedMember === member.id}
+                isAnimating={isAnimating}
                 state={getMemberState(member.id)}
                 onSelect={handleSelect}
                 onDragStart={handleDragStart}
@@ -340,6 +358,7 @@ const GenogramEditor: React.FC = () => {
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
             onFitToScreen={handleFitToScreen}
+            onAutoLayout={handleAutoLayout}
             zoom={zoom}
             mode={mode}
             onToggleMode={handleToggleMode}
