@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import EditorHeader from '@/components/EditorHeader';
 import EditorSidebar from '@/components/EditorSidebar';
 import MemberCard from '@/components/MemberCard';
@@ -19,6 +19,8 @@ const MIN_ZOOM = 0.15;
 const MAX_ZOOM = 3;
 const ZOOM_SENSITIVITY = 0.002;
 const DOT_SPACING = 24;
+const SNAP_GRID = 20;
+const STORAGE_KEY = 'genogy-member-positions';
 
 type Side = 'top' | 'bottom' | 'left' | 'right';
 
@@ -69,11 +71,22 @@ function getDirectionalAnchors(from: FamilyMember, to: FamilyMember) {
 }
 
 const GenogramEditor: React.FC = () => {
-  const [members, setMembers] = useState<FamilyMember[]>(SAMPLE_MEMBERS);
+  // Load saved positions from localStorage
+  const [members, setMembers] = useState<FamilyMember[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const positions: Record<string, { x: number; y: number }> = JSON.parse(saved);
+        return SAMPLE_MEMBERS.map(m => positions[m.id] ? { ...m, ...positions[m.id] } : m);
+      }
+    } catch { /* ignore */ }
+    return SAMPLE_MEMBERS;
+  });
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
   const [mode, setMode] = useState<EditorMode>('select');
   const [isAnimating, setIsAnimating] = useState(false);
+  const [snapToGrid, setSnapToGrid] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
@@ -82,6 +95,30 @@ const GenogramEditor: React.FC = () => {
     id: string; startX: number; startY: number; memberX: number; memberY: number;
   } | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  // ─── Persist positions to localStorage ───
+  useEffect(() => {
+    const positions: Record<string, { x: number; y: number }> = {};
+    members.forEach(m => { positions[m.id] = { x: m.x, y: m.y }; });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(positions));
+  }, [members]);
+
+  // ─── Collision detection ───
+  const collisions = useMemo(() => {
+    const set = new Set<string>();
+    for (let i = 0; i < members.length; i++) {
+      for (let j = i + 1; j < members.length; j++) {
+        const a = members[i], b = members[j];
+        const overlapX = a.x < b.x + CARD_W && b.x < a.x + CARD_W;
+        const overlapY = a.y < b.y + CARD_H && b.y < a.y + CARD_H;
+        if (overlapX && overlapY) {
+          set.add(a.id);
+          set.add(b.id);
+        }
+      }
+    }
+    return set;
+  }, [members]);
 
   // ─── Space key tracking for Figma-like space+drag panning ───
   useEffect(() => {
@@ -149,18 +186,33 @@ const GenogramEditor: React.FC = () => {
     if (dragInfo) {
       const dx = (e.clientX - dragInfo.startX) / zoom;
       const dy = (e.clientY - dragInfo.startY) / zoom;
+      let newX = dragInfo.memberX + dx;
+      let newY = dragInfo.memberY + dy;
+      // Live snap while dragging
+      if (snapToGrid) {
+        newX = Math.round(newX / SNAP_GRID) * SNAP_GRID;
+        newY = Math.round(newY / SNAP_GRID) * SNAP_GRID;
+      }
       setMembers(prev => prev.map(m =>
-        m.id === dragInfo.id ? { ...m, x: dragInfo.memberX + dx, y: dragInfo.memberY + dy } : m
+        m.id === dragInfo.id ? { ...m, x: newX, y: newY } : m
       ));
     } else if (isPanning) {
       setPan(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }));
     }
-  }, [dragInfo, isPanning, zoom]);
+  }, [dragInfo, isPanning, zoom, snapToGrid]);
 
   const handleMouseUp = useCallback(() => {
+    // Snap on release if enabled
+    if (dragInfo && snapToGrid) {
+      setMembers(prev => prev.map(m =>
+        m.id === dragInfo.id
+          ? { ...m, x: Math.round(m.x / SNAP_GRID) * SNAP_GRID, y: Math.round(m.y / SNAP_GRID) * SNAP_GRID }
+          : m
+      ));
+    }
     setDragInfo(null);
     setIsPanning(false);
-  }, []);
+  }, [dragInfo, snapToGrid]);
 
   // ─── Canvas mouse down: space+click or middle-click = pan, else deselect ───
   const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
@@ -344,6 +396,7 @@ const GenogramEditor: React.FC = () => {
                 member={member}
                 isSelected={selectedMember === member.id}
                 isAnimating={isAnimating}
+                isColliding={collisions.has(member.id)}
                 state={getMemberState(member.id)}
                 onSelect={handleSelect}
                 onDragStart={handleDragStart}
@@ -362,6 +415,8 @@ const GenogramEditor: React.FC = () => {
             zoom={zoom}
             mode={mode}
             onToggleMode={handleToggleMode}
+            snapToGrid={snapToGrid}
+            onToggleSnap={() => setSnapToGrid(prev => !prev)}
           />
         </div>
       </div>
