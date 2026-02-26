@@ -10,6 +10,44 @@ import { FamilyMember } from '@/types/genogram';
 
 type EditorMode = 'select' | 'link';
 
+// Card approximate dimensions (matches MemberCard layout: p-2, icon 48px, gap-3, text)
+const CARD_W = 160;
+const CARD_H = 56;
+
+/**
+ * Edge-to-Edge anchor algorithm.
+ * For each card, compute 4 anchor points (mid-top, mid-bottom, mid-left, mid-right).
+ * Select the pair (one from each card) with the shortest distance.
+ */
+function getEdgeAnchors(
+  from: FamilyMember,
+  to: FamilyMember
+): { x1: number; y1: number; x2: number; y2: number } {
+  const anchorsOf = (m: FamilyMember) => [
+    { x: m.x + CARD_W / 2, y: m.y },                // top
+    { x: m.x + CARD_W / 2, y: m.y + CARD_H },       // bottom
+    { x: m.x,              y: m.y + CARD_H / 2 },    // left
+    { x: m.x + CARD_W,     y: m.y + CARD_H / 2 },    // right
+  ];
+
+  const fromAnchors = anchorsOf(from);
+  const toAnchors = anchorsOf(to);
+
+  let best = { x1: 0, y1: 0, x2: 0, y2: 0 };
+  let bestDist = Infinity;
+
+  for (const a of fromAnchors) {
+    for (const b of toAnchors) {
+      const d = (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
+      if (d < bestDist) {
+        bestDist = d;
+        best = { x1: a.x, y1: a.y, x2: b.x, y2: b.y };
+      }
+    }
+  }
+  return best;
+}
+
 const GenogramEditor: React.FC = () => {
   const [members, setMembers] = useState<FamilyMember[]>(SAMPLE_MEMBERS);
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
@@ -116,11 +154,12 @@ const GenogramEditor: React.FC = () => {
                   const from = members.find(m => m.id === link.from);
                   const to = members.find(m => m.id === link.to);
                   if (!from || !to) return null;
+                  const anchors = getEdgeAnchors(from, to);
                   return (
                     <EmotionalLinkLine
                       key={link.id}
-                      x1={from.x + 80} y1={from.y + 25}
-                      x2={to.x + 80} y2={to.y + 25}
+                      x1={anchors.x1} y1={anchors.y1}
+                      x2={anchors.x2} y2={anchors.y2}
                       type={link.type}
                       onClick={() => console.log('Edit emotional link', link.id)}
                     />
