@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Share2, Plus, UserPlus, Pencil, ZoomIn, ZoomOut, X, Search, ChevronDown, ChevronUp, ArrowLeft, Link } from 'lucide-react';
 import { PATHOLOGIES, FAMILY_LINK_TYPES, EMOTIONAL_LINK_TYPES } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
+import { EmotionalLinkPreview } from '@/components/EmotionalLinkLine';
 import type { MemberCardState } from '@/components/MemberCard';
 
 /* ============================================================
@@ -470,6 +471,24 @@ const DesignSystemPage: React.FC = () => {
                   <p className="text-xs text-muted-foreground">Violence dans la relation</p>
                 </div>
               </div>
+            </div>
+          </div>
+        </SubSection>
+
+        {/* Emotional Links (SVG dynamic lines) */}
+        <SubSection title="Liens émotionnels (SVG dynamique)">
+          <p className="text-sm text-muted-foreground mb-4">Moteur de rendu SVG pour les 11 types de liens émotionnels. Chaque ligne est calculée dynamiquement entre deux points d'ancrage.</p>
+          <div className="bg-card rounded-2xl border border-border p-8">
+            <div className="space-y-5">
+              {EMOTIONAL_LINK_TYPES.map(link => (
+                <div key={link.id} className="flex items-center gap-6">
+                  <EmotionalLinkPreview type={link.id} width={200} height={32} />
+                  <div>
+                    <span className="text-sm font-semibold text-foreground">{link.label}</span>
+                    <p className="text-xs text-muted-foreground font-mono">{link.id}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </SubSection>
