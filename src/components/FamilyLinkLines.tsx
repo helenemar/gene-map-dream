@@ -5,7 +5,7 @@ import RelationshipBadge from './RelationshipBadge';
 const CARD_W = 186;
 const CARD_H = 64;
 const MARGIN = 5;
-const RAIL_MIN_GAP = 20; // Minimum 20px between parallel vertical descent lines
+const RAIL_MIN_GAP = 15; // Minimum 15px between parallel vertical descent lines
 
 interface FamilyLinkLinesProps {
   members: FamilyMember[];
