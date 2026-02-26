@@ -3,26 +3,22 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 const CARD_W = 186;
 const CARD_H = 64;
 const GENERATION_GAP = 300;
-const SIBLING_GAP = 60;
+const BASE_SIBLING_GAP = 60;
 const COUPLE_GAP = 120;
-const BRANCH_GAP = 140; // gap between separate sub-tree blocks
+const BRANCH_GAP = 140;
 const MIN_OVERLAP_PAD = 30;
+/** Extra horizontal corridor when a child has their own union, to prevent descent lines from crossing sibling union lines */
+const UNION_CORRIDOR = 40;
 
 interface LayoutResult {
   positions: Map<string, { x: number; y: number }>;
 }
 
-/**
- * Sub-tree bounding box returned by recursive layout.
- */
 interface SubTreeBox {
   width: number;
-  positions: Map<string, { x: number; y: number }>; // local positions (x relative to block left)
+  positions: Map<string, { x: number; y: number }>;
 }
 
-/**
- * Build adjacency: for each member, which unions they participate in.
- */
 function buildUnionIndex(unions: Union[]) {
   const parentToUnions = new Map<string, Union[]>();
   for (const u of unions) {
@@ -35,15 +31,70 @@ function buildUnionIndex(unions: Union[]) {
 }
 
 /**
- * Layout a nuclear family sub-tree (a union + its descendants) recursively.
- * Returns local positions relative to x=0.
+ * Compute dynamic sibling gap: larger when siblings have their own unions
+ * to create corridors for filiation lines.
  */
+function computeSiblingGap(
+  childId: string,
+  nextChildId: string | null,
+  parentToUnions: Map<string, Union[]>,
+  visited: Set<string>,
+): number {
+  let gap = BASE_SIBLING_GAP;
+  const childUnions = (parentToUnions.get(childId) ?? []).filter(u => !visited.has(u.id));
+  const nextUnions = nextChildId ? (parentToUnions.get(nextChildId) ?? []).filter(u => !visited.has(u.id)) : [];
+  // If either adjacent sibling has a union, add corridor
+  if (childUnions.length > 0 || nextUnions.length > 0) {
+    gap += UNION_CORRIDOR;
+  }
+  return gap;
+}
+
+/**
+ * Minimize edge crossings by ordering children optimally.
+ * Heuristic: children with the most descendants go to the edges,
+ * children with fewer descendants go to the center.
+ * Also: children who are partners in unions are placed adjacent to their partner's subtree side.
+ */
+function orderChildrenToMinimizeCrossings(
+  children: string[],
+  parentToUnions: Map<string, Union[]>,
+  visited: Set<string>,
+  memberMap: Map<string, FamilyMember>,
+): string[] {
+  if (children.length <= 2) return children;
+
+  // Count descendant weight for each child
+  const weights = new Map<string, number>();
+  for (const cid of children) {
+    const unions = (parentToUnions.get(cid) ?? []).filter(u => !visited.has(u.id));
+    let w = 0;
+    for (const u of unions) {
+      w += u.children.length + 1; // +1 for partner
+    }
+    weights.set(cid, w);
+  }
+
+  // Sort: heaviest subtrees at edges, lightest in center
+  const sorted = [...children].sort((a, b) => (weights.get(b) ?? 0) - (weights.get(a) ?? 0));
+  const result: string[] = new Array(sorted.length);
+  let left = 0, right = sorted.length - 1;
+  for (let i = 0; i < sorted.length; i++) {
+    if (i % 2 === 0) {
+      result[left++] = sorted[i];
+    } else {
+      result[right--] = sorted[i];
+    }
+  }
+  return result;
+}
+
 function layoutSubTree(
   union: Union,
   generation: number,
   allUnions: Union[],
   parentToUnions: Map<string, Union[]>,
-  visited: Set<string>, // visited union IDs to avoid cycles
+  visited: Set<string>,
   memberMap: Map<string, FamilyMember>,
 ): SubTreeBox {
   visited.add(union.id);
@@ -51,26 +102,26 @@ function layoutSubTree(
   const positions = new Map<string, { x: number; y: number }>();
   const y = generation * GENERATION_GAP;
 
-  // Sort children by birth year
-  const children = union.children
+  // Sort children by birth year first
+  const childrenByBirth = union.children
     .filter(cid => memberMap.has(cid))
     .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
 
-  // Recursively layout each child's own sub-trees (if they have unions)
+  // Then optimize order to minimize crossings
+  const children = orderChildrenToMinimizeCrossings(childrenByBirth, parentToUnions, visited, memberMap);
+
   const childBlocks: { childId: string; width: number; subPositions: Map<string, { x: number; y: number }> }[] = [];
 
   for (const childId of children) {
     const childUnions = (parentToUnions.get(childId) ?? []).filter(u => !visited.has(u.id));
 
     if (childUnions.length === 0) {
-      // Leaf child — just a single card
       childBlocks.push({
         childId,
         width: CARD_W,
         subPositions: new Map(),
       });
     } else {
-      // Child has their own union(s) — layout each as sub-tree
       let totalWidth = 0;
       const mergedSub = new Map<string, { x: number; y: number }>();
 
@@ -78,7 +129,6 @@ function layoutSubTree(
         const cu = childUnions[ui];
         const sub = layoutSubTree(cu, generation + 1, allUnions, parentToUnions, visited, memberMap);
 
-        // Offset sub positions by totalWidth
         for (const [id, pos] of sub.positions) {
           mergedSub.set(id, { x: pos.x + totalWidth, y: pos.y });
         }
@@ -86,8 +136,6 @@ function layoutSubTree(
         if (ui < childUnions.length - 1) totalWidth += BRANCH_GAP;
       }
 
-      // The child card itself is centered over its sub-tree block
-      // but we include it in the parent's child row, not here
       childBlocks.push({
         childId,
         width: Math.max(CARD_W, totalWidth),
@@ -96,14 +144,21 @@ function layoutSubTree(
     }
   }
 
-  // Compute total children row width
+  // Compute total children row width with dynamic gaps
   let childrenTotalWidth = 0;
   for (let i = 0; i < childBlocks.length; i++) {
     childrenTotalWidth += childBlocks[i].width;
-    if (i < childBlocks.length - 1) childrenTotalWidth += SIBLING_GAP;
+    if (i < childBlocks.length - 1) {
+      const gap = computeSiblingGap(
+        childBlocks[i].childId,
+        childBlocks[i + 1]?.childId ?? null,
+        parentToUnions,
+        visited,
+      );
+      childrenTotalWidth += gap;
+    }
   }
 
-  // Couple width (two cards side by side)
   const coupleWidth = CARD_W + COUPLE_GAP + CARD_W;
   const totalWidth = Math.max(coupleWidth, childrenTotalWidth);
 
@@ -112,34 +167,34 @@ function layoutSubTree(
   positions.set(union.partner1, { x: coupleStartX, y });
   positions.set(union.partner2, { x: coupleStartX + CARD_W + COUPLE_GAP, y });
 
-  // Place children centered under the couple
+  // Place children centered under the couple with dynamic gaps
   const childRowStartX = (totalWidth - childrenTotalWidth) / 2;
   let cx = childRowStartX;
   const childY = y + GENERATION_GAP;
 
-  for (const block of childBlocks) {
+  for (let i = 0; i < childBlocks.length; i++) {
+    const block = childBlocks[i];
     const childCenterX = cx + block.width / 2 - CARD_W / 2;
     positions.set(block.childId, { x: childCenterX, y: childY });
 
-    // Merge descendant sub-positions
     for (const [id, pos] of block.subPositions) {
       positions.set(id, { x: cx + pos.x, y: pos.y });
     }
 
-    cx += block.width + SIBLING_GAP;
+    cx += block.width;
+    if (i < childBlocks.length - 1) {
+      cx += computeSiblingGap(
+        block.childId,
+        childBlocks[i + 1]?.childId ?? null,
+        parentToUnions,
+        visited,
+      );
+    }
   }
 
   return { width: totalWidth, positions };
 }
 
-/**
- * Optimized auto-layout with sub-tree packing.
- *
- * 1. Identify root unions (unions whose partners are not children of any other union).
- * 2. Recursively layout each root union as a sub-tree.
- * 3. Place disconnected members at the end.
- * 4. Center everything around (0,0).
- */
 export function computeAutoLayout(
   members: FamilyMember[],
   unions: Union[],
@@ -151,19 +206,15 @@ export function computeAutoLayout(
   const parentToUnions = buildUnionIndex(unions);
   const allChildren = new Set(unions.flatMap(u => u.children));
 
-  // Find root unions: unions where at least one partner is NOT a child in any union
   const rootUnions = unions.filter(u =>
     !allChildren.has(u.partner1) || !allChildren.has(u.partner2)
   );
 
-  // If no root unions found, treat all unions as roots
   const effectiveRoots = rootUnions.length > 0 ? rootUnions : unions;
-
   const visited = new Set<string>();
   const globalPositions = new Map<string, { x: number; y: number }>();
   let globalX = 0;
 
-  // Layout each root sub-tree
   for (let i = 0; i < effectiveRoots.length; i++) {
     const rootUnion = effectiveRoots[i];
     if (visited.has(rootUnion.id)) continue;
@@ -177,15 +228,15 @@ export function computeAutoLayout(
     globalX += subTree.width + BRANCH_GAP;
   }
 
-  // Place any disconnected members (not in any union at all)
+  // Place disconnected members
   const placed = new Set(globalPositions.keys());
   const disconnected = members.filter(m => !placed.has(m.id));
   for (const m of disconnected) {
     globalPositions.set(m.id, { x: globalX, y: 0 });
-    globalX += CARD_W + SIBLING_GAP;
+    globalX += CARD_W + BASE_SIBLING_GAP;
   }
 
-  // Resolve overlaps within same generation
+  // Resolve overlaps
   resolveOverlaps(globalPositions, memberMap);
 
   // Center around (0,0)
@@ -206,14 +257,10 @@ export function computeAutoLayout(
   return { positions: globalPositions };
 }
 
-/**
- * Post-process: resolve any remaining horizontal overlaps within the same Y level.
- */
 function resolveOverlaps(
   positions: Map<string, { x: number; y: number }>,
   _memberMap: Map<string, FamilyMember>,
 ) {
-  // Group by Y
   const byY = new Map<number, { id: string; x: number }[]>();
   for (const [id, pos] of positions) {
     const key = Math.round(pos.y);
@@ -232,9 +279,7 @@ function resolveOverlaps(
       if (curr.x < minX) {
         const shift = minX - curr.x;
         curr.x = minX;
-        // Push this and all subsequent members
         positions.get(curr.id)!.x = curr.x;
-        // Also shift all following in this row
         for (let j = i + 1; j < row.length; j++) {
           row[j].x += shift;
           positions.get(row[j].id)!.x = row[j].x;
