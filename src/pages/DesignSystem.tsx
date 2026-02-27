@@ -846,7 +846,7 @@ const MemberCardDemo: React.FC<{
           <MemberIcon gender={gender} isGay={isGay} isBisexual={isBisexual} isTransgender={isTransgender} isDead={isDeceased} pathologyColors={matchedPathologies.map(p => `hsl(var(--pathology-${p.id}))`)} size={48} className="text-foreground" />
         </div>
         <div className="whitespace-nowrap">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-6">
             <span className="font-semibold text-sm text-foreground">{name}</span>
             <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">{age} ans</span>
           </div>
@@ -905,7 +905,7 @@ const MemberCardStatic: React.FC<{
           <MemberIcon gender={gender} isGay={isGay} isBisexual={isBisexual} isTransgender={isTransgender} isDead={isDeceased} pathologyColors={matchedPathologies.map(p => `hsl(var(--pathology-${p.id}))`)} size={48} className="text-foreground" />
         </div>
         <div className="whitespace-nowrap">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-6">
             <span className="font-semibold text-sm text-foreground">{name}</span>
             <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">{age} ans</span>
           </div>
