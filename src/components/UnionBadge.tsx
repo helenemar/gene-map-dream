@@ -94,9 +94,9 @@ function hasStatusIcon(status: UnionStatus): boolean {
 
 const PILL_H = 18;
 const PILL_RX = 9;
-const ICON_R = 12;       // circle radius
+const ICON_R = 13;       // circle radius
 const ICON_D = ICON_R * 2;
-const OVERLAP = 5;       // how far the icon circle invades the pill
+const OVERLAP = 6;       // how far the icon circle invades the pill
 const FONT_SIZE = 9;
 
 const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
@@ -109,14 +109,22 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
   const pillW = label ? Math.max(label.length * 5.6 + 16, 56) : 0;
   const blockW = Math.max(pillW, showIcon ? ICON_D : 0);
 
-  // Vertical layout: pill on top, icon overlapping below
-  const pillTop = 0;
-  const iconCenterY = label ? PILL_H - OVERLAP + ICON_R : ICON_R;
-  const totalH = (label ? PILL_H : 0) + (showIcon ? ICON_D - (label ? OVERLAP : 0) : 0);
+  // Anchor: the ICON CENTER sits on the union line Y.
+  // The pill floats above the icon, overlapping by OVERLAP px.
+  // If no icon, the pill itself is centered on Y.
+  const iconCenterLocal = showIcon ? ICON_R : 0;
+  const pillBottom = showIcon ? iconCenterLocal - ICON_R + OVERLAP : PILL_H;
+  const pillTopLocal = pillBottom - PILL_H;
 
-  // Center the block on (x, y)
+  // Total bounds
+  const topEdge = label ? pillTopLocal : (showIcon ? 0 : 0);
+  const bottomEdge = showIcon ? ICON_D : (label ? PILL_H : 0);
+
+  // Translate so icon center = line Y, horizontally centered on x
   const groupX = x - blockW / 2;
-  const groupY = y - totalH / 2;
+  const groupY = showIcon
+    ? y - ICON_R   // icon center on line Y
+    : y - PILL_H / 2; // pill center on line Y
 
   const stroke = 'hsl(var(--border))';
   const bg = 'hsl(var(--card))';
@@ -132,7 +140,7 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
         <>
           <rect
             x={(blockW - pillW) / 2}
-            y={pillTop}
+            y={pillTopLocal}
             width={pillW}
             height={PILL_H}
             rx={PILL_RX}
@@ -143,7 +151,7 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
           />
           <text
             x={blockW / 2}
-            y={pillTop + PILL_H / 2}
+            y={pillTopLocal + PILL_H / 2}
             textAnchor="middle"
             dominantBaseline="central"
             fill="hsl(var(--muted-foreground))"
@@ -164,7 +172,7 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
           {/* White opaque background — hides the union line behind it */}
           <circle
             cx={blockW / 2}
-            cy={iconCenterY}
+            cy={ICON_R}
             r={ICON_R}
             fill={bg}
             stroke={stroke}
@@ -174,14 +182,14 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
           {/* Drop shadow simulation */}
           <circle
             cx={blockW / 2}
-            cy={iconCenterY + 0.5}
+            cy={ICON_R + 0.5}
             r={ICON_R + 0.5}
             fill="none"
             stroke="hsla(0,0%,0%,0.06)"
             strokeWidth={1.5}
           />
           {/* Icon positioned inside the circle */}
-          <g transform={`translate(${blockW / 2 - 8}, ${iconCenterY - 8})`}>
+          <g transform={`translate(${blockW / 2 - 8}, ${ICON_R - 8})`}>
             <StatusIcon status={union.status} size={16} />
           </g>
         </>
