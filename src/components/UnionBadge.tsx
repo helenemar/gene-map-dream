@@ -92,11 +92,11 @@ function hasStatusIcon(status: UnionStatus): boolean {
  * to avoid foreignObject alignment quirks across browsers.
  */
 
-const PILL_H = 18;
-const PILL_RX = 9;
+const PILL_H = 24;
+const PILL_RX = 12;
 const ICON_R = 13;       // circle radius
 const ICON_D = ICON_R * 2;
-const OVERLAP = 6;       // how far the icon circle invades the pill
+const OVERLAP = 2;       // minimal overlap — pill sits clearly above icon
 const FONT_SIZE = 9;
 
 const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
