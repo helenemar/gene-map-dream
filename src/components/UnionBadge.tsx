@@ -106,7 +106,7 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
   if (!label && !showIcon) return null;
 
   // Measure approximate pill width from label length
-  const pillW = label ? Math.max(label.length * 5.6 + 16, 56) : 0;
+  const pillW = label ? Math.max(label.length * 6.5 + 24, 56) : 0;
   const blockW = Math.max(pillW, showIcon ? ICON_D : 0);
 
   // Layout: icon center ON the union line Y, pill ABOVE overlapping the icon.
