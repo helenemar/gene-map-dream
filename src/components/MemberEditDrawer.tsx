@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Trash2 } from 'lucide-react';
+import MemberIcon from '@/components/MemberIcon';
 
 interface MemberEditDrawerProps {
   member: FamilyMember | null;
@@ -111,6 +112,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
       twinGroup: twinGroup || undefined,
       twinType: (twinType as TwinType) || undefined,
     });
+    onClose();
   };
 
   return (
@@ -125,6 +127,33 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
               {isExisting ? `${member.firstName} ${member.lastName}` : 'Saisissez les informations du membre'}
             </p>
           </SheetHeader>
+
+          {/* ── Live icon preview ── */}
+          <div className="flex items-center gap-4 mt-4 p-3 rounded-xl bg-accent/30 border border-border">
+            <MemberIcon
+              gender={gender}
+              isGay={isGay}
+              isBisexual={isBisexual}
+              isTransgender={isTransgender}
+              isDead={isDeceased}
+              pathologyColors={
+                PATHOLOGIES
+                  .filter(p => selectedPathologies.includes(p.id))
+                  .map(p => `hsl(var(--pathology-${p.id}))`)
+              }
+              size={56}
+              className="text-foreground"
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-foreground truncate">
+                {firstName || 'Nouveau'} {lastName}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {birthYear || '?'}{isDeceased ? ` - ${deathYear}` : ' -'} · {age > 0 ? `${age} ans` : ''}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">{profession}</p>
+            </div>
+          </div>
         </div>
 
         <Separator />
