@@ -6,7 +6,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import MemberIcon from '@/components/MemberIcon';
-import { UserPlus, Baby } from 'lucide-react';
+import { UserPlus, Baby, User } from 'lucide-react';
 
 export interface ParentPickerOption {
   type: 'existing-union';
@@ -15,19 +15,14 @@ export interface ParentPickerOption {
 }
 
 interface ParentPickerProps {
-  /** The source parent member */
   sourceMember: FamilyMember;
-  /** All unions involving the source member */
   unions: Union[];
-  /** All members for resolving partner names */
   members: FamilyMember[];
-  /** Called when user picks an existing union */
   onSelectUnion: (unionId: string) => void;
-  /** Called when user picks "new partner" (create placeholder) */
   onSelectNewPartner: () => void;
+  onSelectAlone: () => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Anchor element position */
   children: React.ReactNode;
 }
 
@@ -45,6 +40,7 @@ const ParentPicker: React.FC<ParentPickerProps> = ({
   members,
   onSelectUnion,
   onSelectNewPartner,
+  onSelectAlone,
   open,
   onOpenChange,
   children,
@@ -128,6 +124,20 @@ const ParentPicker: React.FC<ParentPickerProps> = ({
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">Nouveau partenaire</p>
               <p className="text-[10px] text-muted-foreground">Crée un parent inconnu en pointillés</p>
+            </div>
+          </button>
+
+          {/* Standalone child option */}
+          <button
+            onClick={() => { onSelectAlone(); onOpenChange(false); }}
+            className="flex items-center gap-3 px-4 py-2.5 hover:bg-accent/50 transition-colors text-left w-full"
+          >
+            <div className="w-7 h-7 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center shrink-0">
+              <User className="w-3.5 h-3.5 text-muted-foreground/50" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground">Enfant seul</p>
+              <p className="text-[10px] text-muted-foreground">Sans lien d'union, fiche vierge</p>
             </div>
           </button>
         </div>
