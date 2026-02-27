@@ -11,6 +11,10 @@ interface EditorHeaderProps {
   suggestions: SearchSuggestion[];
   isSearchActive: boolean;
   matchCount: number;
+  onUndo: () => void;
+  onRedo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -34,6 +38,10 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   suggestions,
   isSearchActive,
   matchCount,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -69,10 +77,20 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
       <div className="flex items-center gap-3">
         <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
         <div className="flex items-center gap-1 bg-muted rounded-full p-1">
-          <button className="p-1.5 rounded-full hover:bg-accent transition-colors">
+          <button
+            onClick={onUndo}
+            disabled={!canUndo}
+            className="p-1.5 rounded-full hover:bg-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            title="Annuler (Ctrl+Z)"
+          >
             <Undo2 className="w-4 h-4 text-muted-foreground" />
           </button>
-          <button className="p-1.5 rounded-full hover:bg-accent transition-colors">
+          <button
+            onClick={onRedo}
+            disabled={!canRedo}
+            className="p-1.5 rounded-full hover:bg-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            title="Rétablir (Ctrl+Shift+Z)"
+          >
             <Redo2 className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>

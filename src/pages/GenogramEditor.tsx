@@ -21,6 +21,9 @@ import { SAMPLE_MEMBERS, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sa
 import { FamilyMember, EmotionalLink, EmotionalLinkType, Union, UnionStatus } from '@/types/genogram';
 import { computeAutoLayout } from '@/utils/autoLayout';
 import { useFamilySearch } from '@/hooks/useFamilySearch';
+import { useUndoRedo } from '@/hooks/useUndoRedo';
+import { toast } from 'sonner';
+import { Undo2, Redo2 } from 'lucide-react';
 
 // Card bounding box
 const CARD_W = MEMBER_CARD_W;
@@ -161,6 +164,54 @@ const GenogramEditor: React.FC = () => {
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  // ─── Undo/Redo system ───
+  type CanvasSnapshot = { members: FamilyMember[]; unions: Union[]; emotionalLinks: EmotionalLink[] };
+  const history = useUndoRedo<CanvasSnapshot>();
+
+  const recordSnapshot = useCallback(() => {
+    history.record({
+      members: members.map(m => ({ ...m })),
+      unions: unions.map(u => ({ ...u, children: [...u.children] })),
+      emotionalLinks: emotionalLinks.map(l => ({ ...l })),
+    });
+  }, [members, unions, emotionalLinks, history]);
+
+  const handleUndo = useCallback(() => {
+    const snapshot = history.undo({ members, unions, emotionalLinks });
+    if (snapshot) {
+      setMembers(snapshot.members);
+      setUnions(snapshot.unions);
+      setEmotionalLinks(snapshot.emotionalLinks);
+      toast('Action annulée', { icon: <Undo2 className="w-4 h-4" />, duration: 2000 });
+    }
+  }, [members, unions, emotionalLinks, history]);
+
+  const handleRedo = useCallback(() => {
+    const snapshot = history.redo({ members, unions, emotionalLinks });
+    if (snapshot) {
+      setMembers(snapshot.members);
+      setUnions(snapshot.unions);
+      setEmotionalLinks(snapshot.emotionalLinks);
+      toast('Action rétablie', { icon: <Redo2 className="w-4 h-4" />, duration: 2000 });
+    }
+  }, [members, unions, emotionalLinks, history]);
+
+  // Keyboard shortcuts: Cmd/Ctrl+Z and Cmd/Ctrl+Shift+Z / Ctrl+Y
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      } else if ((mod && e.key === 'z' && e.shiftKey) || (e.ctrlKey && e.key === 'y')) {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [handleUndo, handleRedo]);
+
   // ─── Persist positions to localStorage ───
   useEffect(() => {
     const positions: Record<string, { x: number; y: number }> = {};
@@ -244,8 +295,9 @@ const GenogramEditor: React.FC = () => {
     if (isSpaceDown) return; // space+drag = pan, not member drag
     const member = members.find(m => m.id === id);
     if (!member) return;
+    recordSnapshot(); // Record before position change
     setDragInfo({ id, startX: e.clientX, startY: e.clientY, memberX: member.x, memberY: member.y });
-  }, [members, isSpaceDown]);
+  }, [members, isSpaceDown, recordSnapshot]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     // Link drag in progress — update cursor position in world space + snap detection
@@ -479,6 +531,7 @@ const GenogramEditor: React.FC = () => {
           newChild.y = Math.max(p1.y, p2.y) + LEVEL_Y;
         }
       }
+      recordSnapshot();
       setMembers(prev => [...prev, newChild]);
       setUnions(prev => prev.map(u =>
         u.id === targetUnionId ? { ...u, children: [...u.children, newChild.id] } : u
@@ -605,6 +658,7 @@ const GenogramEditor: React.FC = () => {
       children: [newChild.id],
     };
 
+    recordSnapshot();
     setMembers(prev => [...prev, newChild]);
     setUnions(prev => [...prev, newUnion]);
     setSelectedMember(newChild.id);
@@ -646,6 +700,7 @@ const GenogramEditor: React.FC = () => {
       spouse_widowed: 'widowed',
     };
 
+    recordSnapshot();
     setMembers(prev => [...prev, newMember]);
 
     // Create union for spouse relationships
@@ -722,14 +777,15 @@ const GenogramEditor: React.FC = () => {
     const currentYear = new Date().getFullYear();
     const age = updated.birthYear ? currentYear - updated.birthYear : updated.age;
     // Clear placeholder flag when user fills in data
+    recordSnapshot();
     setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false } : m));
     setEditingNewMember(null);
-  }, []);
+  }, [recordSnapshot]);
 
   const [fadingOutIds, setFadingOutIds] = useState<Set<string>>(new Set());
 
   const handleDeleteMember = useCallback((id: string) => {
-    // Cascade cleanup: find unions where this member is a child
+    recordSnapshot();
     const affectedUnions = unions.filter(u => u.children.includes(id));
     const idsToFadeOut: string[] = [];
 
@@ -836,6 +892,7 @@ const GenogramEditor: React.FC = () => {
   // ─── Auto-layout: reorganize tree ───
   const handleAutoLayout = useCallback(() => {
     const result = computeAutoLayout(members, unions, emotionalLinks);
+    recordSnapshot();
     setIsAnimating(true);
     setMembers(prev => prev.map(m => {
       const pos = result.positions.get(m.id);
@@ -903,6 +960,10 @@ const GenogramEditor: React.FC = () => {
         suggestions={search.suggestions}
         isSearchActive={search.isActive}
         matchCount={search.matchedMemberIds.size + search.matchedEmotionalLinkIds.size}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        canUndo={history.canUndo}
+        canRedo={history.canRedo}
       />
       <div className="flex flex-1 overflow-hidden">
         {!presentationMode && (
@@ -1098,6 +1159,7 @@ const GenogramEditor: React.FC = () => {
             open={!!linkModalTarget}
             onSelect={(type: EmotionalLinkType) => {
               if (linkModalTarget) {
+                recordSnapshot();
                 const newLink: EmotionalLink = {
                   id: `el-${Date.now()}`,
                   from: linkModalTarget.fromId,
@@ -1117,12 +1179,14 @@ const GenogramEditor: React.FC = () => {
             currentType={emotionalLinks.find(l => l.id === editingLinkId)?.type}
             onSelect={(type: EmotionalLinkType) => {
               if (editingLinkId) {
+                recordSnapshot();
                 setEmotionalLinks(prev => prev.map(l => l.id === editingLinkId ? { ...l, type } : l));
               }
               setEditingLinkId(null);
             }}
             onDelete={() => {
               if (editingLinkId) {
+                recordSnapshot();
                 setEmotionalLinks(prev => prev.filter(l => l.id !== editingLinkId));
               }
               setEditingLinkId(null);
@@ -1154,7 +1218,7 @@ const GenogramEditor: React.FC = () => {
             union={unions.find(u => u.id === editingUnionId) ?? null}
             open={!!editingUnionId}
             onClose={() => setEditingUnionId(null)}
-            onUpdate={(updated) => setUnions(prev => prev.map(u => u.id === updated.id ? updated : u))}
+            onUpdate={(updated) => { recordSnapshot(); setUnions(prev => prev.map(u => u.id === updated.id ? updated : u)); }}
             getMemberName={(id) => {
               const m = members.find(m => m.id === id);
               return m ? `${m.firstName} ${m.lastName}` : id;
@@ -1172,12 +1236,15 @@ const GenogramEditor: React.FC = () => {
             members={members}
             unions={unions}
             onUpdateEmotionalLink={(linkId, newType) => {
+              recordSnapshot();
               setEmotionalLinks(prev => prev.map(l => l.id === linkId ? { ...l, type: newType } : l));
             }}
             onDeleteEmotionalLink={(linkId) => {
+              recordSnapshot();
               setEmotionalLinks(prev => prev.filter(l => l.id !== linkId));
             }}
             onUpdateUnion={(unionId, updates) => {
+              recordSnapshot();
               setUnions(prev => prev.map(u => u.id === unionId ? { ...u, ...updates } : u));
             }}
             onLiveUpdate={(updated) => {
