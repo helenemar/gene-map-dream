@@ -539,14 +539,16 @@ const DesignSystemPage: React.FC = () => {
         </SubSection>
 
         {/* Member Card States */}
-        <SubSection title="Carte Membre — États interactifs (States)">
+        <SubSection title="Carte Membre — 4 États interactifs">
           <p className="text-sm text-muted-foreground mb-4">
-            Chaque carte possède 3 états UI : <strong>Default</strong>, <strong>Hover</strong> (bordure violette),
-            <strong> Edition</strong> (ancres + boutons flottants avec création de lien par drag).
+            Chaque carte possède 4 états UI : <strong>Default</strong> (bordure grise, pas d'ombre),{' '}
+            <strong>Hover</strong> (bordure violette + halo),{' '}
+            <strong>Selected</strong> (halo + ancres outline + boutons d'action),{' '}
+            <strong>Anchor-active</strong> (ancres pleines, mode drag activé).
           </p>
           <div className="dot-grid rounded-2xl border border-border p-12">
-            <div className="grid grid-cols-3 gap-x-16 gap-y-20">
-              {(['default', 'hover', 'edition'] as const).map(st => (
+            <div className="grid grid-cols-2 gap-x-16 gap-y-20">
+              {(['default', 'hover', 'selected', 'anchor-active'] as const).map(st => (
                 <div key={st} className="flex flex-col items-start gap-2">
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
                     State: {st}
