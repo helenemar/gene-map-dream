@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import gogyIcon from '@/assets/genogy-icon.svg';
 import { Search, Download, Share2, Undo2, Redo2, X, User, Briefcase, HeartPulse, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchSuggestion } from '@/hooks/useFamilySearch';
@@ -66,9 +67,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
     <header className="h-14 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
       {/* Left: Logo + actions */}
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center">
-          <span className="text-card text-xs font-bold">G</span>
-        </div>
+        <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
         <div className="flex items-center gap-1 bg-muted rounded-full p-1">
           <button className="p-1.5 rounded-full hover:bg-accent transition-colors">
             <Undo2 className="w-4 h-4 text-muted-foreground" />

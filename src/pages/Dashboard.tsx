@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import gogyIcon from '@/assets/genogy-icon.svg';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -53,9 +54,7 @@ const Dashboard: React.FC = () => {
       {/* ── Top Nav ── */}
       <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary via-destructive to-brand-orange flex items-center justify-center">
-            <span className="text-card text-xs font-bold">G</span>
-          </div>
+          <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
           <span className="text-base font-semibold text-foreground">Genogy</span>
         </div>
         <div className="flex items-center gap-3">
