@@ -8,8 +8,9 @@ import EmotionalLinkLine from '@/components/EmotionalLinkLine';
 import ElasticLinkLine from '@/components/ElasticLinkLine';
 import LinkTypeModal from '@/components/LinkTypeModal';
 import FloatingControls from '@/components/FloatingControls';
+import UnionEditDrawer from '@/components/UnionEditDrawer';
 import { SAMPLE_MEMBERS, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sampleData';
-import { FamilyMember, EmotionalLink, EmotionalLinkType } from '@/types/genogram';
+import { FamilyMember, EmotionalLink, EmotionalLinkType, Union } from '@/types/genogram';
 import { computeAutoLayout } from '@/utils/autoLayout';
 
 // Card bounding box
@@ -120,6 +121,8 @@ const GenogramEditor: React.FC = () => {
   const [anchorActiveMember, setAnchorActiveMember] = useState<string | null>(null);
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
   const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(SAMPLE_EMOTIONAL_LINKS);
+  const [unions, setUnions] = useState<Union[]>(SAMPLE_UNIONS);
+  const [editingUnionId, setEditingUnionId] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [snapToGrid, setSnapToGrid] = useState(false);
   const [zoom, setZoom] = useState(1);
@@ -382,7 +385,7 @@ const GenogramEditor: React.FC = () => {
 
   // ─── Auto-layout: reorganize tree ───
   const handleAutoLayout = useCallback(() => {
-    const result = computeAutoLayout(members, SAMPLE_UNIONS, emotionalLinks);
+    const result = computeAutoLayout(members, unions, emotionalLinks);
     setIsAnimating(true);
     setMembers(prev => prev.map(m => {
       const pos = result.positions.get(m.id);
@@ -462,7 +465,7 @@ const GenogramEditor: React.FC = () => {
               willChange: 'transform',
             }}
           >
-            <FamilyLinkLines members={members} unions={SAMPLE_UNIONS} />
+            <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} />
             {/* Emotional links SVG overlay — z-index 50, ABOVE cards (z-10) */}
             <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
               {/* Over-card transparency mask: full opacity in void, 0.25 over card surfaces */}
@@ -560,6 +563,17 @@ const GenogramEditor: React.FC = () => {
               setLinkModalTarget(null);
             }}
             onClose={() => setLinkModalTarget(null)}
+          />
+
+          <UnionEditDrawer
+            union={unions.find(u => u.id === editingUnionId) ?? null}
+            open={!!editingUnionId}
+            onClose={() => setEditingUnionId(null)}
+            onUpdate={(updated) => setUnions(prev => prev.map(u => u.id === updated.id ? updated : u))}
+            getMemberName={(id) => {
+              const m = members.find(m => m.id === id);
+              return m ? `${m.firstName} ${m.lastName}` : id;
+            }}
           />
 
           <FloatingControls

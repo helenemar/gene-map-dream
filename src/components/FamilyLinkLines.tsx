@@ -9,6 +9,7 @@ const RAIL_OFFSET = 20; // Offset for parallel rail conflict resolution
 interface FamilyLinkLinesProps {
   members: FamilyMember[];
   unions: Union[];
+  onEditUnion?: (unionId: string) => void;
 }
 
 /** Snap exactly to card border — zero gap */
@@ -113,7 +114,7 @@ const UnionLine: React.FC<{
  *   - ZERO diagonal lines. Every segment is strictly H or V.
  *   - Drops go straight down from the child's center X.
  */
-const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) => {
+const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion }) => {
   const getMember = (id: string) => members.find(m => m.id === id);
 
   const stroke = 'hsl(var(--foreground))';
@@ -363,7 +364,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
             union={unionObj}
             x={midX}
             y={midY}
-            onClick={() => console.log('Edit union', unionObj.id)}
+            onClick={() => onEditUnion?.(unionObj.id)}
           />
         ))}
       </svg>
