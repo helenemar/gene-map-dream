@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import GenogramEditor from "./pages/GenogramEditor";
 import DesignSystemPage from "./pages/DesignSystem";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/editor" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
             <Route path="/editor/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />

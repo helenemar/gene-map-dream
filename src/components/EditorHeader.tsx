@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode, FileText } from 'lucide-react';
+import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode, FileText, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { SearchSuggestion } from '@/hooks/useFamilySearch';
 import SaveIndicator from '@/components/SaveIndicator';
@@ -32,6 +33,28 @@ const CATEGORY_LABELS: Record<string, string> = {
   profession: 'Profession',
   pathology: 'Pathologie',
   relation: 'Relations',
+};
+
+const UserAvatar: React.FC = () => {
+  const { user, signOut } = useAuth();
+  const initials = user?.user_metadata?.full_name
+    ? user.user_metadata.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+    : user?.email?.slice(0, 2).toUpperCase() ?? '??';
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <button
+        onClick={() => signOut()}
+        className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
+        title="Se déconnecter"
+      >
+        <LogOut className="w-3.5 h-3.5 text-muted-foreground" />
+      </button>
+      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+        <span className="text-[10px] font-semibold text-primary-foreground">{initials}</span>
+      </div>
+    </div>
+  );
 };
 
 const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -181,6 +204,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
           <Share2 className="w-3.5 h-3.5" />
           Partager
         </Button>
+        <UserAvatar />
       </div>
 
     </header>
