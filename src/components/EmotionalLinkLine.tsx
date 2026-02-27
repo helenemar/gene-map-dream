@@ -354,8 +354,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       {/* Glow filter for hover */}
       {hovered && (
         <defs>
-          <filter id={`glow-${type}`} x="-40%" y="-40%" width="180%" height="180%">
-            <feGaussianBlur stdDeviation="4" result="blur" />
+          <filter id={`glow-${type}`} x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
