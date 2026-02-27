@@ -368,8 +368,7 @@ const GenogramEditor: React.FC = () => {
     open: boolean;
   } | null>(null);
 
-  // ─── Standalone parent-child links (no union) ───
-  const [standaloneLinks, setStandaloneLinks] = useState<{ parentId: string; childId: string }[]>([]);
+  // (standalone links removed — all children go through unions now)
 
   /** Center canvas on a specific member with smooth animation */
   const centerOnMember = useCallback((member: FamilyMember) => {
@@ -423,7 +422,7 @@ const GenogramEditor: React.FC = () => {
   }, [members]);
 
   /** Create a child and attach it to a specific union, create a new placeholder union, or create standalone */
-  const executeChildCreation = useCallback((sourceId: string, targetUnionId?: string, standalone?: boolean) => {
+  const executeChildCreation = useCallback((sourceId: string, targetUnionId?: string) => {
     const source = members.find(m => m.id === sourceId);
     const currentYear = new Date().getFullYear();
     const LEVEL_Y = 250;
@@ -441,45 +440,6 @@ const GenogramEditor: React.FC = () => {
       pathologies: [],
     };
 
-    if (standalone) {
-      // Standalone child — no union, but create a placeholder parent card
-      const SPOUSE_GAP = CARD_W + 120;
-      const sourceX = source?.x ?? 200;
-      const sourceY = source?.y ?? 200;
-      const placeholderX = sourceX + SPOUSE_GAP;
-      const placeholderId = `m-ph-${Date.now()}`;
-
-      const placeholder: FamilyMember = {
-        id: placeholderId,
-        firstName: '',
-        lastName: '',
-        birthYear: 0,
-        age: 0,
-        profession: '',
-        gender: source?.gender === 'male' ? 'female' : 'male',
-        x: placeholderX,
-        y: sourceY,
-        pathologies: [],
-        isPlaceholder: true,
-      };
-
-      // Center child between parent and placeholder
-      const coupleCenterX = (sourceX + placeholderX + CARD_W) / 2 - CARD_W / 2;
-      newChild.x = coupleCenterX;
-      newChild.y = sourceY + LEVEL_Y;
-
-      setMembers(prev => [...prev, placeholder, newChild]);
-      setStandaloneLinks(prev => [
-        ...prev,
-        { parentId: sourceId, childId: newChild.id },
-        { parentId: placeholderId, childId: newChild.id },
-      ]);
-      setSelectedMember(newChild.id);
-      setEditingNewMember(newChild);
-      setNewMemberDrawerOpen(true);
-      setTimeout(() => centerOnMember(newChild), 100);
-      return;
-    }
 
     if (targetUnionId) {
       // Add child to an existing union
@@ -585,6 +545,49 @@ const GenogramEditor: React.FC = () => {
     setNewMemberDrawerOpen(true);
     setTimeout(() => centerOnMember(newChild), 100);
   }, [members, unions, centerOnMember]);
+
+  /** Create a child with an existing member as co-parent (creates a new union between them) */
+  const executeChildCreationWithExisting = useCallback((sourceId: string, partnerId: string) => {
+    const source = members.find(m => m.id === sourceId);
+    const partner = members.find(m => m.id === partnerId);
+    if (!source || !partner) return;
+
+    const currentYear = new Date().getFullYear();
+    const LEVEL_Y = 250;
+
+    const coupleLeft = Math.min(source.x, partner.x);
+    const coupleRight = Math.max(source.x, partner.x) + CARD_W;
+    const coupleCenterX = (coupleLeft + coupleRight) / 2 - CARD_W / 2;
+    const coupleBottomY = Math.max(source.y, partner.y);
+
+    const newChild: FamilyMember = {
+      id: `m-${Date.now()}`,
+      firstName: 'Nouveau',
+      lastName: source.lastName || '',
+      birthYear: currentYear - 5,
+      age: 5,
+      profession: '',
+      gender: 'female',
+      x: coupleCenterX,
+      y: coupleBottomY + LEVEL_Y,
+      pathologies: [],
+    };
+
+    const newUnion: Union = {
+      id: `u-${Date.now()}`,
+      partner1: sourceId,
+      partner2: partnerId,
+      status: 'love_affair',
+      children: [newChild.id],
+    };
+
+    setMembers(prev => [...prev, newChild]);
+    setUnions(prev => [...prev, newUnion]);
+    setSelectedMember(newChild.id);
+    setEditingNewMember(newChild);
+    setNewMemberDrawerOpen(true);
+    setTimeout(() => centerOnMember(newChild), 100);
+  }, [members, centerOnMember]);
 
   const handleCreateRelated = useCallback((sourceId: string, relationship: RelationshipChoice) => {
     // ── Always show parent picker for child creation ──
@@ -877,67 +880,7 @@ const GenogramEditor: React.FC = () => {
             }}
           >
             <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} />
-            {/* Standalone parent-child grey lines */}
-            <svg className="absolute pointer-events-none" style={{ zIndex: 5, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
-              {(() => {
-                // Group standalone links by child to draw converging lines
-                const byChild = new Map<string, string[]>();
-                standaloneLinks.forEach(({ parentId, childId }) => {
-                  if (!byChild.has(childId)) byChild.set(childId, []);
-                  byChild.get(childId)!.push(parentId);
-                });
-                return Array.from(byChild.entries()).map(([childId, parentIds]) => {
-                  const child = members.find(m => m.id === childId);
-                  if (!child) return null;
-                  const parents = parentIds.map(pid => members.find(m => m.id === pid)).filter(Boolean) as FamilyMember[];
-                  if (parents.length === 0) return null;
-
-                  const childCX = child.x + CARD_W / 2;
-                  const childTop = child.y;
-                  const midY = parents.length > 0
-                    ? (Math.max(...parents.map(p => p.y + CARD_H)) + childTop) / 2
-                    : childTop - 40;
-
-                  return (
-                    <g key={`standalone-group-${childId}`}>
-                      {/* Horizontal dashed line between parents if 2+ */}
-                      {parents.length >= 2 && (() => {
-                        const sorted = [...parents].sort((a, b) => a.x - b.x);
-                        const leftX = sorted[0].x + CARD_W;
-                        const rightX = sorted[sorted.length - 1].x;
-                        const lineY = sorted[0].y + CARD_H / 2;
-                        return (
-                          <path
-                            d={`M ${leftX} ${lineY} L ${rightX} ${lineY}`}
-                            fill="none"
-                            stroke="hsl(var(--muted-foreground))"
-                            strokeWidth={1.5}
-                            strokeOpacity={0.3}
-                            strokeDasharray="6 4"
-                          />
-                        );
-                      })()}
-                      {/* Vertical lines from each parent down to midY, then to child */}
-                      {parents.map(parent => {
-                        const px = parent.x + CARD_W / 2;
-                        const py = parent.y + CARD_H;
-                        return (
-                          <path
-                            key={`standalone-${parent.id}-${childId}`}
-                            d={`M ${px} ${py} L ${px} ${midY} L ${childCX} ${midY} L ${childCX} ${childTop}`}
-                            fill="none"
-                            stroke="hsl(var(--muted-foreground))"
-                            strokeWidth={1.5}
-                            strokeOpacity={0.3}
-                            strokeDasharray="6 4"
-                          />
-                        );
-                      })}
-                    </g>
-                  );
-                });
-              })()}
-            </svg>
+            {/* All children go through unions now */}
             <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
               {/* Over-card transparency mask: full opacity in void, reduced over cards & union badges */}
               <defs>
@@ -1053,8 +996,8 @@ const GenogramEditor: React.FC = () => {
                     executeChildCreation(parentPickerState.sourceId);
                     setParentPickerState(null);
                   }}
-                  onSelectAlone={() => {
-                    executeChildCreation(parentPickerState.sourceId, undefined, true);
+                  onSelectExistingPartner={(partnerId) => {
+                    executeChildCreationWithExisting(parentPickerState.sourceId, partnerId);
                     setParentPickerState(null);
                   }}
                 >
