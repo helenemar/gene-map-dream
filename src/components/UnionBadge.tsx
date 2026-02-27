@@ -109,14 +109,17 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
   const pillW = label ? Math.max(label.length * 5.6 + 16, 56) : 0;
   const blockW = Math.max(pillW, showIcon ? ICON_D : 0);
 
-  // Layout: pill on top, icon below with overlap.
-  // The TOP of the group is anchored at the union line Y (badge hangs below the line).
-  const pillTopLocal = 0;
-  const iconCenterLocal = label ? PILL_H - OVERLAP + ICON_R : ICON_R;
+  // Layout: icon center ON the union line Y, pill ABOVE overlapping the icon.
+  // Local coords: icon center at ICON_R, pill sits above it.
+  const iconCenterLocal = showIcon ? ICON_R : 0;
+  const pillTopLocal = showIcon ? ICON_R - OVERLAP - PILL_H + OVERLAP : 0;
+  // Pill bottom edge = iconCenter - ICON_R + OVERLAP = OVERLAP
+  // Pill top = OVERLAP - PILL_H
+  const pillY = showIcon ? OVERLAP - PILL_H : 0;
 
-  // Horizontally centered on x, top edge at y + small gap
+  // Group positioned so icon center aligns with line Y
   const groupX = x - blockW / 2;
-  const groupY = y + 2; // sits just below the union line
+  const groupY = showIcon ? y - ICON_R : y - PILL_H / 2;
 
   const stroke = 'hsl(var(--border))';
   const bg = 'hsl(var(--card))';
@@ -132,7 +135,7 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
         <>
           <rect
             x={(blockW - pillW) / 2}
-            y={pillTopLocal}
+            y={pillY}
             width={pillW}
             height={PILL_H}
             rx={PILL_RX}
@@ -143,7 +146,7 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
           />
           <text
             x={blockW / 2}
-            y={pillTopLocal + PILL_H / 2}
+            y={pillY + PILL_H / 2}
             textAnchor="middle"
             dominantBaseline="central"
             fill="hsl(var(--muted-foreground))"
