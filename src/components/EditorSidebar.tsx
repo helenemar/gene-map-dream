@@ -173,13 +173,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                 return (
                   <div
                     key={link.id}
-                    className={`flex items-center gap-2.5 text-sm py-1.5 px-1.5 -mx-1.5 rounded-md cursor-pointer transition-all ${
-                      isHighlighted
-                        ? 'bg-primary/10 text-primary ring-1 ring-primary/20'
-                        : 'text-foreground/80 hover:bg-accent/30 hover:text-foreground'
-                    }`}
-                    onMouseEnter={() => onHighlightUnionStatus(link.id)}
-                    onMouseLeave={() => onHighlightUnionStatus(null)}
+                    className="flex items-center gap-2.5 text-sm py-1.5 px-1.5 -mx-1.5 rounded-md text-foreground/80"
                   >
                     <div className="w-5 flex items-center justify-center shrink-0">
                       <FamilyLinkIcon status={link.id} />
