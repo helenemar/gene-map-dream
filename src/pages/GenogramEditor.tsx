@@ -15,6 +15,7 @@ import ParentPicker from '@/components/ParentPicker';
 import { SAMPLE_MEMBERS, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sampleData';
 import { FamilyMember, EmotionalLink, EmotionalLinkType, Union, UnionStatus } from '@/types/genogram';
 import { computeAutoLayout } from '@/utils/autoLayout';
+import { useFamilySearch } from '@/hooks/useFamilySearch';
 
 // Card bounding box
 const CARD_W = MEMBER_CARD_W;
@@ -125,6 +126,7 @@ const GenogramEditor: React.FC = () => {
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
   const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(SAMPLE_EMOTIONAL_LINKS);
   const [unions, setUnions] = useState<Union[]>(SAMPLE_UNIONS);
+  const search = useFamilySearch(members, unions);
   const [editingUnionId, setEditingUnionId] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [snapToGrid, setSnapToGrid] = useState(false);
@@ -856,7 +858,14 @@ const GenogramEditor: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <EditorHeader />
+      <EditorHeader
+        searchQuery={search.query}
+        onSearchChange={search.setQuery}
+        onSearchClear={search.clear}
+        suggestions={search.suggestions}
+        isSearchActive={search.isActive}
+        matchCount={search.matchedMemberIds.size}
+      />
       <div className="flex flex-1 overflow-hidden">
         <EditorSidebar members={members} fileName="Nouveau fichier" />
 
@@ -879,9 +888,9 @@ const GenogramEditor: React.FC = () => {
               willChange: 'transform',
             }}
           >
-            <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} />
+            <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} searchMatchedUnionIds={search.matchedUnionIds} isSearchActive={search.isActive} />
             {/* All children go through unions now */}
-            <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
+            <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: search.isActive ? 0.1 : 1, transition: 'opacity 0.3s' }}>
               {/* Over-card transparency mask: full opacity in void, reduced over cards & union badges */}
               <defs>
                 <mask id="card-depth-mask">
@@ -965,6 +974,8 @@ const GenogramEditor: React.FC = () => {
                 state={getMemberState(member.id)}
                 isLinkTarget={!!linkDrag && linkDrag.fromId !== member.id}
                 isFadingOut={fadingOutIds.has(member.id)}
+                searchDimmed={search.isActive && !search.matchedMemberIds.has(member.id)}
+                searchHighlighted={search.isActive && search.matchedMemberIds.has(member.id)}
                 onSelect={handleSelect}
                 onDragStart={handleDragStart}
                 onCreateRelated={handleCreateRelated}

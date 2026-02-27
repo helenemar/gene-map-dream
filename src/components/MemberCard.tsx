@@ -31,6 +31,10 @@ interface MemberCardProps {
   isLinkTarget?: boolean;
   /** Fade-out animation before cascade deletion */
   isFadingOut?: boolean;
+  /** Search: dimmed when search active but this card doesn't match */
+  searchDimmed?: boolean;
+  /** Search: glowing when this card matches search */
+  searchHighlighted?: boolean;
   onSelect?: (id: string) => void;
   onDragStart?: (id: string, e: React.MouseEvent) => void;
   onCreateRelated?: (id: string, relationship: RelationshipChoice) => void;
@@ -57,6 +61,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
   static: isStatic = false,
   isLinkTarget = false,
   isFadingOut = false,
+  searchDimmed = false,
+  searchHighlighted = false,
   onSelect,
   onDragStart,
   onCreateRelated,
@@ -117,8 +123,14 @@ const MemberCard: React.FC<MemberCardProps> = ({
           ${isPlaceholder ? 'border-2 border-dashed' : 'border'}
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
           ${isPlaceholder && !isHighlighted ? 'border-muted-foreground/30' : borderClasses}
+          ${searchHighlighted ? 'border-2 border-primary ring-4 ring-primary/25' : ''}
         `}
-        style={{ minWidth: MEMBER_CARD_W, width: 'fit-content', padding: '12px 16px' }}
+        style={{
+          minWidth: MEMBER_CARD_W,
+          width: 'fit-content',
+          padding: '12px 16px',
+          ...(searchHighlighted ? { boxShadow: '0 0 20px hsl(var(--primary) / 0.35), 0 0 40px hsl(var(--primary) / 0.15)' } : {}),
+        }}
       >
         {/* Corner anchor dots — absolutely positioned at card corners with negative offset */}
         {showDots && CORNER_DOTS.map(({ side, style }) => (
@@ -239,7 +251,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       animate={{
         left: member.x,
         top: member.y,
-        opacity: isFadingOut ? 0 : 1,
+        opacity: isFadingOut ? 0 : searchDimmed ? 0.12 : 1,
         scale: isFadingOut ? 0.85 : 1,
       }}
       transition={isFadingOut
