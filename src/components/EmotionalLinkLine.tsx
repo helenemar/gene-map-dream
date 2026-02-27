@@ -24,6 +24,8 @@ interface EmotionalLinkLineProps {
   cardRects?: CardRect[];
   /** IDs of the two connected members (to exclude from collision) */
   excludeIds?: [string, string];
+  /** Curvature override to avoid crossing other links (-1 to 1, 0 = straight) */
+  curvature?: number;
   onClick?: () => void;
   /** When true, dim this link (card hover mode) */
   dimmed?: boolean;
@@ -194,13 +196,13 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   x1, y1, x2, y2, type, onClick,
   linkIndex = 0, linkCount = 1,
   cardRects = [], excludeIds = ['', ''],
+  curvature = 0,
   dimmed = false,
   searchHighlighted = false,
   searchDimmed = false,
 }) => {
   const [hovered, setHovered] = useState(false);
 
-  const mainPath = `M ${x1} ${y1} L ${x2} ${y2}`;
   const segments = 16;
   const amp = 6;
 
@@ -213,14 +215,42 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   const px = -uy; // perpendicular
   const py = ux;
 
-  const midX = (x1 + x2) / 2;
-  const midY = (y1 + y2) / 2;
+  // Compute Bézier control point when curvature is non-zero
+  const useCurve = Math.abs(curvature) > 0.01;
+  const midXRaw = (x1 + x2) / 2;
+  const midYRaw = (y1 + y2) / 2;
+  const mx = useCurve ? midXRaw - dy * curvature : midXRaw;
+  const my = useCurve ? midYRaw + dx * curvature : midYRaw;
+
+  // Main path: curved or straight
+  const mainPath = useCurve
+    ? `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`
+    : `M ${x1} ${y1} L ${x2} ${y2}`;
+
+  // Midpoint on the curve (for icons, marks)
+  const midX = useCurve ? 0.25 * x1 + 0.5 * mx + 0.25 * x2 : midXRaw;
+  const midY = useCurve ? 0.25 * y1 + 0.5 * my + 0.25 * y2 : midYRaw;
+
+  // Tangent at midpoint for perpendicular calculations
+  const tmx = useCurve ? (mx - x1) + (x2 - mx) : dx;
+  const tmy = useCurve ? (my - y1) + (y2 - my) : dy;
+  const tmLen = Math.sqrt(tmx * tmx + tmy * tmy);
+  const tux = tmLen > 0 ? tmx / tmLen : ux;
+  const tuy = tmLen > 0 ? tmy / tmLen : uy;
+  const tpx = -tuy; // perpendicular at midpoint
+  const tpy = tux;
 
   function parallelLine(offset: number) {
+    if (useCurve) {
+      return parallelQ(x1, y1, mx, my, x2, y2, offset);
+    }
     return `M ${x1 + px * offset} ${y1 + py * offset} L ${x2 + px * offset} ${y2 + py * offset}`;
   }
 
   function zigzagStraight(amplitude: number, segs: number, lineOffset = 0) {
+    if (useCurve) {
+      return zigzagQ(x1, y1, mx, my, x2, y2, amplitude, segs, lineOffset);
+    }
     const ox1 = x1 + px * lineOffset, oy1 = y1 + py * lineOffset;
     const ox2 = x2 + px * lineOffset, oy2 = y2 + py * lineOffset;
     const odx = ox2 - ox1, ody = oy2 - oy1;
@@ -240,6 +270,9 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   }
 
   function straightArrowHead(size: number, color: string) {
+    if (useCurve) {
+      return arrowHead(x2, y2, mx, my, size, color);
+    }
     if (dist === 0) return null;
     const left = { x: x2 - ux * size + px * size * 0.5, y: y2 - uy * size + py * size * 0.5 };
     const right = { x: x2 - ux * size - px * size * 0.5, y: y2 - uy * size - py * size * 0.5 };
@@ -278,12 +311,12 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
           <>
             <path d={mainPath} fill="none" stroke="hsl(var(--link-cutoff))" strokeWidth={1} strokeDasharray="4 3" />
             <line
-              x1={midX - ux * barGap + px * barH} y1={midY - uy * barGap + py * barH}
-              x2={midX - ux * barGap - px * barH} y2={midY - uy * barGap - py * barH}
+              x1={midX - tux * barGap + tpx * barH} y1={midY - tuy * barGap + tpy * barH}
+              x2={midX - tux * barGap - tpx * barH} y2={midY - tuy * barGap - tpy * barH}
               stroke="hsl(var(--link-cutoff))" strokeWidth={1.5} />
             <line
-              x1={midX + ux * barGap + px * barH} y1={midY + uy * barGap + py * barH}
-              x2={midX + ux * barGap - px * barH} y2={midY + uy * barGap - py * barH}
+              x1={midX + tux * barGap + tpx * barH} y1={midY + tuy * barGap + tpy * barH}
+              x2={midX + tux * barGap - tpx * barH} y2={midY + tuy * barGap - tpy * barH}
               stroke="hsl(var(--link-cutoff))" strokeWidth={1.5} />
           </>
         );
