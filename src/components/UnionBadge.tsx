@@ -9,7 +9,7 @@ interface UnionBadgeProps {
 }
 
 /** SVG status icon for the circular badge */
-const StatusIcon: React.FC<{ status: UnionStatus; size?: number }> = ({ status, size = 20 }) => {
+export const StatusIcon: React.FC<{ status: UnionStatus; size?: number }> = ({ status, size = 20 }) => {
   const half = size / 2;
   const stroke = 'hsl(var(--foreground))';
   const sw = 1.8;
