@@ -501,7 +501,7 @@ const GenogramEditor: React.FC = () => {
             <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} />
             {/* Emotional links SVG overlay — z-index 50, ABOVE cards (z-10) */}
             <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
-              {/* Over-card transparency mask: full opacity in void, 0.25 over card surfaces */}
+              {/* Over-card transparency mask: full opacity in void, reduced over cards & union badges */}
               <defs>
                 <mask id="card-depth-mask">
                   {/* White = full visibility everywhere */}
@@ -516,6 +516,25 @@ const GenogramEditor: React.FC = () => {
                       fill="rgba(255,255,255,0.2)"
                     />
                   ))}
+                  {/* Mask over union badge areas */}
+                  {unions.map(u => {
+                    const p1 = members.find(m => m.id === u.partner1);
+                    const p2 = members.find(m => m.id === u.partner2);
+                    if (!p1 || !p2) return null;
+                    const [left, right] = p1.x < p2.x ? [p1, p2] : [p2, p1];
+                    const midX = (left.x + CARD_W + right.x) / 2;
+                    const midY = (left.y + CARD_H / 2 + right.y + CARD_H / 2) / 2;
+                    // Badge area: ~120w × 60h centered on union midpoint
+                    return (
+                      <rect
+                        key={`mask-badge-${u.id}`}
+                        x={midX - 60} y={midY - 40}
+                        width={120} height={70}
+                        rx={14}
+                        fill="rgba(255,255,255,0.15)"
+                      />
+                    );
+                  })}
                 </mask>
               </defs>
               <g style={{ pointerEvents: 'auto' }} mask="url(#card-depth-mask)">
