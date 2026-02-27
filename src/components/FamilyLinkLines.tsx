@@ -170,14 +170,48 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
     }
 
     const childAnchors = childMembers.map(c => getAnchor(c, 'top'));
-    const childDropXs = childAnchors.map(a => a.x);
+
+    const twinGroups = new Set(childMembers.filter(c => c.twinGroup).map(c => c.twinGroup));
+    const nonTwinCount = childMembers.filter(c => !c.twinGroup).length;
+    const effectiveDropCount = nonTwinCount + twinGroups.size;
+
+    // Compute twin fork positions
+    const twinForkXs: number[] = [];
+    const twinForkMap = new Map<string, number>(); // twinGroup → forkX
+    if (twinGroups.size > 0) {
+      for (const tg of twinGroups) {
+        if (!tg) continue;
+        const twins = childMembers.filter(c => c.twinGroup === tg);
+        const twinAnchorsForGroup = twins.map(t => getAnchor(t, 'top'));
+        const forkX = twinAnchorsForGroup.reduce((sum, a) => sum + a.x, 0) / twinAnchorsForGroup.length;
+        twinForkXs.push(forkX);
+        twinForkMap.set(tg, forkX);
+      }
+    }
+
+    // Compute effective drop X positions (fork X for twins, anchor X for non-twins)
+    const effectiveDropXs: number[] = [];
+    const processedTwinGroups = new Set<string>();
+    for (let i = 0; i < childMembers.length; i++) {
+      const child = childMembers[i];
+      if (child.twinGroup) {
+        if (!processedTwinGroups.has(child.twinGroup)) {
+          processedTwinGroups.add(child.twinGroup);
+          const forkX = twinForkMap.get(child.twinGroup);
+          if (forkX !== undefined) effectiveDropXs.push(forkX);
+        }
+      } else {
+        effectiveDropXs.push(childAnchors[i].x);
+      }
+    }
 
     const parentBottom = unionLineY;
     const childTop = Math.min(...childAnchors.map(a => a.y));
     const baseY = parentBottom + (childTop - parentBottom) / 2;
 
-    const combLeftX = Math.min(unionMidX, ...childDropXs);
-    const combRightX = Math.max(unionMidX, ...childDropXs);
+    // Comb bar bounds use effective drop points (not raw child anchors)
+    const combLeftX = Math.min(unionMidX, ...effectiveDropXs);
+    const combRightX = Math.max(unionMidX, ...effectiveDropXs);
 
     combInfos.push({
       unionId: union.id,
@@ -186,20 +220,6 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
       rightX: combRightX,
       finalY: baseY,
     });
-
-    const twinGroups = new Set(childMembers.filter(c => c.twinGroup).map(c => c.twinGroup));
-    const nonTwinCount = childMembers.filter(c => !c.twinGroup).length;
-    const effectiveDropCount = nonTwinCount + twinGroups.size;
-
-    const twinForkXs: number[] = [];
-    if (twinGroups.size > 0) {
-      for (const tg of twinGroups) {
-        const twins = childMembers.filter(c => c.twinGroup === tg);
-        const twinAnchorsForGroup = twins.map(t => getAnchor(t, 'top'));
-        const forkX = twinAnchorsForGroup.reduce((sum, a) => sum + a.x, 0) / twinAnchorsForGroup.length;
-        twinForkXs.push(forkX);
-      }
-    }
 
     geometries.push({
       union, leftAnchor, rightAnchor, unionLineY, unionMidX,
