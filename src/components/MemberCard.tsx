@@ -12,6 +12,8 @@ interface MemberCardProps {
   isAnimating?: boolean;
   isColliding?: boolean;
   state?: MemberCardState;
+  /** When true, renders inline (no absolute positioning or motion) for use in the Design System */
+  static?: boolean;
   onSelect?: (id: string) => void;
   onDragStart?: (id: string, e: React.MouseEvent) => void;
   onCreateRelated?: (id: string) => void;
@@ -25,6 +27,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   isAnimating = false,
   isColliding = false,
   state = 'default',
+  static: isStatic = false,
   onSelect,
   onDragStart,
   onCreateRelated,
@@ -41,26 +44,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
   const showActions = activeState === 'edition';
   const showLinkIcon = activeState === 'linkable';
 
-  return (
-    <motion.div
-      className="absolute select-none"
-      animate={{
-        left: member.x,
-        top: member.y,
-      }}
-      transition={isAnimating
-        ? { type: 'spring', stiffness: 80, damping: 18, mass: 0.8 }
-        : { duration: 0 }
-      }
-      style={{ zIndex: 2 }}
-      onMouseDown={(e) => {
-        e.stopPropagation();
-        onDragStart?.(member.id, e);
-      }}
-      onClick={() => onSelect?.(member.id)}
-      onMouseEnter={() => onHover?.(member.id)}
-      onMouseLeave={() => onHover?.(null)}
-    >
+  const cardContent = (
+    <>
       {/* Anchor points */}
       {showAnchors && (
         <>
@@ -74,7 +59,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       {/* Card body */}
       <div
         className={`
-          relative flex items-center gap-3 rounded-xl p-2 bg-card border shadow-card transition-all cursor-grab active:cursor-grabbing
+          relative flex items-center gap-3 rounded-xl p-2 bg-card border shadow-card transition-all ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
           ${isColliding ? 'border-destructive ring-2 ring-destructive/30' : showRing ? 'border-primary ring-2 ring-primary/30' : 'border-border'}
         `}
       >
@@ -132,6 +117,34 @@ const MemberCard: React.FC<MemberCardProps> = ({
           </button>
         </div>
       )}
+    </>
+  );
+
+  if (isStatic) {
+    return <div className="relative inline-block">{cardContent}</div>;
+  }
+
+  return (
+    <motion.div
+      className="absolute select-none"
+      animate={{
+        left: member.x,
+        top: member.y,
+      }}
+      transition={isAnimating
+        ? { type: 'spring', stiffness: 80, damping: 18, mass: 0.8 }
+        : { duration: 0 }
+      }
+      style={{ zIndex: 2 }}
+      onMouseDown={(e) => {
+        e.stopPropagation();
+        onDragStart?.(member.id, e);
+      }}
+      onClick={() => onSelect?.(member.id)}
+      onMouseEnter={() => onHover?.(member.id)}
+      onMouseLeave={() => onHover?.(null)}
+    >
+      {cardContent}
     </motion.div>
   );
 };
