@@ -13,8 +13,8 @@ import { Plus, Pencil, Link, X } from 'lucide-react';
  */
 export type MemberCardState = 'default' | 'hover' | 'selected' | 'anchor-active';
 
-/** Fixed card width — must match CARD_W in GenogramEditor */
-export const MEMBER_CARD_W = 250;
+/** Min width for layout calculations — actual card uses fit-content */
+export const MEMBER_CARD_W = 220;
 
 type AnchorSide = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
@@ -38,11 +38,11 @@ interface MemberCardProps {
   onCancelAnchor?: (id: string) => void;
 }
 
-const CORNER_DOTS: { side: AnchorSide; className: string }[] = [
-  { side: 'top-left',     className: 'top-0 left-0 -translate-x-1/2 -translate-y-1/2' },
-  { side: 'top-right',    className: 'top-0 right-0 translate-x-1/2 -translate-y-1/2' },
-  { side: 'bottom-left',  className: 'bottom-0 left-0 -translate-x-1/2 translate-y-1/2' },
-  { side: 'bottom-right', className: 'bottom-0 right-0 translate-x-1/2 translate-y-1/2' },
+const CORNER_DOTS: { side: AnchorSide; style: React.CSSProperties }[] = [
+  { side: 'top-left',     style: { top: -6, left: -6 } },
+  { side: 'top-right',    style: { top: -6, right: -6 } },
+  { side: 'bottom-left',  style: { bottom: -6, left: -6 } },
+  { side: 'bottom-right', style: { bottom: -6, right: -6 } },
 ];
 
 const MemberCard: React.FC<MemberCardProps> = ({
@@ -91,7 +91,6 @@ const MemberCard: React.FC<MemberCardProps> = ({
       setInternalAnchorActive(true);
       return;
     }
-    // In editor: initiate link drag from this anchor
     onLinkDragStart?.(member.id, e);
   }, [isStatic, member.id, onLinkDragStart]);
 
@@ -106,22 +105,23 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
   const cardContent = (
     <>
-      {/* Card body — fixed width, dots are INSIDE this relative container */}
+      {/* Card body — hug contents with min-width, dots inside relative container */}
       <div
         className={`
-          relative overflow-visible flex items-center gap-3 rounded-xl p-2 bg-card border transition-all
+          relative overflow-visible flex items-center gap-3 rounded-xl bg-card border transition-all
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
           ${borderClasses}
         `}
-        style={{ width: MEMBER_CARD_W }}
+        style={{ minWidth: MEMBER_CARD_W, width: 'fit-content', padding: '12px 16px' }}
       >
-        {/* Corner anchor dots — absolutely positioned at card corners */}
-        {showDots && CORNER_DOTS.map(({ side, className }) => (
+        {/* Corner anchor dots — absolutely positioned at card corners with negative offset */}
+        {showDots && CORNER_DOTS.map(({ side, style }) => (
           <div
             key={side}
-            className={`absolute ${className} w-4 h-4 rounded-full border-2 border-primary z-20 cursor-crosshair transition-all duration-150 shadow-md ${
+            className={`absolute w-4 h-4 rounded-full border-2 border-primary z-20 cursor-crosshair transition-all duration-150 shadow-md ${
               dotsFilled ? 'bg-primary scale-125' : 'bg-card hover:bg-primary/30'
             }`}
+            style={style}
             onMouseDown={(e) => handleDotClick(side, e)}
           />
         ))}
@@ -140,18 +140,19 @@ const MemberCard: React.FC<MemberCardProps> = ({
           />
         </div>
 
-        {/* Info — overflow ellipsis */}
+        {/* Info block */}
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-6">
-            <span className="font-semibold text-sm text-foreground truncate">{member.firstName}</span>
+          {/* Header: Prénom left, Âge right — space-between */}
+          <div className="flex items-center justify-between gap-3">
+            <span className="font-semibold text-sm text-foreground whitespace-nowrap">{member.firstName}</span>
             <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">
               {member.age} ans
             </span>
           </div>
-          <div className="text-xs text-muted-foreground truncate">
+          <div className="text-xs text-muted-foreground whitespace-nowrap">
             {member.birthYear}{member.deathYear ? ` - ${member.deathYear}` : ' -'}
           </div>
-          <div className="text-xs text-muted-foreground truncate">{member.profession}</div>
+          <div className="text-xs text-muted-foreground whitespace-nowrap">{member.profession}</div>
         </div>
       </div>
 
