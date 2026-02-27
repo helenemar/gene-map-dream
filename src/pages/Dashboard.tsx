@@ -114,7 +114,7 @@ const Dashboard: React.FC = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent bg-transparent">
-                    <TableHead className="w-12"></TableHead>
+                    
                     <TableHead>
                       <button className="flex items-center gap-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                         Nom <ArrowUpDown className="w-3 h-3" />
@@ -147,9 +147,6 @@ const Dashboard: React.FC = () => {
                       onClick={() => navigate('/editor')}
                       className="cursor-pointer group"
                     >
-                      <TableCell className="w-12 pr-0">
-                        <div className="w-10 h-10 rounded-lg bg-muted border border-border" />
-                      </TableCell>
                       <TableCell>
                         <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                           {file.name}
