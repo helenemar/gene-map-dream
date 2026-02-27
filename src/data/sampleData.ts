@@ -13,7 +13,7 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
     gender: 'female', x: 300, y: 0, pathologies: ['cancer'],
   },
 
-  // ── Génération 1 (Parents — 2 enfants) ──
+  // ── Génération 1 (3 enfants) ──
   {
     id: 'p1', firstName: 'Philippe', lastName: 'Lefèvre',
     birthYear: 1970, age: 56, profession: 'Comptable',
@@ -29,14 +29,24 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
     birthYear: 1974, age: 52, profession: 'Pharmacienne',
     gender: 'female', x: 500, y: 350, pathologies: ['neurodegeneration', 'depression'],
   },
+  {
+    id: 'p2-h', firstName: 'Marc', lastName: 'Dupont',
+    birthYear: 1971, age: 55, profession: 'Ingénieur',
+    gender: 'male', x: 400, y: 350, pathologies: [],
+  },
 
-  // ── Génération 2 (Petits-enfants — 4 enfants de Philippe) ──
+  // ── Génération 2 (Enfants de Philippe + Nathalie) ──
   {
     id: 'c1', firstName: 'Julien', lastName: 'Lefèvre',
     birthYear: 1998, age: 28, profession: 'Kinésithérapeute',
     gender: 'male', x: 0, y: 700, pathologies: ['bipolar'],
   },
-  // Jumeaux monozygotes (vrais jumeaux)
+  {
+    id: 'c1-w', firstName: 'Léa', lastName: 'Martin',
+    birthYear: 1999, age: 27, profession: 'Infirmière',
+    gender: 'female', x: 200, y: 700, pathologies: [],
+  },
+  // Jumelles monozygotes
   {
     id: 'c2', firstName: 'Camille', lastName: 'Lefèvre',
     birthYear: 2001, age: 25, profession: 'Graphiste',
@@ -49,23 +59,56 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
     gender: 'female', x: 450, y: 700, pathologies: ['psychogenic'],
     twinGroup: 'twin-1', twinType: 'monozygotic',
   },
+
+  // ── Enfants de Sylvie + Marc ──
   {
-    id: 'c3', firstName: 'Raphaël', lastName: 'Lefèvre',
-    birthYear: 2004, age: 22, profession: 'Étudiant',
-    gender: 'male', x: 500, y: 700, pathologies: ['psychogenic'],
+    id: 'c3', firstName: 'Lucas', lastName: 'Dupont',
+    birthYear: 2000, age: 26, profession: 'Développeur',
+    gender: 'male', x: 500, y: 700, pathologies: [],
+  },
+  {
+    id: 'c4', firstName: 'Emma', lastName: 'Dupont',
+    birthYear: 2003, age: 23, profession: 'Étudiante',
+    gender: 'female', x: 700, y: 700, pathologies: ['psychogenic'],
+  },
+
+  // ── Génération 3 (Enfants de Julien + Léa) ──
+  {
+    id: 'gc1', firstName: 'Théo', lastName: 'Lefèvre',
+    birthYear: 2024, age: 2, profession: '',
+    gender: 'male', x: 0, y: 1050, pathologies: [],
+  },
+  {
+    id: 'gc2', firstName: 'Rose', lastName: 'Lefèvre',
+    birthYear: 2026, age: 0, profession: '',
+    gender: 'female', x: 200, y: 1050, pathologies: [],
   },
 ];
 
 export const SAMPLE_UNIONS: Union[] = [
+  // Gen 0 → Gen 1
   {
     id: 'u-gp', partner1: 'gp-m', partner2: 'gp-f',
     status: 'widowed', marriageYear: 1968,
     children: ['p1', 'p2'],
   },
+  // Gen 1 → Gen 2 (Philippe)
   {
     id: 'u-p1', partner1: 'p1', partner2: 'p1-w',
     status: 'married', marriageYear: 1996,
-    children: ['c1', 'c2', 'c2b', 'c3'],
+    children: ['c1', 'c2', 'c2b'],
+  },
+  // Gen 1 → Gen 2 (Sylvie)
+  {
+    id: 'u-p2', partner1: 'p2-h', partner2: 'p2',
+    status: 'married', marriageYear: 1998,
+    children: ['c3', 'c4'],
+  },
+  // Gen 2 → Gen 3 (Julien)
+  {
+    id: 'u-c1', partner1: 'c1', partner2: 'c1-w',
+    status: 'married', marriageYear: 2022,
+    children: ['gc1', 'gc2'],
   },
 ];
 
@@ -74,5 +117,6 @@ export const SAMPLE_RELATIONSHIPS: Relationship[] = [];
 
 export const SAMPLE_EMOTIONAL_LINKS: EmotionalLink[] = [
   { id: 'e1', from: 'p1', to: 'p2', type: 'fusional' },
-  { id: 'e2', from: 'c1', to: 'c3', type: 'conflictual' },
+  { id: 'e2', from: 'c1', to: 'c2', type: 'conflictual' },
+  { id: 'e3', from: 'gp-f', to: 'gc1', type: 'fusional' },
 ];
