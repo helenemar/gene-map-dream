@@ -213,19 +213,6 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                       </span>
                       <EmotionalLinkPreview type={link.id} width={60} height={16} />
                     </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => onToggleSoloEmotional(link.id)}
-                        className={`p-1 rounded-md transition-all ${
-                          isSolo
-                            ? 'text-primary bg-primary/10'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                        }`}
-                        title={isSolo ? 'Afficher tous les liens' : `Isoler : ${link.label}`}
-                      >
-                        {isSolo ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
                   </div>
                 );
               })}
