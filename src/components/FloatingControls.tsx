@@ -1,5 +1,5 @@
 import React from 'react';
-import { ZoomIn, ZoomOut, Maximize, Wand2 } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize, Wand2, Presentation } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface FloatingControlsProps {
@@ -8,28 +8,32 @@ interface FloatingControlsProps {
   onFitToScreen?: () => void;
   onAutoLayout?: () => void;
   zoom?: number;
+  presentationMode?: boolean;
+  onTogglePresentation?: () => void;
 }
 
 const FloatingControls: React.FC<FloatingControlsProps> = ({
-  onZoomIn, onZoomOut, onFitToScreen, onAutoLayout, zoom = 1,
+  onZoomIn, onZoomOut, onFitToScreen, onAutoLayout, zoom = 1, presentationMode = false, onTogglePresentation,
 }) => {
   const zoomPercent = Math.round(zoom * 100);
 
   return (
     <TooltipProvider delayDuration={300}>
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              onClick={onAutoLayout}
-              className="h-10 px-4 rounded-full bg-card shadow-float border border-border flex items-center justify-center gap-2 hover:bg-accent transition-colors"
-            >
-              <Wand2 className="w-4 h-4 text-foreground" />
-              <span className="text-xs font-medium text-foreground">Réorganiser</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="top">Réorganiser l'arbre automatiquement</TooltipContent>
-        </Tooltip>
+        {!presentationMode && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={onAutoLayout}
+                className="h-10 px-4 rounded-full bg-card shadow-float border border-border flex items-center justify-center gap-2 hover:bg-accent transition-colors"
+              >
+                <Wand2 className="w-4 h-4 text-foreground" />
+                <span className="text-xs font-medium text-foreground">Réorganiser</span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">Réorganiser l'arbre automatiquement</TooltipContent>
+          </Tooltip>
+        )}
 
         <div className="flex items-center gap-1 bg-card rounded-full shadow-float border border-border p-1.5">
           <Tooltip>
@@ -65,6 +69,22 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
             <TooltipContent side="top">Recentrer la vue</TooltipContent>
           </Tooltip>
         </div>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={onTogglePresentation}
+              className={`h-10 w-10 rounded-full shadow-float border flex items-center justify-center transition-colors ${
+                presentationMode
+                  ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90'
+                  : 'bg-card border-border hover:bg-accent'
+              }`}
+            >
+              <Presentation className="w-4 h-4" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top">{presentationMode ? 'Quitter la présentation' : 'Mode présentation'}</TooltipContent>
+        </Tooltip>
       </div>
     </TooltipProvider>
   );
