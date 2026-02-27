@@ -20,6 +20,7 @@ import {
 import { SAMPLE_MEMBERS, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sampleData';
 import { FamilyMember, EmotionalLink, EmotionalLinkType, Union, UnionStatus } from '@/types/genogram';
 import { computeAutoLayout } from '@/utils/autoLayout';
+import { exportAsPng, exportAsSvg } from '@/utils/exportCanvas';
 import { useFamilySearch } from '@/hooks/useFamilySearch';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
 import { toast } from 'sonner';
@@ -965,6 +966,18 @@ const GenogramEditor: React.FC = () => {
         onRedo={handleRedo}
         canUndo={history.canUndo}
         canRedo={history.canRedo}
+        onExportPng={() => {
+          if (canvasRef.current) {
+            exportAsPng(canvasRef.current, fileName);
+            toast('Export PNG en cours…', { duration: 2000 });
+          }
+        }}
+        onExportSvg={() => {
+          if (canvasRef.current) {
+            exportAsSvg(canvasRef.current, members, CARD_W, CARD_H, fileName);
+            toast('Export SVG téléchargé', { duration: 2000 });
+          }
+        }}
       />
       <div className="flex flex-1 overflow-hidden">
         {!presentationMode && (
