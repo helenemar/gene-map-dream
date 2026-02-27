@@ -9,7 +9,7 @@ interface RelationshipLinesProps {
 const RelationshipLines: React.FC<RelationshipLinesProps> = ({ members, relationships }) => {
   const getMember = (id: string) => members.find(m => m.id === id);
 
-  const CARD_W = 186;
+  const CARD_W = 220;
   const CARD_H = 64;
 
   const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') => {

@@ -2,7 +2,7 @@ import React from 'react';
 import { FamilyMember, Union, UnionStatus } from '@/types/genogram';
 import UnionBadge from './UnionBadge';
 
-const CARD_W = 186;
+const CARD_W = 220;
 const CARD_H = 64;
 const RAIL_OFFSET = 20; // Offset for parallel rail conflict resolution
 
