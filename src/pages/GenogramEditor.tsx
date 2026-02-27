@@ -48,32 +48,32 @@ function cardAnchors(m: FamilyMember): AnchorPoint[] {
 }
 
 /**
- * Corner-based anchor selection for emotional links.
- * Picks the pair of corners (one per card) that:
+ * Side-based anchor selection for emotional links.
+ * Picks the pair of side anchors (one per card) that:
  *  1. Minimises the total distance
  *  2. Avoids routing the line through either card's bounding box
  */
 function getEmotionalAnchors(from: FamilyMember, to: FamilyMember) {
-  const fromCorners = cardCorners(from);
-  const toCorners = cardCorners(to);
+  const fromSides = cardAnchors(from);
+  const toSides = cardAnchors(to);
 
   let best = { x1: 0, y1: 0, x2: 0, y2: 0, dist: Infinity };
 
-  for (const fc of fromCorners) {
-    for (const tc of toCorners) {
-      const dx = tc.x - fc.x;
-      const dy = tc.y - fc.y;
+  for (const fs of fromSides) {
+    for (const ts of toSides) {
+      const dx = ts.x - fs.x;
+      const dy = ts.y - fs.y;
       const d = Math.sqrt(dx * dx + dy * dy);
 
       // Reject if the straight line passes through either card
-      const crossesFrom = linePassesThroughCard(fc.x, fc.y, tc.x, tc.y, from);
-      const crossesTo   = linePassesThroughCard(fc.x, fc.y, tc.x, tc.y, to);
+      const crossesFrom = linePassesThroughCard(fs.x, fs.y, ts.x, ts.y, from);
+      const crossesTo   = linePassesThroughCard(fs.x, fs.y, ts.x, ts.y, to);
 
       const penalty = (crossesFrom ? 10000 : 0) + (crossesTo ? 10000 : 0);
       const score = d + penalty;
 
       if (score < best.dist) {
-        best = { x1: fc.x, y1: fc.y, x2: tc.x, y2: tc.y, dist: score };
+        best = { x1: fs.x, y1: fs.y, x2: ts.x, y2: ts.y, dist: score };
       }
     }
   }
