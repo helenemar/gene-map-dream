@@ -98,7 +98,7 @@ const DesignSystemPage: React.FC = () => {
 
           <h4 className="text-sm font-semibold text-foreground mb-3">Couleurs de marque</h4>
           <div className="flex flex-wrap gap-6 mb-8">
-            <ColorSwatch name="Primary (Violet)" cssVar="primary" hex="#6366F1" />
+            <ColorSwatch name="Primary (Violet)" cssVar="primary" hex="#6532FD" />
             <ColorSwatch name="Primary fg" cssVar="primary-foreground" hex="#FFFFFF" />
             <ColorSwatch name="Orange CTA" cssVar="brand-orange" hex="#F97316" />
             <ColorSwatch name="Orange fg" cssVar="brand-orange-foreground" hex="#FFFFFF" />
