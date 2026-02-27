@@ -27,12 +27,17 @@ type Side = 'top' | 'bottom' | 'left' | 'right';
 
 interface AnchorPoint { x: number; y: number; side: Side; }
 
-/** Center anchor for emotional links */
-function cardCenter(m: FamilyMember): { x: number; y: number } {
-  return { x: m.x + CARD_W / 2, y: m.y + CARD_H / 2 };
+/** Corner positions for a card */
+function cardCorners(m: FamilyMember) {
+  return [
+    { x: m.x, y: m.y },                     // top-left
+    { x: m.x + CARD_W, y: m.y },            // top-right
+    { x: m.x, y: m.y + CARD_H },            // bottom-left
+    { x: m.x + CARD_W, y: m.y + CARD_H },   // bottom-right
+  ];
 }
 
-/** Side anchors (center of edges) — snap exactly to card border, zero gap */
+/** Side anchors (center of edges) — for family links */
 function cardAnchors(m: FamilyMember): AnchorPoint[] {
   return [
     { x: m.x + CARD_W / 2, y: m.y, side: 'top' },
@@ -44,14 +49,23 @@ function cardAnchors(m: FamilyMember): AnchorPoint[] {
 
 /**
  * Corner-based anchor selection for emotional links.
- * Picks the pair of corners (one per card) that:
- *  1. Minimises the total distance
- *  2. Avoids routing the line through either card's bounding box
+ * Picks the pair of corners (one per card) that minimises distance.
  */
 function getEmotionalAnchors(from: FamilyMember, to: FamilyMember) {
-  const fc = cardCenter(from);
-  const tc = cardCenter(to);
-  return { x1: fc.x, y1: fc.y, x2: tc.x, y2: tc.y };
+  const fc = cardCorners(from);
+  const tc = cardCorners(to);
+  let best = { x1: fc[0].x, y1: fc[0].y, x2: tc[0].x, y2: tc[0].y };
+  let bestDist = Infinity;
+  for (const f of fc) {
+    for (const t of tc) {
+      const d = Math.hypot(f.x - t.x, f.y - t.y);
+      if (d < bestDist) {
+        bestDist = d;
+        best = { x1: f.x, y1: f.y, x2: t.x, y2: t.y };
+      }
+    }
+  }
+  return best;
 }
 
 /** Legacy side-based anchors for any non-emotional usage */
@@ -103,6 +117,7 @@ const GenogramEditor: React.FC = () => {
     return SAMPLE_MEMBERS;
   });
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
+  const [anchorActiveMember, setAnchorActiveMember] = useState<string | null>(null);
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
   const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(SAMPLE_EMOTIONAL_LINKS);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -287,19 +302,22 @@ const GenogramEditor: React.FC = () => {
     if (e.button === 0 && (e.target === canvasRef.current || (e.target as HTMLElement).classList.contains('canvas-bg'))) {
       setIsPanning(true);
       setSelectedMember(null);
+      setAnchorActiveMember(null);
       return;
     }
   }, [isSpaceDown]);
 
   const handleSelect = useCallback((id: string) => {
     setSelectedMember(prev => prev === id ? null : id);
+    setAnchorActiveMember(null);
   }, []);
 
   const getMemberState = useCallback((memberId: string) => {
+    if (anchorActiveMember === memberId) return 'anchor-active' as const;
     if (selectedMember === memberId) return 'selected' as const;
     if (hoveredMember === memberId) return 'hover' as const;
     return 'default' as const;
-  }, [selectedMember, hoveredMember]);
+  }, [selectedMember, hoveredMember, anchorActiveMember]);
 
   const handleCreateRelated = useCallback((id: string) => {
     console.log('Create related member for', id);
@@ -309,8 +327,13 @@ const GenogramEditor: React.FC = () => {
     console.log('Edit member', id);
   }, []);
 
+  const handleCancelAnchor = useCallback((id: string) => {
+    setAnchorActiveMember(null);
+  }, []);
+
   // ─── Link drag handlers ───
   const handleLinkDragStart = useCallback((fromId: string, e: React.MouseEvent) => {
+    setAnchorActiveMember(fromId);
     const member = members.find(m => m.id === fromId);
     if (!member) return;
     const canvas = canvasRef.current;
@@ -492,6 +515,7 @@ const GenogramEditor: React.FC = () => {
                 onEdit={handleEdit}
                 onHover={setHoveredMember}
                 onLinkDragStart={handleLinkDragStart}
+                onCancelAnchor={handleCancelAnchor}
               />
             ))}
             {/* Elastic link line while dragging */}
