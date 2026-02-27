@@ -109,19 +109,6 @@ function getDirectionalAnchors(from: FamilyMember, to: FamilyMember) {
   return { x1: fa.x, y1: fa.y, x2: ta.x, y2: ta.y, fromSide, toSide };
 }
 
-/** Check if two line segments cross each other */
-function segmentsCross(
-  ax1: number, ay1: number, ax2: number, ay2: number,
-  bx1: number, by1: number, bx2: number, by2: number
-): boolean {
-  const d1x = ax2 - ax1, d1y = ay2 - ay1;
-  const d2x = bx2 - bx1, d2y = by2 - by1;
-  const cross = d1x * d2y - d1y * d2x;
-  if (Math.abs(cross) < 1e-9) return false;
-  const t = ((bx1 - ax1) * d2y - (by1 - ay1) * d2x) / cross;
-  const u = ((bx1 - ax1) * d1y - (by1 - ay1) * d1x) / cross;
-  return t > 0.05 && t < 0.95 && u > 0.05 && u < 0.95;
-}
 
 const GenogramEditor: React.FC = () => {
   // Load saved positions from localStorage
@@ -951,32 +938,6 @@ const GenogramEditor: React.FC = () => {
                     pairMap.get(key)!.push(i);
                   });
 
-                  // Pre-compute all link segments for crossing detection
-                  const linkSegments = emotionalLinks.map(link => {
-                    const from = members.find(m => m.id === link.from);
-                    const to = members.find(m => m.id === link.to);
-                    if (!from || !to) return null;
-                    const anchors = getEmotionalAnchors(from, to);
-                    return anchors;
-                  });
-
-                  // Detect crossings and assign curvatures
-                  const curvatures = new Array(emotionalLinks.length).fill(0);
-                  for (let i = 0; i < linkSegments.length; i++) {
-                    const a = linkSegments[i];
-                    if (!a) continue;
-                    for (let j = i + 1; j < linkSegments.length; j++) {
-                      const b = linkSegments[j];
-                      if (!b) continue;
-                      if (segmentsCross(a.x1, a.y1, a.x2, a.y2, b.x1, b.y1, b.x2, b.y2)) {
-                        // Curve the second link in the opposite direction of the first
-                        if (curvatures[i] === 0) curvatures[i] = 0.25;
-                        if (curvatures[j] === 0) curvatures[j] = -0.25;
-                        else curvatures[j] = -curvatures[i]; // opposite direction
-                      }
-                    }
-                  }
-
                   return emotionalLinks.map((link, globalIdx) => {
                     const from = members.find(m => m.id === link.from);
                     const to = members.find(m => m.id === link.to);
@@ -998,7 +959,6 @@ const GenogramEditor: React.FC = () => {
                         linkCount={group.length}
                         cardRects={cardRects}
                         excludeIds={[link.from, link.to]}
-                        curvature={curvatures[globalIdx]}
                         dimmed={isDimmed}
                         searchHighlighted={isSearchHighlighted}
                         searchDimmed={isSearchDimmed}
