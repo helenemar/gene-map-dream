@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, LogOut } from 'lucide-react';
+import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -11,6 +11,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface GenogramRow {
   id: string;
@@ -20,13 +23,18 @@ interface GenogramRow {
   user_id: string;
 }
 
+type SortKey = 'name' | 'updated_at' | 'created_at';
+type SortDir = 'asc' | 'desc';
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [creating, setCreating] = useState(false);
+  const [sortKey, setSortKey] = useState<SortKey>('updated_at');
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
 
-  const { data: genograms, isLoading, refetch } = useQuery({
+  const { data: genograms, isLoading } = useQuery({
     queryKey: ['genograms', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -41,10 +49,27 @@ const Dashboard: React.FC = () => {
 
   const filteredFiles = useMemo(() => {
     if (!genograms) return [];
-    if (!searchQuery.trim()) return genograms;
-    const q = searchQuery.toLowerCase();
-    return genograms.filter((f) => f.name.toLowerCase().includes(q));
-  }, [searchQuery, genograms]);
+    let list = genograms;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter((f) => f.name.toLowerCase().includes(q));
+    }
+    return [...list].sort((a, b) => {
+      const aVal = a[sortKey];
+      const bVal = b[sortKey];
+      const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+  }, [searchQuery, genograms, sortKey, sortDir]);
+
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
+  };
 
   const handleCreate = async () => {
     if (!user || creating) return;
@@ -64,74 +89,92 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const formatDate = (iso: string) => {
-    return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm('Supprimer ce génogramme ?')) return;
+    const { error } = await supabase.from('genograms').delete().eq('id', id);
+    if (error) toast.error(error.message);
   };
 
-  const userInitials = user?.user_metadata?.full_name
-    ? user.user_metadata.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
-    : user?.email?.slice(0, 2).toUpperCase() ?? '??';
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  const displayName = user?.user_metadata?.full_name || user?.email || '';
+  const userInitials = displayName
+    .split(/[\s@]+/)
+    .filter(Boolean)
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <div className="min-h-screen bg-background">
       {/* ── Top Nav ── */}
-      <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6">
+      <header className="h-[64px] bg-card border-b border-border flex items-center justify-between px-8">
         <div className="flex items-center gap-2.5">
           <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
-          <span className="text-base font-semibold text-foreground">Genogy</span>
+          <span className="text-[15px] font-semibold text-foreground tracking-tight">Genogy</span>
         </div>
-        <div className="flex items-center gap-3">
-          <Button variant="beta" size="sm">
+        <div className="flex items-center gap-2">
+          <Button variant="beta" size="sm" className="h-9 px-4 text-xs font-bold">
             <Atom className="w-3.5 h-3.5" />
             BETA Test
           </Button>
-          <button className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-muted transition-colors">
-            <Bell className="w-4.5 h-4.5 text-foreground" />
+          <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-muted transition-colors">
+            <Bell className="w-[18px] h-[18px] text-foreground" />
           </button>
-          <button className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-muted transition-colors">
-            <Settings className="w-4.5 h-4.5 text-foreground" />
+          <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-muted transition-colors">
+            <Settings className="w-[18px] h-[18px] text-foreground" />
           </button>
-          <button
-            onClick={() => signOut()}
-            className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
-            title="Se déconnecter"
-          >
-            <LogOut className="w-4 h-4 text-foreground" />
-          </button>
-          <div className="w-9 h-9 rounded-full bg-foreground flex items-center justify-center cursor-pointer">
-            <span className="text-card text-xs font-semibold">{userInitials}</span>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-1.5 h-10 pl-1 pr-2 rounded-full bg-foreground hover:opacity-90 transition-opacity">
+                <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center">
+                  <span className="text-card text-[11px] font-bold tracking-wide">{userInitials}</span>
+                </div>
+                <ChevronDown className="w-3.5 h-3.5 text-card" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem onClick={() => signOut()} className="text-destructive focus:text-destructive">
+                Se déconnecter
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
       {/* ── Main Content ── */}
-      <main className="max-w-6xl mx-auto px-6 py-8">
+      <main className="max-w-[1200px] mx-auto px-8 py-8">
         {/* Hero / CTA Section */}
-        <div className="bg-card border border-border rounded-2xl p-8 mb-8">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Créer un nouveau génogramme</h1>
-          <p className="text-sm text-muted-foreground mb-6">
-            Commencez à construire l'arbre familial de votre patient.
+        <div className="bg-card border border-border rounded-2xl px-10 py-9 mb-6">
+          <h1 className="text-[26px] font-bold text-foreground leading-tight mb-1.5">
+            Créer un nouveau génogramme
+          </h1>
+          <p className="text-[14px] text-muted-foreground mb-7 max-w-lg">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi.
           </p>
-          <Button onClick={handleCreate} disabled={creating} className="gap-2 rounded-full px-6">
+          <Button onClick={handleCreate} disabled={creating} className="gap-2 rounded-full px-6 h-11 text-[14px] font-semibold">
             <Plus className="w-4 h-4" />
             {creating ? 'Création…' : 'Créer à partir d\'un nouveau membre'}
           </Button>
         </div>
 
         {/* Files Section */}
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <h2 className="text-base font-bold text-foreground">
+        <div className="bg-card border border-border rounded-2xl px-8 py-7">
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <h2 className="text-[16px] font-bold text-foreground">
               Mes génogrammes {genograms ? `(${filteredFiles.length})` : ''}
             </h2>
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <div className="relative w-72">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Rechercher"
-                className="w-full pl-9 pr-4 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring/30 placeholder:text-muted-foreground/50"
+                className="w-full pl-10 pr-4 py-2.5 text-[13px] bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/30 placeholder:text-muted-foreground/50"
               />
             </div>
           </div>
@@ -139,11 +182,12 @@ const Dashboard: React.FC = () => {
           {isLoading ? (
             <div className="space-y-3">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-4">
-                  <Skeleton className="h-5 w-40" />
-                  <Skeleton className="h-5 w-32" />
-                  <Skeleton className="h-5 w-24 hidden sm:block" />
-                  <Skeleton className="h-5 w-24 hidden md:block" />
+                <div key={i} className="flex items-center gap-6 py-4 px-2">
+                  <Skeleton className="h-10 w-16 rounded-lg" />
+                  <Skeleton className="h-4 w-36" />
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-24" />
                 </div>
               ))}
             </div>
@@ -152,23 +196,30 @@ const Dashboard: React.FC = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent bg-transparent">
-                    <TableHead>
-                      <button className="flex items-center gap-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    <TableHead className="pl-6 w-[280px]">
+                      <button onClick={() => toggleSort('name')} className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                         Nom <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </TableHead>
-                    <TableHead className="hidden sm:table-cell">
-                      <button className="flex items-center gap-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        Dernière modification <ArrowUpDown className="w-3 h-3" />
+                    <TableHead>
+                      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        Créateur
+                      </span>
+                    </TableHead>
+                    <TableHead>
+                      <button onClick={() => toggleSort('updated_at')} className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        Dernière modifications <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      <button className="flex items-center gap-1 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    <TableHead>
+                      <button onClick={() => toggleSort('created_at')} className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                         Date de création <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </TableHead>
-                    <TableHead className="text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Actions
+                    <TableHead className="text-right pr-6">
+                      <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        Actions
+                      </span>
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -177,26 +228,60 @@ const Dashboard: React.FC = () => {
                     <TableRow
                       key={file.id}
                       onClick={() => navigate(`/editor/${file.id}`)}
-                      className="cursor-pointer group"
+                      className="cursor-pointer group h-[60px]"
                     >
+                      <TableCell className="pl-6">
+                        <div className="flex items-center gap-3">
+                          {/* Thumbnail placeholder */}
+                          <div className="w-14 h-10 rounded-lg border border-border bg-muted/30 flex items-center justify-center shrink-0">
+                            <div className="w-6 h-5 border border-dashed border-muted-foreground/30 rounded-sm" />
+                          </div>
+                          <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
+                            {file.name}
+                          </span>
+                        </div>
+                      </TableCell>
                       <TableCell>
-                        <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                          {file.name}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center shrink-0">
+                            <span className="text-primary-foreground text-[10px] font-bold">{userInitials}</span>
+                          </div>
+                          <span className="text-[13px] text-foreground">
+                            {displayName.split('@')[0]}{' '}
+                            <span className="text-muted-foreground">(moi)</span>
+                          </span>
+                        </div>
                       </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <span className="text-sm text-foreground">{formatDate(file.updated_at)}</span>
+                      <TableCell>
+                        <span className="text-[13px] text-foreground">{formatDate(file.updated_at)}</span>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        <span className="text-sm text-foreground">{formatDate(file.created_at)}</span>
+                      <TableCell>
+                        <span className="text-[13px] text-foreground">{formatDate(file.created_at)}</span>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); }}
-                          className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
-                        >
-                          <MoreVertical className="w-4 h-4 text-muted-foreground" />
-                        </button>
+                      <TableCell className="text-right pr-6">
+                        <div className="flex items-center justify-end gap-1">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
+                              >
+                                <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-40">
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/editor/${file.id}`); }}>
+                                Ouvrir
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => handleDelete(file.id, e as any)}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
