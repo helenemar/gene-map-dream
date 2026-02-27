@@ -22,12 +22,13 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
           <TooltipTrigger asChild>
             <button
               onClick={onAutoLayout}
-              className="w-10 h-10 rounded-full bg-card shadow-float border border-border flex items-center justify-center hover:bg-accent transition-colors"
+              className="h-10 px-4 rounded-full bg-card shadow-float border border-border flex items-center justify-center gap-2 hover:bg-accent transition-colors"
             >
               <Wand2 className="w-4 h-4 text-foreground" />
+              <span className="text-xs font-medium text-foreground">Réorganiser</span>
             </button>
           </TooltipTrigger>
-          <TooltipContent side="top">Réorganiser l'arbre</TooltipContent>
+          <TooltipContent side="top">Réorganiser l'arbre automatiquement</TooltipContent>
         </Tooltip>
 
         <div className="flex items-center gap-1 bg-card rounded-full shadow-float border border-border p-1.5">
