@@ -13,6 +13,7 @@ interface FamilyLinkLinesProps {
   onEditUnion?: (unionId: string) => void;
   searchMatchedUnionIds?: Set<string>;
   isSearchActive?: boolean;
+  highlightedUnionStatus?: UnionStatus | null;
 }
 
 const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') => {
@@ -104,7 +105,7 @@ function buildAvoidingVerticalPath(
   return d;
 }
 
-const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, searchMatchedUnionIds, isSearchActive }) => {
+const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, searchMatchedUnionIds, isSearchActive, highlightedUnionStatus }) => {
   const getMember = (id: string) => members.find(m => m.id === id);
 
   const stroke = 'hsl(var(--foreground))';
@@ -391,14 +392,38 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
     );
   });
 
+  // Is any union status being highlighted from sidebar?
+  const isHighlightActive = highlightedUnionStatus !== null;
+
   return (
     <>
       {/* Structural lines layer */}
       <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: 0.9, transition: 'opacity 0.3s' }}>
+        {/* Glow filter for highlighted unions */}
+        <defs>
+          <filter id="union-glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feFlood floodColor="hsl(var(--primary))" floodOpacity="0.6" result="color" />
+            <feComposite in="color" in2="blur" operator="in" result="glow" />
+            <feMerge>
+              <feMergeNode in="glow" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
         {geometries.map((geo, idx) => {
           const dimmed = isSearchActive && searchMatchedUnionIds && !searchMatchedUnionIds.has(geo.union.id);
+          const isStatusMatch = isHighlightActive && geo.union.status === highlightedUnionStatus;
+          const isStatusDimmed = isHighlightActive && !isStatusMatch;
           return (
-            <g key={geo.union.id} style={{ opacity: dimmed ? 0.08 : 1, transition: 'opacity 0.3s' }}>
+            <g
+              key={geo.union.id}
+              style={{
+                opacity: dimmed ? 0.08 : isStatusDimmed ? 0.12 : 1,
+                filter: isStatusMatch ? 'url(#union-glow)' : 'none',
+                transition: 'opacity 0.2s, filter 0.2s',
+              }}
+            >
               {linesContent[idx]}
             </g>
           );
@@ -407,15 +432,27 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
 
       {/* Union badges layer */}
       <svg className="absolute pointer-events-none" style={{ zIndex: 100, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
-        {badgeData.map(({ unionObj, midX, midY }) => (
-          <UnionBadge
-            key={`badge-${unionObj.id}`}
-            union={unionObj}
-            x={midX}
-            y={midY}
-            onClick={() => onEditUnion?.(unionObj.id)}
-          />
-        ))}
+        {badgeData.map(({ unionObj, midX, midY }) => {
+          const isStatusMatch = isHighlightActive && unionObj.status === highlightedUnionStatus;
+          const isStatusDimmed = isHighlightActive && !isStatusMatch;
+          return (
+            <g
+              key={`badge-${unionObj.id}`}
+              style={{
+                opacity: isStatusDimmed ? 0.15 : 1,
+                filter: isStatusMatch ? 'url(#union-glow)' : 'none',
+                transition: 'opacity 0.2s, filter 0.2s',
+              }}
+            >
+              <UnionBadge
+                union={unionObj}
+                x={midX}
+                y={midY}
+                onClick={() => onEditUnion?.(unionObj.id)}
+              />
+            </g>
+          );
+        })}
       </svg>
     </>
   );

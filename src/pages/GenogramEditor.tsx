@@ -131,6 +131,8 @@ const GenogramEditor: React.FC = () => {
   const [editingUnionId, setEditingUnionId] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [snapToGrid, setSnapToGrid] = useState(false);
+  const [highlightedUnionStatus, setHighlightedUnionStatus] = useState<UnionStatus | null>(null);
+  const [soloEmotionalType, setSoloEmotionalType] = useState<EmotionalLinkType | null>(null);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
@@ -382,6 +384,17 @@ const GenogramEditor: React.FC = () => {
     const targetY = rect.height / 2 - (member.y + CARD_H / 2) * zoom;
     setPan({ x: targetX, y: targetY });
   }, [zoom]);
+
+  /** Focus on member: center + select + briefly highlight */
+  const handleFocusMember = useCallback((member: FamilyMember) => {
+    centerOnMember(member);
+    setSelectedMember(member.id);
+  }, [centerOnMember]);
+
+  /** Toggle solo emotional type: same type = off, different type = switch */
+  const handleToggleSoloEmotional = useCallback((type: EmotionalLinkType) => {
+    setSoloEmotionalType(prev => prev === type ? null : type);
+  }, []);
 
   /** Smart placement: compute position for new member based on relationship */
   const computeNewPosition = useCallback((
@@ -867,7 +880,17 @@ const GenogramEditor: React.FC = () => {
         matchCount={search.matchedMemberIds.size + search.matchedEmotionalLinkIds.size}
       />
       <div className="flex flex-1 overflow-hidden">
-        <EditorSidebar members={members} fileName="Nouveau fichier" />
+        <EditorSidebar
+          members={members}
+          unions={unions}
+          emotionalLinks={emotionalLinks}
+          fileName="Nouveau fichier"
+          onFocusMember={handleFocusMember}
+          highlightedUnionStatus={highlightedUnionStatus}
+          onHighlightUnionStatus={setHighlightedUnionStatus}
+          soloEmotionalType={soloEmotionalType}
+          onToggleSoloEmotional={handleToggleSoloEmotional}
+        />
 
         {/* Canvas */}
         <div
@@ -888,7 +911,7 @@ const GenogramEditor: React.FC = () => {
               willChange: 'transform',
             }}
           >
-            <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} searchMatchedUnionIds={search.matchedUnionIds} isSearchActive={search.isActive} />
+            <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} searchMatchedUnionIds={search.matchedUnionIds} isSearchActive={search.isActive} highlightedUnionStatus={highlightedUnionStatus} />
             {/* All children go through unions now */}
             <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: (search.isActive && search.matchedEmotionalLinkIds.size === 0) ? 0.1 : 1, transition: 'opacity 0.3s' }}>
               {/* Over-card transparency mask: full opacity in void, reduced over cards & union badges */}
@@ -949,6 +972,9 @@ const GenogramEditor: React.FC = () => {
                     const isDimmed = !!hoveredMember && link.from !== hoveredMember && link.to !== hoveredMember;
                     const isSearchHighlighted = search.isActive && search.matchedEmotionalLinkIds.has(link.id);
                     const isSearchDimmed = search.isActive && !isSearchHighlighted;
+                    // Solo mode: hide links that don't match the solo type
+                    const isSoloHidden = soloEmotionalType !== null && link.type !== soloEmotionalType;
+                    if (isSoloHidden) return null;
                     return (
                       <EmotionalLinkLine
                         key={link.id}
