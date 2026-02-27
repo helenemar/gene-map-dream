@@ -73,7 +73,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
     isSelected && state === 'default' ? 'selected' : state;
 
   const isHighlighted = activeState === 'hover' || activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget;
-  const showDots = activeState === 'selected' || activeState === 'anchor-active';
+  const showDots = activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget;
   const dotsFilled = activeState === 'anchor-active';
 
   // Border & ring logic
@@ -118,8 +118,12 @@ const MemberCard: React.FC<MemberCardProps> = ({
         {showDots && CORNER_DOTS.map(({ side, style }) => (
           <div
             key={side}
-            className={`absolute w-4 h-4 rounded-full border-2 border-primary cursor-crosshair transition-all duration-150 shadow-md ${
-              dotsFilled ? 'bg-primary scale-125' : 'bg-card hover:bg-primary/30'
+            className={`absolute w-4 h-4 rounded-full border-2 border-primary cursor-crosshair transition-all duration-150 ${
+              dotsFilled
+                ? 'bg-primary scale-125 shadow-[0_0_8px_hsl(var(--primary)/0.5)]'
+                : isLinkTarget
+                  ? 'bg-primary/20 opacity-50 hover:opacity-100 hover:bg-primary/40 hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
+                  : 'bg-card hover:bg-primary/30 hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
             }`}
             style={style}
             onMouseDown={(e) => handleDotClick(side, e)}

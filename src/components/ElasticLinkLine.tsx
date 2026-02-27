@@ -5,12 +5,20 @@ interface ElasticLinkLineProps {
   y1: number;
   x2: number;
   y2: number;
+  /** When snapped, show endpoint locked to this position */
+  snapX?: number;
+  snapY?: number;
+  isSnapped?: boolean;
 }
 
 /** Temporary elastic line shown while dragging to create a link */
-const ElasticLinkLine: React.FC<ElasticLinkLineProps> = ({ x1, y1, x2, y2 }) => {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
+const ElasticLinkLine: React.FC<ElasticLinkLineProps> = ({ x1, y1, x2, y2, snapX, snapY, isSnapped }) => {
+  // Use snap position if available
+  const endX = isSnapped && snapX !== undefined ? snapX : x2;
+  const endY = isSnapped && snapY !== undefined ? snapY : y2;
+
+  const dx = endX - x1;
+  const dy = endY - y1;
   const dist = Math.sqrt(dx * dx + dy * dy);
   const curvature = Math.min(dist * 0.3, 80);
 
@@ -25,17 +33,35 @@ const ElasticLinkLine: React.FC<ElasticLinkLineProps> = ({ x1, y1, x2, y2 }) => 
       style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}
     >
       <path
-        d={`M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`}
+        d={`M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${endX} ${endY}`}
         fill="none"
         stroke="hsl(var(--primary))"
-        strokeWidth={2}
-        strokeDasharray="6 4"
-        opacity={0.7}
+        strokeWidth={isSnapped ? 2.5 : 2}
+        strokeDasharray={isSnapped ? undefined : '6 4'}
+        opacity={isSnapped ? 0.9 : 0.7}
+        className="transition-all duration-100"
       />
       {/* Origin dot */}
       <circle cx={x1} cy={y1} r={4} fill="hsl(var(--primary))" opacity={0.8} />
-      {/* Cursor dot */}
-      <circle cx={x2} cy={y2} r={5} fill="hsl(var(--primary))" opacity={0.5} />
+      {/* Cursor/snap dot */}
+      <circle
+        cx={endX} cy={endY}
+        r={isSnapped ? 7 : 5}
+        fill={isSnapped ? 'hsl(var(--primary))' : 'hsl(var(--primary))'}
+        opacity={isSnapped ? 0.9 : 0.5}
+        className="transition-all duration-100"
+      />
+      {/* Snap glow ring */}
+      {isSnapped && (
+        <circle
+          cx={endX} cy={endY} r={14}
+          fill="none"
+          stroke="hsl(var(--primary))"
+          strokeWidth={2}
+          opacity={0.3}
+          className="animate-pulse"
+        />
+      )}
     </svg>
   );
 };
