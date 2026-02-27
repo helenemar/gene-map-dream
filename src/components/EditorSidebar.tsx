@@ -121,7 +121,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-3">
             <div className="space-y-0.5">
-              {members.map(m => (
+              {[...members].sort((a, b) => a.firstName.localeCompare(b.firstName, 'fr')).map(m => (
                 <div
                   key={m.id}
                   className="flex items-center justify-between group py-1.5 text-sm text-foreground/80 hover:text-foreground transition-colors rounded-md hover:bg-accent/30 px-1.5 -mx-1.5"
