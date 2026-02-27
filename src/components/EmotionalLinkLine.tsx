@@ -31,8 +31,6 @@ interface EmotionalLinkLineProps {
   searchHighlighted?: boolean;
   /** When true and not highlighted, heavy dim for search context */
   searchDimmed?: boolean;
-  /** Pre-computed Bézier control point from the router (for obstacle avoidance) */
-  curveControl?: { mx: number; my: number };
 }
 
 // ─── Core Bézier Math ───────────────────────────────────────────────
@@ -199,10 +197,10 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   dimmed = false,
   searchHighlighted = false,
   searchDimmed = false,
-  curveControl,
 }) => {
   const [hovered, setHovered] = useState(false);
 
+  const mainPath = `M ${x1} ${y1} L ${x2} ${y2}`;
   const segments = 16;
   const amp = 6;
 
@@ -218,27 +216,11 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   const midX = (x1 + x2) / 2;
   const midY = (y1 + y2) / 2;
 
-  // ─── Unified helpers (straight or Bézier) ──────────────────────────
-  const hasCurve = !!curveControl;
-  const cmx = curveControl?.mx ?? midX;
-  const cmy = curveControl?.my ?? midY;
-
-  // Main path (straight or Q curve)
-  const mainD = hasCurve
-    ? `M ${x1} ${y1} Q ${cmx} ${cmy} ${x2} ${y2}`
-    : `M ${x1} ${y1} L ${x2} ${y2}`;
-
-  // Bézier midpoint at t=0.5
-  const vizMidX = hasCurve ? (0.25 * x1 + 0.5 * cmx + 0.25 * x2) : midX;
-  const vizMidY = hasCurve ? (0.25 * y1 + 0.5 * cmy + 0.25 * y2) : midY;
-
-  function uParallel(offset: number): string {
-    if (hasCurve) return parallelQ(x1, y1, cmx, cmy, x2, y2, offset);
+  function parallelLine(offset: number) {
     return `M ${x1 + px * offset} ${y1 + py * offset} L ${x2 + px * offset} ${y2 + py * offset}`;
   }
 
-  function uZigzag(amplitude: number, segs: number, lineOffset = 0): string {
-    if (hasCurve) return zigzagQ(x1, y1, cmx, cmy, x2, y2, amplitude, segs, lineOffset);
+  function zigzagStraight(amplitude: number, segs: number, lineOffset = 0) {
     const ox1 = x1 + px * lineOffset, oy1 = y1 + py * lineOffset;
     const ox2 = x2 + px * lineOffset, oy2 = y2 + py * lineOffset;
     const odx = ox2 - ox1, ody = oy2 - oy1;
@@ -257,44 +239,36 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
     return pts.join(' ');
   }
 
-  function uArrow(size: number, color: string) {
-    if (hasCurve) return arrowHead(x2, y2, cmx, cmy, size, color);
+  function straightArrowHead(size: number, color: string) {
     if (dist === 0) return null;
     const left = { x: x2 - ux * size + px * size * 0.5, y: y2 - uy * size + py * size * 0.5 };
     const right = { x: x2 - ux * size - px * size * 0.5, y: y2 - uy * size - py * size * 0.5 };
     return <polygon points={`${x2},${y2} ${left.x},${left.y} ${right.x},${right.y}`} fill={color} />;
   }
 
-  // Tangent at curve midpoint for markers (bars, square)
-  // For Q Bézier at t=0.5: tangent = B - A (same as straight chord)
-  const vizUx = ux;
-  const vizUy = uy;
-  const vizPx = px;
-  const vizPy = py;
-
   const renderLine = () => {
     switch (type) {
       case 'fusional':
         return (
           <>
-            <path d={uParallel(2)} fill="none" stroke="hsl(var(--link-fusional))" strokeWidth={1} />
-            <path d={uParallel(-2)} fill="none" stroke="hsl(var(--link-fusional))" strokeWidth={1} />
+            <path d={parallelLine(2)} fill="none" stroke="hsl(var(--link-fusional))" strokeWidth={1} />
+            <path d={parallelLine(-2)} fill="none" stroke="hsl(var(--link-fusional))" strokeWidth={1} />
           </>
         );
       case 'distant':
-        return <path d={mainD} fill="none" stroke="hsl(var(--link-distant))" strokeWidth={1} strokeDasharray="8 5" />;
+        return <path d={mainPath} fill="none" stroke="hsl(var(--link-distant))" strokeWidth={1} strokeDasharray="8 5" />;
       case 'conflictual':
         return (
           <>
-            <path d={uParallel(2.5)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={1} strokeDasharray="8 5" />
-            <path d={uParallel(-2.5)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={1} strokeDasharray="8 5" />
+            <path d={parallelLine(2.5)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={1} strokeDasharray="8 5" />
+            <path d={parallelLine(-2.5)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={1} strokeDasharray="8 5" />
           </>
         );
       case 'ambivalent':
         return (
           <>
-            <path d={mainD} fill="none" stroke="hsl(var(--link-ambivalent))" strokeWidth={1} />
-            <polyline points={uZigzag(amp, segments)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={1} />
+            <path d={mainPath} fill="none" stroke="hsl(var(--link-ambivalent))" strokeWidth={1} />
+            <polyline points={zigzagStraight(amp, segments)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={1} />
           </>
         );
       case 'cutoff': {
@@ -302,33 +276,33 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
         const barH = 10;
         return (
           <>
-            <path d={mainD} fill="none" stroke="hsl(var(--link-cutoff))" strokeWidth={1} strokeDasharray="4 3" />
+            <path d={mainPath} fill="none" stroke="hsl(var(--link-cutoff))" strokeWidth={1} strokeDasharray="4 3" />
             <line
-              x1={vizMidX - vizUx * barGap + vizPx * barH} y1={vizMidY - vizUy * barGap + vizPy * barH}
-              x2={vizMidX - vizUx * barGap - vizPx * barH} y2={vizMidY - vizUy * barGap - vizPy * barH}
+              x1={midX - ux * barGap + px * barH} y1={midY - uy * barGap + py * barH}
+              x2={midX - ux * barGap - px * barH} y2={midY - uy * barGap - py * barH}
               stroke="hsl(var(--link-cutoff))" strokeWidth={1.5} />
             <line
-              x1={vizMidX + vizUx * barGap + vizPx * barH} y1={vizMidY + vizUy * barGap + vizPy * barH}
-              x2={vizMidX + vizUx * barGap - vizPx * barH} y2={vizMidY + vizUy * barGap - vizPy * barH}
+              x1={midX + ux * barGap + px * barH} y1={midY + uy * barGap + py * barH}
+              x2={midX + ux * barGap - px * barH} y2={midY + uy * barGap - py * barH}
               stroke="hsl(var(--link-cutoff))" strokeWidth={1.5} />
           </>
         );
       }
       case 'violence':
-        return <polyline points={uZigzag(amp, segments)} fill="none" stroke="hsl(var(--link-violence))" strokeWidth={1} />;
+        return <polyline points={zigzagStraight(amp, segments)} fill="none" stroke="hsl(var(--link-violence))" strokeWidth={1} />;
       case 'emotional_abuse':
         return (
           <>
-            <polyline points={uZigzag(amp * 0.8, segments, 0)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={1} />
-            <polyline points={uZigzag(amp * 0.8, segments, 5)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={1} />
-            <polyline points={uZigzag(amp * 0.8, segments, -5)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={1} />
+            <polyline points={zigzagStraight(amp * 0.8, segments, 0)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={1} />
+            <polyline points={zigzagStraight(amp * 0.8, segments, 5)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={1} />
+            <polyline points={zigzagStraight(amp * 0.8, segments, -5)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={1} />
           </>
         );
       case 'physical_violence':
         return (
           <>
-            <path d={mainD} fill="none" stroke="hsl(var(--link-physical-violence))" strokeWidth={1} />
-            <polyline points={uZigzag(amp, segments)} fill="none" stroke="hsl(var(--link-physical-violence))" strokeWidth={1} strokeOpacity={0.7} />
+            <path d={mainPath} fill="none" stroke="hsl(var(--link-physical-violence))" strokeWidth={1} />
+            <polyline points={zigzagStraight(amp, segments)} fill="none" stroke="hsl(var(--link-physical-violence))" strokeWidth={1} strokeOpacity={0.7} />
           </>
         );
       case 'sexual_abuse':
@@ -336,7 +310,7 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
           <>
             {[-7, -2.5, 2.5, 7].map((off, i) => (
               <polyline key={i}
-                points={uZigzag(amp * 0.7, segments, off)}
+                points={zigzagStraight(amp * 0.7, segments, off)}
                 fill="none" stroke="hsl(var(--link-sexual-abuse))" strokeWidth={1} />
             ))}
           </>
@@ -344,8 +318,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       case 'neglect':
         return (
           <>
-            <path d={mainD} fill="none" stroke="hsl(var(--link-neglect))" strokeWidth={1} />
-            {uArrow(8, 'hsl(var(--link-neglect))')}
+            <path d={mainPath} fill="none" stroke="hsl(var(--link-neglect))" strokeWidth={1} />
+            {straightArrowHead(8, 'hsl(var(--link-neglect))')}
           </>
         );
       case 'controlling': {
@@ -353,17 +327,17 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
         const angle = Math.atan2(dy, dx) * 180 / Math.PI;
         return (
           <>
-            <path d={mainD} fill="none" stroke="hsl(var(--link-controlling))" strokeWidth={1} />
+            <path d={mainPath} fill="none" stroke="hsl(var(--link-controlling))" strokeWidth={1} />
             <rect
-              x={vizMidX - sq} y={vizMidY - sq} width={sq * 2} height={sq * 2}
+              x={midX - sq} y={midY - sq} width={sq * 2} height={sq * 2}
               fill="hsl(var(--background))" stroke="hsl(var(--link-controlling))" strokeWidth={1}
-              transform={`rotate(${angle}, ${vizMidX}, ${vizMidY})`}
+              transform={`rotate(${angle}, ${midX}, ${midY})`}
             />
-            <line x1={vizMidX - sq * 0.6} y1={vizMidY - sq * 0.6} x2={vizMidX + sq * 0.6} y2={vizMidY + sq * 0.6}
-              stroke="hsl(var(--link-controlling))" strokeWidth={1} transform={`rotate(${angle}, ${vizMidX}, ${vizMidY})`} />
-            <line x1={vizMidX + sq * 0.6} y1={vizMidY - sq * 0.6} x2={vizMidX - sq * 0.6} y2={vizMidY + sq * 0.6}
-              stroke="hsl(var(--link-controlling))" strokeWidth={1} transform={`rotate(${angle}, ${vizMidX}, ${vizMidY})`} />
-            {uArrow(8, 'hsl(var(--link-controlling))')}
+            <line x1={midX - sq * 0.6} y1={midY - sq * 0.6} x2={midX + sq * 0.6} y2={midY + sq * 0.6}
+              stroke="hsl(var(--link-controlling))" strokeWidth={1} transform={`rotate(${angle}, ${midX}, ${midY})`} />
+            <line x1={midX + sq * 0.6} y1={midY - sq * 0.6} x2={midX - sq * 0.6} y2={midY + sq * 0.6}
+              stroke="hsl(var(--link-controlling))" strokeWidth={1} transform={`rotate(${angle}, ${midX}, ${midY})`} />
+            {straightArrowHead(8, 'hsl(var(--link-controlling))')}
           </>
         );
       }
@@ -371,6 +345,9 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
         return null;
     }
   };
+
+  const vizMidX = midX;
+  const vizMidY = midY;
 
   return (
     <g
@@ -380,7 +357,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       onClick={onClick}
     >
       {/* Invisible fat hit area */}
-      <path d={mainD} fill="none" stroke="transparent" strokeWidth={20} />
+      <path d={mainPath} fill="none" stroke="transparent" strokeWidth={20} />
+      {/* Bridge halo — removed for hollow/transparent look */}
       {/* Glow filter for hover */}
       {hovered && (
         <defs>
