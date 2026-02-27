@@ -351,8 +351,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       <path d={mainPath} fill="none" stroke="transparent" strokeWidth={20} />
       {/* Bridge halo */}
       <path d={mainPath} fill="none" stroke="hsl(var(--canvas-bg, var(--background)))" strokeWidth={5} strokeLinecap="round" />
-      {/* Rendered line */}
-      <g style={{ opacity: hovered ? 1 : 0.85 }}>
+      {/* Rendered line — thicker on hover */}
+      <g style={{ opacity: hovered ? 1 : 0.85, strokeWidth: hovered ? 2 : undefined }} className="transition-all duration-150">
         {renderLine()}
       </g>
       {/* Hover edit icon */}
