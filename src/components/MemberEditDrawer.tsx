@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FamilyMember, PATHOLOGIES, TwinType, EmotionalLink, EmotionalLinkType, EMOTIONAL_LINK_TYPES } from '@/types/genogram';
+import React, { useState, useEffect, useCallback } from 'react';
+import { FamilyMember, PATHOLOGIES, TwinType, EmotionalLink, EmotionalLinkType, EMOTIONAL_LINK_TYPES, Union, UnionStatus, FAMILY_LINK_TYPES } from '@/types/genogram';
 import {
   Sheet,
   SheetContent,
@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Heart } from 'lucide-react';
 import MemberIcon from '@/components/MemberIcon';
 
 interface MemberEditDrawerProps {
@@ -42,11 +42,19 @@ interface MemberEditDrawerProps {
   onDelete?: (id: string) => void;
   emotionalLinks?: EmotionalLink[];
   members?: FamilyMember[];
+  unions?: Union[];
   onUpdateEmotionalLink?: (linkId: string, newType: EmotionalLinkType) => void;
   onDeleteEmotionalLink?: (linkId: string) => void;
+  onUpdateUnion?: (unionId: string, updates: Partial<Union>) => void;
+  /** Called on every field change for live canvas updates */
+  onLiveUpdate?: (updated: FamilyMember) => void;
 }
 
-const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClose, onSave, onDelete, emotionalLinks = [], members: allMembers = [], onUpdateEmotionalLink, onDeleteEmotionalLink }) => {
+const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
+  member, open, onClose, onSave, onDelete,
+  emotionalLinks = [], members: allMembers = [], unions = [],
+  onUpdateEmotionalLink, onDeleteEmotionalLink, onUpdateUnion, onLiveUpdate,
+}) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [birthYear, setBirthYear] = useState('');
@@ -77,8 +85,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
     }
   }, [member]);
 
-  if (!member) return null;
-
   const currentYear = new Date().getFullYear();
   const parsedBirthYear = parseInt(birthYear, 10);
   const parsedDeathYear = deathYear ? parseInt(deathYear, 10) : undefined;
@@ -87,16 +93,12 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
     : 0;
 
   const isDeceased = !!deathYear;
-  const isExisting = member.firstName !== 'Nouveau';
+  const isExisting = member ? (member.firstName !== 'Nouveau' && member.firstName !== '') : false;
 
-  const togglePathology = (id: string) => {
-    setSelectedPathologies(prev =>
-      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
-    );
-  };
-
-  const handleSave = () => {
-    onSave({
+  /** Build the current member state from form fields */
+  const buildMember = useCallback((): FamilyMember | null => {
+    if (!member) return null;
+    return {
       ...member,
       firstName: firstName || 'Nouveau',
       lastName: lastName || member.lastName,
@@ -111,13 +113,38 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
       pathologies: selectedPathologies,
       twinGroup: twinGroup || undefined,
       twinType: (twinType as TwinType) || undefined,
-    });
+    };
+  }, [member, firstName, lastName, parsedBirthYear, parsedDeathYear, age, profession, gender, isGay, isBisexual, isTransgender, selectedPathologies, twinGroup, twinType, currentYear]);
+
+  /** Fire live update to canvas */
+  useEffect(() => {
+    if (open && member && onLiveUpdate) {
+      const updated = buildMember();
+      if (updated) onLiveUpdate(updated);
+    }
+  }, [firstName, lastName, birthYear, deathYear, profession, gender, isGay, isBisexual, isTransgender, selectedPathologies, twinGroup, twinType]);
+
+  if (!member) return null;
+
+  const togglePathology = (id: string) => {
+    setSelectedPathologies(prev =>
+      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+    );
+  };
+
+  const handleSave = () => {
+    const updated = buildMember();
+    if (updated) onSave(updated);
     onClose();
   };
 
+  // Find unions involving this member
+  const memberUnions = unions.filter(u => u.partner1 === member.id || u.partner2 === member.id);
+
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent side="right" className="w-[320px] sm:w-[360px] p-0 flex flex-col">
+      <SheetContent side="right" className="w-[340px] sm:w-[380px] p-0 flex flex-col border-l border-border/50">
+        {/* ── Header with live preview ── */}
         <div className="px-6 pt-6 pb-4">
           <SheetHeader>
             <SheetTitle className="text-base font-semibold">
@@ -129,21 +156,23 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
           </SheetHeader>
 
           {/* ── Live icon preview ── */}
-          <div className="flex items-center gap-4 mt-4 p-3 rounded-xl bg-accent/30 border border-border">
-            <MemberIcon
-              gender={gender}
-              isGay={isGay}
-              isBisexual={isBisexual}
-              isTransgender={isTransgender}
-              isDead={isDeceased}
-              pathologyColors={
-                PATHOLOGIES
-                  .filter(p => selectedPathologies.includes(p.id))
-                  .map(p => `hsl(var(--pathology-${p.id}))`)
-              }
-              size={56}
-              className="text-foreground"
-            />
+          <div className="flex items-center gap-4 mt-4 p-4 rounded-2xl bg-accent/20 border border-border/50">
+            <div className="shrink-0">
+              <MemberIcon
+                gender={gender}
+                isGay={isGay}
+                isBisexual={isBisexual}
+                isTransgender={isTransgender}
+                isDead={isDeceased}
+                pathologyColors={
+                  PATHOLOGIES
+                    .filter(p => selectedPathologies.includes(p.id))
+                    .map(p => `hsl(var(--pathology-${p.id}))`)
+                }
+                size={56}
+                className="text-foreground"
+              />
+            </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-foreground truncate">
                 {firstName || 'Nouveau'} {lastName}
@@ -164,7 +193,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
             <div className="flex flex-col gap-2">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Genre</Label>
               <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female')}>
-                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-9 border-border/50 bg-card"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="male">Homme</SelectItem>
                   <SelectItem value="female">Femme</SelectItem>
@@ -172,66 +201,153 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
               </Select>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Prénom</Label>
-              <Input className="h-9" placeholder="ex: Marie" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus />
+              <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Marie" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus />
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Nom</Label>
-              <Input className="h-9" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+              <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Année de naissance</Label>
-              <Input className="h-9" type="number" placeholder="ex: 1985" min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Naissance</Label>
+                <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="1985" min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Décès</Label>
+                <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="Vivant" min={1900} max={2100} value={deathYear} onChange={(e) => setDeathYear(e.target.value)} />
+              </div>
             </div>
+            {isDeceased && (
+              <p className="text-xs text-muted-foreground -mt-3">⚰️ Décédé(e) — {age} ans</p>
+            )}
 
-            <div className="flex flex-col gap-2">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Année de décès</Label>
-              <Input className="h-9" type="number" placeholder="Laisser vide si vivant" min={1900} max={2100} value={deathYear} onChange={(e) => setDeathYear(e.target.value)} />
-              {isDeceased && (
-                <p className="text-xs text-muted-foreground">⚰️ Décédé(e) — {age} ans</p>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Profession</Label>
-              <Input className="h-9" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} />
+              <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} />
             </div>
 
-            <Separator />
+            <Separator className="opacity-50" />
 
             {/* ── Identité de genre & orientation ── */}
             <div className="flex flex-col gap-3">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Identité & Orientation</Label>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between py-1">
                 <span className="text-sm text-foreground">Personne transgenre</span>
                 <Switch checked={isTransgender} onCheckedChange={setIsTransgender} />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between py-1">
                 <span className="text-sm text-foreground">Homosexuel(le)</span>
                 <Switch checked={isGay} onCheckedChange={(v) => { setIsGay(v); if (v) setIsBisexual(false); }} />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between py-1">
                 <span className="text-sm text-foreground">Bisexuel(le)</span>
                 <Switch checked={isBisexual} onCheckedChange={(v) => { setIsBisexual(v); if (v) setIsGay(false); }} />
               </div>
             </div>
 
-            <Separator />
+            <Separator className="opacity-50" />
+
+            {/* ── Relations / Unions ── */}
+            <div className="flex flex-col gap-3">
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <Heart className="w-3.5 h-3.5" />
+                Relations ({memberUnions.length})
+              </Label>
+
+              {memberUnions.length === 0 ? (
+                <p className="text-xs text-muted-foreground">Aucune union. Utilisez le menu « Créer un membre » pour ajouter un conjoint.</p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {memberUnions.map(union => {
+                    const partnerId = union.partner1 === member.id ? union.partner2 : union.partner1;
+                    const partner = allMembers.find(m => m.id === partnerId);
+                    const partnerName = partner
+                      ? (partner.isPlaceholder ? 'Parent inconnu' : `${partner.firstName} ${partner.lastName}`)
+                      : partnerId;
+
+                    return (
+                      <div key={union.id} className="p-3 rounded-xl bg-accent/20 border border-border/40 flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          {partner && (
+                            <MemberIcon
+                              gender={partner.gender}
+                              isDead={!!partner.deathYear}
+                              size={24}
+                              className="text-foreground shrink-0"
+                            />
+                          )}
+                          <span className="text-sm font-medium text-foreground truncate flex-1">{partnerName}</span>
+                          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">
+                            {union.children.length} enfant{union.children.length !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                        <Select
+                          value={union.status}
+                          onValueChange={(v) => onUpdateUnion?.(union.id, { status: v as UnionStatus })}
+                        >
+                          <SelectTrigger className="h-8 text-xs border-border/40 bg-card">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {FAMILY_LINK_TYPES.map(t => (
+                              <SelectItem key={t.id} value={t.id} className="text-xs">
+                                {t.icon} {t.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[10px] text-muted-foreground uppercase">Année union</span>
+                            <Input
+                              className="h-7 text-xs border-border/40 bg-card"
+                              type="number"
+                              placeholder="—"
+                              value={union.marriageYear || ''}
+                              onChange={(e) => onUpdateUnion?.(union.id, {
+                                marriageYear: e.target.value ? parseInt(e.target.value, 10) : undefined,
+                              })}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[10px] text-muted-foreground uppercase">
+                              {union.status === 'divorced' ? 'Divorce' : union.status === 'separated' ? 'Séparation' : union.status === 'widowed' ? 'Veuvage' : 'Fin'}
+                            </span>
+                            <Input
+                              className="h-7 text-xs border-border/40 bg-card"
+                              type="number"
+                              placeholder="—"
+                              value={union.divorceYear || ''}
+                              onChange={(e) => onUpdateUnion?.(union.id, {
+                                divorceYear: e.target.value ? parseInt(e.target.value, 10) : undefined,
+                              })}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <Separator className="opacity-50" />
 
             {/* ── Jumeaux ── */}
             <div className="flex flex-col gap-3">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Jumeaux / Triplés</Label>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5">
                 <Label className="text-xs text-muted-foreground">Groupe de jumeaux</Label>
                 <Input
-                  className="h-9"
+                  className="h-9 border-border/50 bg-card focus-visible:ring-primary/30"
                   placeholder="ex: twin-1 (vide si pas jumeau)"
                   value={twinGroup}
                   onChange={(e) => setTwinGroup(e.target.value)}
@@ -242,10 +358,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
               </div>
 
               {twinGroup && (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1.5">
                   <Label className="text-xs text-muted-foreground">Type de jumeaux</Label>
                   <Select value={twinType} onValueChange={(v) => setTwinType(v as TwinType)}>
-                    <SelectTrigger className="h-9"><SelectValue placeholder="Choisir le type" /></SelectTrigger>
+                    <SelectTrigger className="h-9 border-border/50 bg-card"><SelectValue placeholder="Choisir le type" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="monozygotic">Monozygote (vrais jumeaux)</SelectItem>
                       <SelectItem value="dizygotic">Dizygote (faux jumeaux)</SelectItem>
@@ -255,14 +371,14 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
               )}
             </div>
 
-            <Separator />
+            <Separator className="opacity-50" />
 
             {/* ── Pathologies ── */}
             <div className="flex flex-col gap-3">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Pathologies ({selectedPathologies.length})
               </Label>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1">
                 {PATHOLOGIES.map((p) => (
                   <label
                     key={p.id}
@@ -287,7 +403,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
               const memberLinks = emotionalLinks.filter(l => l.from === member.id || l.to === member.id);
               if (memberLinks.length === 0) return (
                 <>
-                  <Separator />
+                  <Separator className="opacity-50" />
                   <div className="flex flex-col gap-2">
                     <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Liens émotionnels</Label>
                     <p className="text-xs text-muted-foreground">Aucun lien émotionnel. Glissez depuis un point d'ancrage pour en créer.</p>
@@ -296,7 +412,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
               );
               return (
                 <>
-                  <Separator />
+                  <Separator className="opacity-50" />
                   <div className="flex flex-col gap-3">
                     <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Liens émotionnels ({memberLinks.length})
@@ -307,14 +423,14 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
                         const other = allMembers.find(m => m.id === otherId);
                         const otherName = other ? `${other.firstName} ${other.lastName}` : otherId;
                         return (
-                          <div key={link.id} className="flex items-center gap-2 py-1.5 px-2 rounded-lg bg-accent/30">
+                          <div key={link.id} className="flex items-center gap-2 py-1.5 px-2 rounded-lg bg-accent/20 border border-border/40">
                             <div className="flex-1 min-w-0">
                               <p className="text-sm text-foreground truncate">{otherName}</p>
                               <Select
                                 value={link.type}
                                 onValueChange={(v) => onUpdateEmotionalLink?.(link.id, v as EmotionalLinkType)}
                               >
-                                <SelectTrigger className="h-7 text-xs mt-1">
+                                <SelectTrigger className="h-7 text-xs mt-1 border-border/40 bg-card">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -341,9 +457,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
               );
             })()}
 
-            <Separator />
+            <Separator className="opacity-50" />
 
-            <Button onClick={handleSave} className="w-full">
+            {/* ── Actions ── */}
+            <Button onClick={handleSave} className="w-full h-10 font-semibold">
               Enregistrer
             </Button>
 
@@ -351,12 +468,13 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="ghost" className="w-full text-destructive hover:text-destructive hover:bg-destructive/10">
+                    <Trash2 className="w-4 h-4 mr-2" />
                     Supprimer ce membre
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Supprimer {member.firstName} {member.lastName} ?</AlertDialogTitle>
+                    <AlertDialogTitle>Supprimer {firstName || member.firstName} {lastName || member.lastName} ?</AlertDialogTitle>
                     <AlertDialogDescription>
                       Cette action est irréversible. Le membre sera supprimé du génogramme ainsi que tous ses liens associés.
                     </AlertDialogDescription>
@@ -375,7 +493,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
             )}
 
             {/* Bottom spacer for scroll */}
-            <div className="h-4" />
+            <div className="h-6" />
           </div>
         </ScrollArea>
       </SheetContent>
