@@ -4,18 +4,17 @@ import UnionBadge from './UnionBadge';
 
 const CARD_W = 220;
 const CARD_H = 64;
-const RAIL_OFFSET = 20; // Offset for parallel rail conflict resolution
+const RAIL_OFFSET = 20;
+const JOG_OFFSET = 12; // Horizontal jog to route around crossings
 
 interface FamilyLinkLinesProps {
   members: FamilyMember[];
   unions: Union[];
   onEditUnion?: (unionId: string) => void;
-  /** Set of union IDs that match the search — others get dimmed */
   searchMatchedUnionIds?: Set<string>;
   isSearchActive?: boolean;
 }
 
-/** Snap exactly to card border — zero gap */
 const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') => {
   switch (side) {
     case 'top': return { x: m.x + CARD_W / 2, y: m.y };
@@ -25,9 +24,6 @@ const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') =
   }
 };
 
-/**
- * UnionLine: ALWAYS horizontal.
- */
 const UnionLine: React.FC<{
   x1: number; y1: number; x2: number; y2: number;
   status: UnionStatus;
@@ -55,22 +51,59 @@ const UnionLine: React.FC<{
   );
 };
 
+/** A horizontal segment for crossing detection */
+interface HSegment {
+  unionId: string;
+  y: number;
+  xMin: number;
+  xMax: number;
+}
+
 /**
- * FamilyLinkLines — MyHeritage-style orthogonal comb routing.
- *
- * Structure for each union with children:
- *   1. Horizontal union line between partners (forced horizontal)
- *   2. Vertical stem from union midpoint down to comb rail Y
- *   3. Horizontal comb bar spanning all children
- *   4. Vertical drops from comb straight down to each child's top
- *
- * Rail conflict resolution:
- *   If two combs would overlap on the same Y, offset by RAIL_OFFSET (20px).
- *
- * Rules:
- *   - ZERO diagonal lines. Every segment is strictly H or V.
- *   - Drops go straight down from the child's center X.
+ * Check if a vertical line at x from y1→y2 crosses a horizontal segment.
+ * Returns the crossing Y values (sorted top to bottom).
  */
+function findCrossings(x: number, yTop: number, yBottom: number, segments: HSegment[], excludeUnionId: string): number[] {
+  const crossings: number[] = [];
+  for (const seg of segments) {
+    if (seg.unionId === excludeUnionId) continue;
+    // Does the vertical line at x pass through this horizontal segment?
+    if (x >= seg.xMin - 2 && x <= seg.xMax + 2 && seg.y > yTop + 2 && seg.y < yBottom - 2) {
+      crossings.push(seg.y);
+    }
+  }
+  return crossings.sort((a, b) => a - b);
+}
+
+/**
+ * Build a path that goes from (x, yTop) to (x, yBottom) but jogs around
+ * any horizontal segments it would cross.
+ */
+function buildAvoidingVerticalPath(
+  x: number, yTop: number, yBottom: number,
+  crossings: number[], jogDir: number = 1
+): string {
+  if (crossings.length === 0) {
+    return `M ${x} ${yTop} L ${x} ${yBottom}`;
+  }
+
+  const jogX = x + JOG_OFFSET * jogDir;
+  let d = `M ${x} ${yTop}`;
+  
+  for (const crossY of crossings) {
+    // Go down to just above the crossing, jog right, go past, jog back
+    const above = crossY - 6;
+    const below = crossY + 6;
+    d += ` L ${x} ${above}`;
+    d += ` L ${jogX} ${above}`;
+    d += ` L ${jogX} ${below}`;
+    d += ` L ${x} ${below}`;
+  }
+  
+  d += ` L ${x} ${yBottom}`;
+  return d;
+}
+
 const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, searchMatchedUnionIds, isSearchActive }) => {
   const getMember = (id: string) => members.find(m => m.id === id);
 
@@ -78,11 +111,30 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
   const opacity = 0.3;
   const sw = 1.5;
 
-  // ─── Rail conflict resolution ───
-  // Compute comb Y for each union, then offset overlapping rails
+  // ═══ PHASE 1: Compute all union line positions & comb data ═══
+  interface UnionGeometry {
+    union: Union;
+    leftAnchor: { x: number; y: number };
+    rightAnchor: { x: number; y: number };
+    unionLineY: number;
+    unionMidX: number;
+    childMembers: FamilyMember[];
+    childAnchors: { x: number; y: number }[];
+    combY: number;
+    combLeftX: number;
+    combRightX: number;
+    effectiveDropCount: number;
+    twinGroups: Set<string | undefined>;
+    nonTwinCount: number;
+    twinForkXs: number[];
+  }
+
+  const geometries: UnionGeometry[] = [];
+
+  // First pass: compute base comb Y for each union
   interface CombInfo {
     unionId: string;
-    baseY: number; // midpoint between parent bottom and child top
+    baseY: number;
     leftX: number;
     rightX: number;
     finalY: number;
@@ -95,23 +147,30 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
     const p2 = getMember(union.partner2);
     if (!p1 || !p2) continue;
 
-    const childMembers = union.children
-      .map(getMember)
-      .filter((m): m is FamilyMember => !!m)
-      .sort((a, b) => a.x - b.x);
-
-    if (childMembers.length === 0) continue;
-
     const [left, right] = p1.x < p2.x ? [p1, p2] : [p2, p1];
     const leftAnchor = getAnchor(left, 'right');
     const rightAnchor = getAnchor(right, 'left');
     const unionLineY = (leftAnchor.y + rightAnchor.y) / 2;
     const unionMidX = (leftAnchor.x + rightAnchor.x) / 2;
 
+    const childMembers = union.children
+      .map(getMember)
+      .filter((m): m is FamilyMember => !!m)
+      .sort((a, b) => a.x - b.x);
+
+    if (childMembers.length === 0) {
+      geometries.push({
+        union, leftAnchor, rightAnchor, unionLineY, unionMidX,
+        childMembers: [], childAnchors: [], combY: 0,
+        combLeftX: 0, combRightX: 0, effectiveDropCount: 0,
+        twinGroups: new Set(), nonTwinCount: 0, twinForkXs: [],
+      });
+      continue;
+    }
+
     const childAnchors = childMembers.map(c => getAnchor(c, 'top'));
     const childDropXs = childAnchors.map(a => a.x);
 
-    // Base comb Y: midpoint between parent bottom and first child top
     const parentBottom = unionLineY;
     const childTop = Math.min(...childAnchors.map(a => a.y));
     const baseY = parentBottom + (childTop - parentBottom) / 2;
@@ -126,18 +185,37 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
       rightX: combRightX,
       finalY: baseY,
     });
+
+    const twinGroups = new Set(childMembers.filter(c => c.twinGroup).map(c => c.twinGroup));
+    const nonTwinCount = childMembers.filter(c => !c.twinGroup).length;
+    const effectiveDropCount = nonTwinCount + twinGroups.size;
+
+    const twinForkXs: number[] = [];
+    if (twinGroups.size > 0) {
+      for (const tg of twinGroups) {
+        const twins = childMembers.filter(c => c.twinGroup === tg);
+        const twinAnchorsForGroup = twins.map(t => getAnchor(t, 'top'));
+        const forkX = twinAnchorsForGroup.reduce((sum, a) => sum + a.x, 0) / twinAnchorsForGroup.length;
+        twinForkXs.push(forkX);
+      }
+    }
+
+    geometries.push({
+      union, leftAnchor, rightAnchor, unionLineY, unionMidX,
+      childMembers, childAnchors, combY: baseY,
+      combLeftX, combRightX, effectiveDropCount,
+      twinGroups, nonTwinCount, twinForkXs,
+    });
   }
 
-  // Detect and resolve rail overlaps: if two combs share similar Y and overlap in X, offset
+  // Rail conflict resolution
   combInfos.sort((a, b) => a.baseY - b.baseY);
   for (let i = 0; i < combInfos.length; i++) {
     for (let j = i + 1; j < combInfos.length; j++) {
       const a = combInfos[i];
       const b = combInfos[j];
-      // Check Y proximity and X overlap
       if (Math.abs(a.finalY - b.finalY) < RAIL_OFFSET &&
           a.leftX < b.rightX && b.leftX < a.rightX) {
-        // Offset the second rail down
         b.finalY = a.finalY + RAIL_OFFSET;
       }
     }
@@ -145,182 +223,189 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
 
   const combYMap = new Map(combInfos.map(c => [c.unionId, c.finalY]));
 
-  // Collect badge data for the overlay layer
+  // Update geometries with resolved combY
+  for (const geo of geometries) {
+    const resolved = combYMap.get(geo.union.id);
+    if (resolved !== undefined) geo.combY = resolved;
+  }
+
+  // ═══ PHASE 2: Collect ALL horizontal segments for crossing detection ═══
+  const allHSegments: HSegment[] = [];
+
+  for (const geo of geometries) {
+    // Union line segment
+    allHSegments.push({
+      unionId: geo.union.id,
+      y: geo.unionLineY,
+      xMin: Math.min(geo.leftAnchor.x, geo.rightAnchor.x),
+      xMax: Math.max(geo.leftAnchor.x, geo.rightAnchor.x),
+    });
+
+    // Comb bar segment (if has children and multiple drops)
+    if (geo.childMembers.length > 0 && geo.effectiveDropCount > 1) {
+      allHSegments.push({
+        unionId: geo.union.id,
+        y: geo.combY,
+        xMin: geo.combLeftX,
+        xMax: geo.combRightX,
+      });
+    }
+  }
+
+  // Also add comb-to-single-child horizontal connectors
+  for (const geo of geometries) {
+    if (geo.effectiveDropCount === 1 && geo.childMembers.length > 0) {
+      const dropX = geo.nonTwinCount === 1
+        ? geo.childAnchors[geo.childMembers.findIndex(c => !c.twinGroup)]?.x ?? geo.unionMidX
+        : geo.twinForkXs[0] ?? geo.unionMidX;
+      if (Math.abs(geo.unionMidX - dropX) > 1) {
+        allHSegments.push({
+          unionId: geo.union.id,
+          y: geo.combY,
+          xMin: Math.min(geo.unionMidX, dropX),
+          xMax: Math.max(geo.unionMidX, dropX),
+        });
+      }
+    }
+  }
+
+  // ═══ PHASE 3: Render with crossing avoidance ═══
   const badgeData: { unionObj: Union; midX: number; midY: number }[] = [];
 
-  const linesContent = unions.map(union => {
-    const p1 = getMember(union.partner1);
-    const p2 = getMember(union.partner2);
-    if (!p1 || !p2) return null;
+  const linesContent = geometries.map((geo) => {
+    const { union, leftAnchor, rightAnchor, unionLineY, unionMidX,
+            childMembers, childAnchors, combY, combLeftX, combRightX,
+            effectiveDropCount, nonTwinCount, twinForkXs } = geo;
 
-    const [left, right] = p1.x < p2.x ? [p1, p2] : [p2, p1];
-    const leftAnchor = getAnchor(left, 'right');
-    const rightAnchor = getAnchor(right, 'left');
-    const unionLineY = (leftAnchor.y + rightAnchor.y) / 2;
-    const unionMidX = (leftAnchor.x + rightAnchor.x) / 2;
-
-    // Collect badge data
     badgeData.push({ unionObj: union, midX: unionMidX, midY: unionLineY });
 
-    const childMembers = union.children
-      .map(getMember)
-      .filter((m): m is FamilyMember => !!m)
-      .sort((a, b) => a.x - b.x);
+    if (childMembers.length === 0) {
+      return (
+        <g key={union.id}>
+          <UnionLine
+            x1={leftAnchor.x} y1={leftAnchor.y}
+            x2={rightAnchor.x} y2={rightAnchor.y}
+            status={union.status}
+          />
+        </g>
+      );
+    }
 
-        if (childMembers.length === 0) {
-          return (
-            <g key={union.id}>
-              <UnionLine
-                x1={leftAnchor.x} y1={leftAnchor.y}
-                x2={rightAnchor.x} y2={rightAnchor.y}
-                status={union.status}
-              />
-            </g>
-          );
-        }
+    // Stem: union midpoint → combY (with crossing avoidance)
+    const stemCrossings = findCrossings(unionMidX, unionLineY, combY, allHSegments, union.id);
+    const stemPath = buildAvoidingVerticalPath(unionMidX, unionLineY, combY, stemCrossings, 1);
 
-        const childAnchors = childMembers.map(c => getAnchor(c, 'top'));
-        const childDropXs = childAnchors.map(a => a.x);
+    return (
+      <g key={union.id}>
+        {/* 1. Union line (horizontal) */}
+        <UnionLine
+          x1={leftAnchor.x} y1={leftAnchor.y}
+          x2={rightAnchor.x} y2={rightAnchor.y}
+          status={union.status}
+        />
 
-        // Use resolved comb Y (with rail offset if needed)
-        const combY = combYMap.get(union.id) ?? unionLineY + 60;
+        {/* 2. Vertical stem with crossing avoidance */}
+        <path d={stemPath} fill="none"
+          stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} />
 
-        // Count effective drop points: each non-twin child = 1, each twin group = 1
-        const twinGroups = new Set(childMembers.filter(c => c.twinGroup).map(c => c.twinGroup));
-        const nonTwinCount = childMembers.filter(c => !c.twinGroup).length;
-        const effectiveDropCount = nonTwinCount + twinGroups.size;
+        {/* 3. Horizontal comb bar */}
+        {effectiveDropCount > 1 && (
+          <line
+            x1={combLeftX} y1={combY}
+            x2={combRightX} y2={combY}
+            stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+          />
+        )}
 
-        const childLeftX = Math.min(...childDropXs);
-        const childRightX = Math.max(...childDropXs);
-        const combLeftX = Math.min(unionMidX, childLeftX);
-        const combRightX = Math.max(unionMidX, childRightX);
+        {/* 4. Vertical drops with crossing avoidance */}
+        {(() => {
+          const elements: React.ReactNode[] = [];
+          const processed = new Set<number>();
 
-        // Compute twin fork positions for single-group connector
-        const twinForkXs: number[] = [];
-        if (twinGroups.size > 0) {
-          for (const tg of twinGroups) {
-            const twins = childMembers.filter(c => c.twinGroup === tg);
-            const twinAnchorsForGroup = twins.map(t => getAnchor(t, 'top'));
-            const forkX = twinAnchorsForGroup.reduce((sum, a) => sum + a.x, 0) / twinAnchorsForGroup.length;
-            twinForkXs.push(forkX);
+          for (let i = 0; i < childMembers.length; i++) {
+            if (processed.has(i)) continue;
+
+            const child = childMembers[i];
+            if (child.twinGroup) {
+              const twinIndices = childMembers
+                .map((c, idx) => ({ c, idx }))
+                .filter(({ c }) => c.twinGroup === child.twinGroup)
+                .map(({ idx }) => idx);
+
+              twinIndices.forEach(idx => processed.add(idx));
+
+              const twinAnchorsLocal = twinIndices.map(idx => childAnchors[idx]);
+              const forkX = twinAnchorsLocal.reduce((sum, a) => sum + a.x, 0) / twinAnchorsLocal.length;
+              const forkY = combY + 20;
+
+              // Stem from comb to fork (with avoidance)
+              const forkCrossings = findCrossings(forkX, combY, forkY, allHSegments, union.id);
+              const forkStemPath = buildAvoidingVerticalPath(forkX, combY, forkY, forkCrossings);
+              elements.push(
+                <path key={`twin-stem-${child.twinGroup}`} d={forkStemPath} fill="none"
+                  stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} />
+              );
+
+              twinAnchorsLocal.forEach((anchor, ti) => {
+                elements.push(
+                  <line key={`twin-branch-${child.twinGroup}-${ti}`}
+                    x1={forkX} y1={forkY}
+                    x2={anchor.x} y2={anchor.y}
+                    stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                  />
+                );
+              });
+            } else {
+              processed.add(i);
+              const dropX = childAnchors[i].x;
+              const dropYTop = combY;
+              const dropYBottom = childAnchors[i].y;
+              const dropCrossings = findCrossings(dropX, dropYTop, dropYBottom, allHSegments, union.id);
+              // Alternate jog direction based on position relative to union center
+              const jogDir = dropX >= unionMidX ? 1 : -1;
+              const dropPath = buildAvoidingVerticalPath(dropX, dropYTop, dropYBottom, dropCrossings, jogDir);
+              elements.push(
+                <path key={`drop-${i}`} d={dropPath} fill="none"
+                  stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} />
+              );
+            }
           }
-        }
+          return elements;
+        })()}
 
-        return (
-          <g key={union.id}>
-            {/* 1. Union line (horizontal) */}
-            <UnionLine
-              x1={leftAnchor.x} y1={leftAnchor.y}
-              x2={rightAnchor.x} y2={rightAnchor.y}
-              status={union.status}
-            />
-
-            {/* 2. Vertical stem: union midpoint → comb Y */}
+        {/* Single drop connector */}
+        {effectiveDropCount === 1 && (() => {
+          const dropX = nonTwinCount === 1
+            ? childAnchors[childMembers.findIndex(c => !c.twinGroup)]?.x
+            : twinForkXs[0];
+          if (dropX === undefined) return null;
+          return Math.abs(unionMidX - dropX) > 1 ? (
             <line
-              x1={unionMidX} y1={unionLineY}
-              x2={unionMidX} y2={combY}
+              x1={unionMidX} y1={combY}
+              x2={dropX} y2={combY}
               stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
             />
-
-            {/* 3. Horizontal comb bar — only when multiple effective drop points */}
-            {effectiveDropCount > 1 && (
-              <line
-                x1={combLeftX} y1={combY}
-                x2={combRightX} y2={combY}
-                stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-              />
-            )}
-
-            {/* 4. Vertical drops: comb → each child (with twin inverted-V) */}
-            {(() => {
-              const elements: React.ReactNode[] = [];
-              const processed = new Set<number>();
-
-              for (let i = 0; i < childMembers.length; i++) {
-                if (processed.has(i)) continue;
-
-                const child = childMembers[i];
-                // Detect twin group
-                if (child.twinGroup) {
-                  // Find all siblings in same twin group
-                  const twinIndices = childMembers
-                    .map((c, idx) => ({ c, idx }))
-                    .filter(({ c }) => c.twinGroup === child.twinGroup)
-                    .map(({ idx }) => idx);
-
-                  twinIndices.forEach(idx => processed.add(idx));
-
-                  // Inverted V: single fork point on comb, branches to each twin
-                  const twinAnchorsLocal = twinIndices.map(idx => childAnchors[idx]);
-                  const forkX = twinAnchorsLocal.reduce((sum, a) => sum + a.x, 0) / twinAnchorsLocal.length;
-                  const forkY = combY + 20; // Fork point slightly below comb
-
-                  // Stem from comb to fork
-                  elements.push(
-                    <line key={`twin-stem-${child.twinGroup}`}
-                      x1={forkX} y1={combY} x2={forkX} y2={forkY}
-                      stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-                    />
-                  );
-
-                  // Branches from fork to each twin
-                  twinAnchorsLocal.forEach((anchor, ti) => {
-                    elements.push(
-                      <line key={`twin-branch-${child.twinGroup}-${ti}`}
-                        x1={forkX} y1={forkY}
-                        x2={anchor.x} y2={anchor.y}
-                        stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-                      />
-                    );
-                  });
-                } else {
-                  // Standard vertical drop
-                  processed.add(i);
-                  elements.push(
-                    <line key={`drop-${i}`}
-                      x1={childAnchors[i].x} y1={combY}
-                      x2={childAnchors[i].x} y2={childAnchors[i].y}
-                      stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-                    />
-                  );
-                }
-              }
-              return elements;
-            })()}
-
-            {/* Single drop point: horizontal connector from stem if offset */}
-            {effectiveDropCount === 1 && (() => {
-              // Find the single drop X: either a single child or a single twin fork
-              const dropX = nonTwinCount === 1
-                ? childAnchors[childMembers.findIndex(c => !c.twinGroup)].x
-                : twinForkXs[0];
-              return Math.abs(unionMidX - dropX) > 1 ? (
-                <line
-                  x1={unionMidX} y1={combY}
-                  x2={dropX} y2={combY}
-                  stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-                />
-              ) : null;
-            })()}
-          </g>
-        );
-      });
+          ) : null;
+        })()}
+      </g>
+    );
+  });
 
   return (
     <>
-      {/* Structural lines layer — z-index 0 */}
+      {/* Structural lines layer */}
       <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: 0.9, transition: 'opacity 0.3s' }}>
-        {unions.map((union, idx) => {
-          const dimmed = isSearchActive && searchMatchedUnionIds && !searchMatchedUnionIds.has(union.id);
+        {geometries.map((geo, idx) => {
+          const dimmed = isSearchActive && searchMatchedUnionIds && !searchMatchedUnionIds.has(geo.union.id);
           return (
-            <g key={union.id} style={{ opacity: dimmed ? 0.08 : 1, transition: 'opacity 0.3s' }}>
+            <g key={geo.union.id} style={{ opacity: dimmed ? 0.08 : 1, transition: 'opacity 0.3s' }}>
               {linesContent[idx]}
             </g>
           );
         })}
       </svg>
 
-      {/* Union badges layer — z-index 60, above cards and emotional links */}
+      {/* Union badges layer */}
       <svg className="absolute pointer-events-none" style={{ zIndex: 100, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
         {badgeData.map(({ unionObj, midX, midY }) => (
           <UnionBadge
