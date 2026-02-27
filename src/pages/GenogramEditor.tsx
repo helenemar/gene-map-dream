@@ -126,7 +126,7 @@ const GenogramEditor: React.FC = () => {
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
   const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(SAMPLE_EMOTIONAL_LINKS);
   const [unions, setUnions] = useState<Union[]>(SAMPLE_UNIONS);
-  const search = useFamilySearch(members, unions);
+  const search = useFamilySearch(members, unions, emotionalLinks);
   const [editingUnionId, setEditingUnionId] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [snapToGrid, setSnapToGrid] = useState(false);
@@ -864,7 +864,7 @@ const GenogramEditor: React.FC = () => {
         onSearchClear={search.clear}
         suggestions={search.suggestions}
         isSearchActive={search.isActive}
-        matchCount={search.matchedMemberIds.size}
+        matchCount={search.matchedMemberIds.size + search.matchedEmotionalLinkIds.size}
       />
       <div className="flex flex-1 overflow-hidden">
         <EditorSidebar members={members} fileName="Nouveau fichier" />
@@ -890,7 +890,7 @@ const GenogramEditor: React.FC = () => {
           >
             <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} searchMatchedUnionIds={search.matchedUnionIds} isSearchActive={search.isActive} />
             {/* All children go through unions now */}
-            <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: search.isActive ? 0.1 : 1, transition: 'opacity 0.3s' }}>
+            <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: (search.isActive && search.matchedEmotionalLinkIds.size === 0) ? 0.1 : 1, transition: 'opacity 0.3s' }}>
               {/* Over-card transparency mask: full opacity in void, reduced over cards & union badges */}
               <defs>
                 <mask id="card-depth-mask">
@@ -946,6 +946,8 @@ const GenogramEditor: React.FC = () => {
                     const group = pairMap.get(key)!;
                     const linkIndex = group.indexOf(globalIdx);
                     const isDimmed = !!hoveredMember && link.from !== hoveredMember && link.to !== hoveredMember;
+                    const isSearchHighlighted = search.isActive && search.matchedEmotionalLinkIds.has(link.id);
+                    const isSearchDimmed = search.isActive && !isSearchHighlighted;
                     return (
                       <EmotionalLinkLine
                         key={link.id}
@@ -957,6 +959,8 @@ const GenogramEditor: React.FC = () => {
                         cardRects={cardRects}
                         excludeIds={[link.from, link.to]}
                         dimmed={isDimmed}
+                        searchHighlighted={isSearchHighlighted}
+                        searchDimmed={isSearchDimmed}
                         onClick={() => console.log('Edit emotional link', link.id)}
                       />
                     );

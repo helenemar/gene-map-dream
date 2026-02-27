@@ -27,6 +27,10 @@ interface EmotionalLinkLineProps {
   onClick?: () => void;
   /** When true, dim this link (card hover mode) */
   dimmed?: boolean;
+  /** When true, highlight this link (search match) — overrides dimmed */
+  searchHighlighted?: boolean;
+  /** When true and not highlighted, heavy dim for search context */
+  searchDimmed?: boolean;
 }
 
 // ─── Core Bézier Math ───────────────────────────────────────────────
@@ -191,6 +195,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   linkIndex = 0, linkCount = 1,
   cardRects = [], excludeIds = ['', ''],
   dimmed = false,
+  searchHighlighted = false,
+  searchDimmed = false,
 }) => {
   const [hovered, setHovered] = useState(false);
 
@@ -368,9 +374,15 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       {/* Rendered line — thicker on hover with glow */}
       <g
         style={{
-          opacity: dimmed ? 0.1 : (hovered ? 0.9 : 0.55),
-          strokeWidth: hovered ? 1.2 : undefined,
-          filter: hovered ? `url(#glow-${type})` : 'none',
+          opacity: searchHighlighted
+            ? (hovered ? 1 : 0.95)
+            : searchDimmed
+              ? 0.06
+              : dimmed
+                ? 0.1
+                : (hovered ? 0.9 : 0.55),
+          strokeWidth: searchHighlighted ? 2 : (hovered ? 1.2 : undefined),
+          filter: (hovered || searchHighlighted) ? `url(#glow-${type})` : 'none',
         }}
         className="transition-all duration-150"
       >
