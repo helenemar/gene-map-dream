@@ -351,8 +351,27 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       <path d={mainPath} fill="none" stroke="transparent" strokeWidth={20} />
       {/* Bridge halo */}
       <path d={mainPath} fill="none" stroke="hsl(var(--canvas-bg, var(--background)))" strokeWidth={5} strokeLinecap="round" />
-      {/* Rendered line — thicker on hover */}
-      <g style={{ opacity: hovered ? 1 : 0.85, strokeWidth: hovered ? 2 : undefined }} className="transition-all duration-150">
+      {/* Glow filter for hover */}
+      {hovered && (
+        <defs>
+          <filter id={`glow-${type}`} x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+      )}
+      {/* Rendered line — thicker on hover with glow */}
+      <g
+        style={{
+          opacity: hovered ? 1 : 0.85,
+          strokeWidth: hovered ? 2 : undefined,
+          filter: hovered ? `url(#glow-${type})` : 'none',
+        }}
+        className="transition-all duration-150"
+      >
         {renderLine()}
       </g>
       {/* Hover edit icon */}
