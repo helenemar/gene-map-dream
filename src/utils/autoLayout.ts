@@ -86,9 +86,10 @@ export function computeAutoLayout(
     if (!generation.has(m.id)) generation.set(m.id, 0);
   }
 
-  // Align partners
-  for (let iter = 0; iter < 10; iter++) {
+  // Align partners AND propagate children generations
+  for (let iter = 0; iter < 20; iter++) {
     let changed = false;
+    // Align partners to same generation
     for (const u of unions) {
       const g1 = generation.get(u.partner1) ?? 0;
       const g2 = generation.get(u.partner2) ?? 0;
@@ -97,6 +98,17 @@ export function computeAutoLayout(
         generation.set(u.partner1, t);
         generation.set(u.partner2, t);
         changed = true;
+      }
+    }
+    // Ensure children are at parent_gen + 1
+    for (const u of unions) {
+      const parentGen = Math.max(generation.get(u.partner1) ?? 0, generation.get(u.partner2) ?? 0);
+      for (const cid of u.children) {
+        const childGen = generation.get(cid) ?? 0;
+        if (childGen <= parentGen) {
+          generation.set(cid, parentGen + 1);
+          changed = true;
+        }
       }
     }
     if (!changed) break;
