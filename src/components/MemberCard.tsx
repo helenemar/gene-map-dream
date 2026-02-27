@@ -110,9 +110,10 @@ const MemberCard: React.FC<MemberCardProps> = ({
       {/* Card body — hug contents with min-width, dots inside relative container */}
       <div
         className={`
-          relative overflow-visible flex items-center gap-3 rounded-xl bg-card border transition-all
+          relative overflow-visible flex items-center gap-3 rounded-xl bg-card transition-all
+          ${isPlaceholder ? 'border-2 border-dashed' : 'border'}
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
-          ${borderClasses}
+          ${isPlaceholder && !isHighlighted ? 'border-muted-foreground/30' : borderClasses}
         `}
         style={{ minWidth: MEMBER_CARD_W, width: 'fit-content', padding: '12px 16px' }}
       >
@@ -135,8 +136,10 @@ const MemberCard: React.FC<MemberCardProps> = ({
         {/* Icon with pathology fills or placeholder */}
         <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
           {isPlaceholder ? (
-            <div className="w-12 h-12 rounded border-2 border-dashed border-muted-foreground/40 flex items-center justify-center">
-              <Plus className="w-5 h-5 text-muted-foreground/50" />
+            <div className={`w-12 h-12 flex items-center justify-center ${
+              member.gender === 'female' ? 'rounded-full' : 'rounded'
+            } bg-muted/30`}>
+              <Plus className="w-5 h-5 text-muted-foreground/40" />
             </div>
           ) : (
             <MemberIcon
@@ -156,8 +159,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
         <div className="min-w-0 flex-1">
           {isPlaceholder ? (
             <div className="flex flex-col gap-0.5">
-              <span className="font-medium text-sm text-muted-foreground/60 italic whitespace-nowrap">Non renseigné</span>
-              <span className="text-[11px] text-muted-foreground/40">Cliquer pour éditer</span>
+              <span className="font-medium text-sm text-muted-foreground/50 italic whitespace-nowrap">Ajouter le parent</span>
+              <span className="text-[11px] text-muted-foreground/30">Cliquer pour compléter</span>
             </div>
           ) : (
             <>
@@ -243,7 +246,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
         e.stopPropagation();
         onDragStart?.(member.id, e);
       }}
-      onClick={() => onSelect?.(member.id)}
+      onClick={() => {
+        if (isPlaceholder) {
+          onEdit?.(member.id);
+        } else {
+          onSelect?.(member.id);
+        }
+      }}
       onMouseEnter={() => onHover?.(member.id)}
       onMouseLeave={() => onHover?.(null)}
     >
