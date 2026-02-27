@@ -16,6 +16,7 @@ export interface FamilyMember {
   y: number;
   pathologies: string[];
   avatar?: string;
+  isPlaceholder?: boolean; // Auto-created empty partner placeholder
   twinGroup?: string;   // Shared ID among twins (e.g. "twin-1")
   twinType?: TwinType;  // monozygotic (identical) or dizygotic (fraternal)
 }
