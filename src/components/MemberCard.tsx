@@ -216,7 +216,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         ? { type: 'spring', stiffness: 80, damping: 18, mass: 0.8 }
         : { duration: 0 }
       }
-      style={{ zIndex: 2 }}
+      style={{ zIndex: 10 }}
       onMouseDown={(e) => {
         e.stopPropagation();
         onDragStart?.(member.id, e);
