@@ -203,344 +203,408 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
         <Separator />
 
         <ScrollArea className="flex-1 px-3">
-          <div className="flex flex-col gap-3 py-3 px-3">
-            {/* ── Identité – grille 2 colonnes ── */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1">
-                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Prénom</Label>
-                <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Marie" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus disabled={!isEditing} />
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Nom</Label>
-                <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={!isEditing} />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1">
-                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Genre</Label>
-                <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female')} disabled={!isEditing}>
-                  <SelectTrigger className="h-8 text-sm border-border/50 bg-card"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Homme</SelectItem>
-                    <SelectItem value="female">Femme</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Profession</Label>
-                <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} disabled={!isEditing} />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1">
-                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Naissance</Label>
-                <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="1985" min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} disabled={!isEditing} />
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Décès</Label>
-                <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="Vivant" min={1900} max={2100} value={deathYear} onChange={(e) => setDeathYear(e.target.value)} disabled={!isEditing} />
-              </div>
-            </div>
-            {isDeceased && (
-              <p className="text-xs text-muted-foreground -mt-1">⚰️ Décédé(e) — {age} ans</p>
-            )}
-
-            <Separator className="opacity-50" />
-
-            {/* ── Identité de genre & orientation – badges cliquables ── */}
-            <div className="flex flex-col gap-2">
-              <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Identité & Orientation</Label>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  disabled={!isEditing}
-                  onClick={() => setIsTransgender(!isTransgender)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                    isTransgender
-                      ? 'bg-primary/15 border-primary/40 text-primary'
-                      : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  🏳️‍⚧️ Transgenre
-                </button>
-                <button
-                  type="button"
-                  disabled={!isEditing}
-                  onClick={() => { setIsGay(!isGay); if (!isGay) setIsBisexual(false); }}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                    isGay
-                      ? 'bg-primary/15 border-primary/40 text-primary'
-                      : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  🏳️‍🌈 Homosexuel(le)
-                </button>
-                <button
-                  type="button"
-                  disabled={!isEditing}
-                  onClick={() => { setIsBisexual(!isBisexual); if (!isBisexual) setIsGay(false); }}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-                    isBisexual
-                      ? 'bg-primary/15 border-primary/40 text-primary'
-                      : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  💜 Bisexuel(le)
-                </button>
-              </div>
-            </div>
-
-            <Separator className="opacity-50" />
-
-            {/* ── Relations / Unions ── */}
-            <div className="flex flex-col gap-3">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                <Heart className="w-3.5 h-3.5" />
-                Relations ({memberUnions.length})
-              </Label>
-
-              {memberUnions.length === 0 ? (
-                <p className="text-xs text-muted-foreground">Aucune union. Utilisez le menu « Créer un membre » pour ajouter un conjoint.</p>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {memberUnions.map(union => {
-                    const partnerId = union.partner1 === member.id ? union.partner2 : union.partner1;
-                    const partner = allMembers.find(m => m.id === partnerId);
-                    const partnerName = partner
-                      ? (partner.isPlaceholder ? 'Parent inconnu' : `${partner.firstName} ${partner.lastName}`)
-                      : partnerId;
-
-                    return (
-                      <div key={union.id} className="p-3 rounded-xl bg-accent/20 border border-border/40 flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          {partner && (
-                            <MemberIcon
-                              gender={partner.gender}
-                              isDead={!!partner.deathYear}
-                              size={24}
-                              className="text-foreground shrink-0"
-                            />
-                          )}
-                          <span className="text-sm font-medium text-foreground truncate flex-1">{partnerName}</span>
-                          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">
-                            {union.children.length} enfant{union.children.length !== 1 ? 's' : ''}
-                          </span>
-                        </div>
-                        <Select
-                          value={union.status}
-                          onValueChange={(v) => onUpdateUnion?.(union.id, { status: v as UnionStatus })}
-                        >
-                          <SelectTrigger className="h-8 text-xs border-border/40 bg-card">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {FAMILY_LINK_TYPES.map(t => (
-                              <SelectItem key={t.id} value={t.id} className="text-xs">
-                                {t.icon} {t.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="flex flex-col gap-1">
-                            <span className="text-[10px] text-muted-foreground uppercase">Année union</span>
-                            <Input
-                              className="h-7 text-xs border-border/40 bg-card"
-                              type="number"
-                              placeholder="—"
-                              value={union.marriageYear || ''}
-                              onChange={(e) => onUpdateUnion?.(union.id, {
-                                marriageYear: e.target.value ? parseInt(e.target.value, 10) : undefined,
-                              })}
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <span className="text-[10px] text-muted-foreground uppercase">
-                              {union.status === 'divorced' ? 'Divorce' : union.status === 'separated' ? 'Séparation' : union.status === 'widowed' ? 'Veuvage' : 'Fin'}
-                            </span>
-                            <Input
-                              className="h-7 text-xs border-border/40 bg-card"
-                              type="number"
-                              placeholder="—"
-                              value={union.divorceYear || ''}
-                              onChange={(e) => onUpdateUnion?.(union.id, {
-                                divorceYear: e.target.value ? parseInt(e.target.value, 10) : undefined,
-                              })}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+          {isEditing ? (
+            /* ═══════════════════════════════════════════════
+               EDIT MODE — Inputs & Selects
+               ═══════════════════════════════════════════════ */
+            <div className="flex flex-col gap-3 py-3 px-3">
+              {/* ── Identité – grille 2 colonnes ── */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Prénom</Label>
+                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Marie" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus />
                 </div>
-              )}
-            </div>
-
-            <Separator className="opacity-50" />
-
-            {/* ── Jumeaux ── */}
-            <div className="flex flex-col gap-3">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Jumeaux / Triplés</Label>
-
-              <div className="flex flex-col gap-1.5">
-                <Label className="text-xs text-muted-foreground">Groupe de jumeaux</Label>
-                <Input
-                  className="h-9 border-border/50 bg-card focus-visible:ring-primary/30"
-                  placeholder="ex: twin-1 (vide si pas jumeau)"
-                  value={twinGroup}
-                  onChange={(e) => setTwinGroup(e.target.value)}
-                  disabled={!isEditing}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Les membres partageant le même identifiant seront affichés comme jumeaux/triplés.
-                </p>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Nom</Label>
+                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                </div>
               </div>
 
-              {twinGroup && (
-                <div className="flex flex-col gap-1.5">
-                  <Label className="text-xs text-muted-foreground">Type de jumeaux</Label>
-                  <Select value={twinType} onValueChange={(v) => setTwinType(v as TwinType)} disabled={!isEditing}>
-                    <SelectTrigger className="h-9 border-border/50 bg-card"><SelectValue placeholder="Choisir le type" /></SelectTrigger>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Genre</Label>
+                  <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female')}>
+                    <SelectTrigger className="h-8 text-sm border-border/50 bg-card"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="monozygotic">Monozygote (vrais jumeaux)</SelectItem>
-                      <SelectItem value="dizygotic">Dizygote (faux jumeaux)</SelectItem>
+                      <SelectItem value="male">Homme</SelectItem>
+                      <SelectItem value="female">Femme</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-              )}
-            </div>
-
-            <Separator className="opacity-50" />
-
-            {/* ── Pathologies ── */}
-            <div className="flex flex-col gap-3">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Pathologies ({selectedPathologies.length})
-              </Label>
-              <div className="flex flex-col gap-1">
-                {PATHOLOGIES.map((p) => (
-                  <label
-                    key={p.id}
-                    className="flex items-center gap-3 py-1.5 px-2 rounded-lg hover:bg-accent/50 cursor-pointer transition-colors"
-                  >
-                    <Checkbox
-                      checked={selectedPathologies.includes(p.id)}
-                      onCheckedChange={() => togglePathology(p.id)}
-                      disabled={!isEditing}
-                    />
-                    <div
-                      className="w-3 h-3 rounded-full shrink-0"
-                      style={{ backgroundColor: `hsl(var(--pathology-${p.id}))` }}
-                    />
-                    <span className="text-sm text-foreground">{p.name}</span>
-                  </label>
-                ))}
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Profession</Label>
+                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} />
+                </div>
               </div>
-            </div>
 
-            {/* ── Liens émotionnels ── */}
-            {member && (() => {
-              const memberLinks = emotionalLinks.filter(l => l.from === member.id || l.to === member.id);
-              if (memberLinks.length === 0) return (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Naissance</Label>
+                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="1985" min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Décès</Label>
+                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="Vivant" min={1900} max={2100} value={deathYear} onChange={(e) => setDeathYear(e.target.value)} />
+                </div>
+              </div>
+              {isDeceased && (
+                <p className="text-xs text-muted-foreground -mt-1">⚰️ Décédé(e) — {age} ans</p>
+              )}
+
+              <Separator className="opacity-50" />
+
+              {/* ── Identité de genre & orientation – badges cliquables ── */}
+              <div className="flex flex-col gap-2">
+                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Identité & Orientation</Label>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" onClick={() => setIsTransgender(!isTransgender)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${isTransgender ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'}`}>
+                    🏳️‍⚧️ Transgenre
+                  </button>
+                  <button type="button" onClick={() => { setIsGay(!isGay); if (!isGay) setIsBisexual(false); }}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${isGay ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'}`}>
+                    🏳️‍🌈 Homosexuel(le)
+                  </button>
+                  <button type="button" onClick={() => { setIsBisexual(!isBisexual); if (!isBisexual) setIsGay(false); }}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${isBisexual ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'}`}>
+                    💜 Bisexuel(le)
+                  </button>
+                </div>
+              </div>
+
+              <Separator className="opacity-50" />
+
+              {/* ── Relations / Unions ── */}
+              <div className="flex flex-col gap-3">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Heart className="w-3.5 h-3.5" />
+                  Relations ({memberUnions.length})
+                </Label>
+                {memberUnions.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">Aucune union. Utilisez le menu « Créer un membre » pour ajouter un conjoint.</p>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {memberUnions.map(union => {
+                      const partnerId = union.partner1 === member.id ? union.partner2 : union.partner1;
+                      const partner = allMembers.find(m => m.id === partnerId);
+                      const partnerName = partner ? (partner.isPlaceholder ? 'Parent inconnu' : `${partner.firstName} ${partner.lastName}`) : partnerId;
+                      return (
+                        <div key={union.id} className="p-3 rounded-xl bg-accent/20 border border-border/40 flex flex-col gap-2">
+                          <div className="flex items-center gap-2">
+                            {partner && <MemberIcon gender={partner.gender} isDead={!!partner.deathYear} size={24} className="text-foreground shrink-0" />}
+                            <span className="text-sm font-medium text-foreground truncate flex-1">{partnerName}</span>
+                            <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">
+                              {union.children.length} enfant{union.children.length !== 1 ? 's' : ''}
+                            </span>
+                          </div>
+                          <Select value={union.status} onValueChange={(v) => onUpdateUnion?.(union.id, { status: v as UnionStatus })}>
+                            <SelectTrigger className="h-8 text-xs border-border/40 bg-card"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              {FAMILY_LINK_TYPES.map(t => (<SelectItem key={t.id} value={t.id} className="text-xs">{t.icon} {t.label}</SelectItem>))}
+                            </SelectContent>
+                          </Select>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[10px] text-muted-foreground uppercase">Année union</span>
+                              <Input className="h-7 text-xs border-border/40 bg-card" type="number" placeholder="—" value={union.marriageYear || ''}
+                                onChange={(e) => onUpdateUnion?.(union.id, { marriageYear: e.target.value ? parseInt(e.target.value, 10) : undefined })} />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[10px] text-muted-foreground uppercase">
+                                {union.status === 'divorced' ? 'Divorce' : union.status === 'separated' ? 'Séparation' : union.status === 'widowed' ? 'Veuvage' : 'Fin'}
+                              </span>
+                              <Input className="h-7 text-xs border-border/40 bg-card" type="number" placeholder="—" value={union.divorceYear || ''}
+                                onChange={(e) => onUpdateUnion?.(union.id, { divorceYear: e.target.value ? parseInt(e.target.value, 10) : undefined })} />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <Separator className="opacity-50" />
+
+              {/* ── Jumeaux ── */}
+              <div className="flex flex-col gap-3">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Jumeaux / Triplés</Label>
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-xs text-muted-foreground">Groupe de jumeaux</Label>
+                  <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: twin-1 (vide si pas jumeau)" value={twinGroup} onChange={(e) => setTwinGroup(e.target.value)} />
+                  <p className="text-xs text-muted-foreground">Les membres partageant le même identifiant seront affichés comme jumeaux/triplés.</p>
+                </div>
+                {twinGroup && (
+                  <div className="flex flex-col gap-1.5">
+                    <Label className="text-xs text-muted-foreground">Type de jumeaux</Label>
+                    <Select value={twinType} onValueChange={(v) => setTwinType(v as TwinType)}>
+                      <SelectTrigger className="h-9 border-border/50 bg-card"><SelectValue placeholder="Choisir le type" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="monozygotic">Monozygote (vrais jumeaux)</SelectItem>
+                        <SelectItem value="dizygotic">Dizygote (faux jumeaux)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+
+              <Separator className="opacity-50" />
+
+              {/* ── Pathologies ── */}
+              <div className="flex flex-col gap-3">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Pathologies ({selectedPathologies.length})</Label>
+                <div className="flex flex-col gap-1">
+                  {PATHOLOGIES.map((p) => (
+                    <label key={p.id} className="flex items-center gap-3 py-1.5 px-2 rounded-lg hover:bg-accent/50 cursor-pointer transition-colors">
+                      <Checkbox checked={selectedPathologies.includes(p.id)} onCheckedChange={() => togglePathology(p.id)} />
+                      <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: `hsl(var(--pathology-${p.id}))` }} />
+                      <span className="text-sm text-foreground">{p.name}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── Liens émotionnels (edit) ── */}
+              {member && (() => {
+                const memberLinks = emotionalLinks.filter(l => l.from === member.id || l.to === member.id);
+                if (memberLinks.length === 0) return (
+                  <>
+                    <Separator className="opacity-50" />
+                    <div className="flex flex-col gap-2">
+                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Liens émotionnels</Label>
+                      <p className="text-xs text-muted-foreground">Aucun lien émotionnel.</p>
+                    </div>
+                  </>
+                );
+                return (
+                  <>
+                    <Separator className="opacity-50" />
+                    <div className="flex flex-col gap-3">
+                      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Liens émotionnels ({memberLinks.length})</Label>
+                      <div className="flex flex-col gap-2">
+                        {memberLinks.map(link => {
+                          const otherId = link.from === member.id ? link.to : link.from;
+                          const other = allMembers.find(m => m.id === otherId);
+                          const otherName = other ? `${other.firstName} ${other.lastName}` : otherId;
+                          return (
+                            <div key={link.id} className="flex items-center gap-2 py-1.5 px-2 rounded-lg bg-accent/20 border border-border/40">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm text-foreground truncate">{otherName}</p>
+                                <Select value={link.type} onValueChange={(v) => onUpdateEmotionalLink?.(link.id, v as EmotionalLinkType)}>
+                                  <SelectTrigger className="h-7 text-xs mt-1 border-border/40 bg-card"><SelectValue /></SelectTrigger>
+                                  <SelectContent>
+                                    {EMOTIONAL_LINK_TYPES.map(t => (<SelectItem key={t.id} value={t.id} className="text-xs">{t.label}</SelectItem>))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => onDeleteEmotionalLink?.(link.id)}>
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+
+              <Separator className="opacity-50" />
+
+              {/* ── Actions ── */}
+              <Button onClick={handleSave} className="w-full h-10 font-semibold">Enregistrer</Button>
+              {onDelete && member && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" className="w-full text-destructive hover:text-destructive hover:bg-destructive/10">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Supprimer ce membre
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Supprimer {firstName || member.firstName} {lastName || member.lastName} ?</AlertDialogTitle>
+                      <AlertDialogDescription>Cette action est irréversible. Le membre sera supprimé du génogramme ainsi que tous ses liens associés.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={() => { onDelete(member.id); onClose(); }}>Supprimer</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+
+              <div className="h-6" />
+            </div>
+          ) : (
+            /* ═══════════════════════════════════════════════
+               READ MODE — Fiche de synthèse
+               ═══════════════════════════════════════════════ */
+            <div className="flex flex-col gap-3 py-3 px-3">
+              {/* ── Identité ── */}
+              <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                {firstName && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Prénom</span>
+                    <span className="text-sm font-medium text-foreground">{firstName}</span>
+                  </div>
+                )}
+                {lastName && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Nom</span>
+                    <span className="text-sm font-medium text-foreground">{lastName}</span>
+                  </div>
+                )}
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Genre</span>
+                  <span className="text-sm text-foreground">{gender === 'male' ? 'Homme' : 'Femme'}</span>
+                </div>
+                {profession && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Profession</span>
+                    <span className="text-sm text-foreground">{profession}</span>
+                  </div>
+                )}
+                {birthYear && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Naissance</span>
+                    <span className="text-sm text-foreground">{birthYear}</span>
+                  </div>
+                )}
+                {isDeceased && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Décès</span>
+                    <span className="text-sm text-foreground">{deathYear} <span className="text-muted-foreground text-xs">({age} ans)</span></span>
+                  </div>
+                )}
+              </div>
+
+              {/* ── Identité & Orientation (only if any active) ── */}
+              {(isTransgender || isGay || isBisexual) && (
+                <>
+                  <Separator className="opacity-50" />
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité & Orientation</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {isTransgender && <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/15 border border-primary/30 text-primary">🏳️‍⚧️ Transgenre</span>}
+                      {isGay && <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/15 border border-primary/30 text-primary">🏳️‍🌈 Homosexuel(le)</span>}
+                      {isBisexual && <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/15 border border-primary/30 text-primary">💜 Bisexuel(le)</span>}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* ── Relations (read-only) ── */}
+              {memberUnions.length > 0 && (
                 <>
                   <Separator className="opacity-50" />
                   <div className="flex flex-col gap-2">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Liens émotionnels</Label>
-                    <p className="text-xs text-muted-foreground">Aucun lien émotionnel. Glissez depuis un point d'ancrage pour en créer.</p>
-                  </div>
-                </>
-              );
-              return (
-                <>
-                  <Separator className="opacity-50" />
-                  <div className="flex flex-col gap-3">
-                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Liens émotionnels ({memberLinks.length})
-                    </Label>
-                    <div className="flex flex-col gap-2">
-                      {memberLinks.map(link => {
-                        const otherId = link.from === member.id ? link.to : link.from;
-                        const other = allMembers.find(m => m.id === otherId);
-                        const otherName = other ? `${other.firstName} ${other.lastName}` : otherId;
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider flex items-center gap-1.5">
+                      <Heart className="w-3 h-3" /> Relations
+                    </span>
+                    <div className="flex flex-col gap-1.5">
+                      {memberUnions.map(union => {
+                        const partnerId = union.partner1 === member.id ? union.partner2 : union.partner1;
+                        const partner = allMembers.find(m => m.id === partnerId);
+                        const partnerName = partner ? (partner.isPlaceholder ? 'Parent inconnu' : `${partner.firstName} ${partner.lastName}`) : partnerId;
+                        const linkType = FAMILY_LINK_TYPES.find(t => t.id === union.status);
+                        const linkLabel = linkType ? linkType.label : union.status;
+                        const yearInfo = union.marriageYear ? ` (${union.marriageYear}${union.divorceYear ? ` - ${union.divorceYear}` : ''})` : '';
+
                         return (
-                          <div key={link.id} className="flex items-center gap-2 py-1.5 px-2 rounded-lg bg-accent/20 border border-border/40">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm text-foreground truncate">{otherName}</p>
-                              <Select
-                                value={link.type}
-                                onValueChange={(v) => onUpdateEmotionalLink?.(link.id, v as EmotionalLinkType)}
-                              >
-                                <SelectTrigger className="h-7 text-xs mt-1 border-border/40 bg-card">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {EMOTIONAL_LINK_TYPES.map(t => (
-                                    <SelectItem key={t.id} value={t.id} className="text-xs">{t.label}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                          <div key={union.id} className="flex items-center gap-2 py-1.5 px-2 rounded-lg bg-accent/10">
+                            {partner && <MemberIcon gender={partner.gender} isDead={!!partner.deathYear} size={20} className="text-foreground shrink-0" />}
+                            <div className="min-w-0 flex-1">
+                              <span className="text-sm text-foreground">{linkLabel}</span>
+                              <span className="text-sm text-muted-foreground"> avec </span>
+                              <span className="text-sm font-medium text-foreground">{partnerName}</span>
+                              {yearInfo && <span className="text-xs text-muted-foreground">{yearInfo}</span>}
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                              onClick={() => onDeleteEmotionalLink?.(link.id)}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
+                            {union.children.length > 0 && (
+                              <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">
+                                {union.children.length} enfant{union.children.length !== 1 ? 's' : ''}
+                              </span>
+                            )}
                           </div>
                         );
                       })}
                     </div>
                   </div>
                 </>
-              );
-            })()}
+              )}
 
-            <Separator className="opacity-50" />
+              {/* ── Jumeaux (read-only, only if set) ── */}
+              {twinGroup && (
+                <>
+                  <Separator className="opacity-50" />
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Jumeaux</span>
+                    <span className="text-sm text-foreground">
+                      Groupe : {twinGroup}
+                      {twinType && ` · ${twinType === 'monozygotic' ? 'Monozygote' : 'Dizygote'}`}
+                    </span>
+                  </div>
+                </>
+              )}
 
-            {/* ── Actions ── */}
-            {isEditing && (
-              <>
-                <Button onClick={handleSave} className="w-full h-10 font-semibold">
-                  Enregistrer
-                </Button>
-
-                {onDelete && member && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" className="w-full text-destructive hover:text-destructive hover:bg-destructive/10">
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Supprimer ce membre
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Supprimer {firstName || member.firstName} {lastName || member.lastName} ?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Cette action est irréversible. Le membre sera supprimé du génogramme ainsi que tous ses liens associés.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          onClick={() => { onDelete(member.id); onClose(); }}
-                        >
-                          Supprimer
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+              {/* ── Pathologies (read-only badges) ── */}
+              <Separator className="opacity-50" />
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Pathologies</span>
+                {selectedPathologies.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">Aucune pathologie renseignée</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1.5">
+                    {PATHOLOGIES.filter(p => selectedPathologies.includes(p.id)).map(p => (
+                      <span
+                        key={p.id}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border"
+                        style={{
+                          backgroundColor: `hsl(var(--pathology-${p.id}) / 0.15)`,
+                          borderColor: `hsl(var(--pathology-${p.id}) / 0.3)`,
+                          color: `hsl(var(--pathology-${p.id}))`,
+                        }}
+                      >
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: `hsl(var(--pathology-${p.id}))` }} />
+                        {p.name}
+                      </span>
+                    ))}
+                  </div>
                 )}
-              </>
-            )}
+              </div>
 
-            {/* Bottom spacer for scroll */}
-            <div className="h-6" />
-          </div>
+              {/* ── Liens émotionnels (read-only) ── */}
+              {member && (() => {
+                const memberLinks = emotionalLinks.filter(l => l.from === member.id || l.to === member.id);
+                if (memberLinks.length === 0) return null;
+                return (
+                  <>
+                    <Separator className="opacity-50" />
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Liens émotionnels</span>
+                      <div className="flex flex-col gap-1">
+                        {memberLinks.map(link => {
+                          const otherId = link.from === member.id ? link.to : link.from;
+                          const other = allMembers.find(m => m.id === otherId);
+                          const otherName = other ? `${other.firstName} ${other.lastName}` : otherId;
+                          const linkType = EMOTIONAL_LINK_TYPES.find(t => t.id === link.type);
+                          return (
+                            <div key={link.id} className="flex items-center gap-2 py-1 px-2 rounded-lg bg-accent/10">
+                              <span className="text-sm text-foreground">{linkType?.label || link.type}</span>
+                              <span className="text-sm text-muted-foreground">avec</span>
+                              <span className="text-sm font-medium text-foreground truncate">{otherName}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+
+              <div className="h-6" />
+            </div>
+          )}
         </ScrollArea>
       </SheetContent>
     </Sheet>
