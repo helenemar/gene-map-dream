@@ -9,8 +9,10 @@ import ElasticLinkLine from '@/components/ElasticLinkLine';
 import LinkTypeModal from '@/components/LinkTypeModal';
 import FloatingControls from '@/components/FloatingControls';
 import UnionEditDrawer from '@/components/UnionEditDrawer';
+import MemberEditDrawer from '@/components/MemberEditDrawer';
+import { RelationshipChoice } from '@/components/CreateMemberDropdown';
 import { SAMPLE_MEMBERS, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sampleData';
-import { FamilyMember, EmotionalLink, EmotionalLinkType, Union } from '@/types/genogram';
+import { FamilyMember, EmotionalLink, EmotionalLinkType, Union, UnionStatus } from '@/types/genogram';
 import { computeAutoLayout } from '@/utils/autoLayout';
 
 // Card bounding box
@@ -355,12 +357,165 @@ const GenogramEditor: React.FC = () => {
     return 'default' as const;
   }, [selectedMember, hoveredMember, anchorActiveMember]);
 
-  const handleCreateRelated = useCallback((id: string) => {
-    console.log('Create related member for', id);
-  }, []);
+  // ─── New member state ───
+  const [editingNewMember, setEditingNewMember] = useState<FamilyMember | null>(null);
+  const [newMemberDrawerOpen, setNewMemberDrawerOpen] = useState(false);
+
+  /** Center canvas on a specific member with smooth animation */
+  const centerOnMember = useCallback((member: FamilyMember) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const targetX = rect.width / 2 - (member.x + CARD_W / 2) * zoom;
+    const targetY = rect.height / 2 - (member.y + CARD_H / 2) * zoom;
+    setPan({ x: targetX, y: targetY });
+  }, [zoom]);
+
+  /** Smart placement: compute position for new member based on relationship */
+  const computeNewPosition = useCallback((
+    sourceId: string,
+    relationship: RelationshipChoice
+  ): { x: number; y: number } => {
+    const source = members.find(m => m.id === sourceId);
+    if (!source) return { x: 200, y: 200 };
+
+    const LEVEL_Y = 250;
+    const SPOUSE_GAP = CARD_W + 120; // card width + badge space
+
+    switch (relationship) {
+      case 'parent':
+        return { x: source.x, y: source.y - LEVEL_Y };
+      case 'child':
+        return { x: source.x, y: source.y + LEVEL_Y };
+      case 'sibling': {
+        // Place to the right of rightmost sibling at same level
+        const sameLevelMembers = members.filter(m => Math.abs(m.y - source.y) < 50);
+        const maxX = Math.max(...sameLevelMembers.map(m => m.x + CARD_W));
+        return { x: maxX + 80, y: source.y };
+      }
+      case 'spouse_married':
+      case 'spouse_divorced':
+      case 'spouse_separated':
+      case 'spouse_widowed': {
+        // Place to the right, leaving space for badge
+        const rightSpace = members.filter(m =>
+          Math.abs(m.y - source.y) < 50 && m.x > source.x
+        );
+        const placeRight = rightSpace.length === 0;
+        return {
+          x: placeRight ? source.x + SPOUSE_GAP : source.x - SPOUSE_GAP,
+          y: source.y,
+        };
+      }
+      default:
+        return { x: source.x + 300, y: source.y };
+    }
+  }, [members]);
+
+  const handleCreateRelated = useCallback((sourceId: string, relationship: RelationshipChoice) => {
+    const pos = computeNewPosition(sourceId, relationship);
+    const source = members.find(m => m.id === sourceId);
+    const currentYear = new Date().getFullYear();
+
+    const newMember: FamilyMember = {
+      id: `m-${Date.now()}`,
+      firstName: 'Nouveau',
+      lastName: source?.lastName || '',
+      birthYear: currentYear - 30,
+      age: 30,
+      profession: '',
+      gender: 'female',
+      x: pos.x,
+      y: pos.y,
+      pathologies: [],
+    };
+
+    // Determine union status for spouse types
+    const statusMap: Record<string, UnionStatus> = {
+      spouse_married: 'married',
+      spouse_divorced: 'divorced',
+      spouse_separated: 'separated',
+      spouse_widowed: 'widowed',
+    };
+
+    setMembers(prev => [...prev, newMember]);
+
+    // Create union for spouse relationships
+    if (relationship.startsWith('spouse_')) {
+      const status = statusMap[relationship] || 'married';
+      const newUnion: Union = {
+        id: `u-${Date.now()}`,
+        partner1: sourceId,
+        partner2: newMember.id,
+        status,
+        marriageYear: currentYear,
+        children: [],
+      };
+      setUnions(prev => [...prev, newUnion]);
+    }
+
+    // For child: find or create a union that includes sourceId, add child
+    if (relationship === 'child') {
+      setUnions(prev => {
+        const parentUnion = prev.find(u => u.partner1 === sourceId || u.partner2 === sourceId);
+        if (parentUnion) {
+          return prev.map(u =>
+            u.id === parentUnion.id ? { ...u, children: [...u.children, newMember.id] } : u
+          );
+        }
+        return prev;
+      });
+    }
+
+    // For sibling: find union where source is a child, add new member as sibling
+    if (relationship === 'sibling') {
+      setUnions(prev => {
+        const siblingUnion = prev.find(u => u.children.includes(sourceId));
+        if (siblingUnion) {
+          return prev.map(u =>
+            u.id === siblingUnion.id ? { ...u, children: [...u.children, newMember.id] } : u
+          );
+        }
+        return prev;
+      });
+    }
+
+    // For parent: create a new union with this parent + placeholder, source as child
+    if (relationship === 'parent') {
+      const existingParentUnion = unions.find(u => u.children.includes(sourceId));
+      if (existingParentUnion) {
+        // Replace a partner if possible or add as second parent
+        setUnions(prev => prev.map(u =>
+          u.id === existingParentUnion.id
+            ? { ...u, partner2: newMember.id }
+            : u
+        ));
+      }
+      // If no existing parent union, don't auto-create one (user can link manually)
+    }
+
+    // Select and open edit drawer
+    setSelectedMember(newMember.id);
+    setEditingNewMember(newMember);
+    setNewMemberDrawerOpen(true);
+
+    // Center on new member after a tick
+    setTimeout(() => centerOnMember(newMember), 100);
+  }, [members, unions, computeNewPosition, centerOnMember]);
 
   const handleEdit = useCallback((id: string) => {
-    console.log('Edit member', id);
+    const member = members.find(m => m.id === id);
+    if (member) {
+      setEditingNewMember(member);
+      setNewMemberDrawerOpen(true);
+    }
+  }, [members]);
+
+  const handleSaveMember = useCallback((updated: FamilyMember) => {
+    const currentYear = new Date().getFullYear();
+    const age = updated.birthYear ? currentYear - updated.birthYear : updated.age;
+    setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age } : m));
+    setEditingNewMember(null);
   }, []);
 
   const handleCancelAnchor = useCallback((id: string) => {
@@ -630,6 +785,13 @@ const GenogramEditor: React.FC = () => {
               const m = members.find(m => m.id === id);
               return m ? `${m.firstName} ${m.lastName}` : id;
             }}
+          />
+
+          <MemberEditDrawer
+            member={editingNewMember}
+            open={newMemberDrawerOpen}
+            onClose={() => { setNewMemberDrawerOpen(false); setEditingNewMember(null); }}
+            onSave={handleSaveMember}
           />
 
           <FloatingControls
