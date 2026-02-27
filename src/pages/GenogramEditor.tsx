@@ -136,8 +136,10 @@ const GenogramEditor: React.FC = () => {
   // Link drag state
   const [linkDrag, setLinkDrag] = useState<{
     fromId: string;
-    startX: number; startY: number; // world-space origin (center of source card)
-    cursorX: number; cursorY: number; // world-space current cursor
+    startX: number; startY: number;
+    cursorX: number; cursorY: number;
+    snapX?: number; snapY?: number; // snapped target point
+    snapTargetId?: string;
   } | null>(null);
   const [linkModalTarget, setLinkModalTarget] = useState<{ fromId: string; toId: string } | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -229,14 +231,36 @@ const GenogramEditor: React.FC = () => {
   }, [members, isSpaceDown]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    // Link drag in progress — update cursor position in world space
+    // Link drag in progress — update cursor position in world space + snap detection
     if (linkDrag) {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
       const cursorX = (e.clientX - rect.left - pan.x) / zoom;
       const cursorY = (e.clientY - rect.top - pan.y) / zoom;
-      setLinkDrag(prev => prev ? { ...prev, cursorX, cursorY } : null);
+
+      // Snap magnetism: find nearest corner of any target card within SNAP_RADIUS
+      const SNAP_RADIUS = 30; // world-space pixels
+      let snapX: number | undefined;
+      let snapY: number | undefined;
+      let snapTargetId: string | undefined;
+      let bestDist = SNAP_RADIUS;
+
+      for (const m of members) {
+        if (m.id === linkDrag.fromId) continue;
+        const corners = cardCorners(m);
+        for (const c of corners) {
+          const d = Math.hypot(cursorX - c.x, cursorY - c.y);
+          if (d < bestDist) {
+            bestDist = d;
+            snapX = c.x;
+            snapY = c.y;
+            snapTargetId = m.id;
+          }
+        }
+      }
+
+      setLinkDrag(prev => prev ? { ...prev, cursorX, cursorY, snapX, snapY, snapTargetId } : null);
       return;
     }
     if (dragInfo) {
@@ -257,21 +281,30 @@ const GenogramEditor: React.FC = () => {
   }, [dragInfo, linkDrag, isPanning, zoom, pan, snapToGrid]);
 
   const handleMouseUp = useCallback((e: React.MouseEvent) => {
-    // Link drag release — find target card under cursor
+    // Link drag release — use snapped target or find card under cursor
     if (linkDrag) {
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        const worldX = (e.clientX - rect.left - pan.x) / zoom;
-        const worldY = (e.clientY - rect.top - pan.y) / zoom;
-        const target = members.find(m =>
-          m.id !== linkDrag.fromId &&
-          worldX >= m.x && worldX <= m.x + CARD_W &&
-          worldY >= m.y && worldY <= m.y + CARD_H
-        );
-        if (target) {
-          setLinkModalTarget({ fromId: linkDrag.fromId, toId: target.id });
+      let targetId: string | undefined;
+
+      // Prefer snap target
+      if (linkDrag.snapTargetId) {
+        targetId = linkDrag.snapTargetId;
+      } else {
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect();
+          const worldX = (e.clientX - rect.left - pan.x) / zoom;
+          const worldY = (e.clientY - rect.top - pan.y) / zoom;
+          const target = members.find(m =>
+            m.id !== linkDrag.fromId &&
+            worldX >= m.x && worldX <= m.x + CARD_W &&
+            worldY >= m.y && worldY <= m.y + CARD_H
+          );
+          targetId = target?.id;
         }
+      }
+
+      if (targetId) {
+        setLinkModalTarget({ fromId: linkDrag.fromId, toId: targetId });
       }
       setLinkDrag(null);
       return;
@@ -545,6 +578,8 @@ const GenogramEditor: React.FC = () => {
               <ElasticLinkLine
                 x1={linkDrag.startX} y1={linkDrag.startY}
                 x2={linkDrag.cursorX} y2={linkDrag.cursorY}
+                snapX={linkDrag.snapX} snapY={linkDrag.snapY}
+                isSnapped={!!linkDrag.snapTargetId}
               />
             )}
           </div>
