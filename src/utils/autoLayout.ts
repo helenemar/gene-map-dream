@@ -13,7 +13,9 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 const CARD_W = 186;
 const CARD_H = 64;
 const LEVEL_SPACING = 250;
-const COUPLE_GAP = 100;
+const BASE_COUPLE_GAP = 100;
+const MIN_BADGE_GAP = 160;   // Minimum gap when a union has dates/status
+const BADGE_SAFETY = 40;     // Extra breathing room around badge
 const SIBLING_GAP = 50;
 const BLOCK_GAP = 80;
 const VERTICAL_STAGGER = 30; // Cumulative Y-offset per sibling for "escalier" effect
@@ -21,6 +23,20 @@ const MAX_STAGGER = 150; // Cap to avoid colliding with next generation
 
 interface LayoutResult {
   positions: Map<string, { x: number; y: number }>;
+}
+
+/** Compute dynamic gap between couple cards based on badge width */
+function coupleGap(union: Union): number {
+  let labelLen = 0;
+  if (union.marriageYear) labelLen += `R: ${union.marriageYear}`.length;
+  if (union.divorceYear) labelLen += `   D: ${union.divorceYear}`.length;
+  if (labelLen > 0) {
+    const badgeW = Math.max(labelLen * 5.6 + 16, 56);
+    return Math.max(badgeW + BADGE_SAFETY, MIN_BADGE_GAP);
+  }
+  // Has status icon but no dates
+  const hasIcon = ['divorced', 'separated', 'widowed', 'love_affair', 'common_law'].includes(union.status);
+  return hasIcon ? Math.max(BASE_COUPLE_GAP, 120) : BASE_COUPLE_GAP;
 }
 
 export function computeAutoLayout(
@@ -156,8 +172,8 @@ export function computeAutoLayout(
         if (i > 0) blockW += SIBLING_GAP;
         blockW += subtreeMinWidth(u.children[i], visited);
       }
-      // The couple itself needs at minimum CARD_W * 2 + COUPLE_GAP
-      const coupleW = CARD_W * 2 + COUPLE_GAP;
+      // The couple itself needs at minimum CARD_W * 2 + gap
+      const coupleW = CARD_W * 2 + coupleGap(u);
       maxW = Math.max(maxW, blockW, coupleW);
     }
     return maxW;
@@ -191,7 +207,7 @@ export function computeAutoLayout(
       // Childless couple
       const x = hasPlacedAt(gen) ? getRightEdge(gen) + BLOCK_GAP : startX;
       placeCouple(union, x, gen);
-      const rightX = x + CARD_W * 2 + COUPLE_GAP;
+      const rightX = x + CARD_W * 2 + coupleGap(union);
       updateRightEdge(gen, rightX);
       return rightX;
     }
@@ -272,8 +288,8 @@ export function computeAutoLayout(
     const blockRight = Math.max(...childXPositions.map(c => c.right));
     const blockCenter = (blockLeft + blockRight) / 2;
 
-    // ─── Center couple above children ───
-    const coupleWidth = CARD_W * 2 + COUPLE_GAP;
+    const gap = coupleGap(union);
+    const coupleWidth = CARD_W * 2 + gap;
     let coupleLeft = blockCenter - coupleWidth / 2;
 
     // Don't overlap previously placed members at this gen
@@ -298,21 +314,21 @@ export function computeAutoLayout(
     return totalRight;
   }
 
-  function placeCouple(union: Union, leftX: number, gen: number) {
-    const m1 = memberMap.get(union.partner1)!;
-    const m2 = memberMap.get(union.partner2)!;
+  function placeCouple(u: Union, leftX: number, gen: number) {
+    const m1 = memberMap.get(u.partner1)!;
+    const gap = coupleGap(u);
     
     // Male left, female right
     const [maleId, femaleId] = m1.gender === 'male'
-      ? [union.partner1, union.partner2]
-      : [union.partner2, union.partner1];
+      ? [u.partner1, u.partner2]
+      : [u.partner2, u.partner1];
 
     if (!placed.has(maleId)) {
       positions.set(maleId, { x: leftX, y: gen * LEVEL_SPACING });
       placed.add(maleId);
     }
     if (!placed.has(femaleId)) {
-      positions.set(femaleId, { x: leftX + CARD_W + COUPLE_GAP, y: gen * LEVEL_SPACING });
+      positions.set(femaleId, { x: leftX + CARD_W + gap, y: gen * LEVEL_SPACING });
       placed.add(femaleId);
     }
   }
