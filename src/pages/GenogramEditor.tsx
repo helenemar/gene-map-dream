@@ -823,8 +823,6 @@ const GenogramEditor: React.FC = () => {
             onFitToScreen={handleFitToScreen}
             onAutoLayout={handleAutoLayout}
             zoom={zoom}
-            snapToGrid={snapToGrid}
-            onToggleSnap={() => setSnapToGrid(prev => !prev)}
           />
         </div>
       </div>
