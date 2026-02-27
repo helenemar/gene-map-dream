@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown } from 'lucide-react';
+import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -59,9 +59,10 @@ const Dashboard: React.FC = () => {
           <span className="text-base font-semibold text-foreground">Genogy</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs font-semibold text-destructive-foreground bg-destructive px-3 py-1.5 rounded-full">
-            🧪 BETA Test
-          </span>
+          <Button variant="beta" size="sm">
+            <Atom className="w-3.5 h-3.5" />
+            BETA Test
+          </Button>
           <button className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-muted transition-colors">
             <Bell className="w-4.5 h-4.5 text-foreground" />
           </button>
