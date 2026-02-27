@@ -88,24 +88,26 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
 
   if (!label && !showIcon) return null;
 
-  const badgeWidth = label ? (label.length > 12 ? 130 : 80) : 0;
-  const badgeHeight = 22;
-  const iconSize = 28;
-  const totalHeight = (label ? badgeHeight + 4 : 0) + (showIcon ? iconSize + 2 : 0);
+  const pillH = 20;
+  const iconSize = 26;
+  const overlap = 6; // icon overlaps pill by this many px
+  const totalH = (label ? pillH : 0) + (showIcon ? iconSize - (label ? overlap : 0) : 0);
+  const foW = 160;
 
-  // Position: center badge on the union line point, shifted below
-  const baseY = y + 6;
+  // Center the entire badge vertically on the union line Y
+  const foX = x - foW / 2;
+  const foY = y - totalH / 2;
 
   return (
     <foreignObject
-      x={x - Math.max(badgeWidth, iconSize) / 2 - 4}
-      y={baseY}
-      width={Math.max(badgeWidth, iconSize) + 8}
-      height={totalHeight + 8}
+      x={foX}
+      y={foY}
+      width={foW}
+      height={totalH + 4}
       style={{ overflow: 'visible', pointerEvents: 'auto' }}
     >
       <div
-        className="flex flex-col items-center gap-1 cursor-pointer"
+        className="flex flex-col items-center cursor-pointer"
         onClick={(e) => {
           e.stopPropagation();
           onClick?.();
@@ -114,20 +116,33 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
         {/* Text pill */}
         {label && (
           <div
-            className="inline-flex items-center justify-center rounded-full bg-card border border-border/60 shadow-sm hover:shadow-md hover:border-foreground/20 transition-all duration-150 select-none px-2.5"
-            style={{ height: `${badgeHeight}px`, fontSize: '10px', lineHeight: '14px', whiteSpace: 'nowrap' }}
+            className="inline-flex items-center justify-center rounded-full bg-card border border-border/40 select-none px-2.5"
+            style={{
+              height: `${pillH}px`,
+              fontSize: '9px',
+              lineHeight: '12px',
+              whiteSpace: 'nowrap',
+              letterSpacing: '0.04em',
+              zIndex: 1,
+            }}
           >
-            <span className="text-muted-foreground font-medium tracking-wide">{label}</span>
+            <span className="text-muted-foreground font-semibold tracking-wide">{label}</span>
           </div>
         )}
 
-        {/* Status icon circle */}
+        {/* Status icon circle — overlaps pill slightly */}
         {showIcon && (
           <div
-            className="flex items-center justify-center rounded-full bg-card border border-border/50 shadow-soft hover:shadow-md transition-all duration-150"
-            style={{ width: `${iconSize}px`, height: `${iconSize}px` }}
+            className="flex items-center justify-center rounded-full bg-card border border-border/40"
+            style={{
+              width: `${iconSize}px`,
+              height: `${iconSize}px`,
+              marginTop: label ? `-${overlap}px` : '0',
+              zIndex: 2,
+              boxShadow: '0 1px 4px 0 hsla(0,0%,0%,0.10)',
+            }}
           >
-            <StatusIcon status={union.status} size={18} />
+            <StatusIcon status={union.status} size={16} />
           </div>
         )}
       </div>
