@@ -148,7 +148,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent side="right" className="w-[340px] sm:w-[380px] p-0 flex flex-col border-l border-border/50">
+      <SheetContent side="right" className="w-[340px] sm:w-[380px] p-0 flex flex-col border-l border-border/50 bg-background">
         {/* ── Header with live preview ── */}
         <div className="px-4 pt-4 pb-3">
           <SheetHeader>
