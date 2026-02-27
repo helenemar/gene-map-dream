@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FamilyMember, PATHOLOGIES, TwinType } from '@/types/genogram';
+import { FamilyMember, PATHOLOGIES, TwinType, EmotionalLink, EmotionalLinkType, EMOTIONAL_LINK_TYPES } from '@/types/genogram';
 import {
   Sheet,
   SheetContent,
@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Trash2 } from 'lucide-react';
 
 interface MemberEditDrawerProps {
   member: FamilyMember | null;
@@ -38,9 +39,13 @@ interface MemberEditDrawerProps {
   onClose: () => void;
   onSave: (updated: FamilyMember) => void;
   onDelete?: (id: string) => void;
+  emotionalLinks?: EmotionalLink[];
+  members?: FamilyMember[];
+  onUpdateEmotionalLink?: (linkId: string, newType: EmotionalLinkType) => void;
+  onDeleteEmotionalLink?: (linkId: string) => void;
 }
 
-const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClose, onSave, onDelete }) => {
+const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClose, onSave, onDelete, emotionalLinks = [], members: allMembers = [], onUpdateEmotionalLink, onDeleteEmotionalLink }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [birthYear, setBirthYear] = useState('');
@@ -247,6 +252,65 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
                 ))}
               </div>
             </div>
+
+            {/* ── Liens émotionnels ── */}
+            {member && (() => {
+              const memberLinks = emotionalLinks.filter(l => l.from === member.id || l.to === member.id);
+              if (memberLinks.length === 0) return (
+                <>
+                  <Separator />
+                  <div className="flex flex-col gap-2">
+                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Liens émotionnels</Label>
+                    <p className="text-xs text-muted-foreground">Aucun lien émotionnel. Glissez depuis un point d'ancrage pour en créer.</p>
+                  </div>
+                </>
+              );
+              return (
+                <>
+                  <Separator />
+                  <div className="flex flex-col gap-3">
+                    <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Liens émotionnels ({memberLinks.length})
+                    </Label>
+                    <div className="flex flex-col gap-2">
+                      {memberLinks.map(link => {
+                        const otherId = link.from === member.id ? link.to : link.from;
+                        const other = allMembers.find(m => m.id === otherId);
+                        const otherName = other ? `${other.firstName} ${other.lastName}` : otherId;
+                        return (
+                          <div key={link.id} className="flex items-center gap-2 py-1.5 px-2 rounded-lg bg-accent/30">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-foreground truncate">{otherName}</p>
+                              <Select
+                                value={link.type}
+                                onValueChange={(v) => onUpdateEmotionalLink?.(link.id, v as EmotionalLinkType)}
+                              >
+                                <SelectTrigger className="h-7 text-xs mt-1">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {EMOTIONAL_LINK_TYPES.map(t => (
+                                    <SelectItem key={t.id} value={t.id} className="text-xs">{t.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={() => onDeleteEmotionalLink?.(link.id)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
 
             <Separator />
 

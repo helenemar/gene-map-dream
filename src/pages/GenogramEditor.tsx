@@ -807,6 +807,14 @@ const GenogramEditor: React.FC = () => {
             onClose={() => { setNewMemberDrawerOpen(false); setEditingNewMember(null); }}
             onSave={handleSaveMember}
             onDelete={handleDeleteMember}
+            emotionalLinks={emotionalLinks}
+            members={members}
+            onUpdateEmotionalLink={(linkId, newType) => {
+              setEmotionalLinks(prev => prev.map(l => l.id === linkId ? { ...l, type: newType } : l));
+            }}
+            onDeleteEmotionalLink={(linkId) => {
+              setEmotionalLinks(prev => prev.filter(l => l.id !== linkId));
+            }}
           />
 
           <FloatingControls
