@@ -28,7 +28,7 @@ interface AnchorPoint { x: number; y: number; side: Side; }
 
 /** Corner anchors for emotional links — corners only, never center/sides */
 type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-const CORNER_INSET = 10; // compensate for rounded-xl border-radius
+const CORNER_INSET = 0; // anchors at exact card corners for visual contact
 function cardCorners(m: FamilyMember): { corner: Corner; x: number; y: number }[] {
   return [
     { corner: 'top-left',     x: m.x + CORNER_INSET,          y: m.y + CORNER_INSET },
