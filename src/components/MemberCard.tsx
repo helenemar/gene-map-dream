@@ -29,6 +29,8 @@ interface MemberCardProps {
   static?: boolean;
   /** Highlight when a link drag hovers over this card */
   isLinkTarget?: boolean;
+  /** Fade-out animation before cascade deletion */
+  isFadingOut?: boolean;
   onSelect?: (id: string) => void;
   onDragStart?: (id: string, e: React.MouseEvent) => void;
   onCreateRelated?: (id: string, relationship: RelationshipChoice) => void;
@@ -54,6 +56,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   state = 'default',
   static: isStatic = false,
   isLinkTarget = false,
+  isFadingOut = false,
   onSelect,
   onDragStart,
   onCreateRelated,
@@ -236,12 +239,16 @@ const MemberCard: React.FC<MemberCardProps> = ({
       animate={{
         left: member.x,
         top: member.y,
+        opacity: isFadingOut ? 0 : 1,
+        scale: isFadingOut ? 0.85 : 1,
       }}
-      transition={isAnimating
-        ? { type: 'spring', stiffness: 80, damping: 18, mass: 0.8 }
-        : { duration: 0 }
+      transition={isFadingOut
+        ? { duration: 0.3, ease: 'easeOut' }
+        : isAnimating
+          ? { type: 'spring', stiffness: 80, damping: 18, mass: 0.8 }
+          : { duration: 0 }
       }
-      style={{ zIndex: 10 }}
+      style={{ zIndex: isFadingOut ? 5 : 10, pointerEvents: isFadingOut ? 'none' : 'auto' }}
       onMouseDown={(e) => {
         e.stopPropagation();
         onDragStart?.(member.id, e);

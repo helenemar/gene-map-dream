@@ -552,19 +552,59 @@ const GenogramEditor: React.FC = () => {
     setEditingNewMember(null);
   }, []);
 
+  const [fadingOutIds, setFadingOutIds] = useState<Set<string>>(new Set());
+
   const handleDeleteMember = useCallback((id: string) => {
-    setMembers(prev => prev.filter(m => m.id !== id));
-    setUnions(prev => prev
-      .map(u => ({
-        ...u,
-        children: u.children.filter(c => c !== id),
-      }))
-      .filter(u => u.partner1 !== id && u.partner2 !== id)
-    );
-    setEmotionalLinks(prev => prev.filter(l => l.from !== id && l.to !== id));
-    setSelectedMember(null);
-    setEditingNewMember(null);
-  }, []);
+    // Cascade cleanup: find unions where this member is a child
+    const affectedUnions = unions.filter(u => u.children.includes(id));
+    const idsToFadeOut: string[] = [];
+
+    for (const union of affectedUnions) {
+      const remainingChildren = union.children.filter(c => c !== id);
+      if (remainingChildren.length === 0) {
+        // Union will have no children — check if either partner is a placeholder
+        const partner1 = members.find(m => m.id === union.partner1);
+        const partner2 = members.find(m => m.id === union.partner2);
+        const placeholderPartner =
+          partner1?.isPlaceholder ? partner1 :
+          partner2?.isPlaceholder ? partner2 : null;
+
+        if (placeholderPartner) {
+          // Cascade: remove placeholder + union
+          idsToFadeOut.push(placeholderPartner.id);
+        }
+      }
+    }
+
+    if (idsToFadeOut.length > 0) {
+      // Animate fade-out first, then clean up after animation
+      const allFading = new Set([id, ...idsToFadeOut]);
+      setFadingOutIds(allFading);
+
+      setTimeout(() => {
+        setFadingOutIds(new Set());
+        const toRemove = allFading;
+        setMembers(prev => prev.filter(m => !toRemove.has(m.id)));
+        setUnions(prev => prev
+          .map(u => ({ ...u, children: u.children.filter(c => !toRemove.has(c)) }))
+          .filter(u => !toRemove.has(u.partner1) && !toRemove.has(u.partner2))
+        );
+        setEmotionalLinks(prev => prev.filter(l => !toRemove.has(l.from) && !toRemove.has(l.to)));
+        setSelectedMember(null);
+        setEditingNewMember(null);
+      }, 350);
+    } else {
+      // Standard delete — no cascade needed
+      setMembers(prev => prev.filter(m => m.id !== id));
+      setUnions(prev => prev
+        .map(u => ({ ...u, children: u.children.filter(c => c !== id) }))
+        .filter(u => u.partner1 !== id && u.partner2 !== id)
+      );
+      setEmotionalLinks(prev => prev.filter(l => l.from !== id && l.to !== id));
+      setSelectedMember(null);
+      setEditingNewMember(null);
+    }
+  }, [members, unions]);
 
   const handleCancelAnchor = useCallback((id: string) => {
     setAnchorActiveMember(null);
@@ -786,6 +826,7 @@ const GenogramEditor: React.FC = () => {
                 isColliding={collisions.has(member.id)}
                 state={getMemberState(member.id)}
                 isLinkTarget={!!linkDrag && linkDrag.fromId !== member.id}
+                isFadingOut={fadingOutIds.has(member.id)}
                 onSelect={handleSelect}
                 onDragStart={handleDragStart}
                 onCreateRelated={handleCreateRelated}
