@@ -16,7 +16,8 @@ const LEVEL_SPACING = 350;
 const COUPLE_GAP = 30;
 const SIBLING_GAP = 40;
 const BLOCK_GAP = 80;
-const STAGGER_OFFSET = 40; // Progressive X-offset per sibling for "escalier" effect
+const VERTICAL_STAGGER = 30; // Cumulative Y-offset per sibling for "escalier" effect
+const MAX_STAGGER = 150; // Cap to avoid colliding with next generation
 
 interface LayoutResult {
   positions: Map<string, { x: number; y: number }>;
@@ -185,12 +186,14 @@ export function computeAutoLayout(
 
     for (let childIdx = 0; childIdx < children.length; childIdx++) {
       const cid = children[childIdx];
-      // Staggered X-offset: each sibling after the first gets STAGGER_OFFSET extra
-      const stagger = childIdx > 0 ? STAGGER_OFFSET : 0;
 
       // Ensure no overlap at child gen
-      childCursor = Math.max(childCursor + stagger, getRightEdge(childGen) + SIBLING_GAP);
+      childCursor = Math.max(childCursor, getRightEdge(childGen) + SIBLING_GAP);
       
+      // Vertical stagger: cumulative Y offset, capped to MAX_STAGGER
+      const yStagger = Math.min(childIdx * VERTICAL_STAGGER, MAX_STAGGER);
+      const childY = childGen * LEVEL_SPACING + yStagger;
+
       // Check if this child has their own sub-family
       const childSubUnions = getParentingUnions(cid).filter(u => !processedUnions.has(u.id));
 
@@ -201,15 +204,16 @@ export function computeAutoLayout(
         for (const cu of childSubUnions) {
           subRight = placeUnion(cu, subRight);
         }
-        // The child was placed by placeUnion → get their position
+        // The child was placed by placeUnion → update Y with stagger
         const childPos = positions.get(cid);
+        if (childPos) childPos.y = childY;
         const left = childPos ? childPos.x : subStart;
         childXPositions.push({ id: cid, left, right: subRight });
         childCursor = subRight + SIBLING_GAP;
       } else {
         // Leaf child
         if (!placed.has(cid)) {
-          positions.set(cid, { x: childCursor, y: childGen * LEVEL_SPACING });
+          positions.set(cid, { x: childCursor, y: childY });
           placed.add(cid);
         }
         childXPositions.push({ id: cid, left: childCursor, right: childCursor + CARD_W });
