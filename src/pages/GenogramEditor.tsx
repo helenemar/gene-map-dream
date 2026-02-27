@@ -463,12 +463,29 @@ const GenogramEditor: React.FC = () => {
             }}
           >
             <FamilyLinkLines members={members} unions={SAMPLE_UNIONS} />
-            {/* Emotional links SVG overlay — z-index 1 so cards render above */}
-            <svg className="absolute pointer-events-none" style={{ zIndex: -1, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
-              <g style={{ pointerEvents: 'auto' }}>
+            {/* Emotional links SVG overlay — z-index 1, cards at 10, dots at 20 */}
+            <svg className="absolute pointer-events-none" style={{ zIndex: 1, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
+              {/* Depth mask: links behind cards appear as filigrane (30% opacity, 50% stroke) */}
+              <defs>
+                <mask id="card-depth-mask">
+                  {/* White = full visibility everywhere */}
+                  <rect x="-99999" y="-99999" width="199998" height="199998" fill="white" />
+                  {/* Grey rects over cards = reduced visibility (0.3 opacity effect) */}
+                  {members.map(m => (
+                    <rect
+                      key={`mask-${m.id}`}
+                      x={m.x - 4} y={m.y - 4}
+                      width={CARD_W + 8} height={CARD_H + 8}
+                      rx={12}
+                      fill="rgba(255,255,255,0.25)"
+                    />
+                  ))}
+                </mask>
+              </defs>
+              <g style={{ pointerEvents: 'auto' }} mask="url(#card-depth-mask)">
                 {(() => {
-                  // Build card rects for collision avoidance
-                   const cardRects = members.map(m => ({ id: m.id, x: m.x, y: m.y, w: CARD_W, h: CARD_H }));
+                   // Build card rects for collision avoidance
+                    const cardRects = members.map(m => ({ id: m.id, x: m.x, y: m.y, w: CARD_W, h: CARD_H }));
                   const pairMap = new Map<string, number[]>();
                   emotionalLinks.forEach((link, i) => {
                     const key = [link.from, link.to].sort().join('|');

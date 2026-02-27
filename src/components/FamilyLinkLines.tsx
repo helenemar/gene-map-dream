@@ -185,7 +185,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
   const combYMap = new Map(combInfos.map(c => [c.unionId, c.finalY]));
 
   return (
-    <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
+    <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: 0.9 }}>
       {unions.map(union => {
         const p1 = getMember(union.partner1);
         const p2 = getMember(union.partner2);
