@@ -349,8 +349,7 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
     >
       {/* Invisible fat hit area */}
       <path d={mainPath} fill="none" stroke="transparent" strokeWidth={20} />
-      {/* Bridge halo */}
-      <path d={mainPath} fill="none" stroke="hsl(var(--canvas-bg, var(--background)))" strokeWidth={4} strokeLinecap="round" />
+      {/* Bridge halo — removed for hollow/transparent look */}
       {/* Glow filter for hover */}
       {hovered && (
         <defs>
