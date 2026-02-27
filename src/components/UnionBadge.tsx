@@ -94,7 +94,7 @@ function hasStatusIcon(status: UnionStatus): boolean {
 
 const PILL_H = 32;
 const PILL_RX = 16;
-const PILL_PAD_X = 18;   // horizontal padding each side
+const PILL_PAD_X = 12;   // horizontal padding each side
 const ICON_R = 14;       // circle radius
 const ICON_D = ICON_R * 2;
 const OVERLAP = 0;
