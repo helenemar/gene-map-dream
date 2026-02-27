@@ -92,12 +92,14 @@ function hasStatusIcon(status: UnionStatus): boolean {
  * to avoid foreignObject alignment quirks across browsers.
  */
 
-const PILL_H = 24;
-const PILL_RX = 12;
+const PILL_H = 28;
+const PILL_RX = 14;
+const PILL_PAD_X = 16;   // horizontal padding each side
 const ICON_R = 13;       // circle radius
 const ICON_D = ICON_R * 2;
-const OVERLAP = 2;       // minimal overlap — pill sits clearly above icon
-const FONT_SIZE = 9;
+const OVERLAP = 0;       // no overlap — pill sits clearly above icon with gap
+const GAP = 3;           // gap between pill bottom and icon top
+const FONT_SIZE = 10;
 
 const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
   const label = getDateLabel(union);
@@ -105,17 +107,13 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
 
   if (!label && !showIcon) return null;
 
-  // Measure approximate pill width from label length
-  const pillW = label ? Math.max(label.length * 6.5 + 24, 56) : 0;
+  // Hug-content width: char width × count + padding
+  const pillW = label ? Math.max(label.length * 6.8 + PILL_PAD_X * 2, 56) : 0;
   const blockW = Math.max(pillW, showIcon ? ICON_D : 0);
 
-  // Layout: icon center ON the union line Y, pill ABOVE overlapping the icon.
-  // Local coords: icon center at ICON_R, pill sits above it.
+  // Layout: icon center ON the union line Y, pill ABOVE with a gap
+  const pillY = showIcon ? -(PILL_H + GAP) : 0;
   const iconCenterLocal = showIcon ? ICON_R : 0;
-  const pillTopLocal = showIcon ? ICON_R - OVERLAP - PILL_H + OVERLAP : 0;
-  // Pill bottom edge = iconCenter - ICON_R + OVERLAP = OVERLAP
-  // Pill top = OVERLAP - PILL_H
-  const pillY = showIcon ? OVERLAP - PILL_H : 0;
 
   // Group positioned so icon center aligns with line Y
   const groupX = x - blockW / 2;
@@ -152,8 +150,8 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
             fill="hsl(var(--muted-foreground))"
             fontSize={FONT_SIZE}
             fontWeight={600}
-            fontFamily="system-ui, -apple-system, sans-serif"
-            letterSpacing="0.04em"
+            fontFamily="Inter, system-ui, -apple-system, sans-serif"
+            letterSpacing="0.03em"
             style={{ userSelect: 'none' }}
           >
             {label}
@@ -214,9 +212,9 @@ export const UnionBadgePreview: React.FC<{ status: UnionStatus; marriageYear?: n
 
   const label = getDateLabel(union);
   const showIcon = hasStatusIcon(status);
-  const pillW = label ? Math.max(label.length * 5.6 + 16, 56) : 0;
+  const pillW = label ? Math.max(label.length * 6.8 + PILL_PAD_X * 2, 56) : 0;
   const blockW = Math.max(pillW, showIcon ? ICON_D : 0, 50);
-  const totalH = (label ? PILL_H : 0) + (showIcon ? ICON_D - (label ? OVERLAP : 0) : 0);
+  const totalH = (label ? PILL_H : 0) + (showIcon ? ICON_D + (label ? GAP : 0) : 0);
 
   return (
     <svg width={blockW + 8} height={totalH + 8} className="shrink-0">
@@ -242,15 +240,15 @@ export const UnionBadgePreview: React.FC<{ status: UnionStatus; marriageYear?: n
               fill="hsl(var(--muted-foreground))"
               fontSize={FONT_SIZE}
               fontWeight={600}
-              fontFamily="system-ui, -apple-system, sans-serif"
-              letterSpacing="0.04em"
+              fontFamily="Inter, system-ui, -apple-system, sans-serif"
+              letterSpacing="0.03em"
             >
               {label}
             </text>
           </>
         )}
         {showIcon && (() => {
-          const iconCY = label ? PILL_H - OVERLAP + ICON_R : ICON_R;
+          const iconCY = label ? PILL_H + GAP + ICON_R : ICON_R;
           return (
             <>
               <circle
