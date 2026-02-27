@@ -19,7 +19,7 @@ const buttonVariants = cva(
         brand: "bg-brand-orange text-brand-orange-foreground hover:bg-brand-orange/90 rounded-full font-semibold shadow-soft",
         "brand-outline": "border border-brand-orange text-brand-orange hover:bg-brand-orange/5 rounded-full",
         subtle: "bg-muted text-muted-foreground hover:bg-muted/80 rounded-full",
-        beta: "bg-gradient-to-r from-primary via-destructive to-brand-orange text-primary-foreground rounded-full font-semibold shadow-soft",
+        beta: "bg-gradient-to-r from-[#FFBA25] to-[#E031FF] text-primary-foreground rounded-full font-semibold shadow-soft",
         "icon-circle": "rounded-full bg-card border border-border shadow-soft hover:bg-accent",
       },
       size: {
