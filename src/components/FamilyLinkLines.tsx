@@ -311,7 +311,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
       </svg>
 
       {/* Union badges layer — z-index 60, above cards and emotional links */}
-      <svg className="absolute pointer-events-none" style={{ zIndex: 60, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
+      <svg className="absolute pointer-events-none" style={{ zIndex: 100, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
         {badgeData.map(({ unionObj, midX, midY }) => (
           <UnionBadge
             key={`badge-${unionObj.id}`}
