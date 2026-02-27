@@ -350,7 +350,7 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       {/* Invisible fat hit area */}
       <path d={mainPath} fill="none" stroke="transparent" strokeWidth={20} />
       {/* Bridge halo */}
-      <path d={mainPath} fill="none" stroke="hsl(var(--canvas-bg, var(--background)))" strokeWidth={5} strokeLinecap="round" />
+      <path d={mainPath} fill="none" stroke="hsl(var(--canvas-bg, var(--background)))" strokeWidth={4} strokeLinecap="round" />
       {/* Glow filter for hover */}
       {hovered && (
         <defs>
@@ -366,8 +366,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       {/* Rendered line — thicker on hover with glow */}
       <g
         style={{
-          opacity: hovered ? 1 : 0.85,
-          strokeWidth: hovered ? 2 : undefined,
+          opacity: hovered ? 1 : 0.8,
+          strokeWidth: hovered ? 1.5 : undefined,
           filter: hovered ? `url(#glow-${type})` : 'none',
         }}
         className="transition-all duration-150"
