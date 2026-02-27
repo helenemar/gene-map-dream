@@ -13,9 +13,9 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 const CARD_W = 186;
 const CARD_H = 64;
 const LEVEL_SPACING = 350;
-const COUPLE_GAP = 30;
-const SIBLING_GAP = 40;
-const BLOCK_GAP = 80;
+const COUPLE_GAP = 40;
+const SIBLING_GAP = 50;
+const BLOCK_GAP = 120;
 const VERTICAL_STAGGER = 30; // Cumulative Y-offset per sibling for "escalier" effect
 const MAX_STAGGER = 150; // Cap to avoid colliding with next generation
 
@@ -251,8 +251,14 @@ export function computeAutoLayout(
     }
 
     placeCouple(union, coupleLeft, gen);
-    const totalRight = Math.max(coupleLeft + coupleWidth, blockRight + (coupleLeft - (blockCenter - coupleWidth / 2)));
-    updateRightEdge(gen, coupleLeft + coupleWidth);
+    
+    // Recompute block right after potential shifts
+    const finalBlockRight = Math.max(...childXPositions.map(c => {
+      const pos = positions.get(c.id);
+      return pos ? pos.x + CARD_W : c.right;
+    }));
+    const totalRight = Math.max(coupleLeft + coupleWidth, finalBlockRight);
+    updateRightEdge(gen, totalRight);
 
     return totalRight;
   }
