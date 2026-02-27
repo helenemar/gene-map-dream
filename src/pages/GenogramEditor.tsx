@@ -442,9 +442,38 @@ const GenogramEditor: React.FC = () => {
     };
 
     if (standalone) {
-      // Standalone child — no union, just placed below parent
-      setMembers(prev => [...prev, newChild]);
-      setStandaloneLinks(prev => [...prev, { parentId: sourceId, childId: newChild.id }]);
+      // Standalone child — no union, but create a placeholder parent card
+      const SPOUSE_GAP = CARD_W + 120;
+      const sourceX = source?.x ?? 200;
+      const sourceY = source?.y ?? 200;
+      const placeholderX = sourceX + SPOUSE_GAP;
+      const placeholderId = `m-ph-${Date.now()}`;
+
+      const placeholder: FamilyMember = {
+        id: placeholderId,
+        firstName: '',
+        lastName: '',
+        birthYear: 0,
+        age: 0,
+        profession: '',
+        gender: source?.gender === 'male' ? 'female' : 'male',
+        x: placeholderX,
+        y: sourceY,
+        pathologies: [],
+        isPlaceholder: true,
+      };
+
+      // Center child between parent and placeholder
+      const coupleCenterX = (sourceX + placeholderX + CARD_W) / 2 - CARD_W / 2;
+      newChild.x = coupleCenterX;
+      newChild.y = sourceY + LEVEL_Y;
+
+      setMembers(prev => [...prev, placeholder, newChild]);
+      setStandaloneLinks(prev => [
+        ...prev,
+        { parentId: sourceId, childId: newChild.id },
+        { parentId: placeholderId, childId: newChild.id },
+      ]);
       setSelectedMember(newChild.id);
       setEditingNewMember(newChild);
       setNewMemberDrawerOpen(true);
@@ -850,28 +879,64 @@ const GenogramEditor: React.FC = () => {
             <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} />
             {/* Standalone parent-child grey lines */}
             <svg className="absolute pointer-events-none" style={{ zIndex: 5, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
-              {standaloneLinks.map(({ parentId, childId }) => {
-                const parent = members.find(m => m.id === parentId);
-                const child = members.find(m => m.id === childId);
-                if (!parent || !child) return null;
-                const x1 = parent.x + CARD_W / 2;
-                const y1 = parent.y + CARD_H;
-                const x2 = child.x + CARD_W / 2;
-                const y2 = child.y;
-                const midY = (y1 + y2) / 2;
-                return (
-                  <g key={`standalone-${parentId}-${childId}`}>
-                    <path
-                      d={`M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`}
-                      fill="none"
-                      stroke="hsl(var(--muted-foreground))"
-                      strokeWidth={1.5}
-                      strokeOpacity={0.3}
-                      strokeDasharray="6 4"
-                    />
-                  </g>
-                );
-              })}
+              {(() => {
+                // Group standalone links by child to draw converging lines
+                const byChild = new Map<string, string[]>();
+                standaloneLinks.forEach(({ parentId, childId }) => {
+                  if (!byChild.has(childId)) byChild.set(childId, []);
+                  byChild.get(childId)!.push(parentId);
+                });
+                return Array.from(byChild.entries()).map(([childId, parentIds]) => {
+                  const child = members.find(m => m.id === childId);
+                  if (!child) return null;
+                  const parents = parentIds.map(pid => members.find(m => m.id === pid)).filter(Boolean) as FamilyMember[];
+                  if (parents.length === 0) return null;
+
+                  const childCX = child.x + CARD_W / 2;
+                  const childTop = child.y;
+                  const midY = parents.length > 0
+                    ? (Math.max(...parents.map(p => p.y + CARD_H)) + childTop) / 2
+                    : childTop - 40;
+
+                  return (
+                    <g key={`standalone-group-${childId}`}>
+                      {/* Horizontal dashed line between parents if 2+ */}
+                      {parents.length >= 2 && (() => {
+                        const sorted = [...parents].sort((a, b) => a.x - b.x);
+                        const leftX = sorted[0].x + CARD_W;
+                        const rightX = sorted[sorted.length - 1].x;
+                        const lineY = sorted[0].y + CARD_H / 2;
+                        return (
+                          <path
+                            d={`M ${leftX} ${lineY} L ${rightX} ${lineY}`}
+                            fill="none"
+                            stroke="hsl(var(--muted-foreground))"
+                            strokeWidth={1.5}
+                            strokeOpacity={0.3}
+                            strokeDasharray="6 4"
+                          />
+                        );
+                      })()}
+                      {/* Vertical lines from each parent down to midY, then to child */}
+                      {parents.map(parent => {
+                        const px = parent.x + CARD_W / 2;
+                        const py = parent.y + CARD_H;
+                        return (
+                          <path
+                            key={`standalone-${parent.id}-${childId}`}
+                            d={`M ${px} ${py} L ${px} ${midY} L ${childCX} ${midY} L ${childCX} ${childTop}`}
+                            fill="none"
+                            stroke="hsl(var(--muted-foreground))"
+                            strokeWidth={1.5}
+                            strokeOpacity={0.3}
+                            strokeDasharray="6 4"
+                          />
+                        );
+                      })}
+                    </g>
+                  );
+                });
+              })()}
             </svg>
             <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
               {/* Over-card transparency mask: full opacity in void, reduced over cards & union badges */}
