@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown } from 'lucide-react';
+import GenogramThumbnail from '@/components/GenogramThumbnail';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -21,6 +22,7 @@ interface GenogramRow {
   created_at: string;
   updated_at: string;
   user_id: string;
+  data: any;
 }
 
 type SortKey = 'name' | 'updated_at' | 'created_at';
@@ -232,10 +234,7 @@ const Dashboard: React.FC = () => {
                     >
                       <TableCell className="pl-6">
                         <div className="flex items-center gap-3">
-                          {/* Thumbnail placeholder */}
-                          <div className="w-14 h-10 rounded-lg border border-border bg-muted/30 flex items-center justify-center shrink-0">
-                            <div className="w-6 h-5 border border-dashed border-muted-foreground/30 rounded-sm" />
-                          </div>
+                          <GenogramThumbnail data={file.data || {}} width={56} height={40} />
                           <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
                             {file.name}
                           </span>
