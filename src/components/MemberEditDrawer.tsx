@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Trash2, Heart } from 'lucide-react';
+import { Trash2, Heart, Pencil } from 'lucide-react';
 import MemberIcon from '@/components/MemberIcon';
 
 interface MemberEditDrawerProps {
@@ -48,13 +48,17 @@ interface MemberEditDrawerProps {
   onUpdateUnion?: (unionId: string, updates: Partial<Union>) => void;
   /** Called on every field change for live canvas updates */
   onLiveUpdate?: (updated: FamilyMember) => void;
+  /** Start in read-only mode when false */
+  initialEditing?: boolean;
 }
 
 const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   member, open, onClose, onSave, onDelete,
   emotionalLinks = [], members: allMembers = [], unions = [],
   onUpdateEmotionalLink, onDeleteEmotionalLink, onUpdateUnion, onLiveUpdate,
+  initialEditing = true,
 }) => {
+  const [isEditing, setIsEditing] = useState(initialEditing);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [birthYear, setBirthYear] = useState('');
@@ -70,6 +74,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
   useEffect(() => {
     if (member) {
+      setIsEditing(initialEditing);
       setFirstName(member.firstName);
       setLastName(member.lastName);
       setBirthYear(member.birthYear ? String(member.birthYear) : '');
@@ -147,11 +152,24 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
         {/* ── Header with live preview ── */}
         <div className="px-6 pt-6 pb-4">
           <SheetHeader>
-            <SheetTitle className="text-base font-semibold">
-              {isExisting ? 'Modifier le membre' : 'Nouveau membre'}
-            </SheetTitle>
+            <div className="flex items-center justify-between">
+              <SheetTitle className="text-base font-semibold">
+                {!isEditing ? 'Fiche membre' : isExisting ? 'Modifier le membre' : 'Nouveau membre'}
+              </SheetTitle>
+              {!isEditing && isExisting && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs gap-1.5 text-muted-foreground hover:text-foreground"
+                  onClick={() => setIsEditing(true)}
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                  Modifier
+                </Button>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">
-              {isExisting ? `${member.firstName} ${member.lastName}` : 'Saisissez les informations du membre'}
+              {!isEditing ? `${member.firstName} ${member.lastName}` : isExisting ? `${member.firstName} ${member.lastName}` : 'Saisissez les informations du membre'}
             </p>
           </SheetHeader>
 
@@ -192,7 +210,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
             {/* ── Identité ── */}
             <div className="flex flex-col gap-2">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Genre</Label>
-              <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female')}>
+              <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female')} disabled={!isEditing}>
                 <SelectTrigger className="h-9 border-border/50 bg-card"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="male">Homme</SelectItem>
@@ -203,22 +221,22 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
             <div className="flex flex-col gap-1.5">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Prénom</Label>
-              <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Marie" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus />
+              <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Marie" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus disabled={!isEditing} />
             </div>
 
             <div className="flex flex-col gap-1.5">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Nom</Label>
-              <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+              <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={!isEditing} />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
                 <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Naissance</Label>
-                <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="1985" min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} />
+                <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="1985" min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} disabled={!isEditing} />
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Décès</Label>
-                <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="Vivant" min={1900} max={2100} value={deathYear} onChange={(e) => setDeathYear(e.target.value)} />
+                <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="Vivant" min={1900} max={2100} value={deathYear} onChange={(e) => setDeathYear(e.target.value)} disabled={!isEditing} />
               </div>
             </div>
             {isDeceased && (
@@ -227,7 +245,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
             <div className="flex flex-col gap-1.5">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Profession</Label>
-              <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} />
+              <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} disabled={!isEditing} />
             </div>
 
             <Separator className="opacity-50" />
@@ -238,17 +256,17 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               <div className="flex items-center justify-between py-1">
                 <span className="text-sm text-foreground">Personne transgenre</span>
-                <Switch checked={isTransgender} onCheckedChange={setIsTransgender} />
+                <Switch checked={isTransgender} onCheckedChange={setIsTransgender} disabled={!isEditing} />
               </div>
 
               <div className="flex items-center justify-between py-1">
                 <span className="text-sm text-foreground">Homosexuel(le)</span>
-                <Switch checked={isGay} onCheckedChange={(v) => { setIsGay(v); if (v) setIsBisexual(false); }} />
+                <Switch checked={isGay} onCheckedChange={(v) => { setIsGay(v); if (v) setIsBisexual(false); }} disabled={!isEditing} />
               </div>
 
               <div className="flex items-center justify-between py-1">
                 <span className="text-sm text-foreground">Bisexuel(le)</span>
-                <Switch checked={isBisexual} onCheckedChange={(v) => { setIsBisexual(v); if (v) setIsGay(false); }} />
+                <Switch checked={isBisexual} onCheckedChange={(v) => { setIsBisexual(v); if (v) setIsGay(false); }} disabled={!isEditing} />
               </div>
             </div>
 
@@ -351,6 +369,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   placeholder="ex: twin-1 (vide si pas jumeau)"
                   value={twinGroup}
                   onChange={(e) => setTwinGroup(e.target.value)}
+                  disabled={!isEditing}
                 />
                 <p className="text-xs text-muted-foreground">
                   Les membres partageant le même identifiant seront affichés comme jumeaux/triplés.
@@ -360,7 +379,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               {twinGroup && (
                 <div className="flex flex-col gap-1.5">
                   <Label className="text-xs text-muted-foreground">Type de jumeaux</Label>
-                  <Select value={twinType} onValueChange={(v) => setTwinType(v as TwinType)}>
+                  <Select value={twinType} onValueChange={(v) => setTwinType(v as TwinType)} disabled={!isEditing}>
                     <SelectTrigger className="h-9 border-border/50 bg-card"><SelectValue placeholder="Choisir le type" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="monozygotic">Monozygote (vrais jumeaux)</SelectItem>
@@ -387,6 +406,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     <Checkbox
                       checked={selectedPathologies.includes(p.id)}
                       onCheckedChange={() => togglePathology(p.id)}
+                      disabled={!isEditing}
                     />
                     <div
                       className="w-3 h-3 rounded-full shrink-0"
@@ -460,36 +480,40 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
             <Separator className="opacity-50" />
 
             {/* ── Actions ── */}
-            <Button onClick={handleSave} className="w-full h-10 font-semibold">
-              Enregistrer
-            </Button>
+            {isEditing && (
+              <>
+                <Button onClick={handleSave} className="w-full h-10 font-semibold">
+                  Enregistrer
+                </Button>
 
-            {onDelete && member && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="ghost" className="w-full text-destructive hover:text-destructive hover:bg-destructive/10">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Supprimer ce membre
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Supprimer {firstName || member.firstName} {lastName || member.lastName} ?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Cette action est irréversible. Le membre sera supprimé du génogramme ainsi que tous ses liens associés.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                      onClick={() => { onDelete(member.id); onClose(); }}
-                    >
-                      Supprimer
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                {onDelete && member && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" className="w-full text-destructive hover:text-destructive hover:bg-destructive/10">
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Supprimer ce membre
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Supprimer {firstName || member.firstName} {lastName || member.lastName} ?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Cette action est irréversible. Le membre sera supprimé du génogramme ainsi que tous ses liens associés.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          onClick={() => { onDelete(member.id); onClose(); }}
+                        >
+                          Supprimer
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </>
             )}
 
             {/* Bottom spacer for scroll */}

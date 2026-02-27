@@ -689,10 +689,22 @@ const GenogramEditor: React.FC = () => {
     setTimeout(() => centerOnMember(newMember), 100);
   }, [members, unions, computeNewPosition, centerOnMember, executeChildCreation]);
 
+  const [drawerEditing, setDrawerEditing] = useState(true);
+
   const handleEdit = useCallback((id: string) => {
     const member = members.find(m => m.id === id);
     if (member) {
       setEditingNewMember(member);
+      setDrawerEditing(true);
+      setNewMemberDrawerOpen(true);
+    }
+  }, [members]);
+
+  const handleView = useCallback((id: string) => {
+    const member = members.find(m => m.id === id);
+    if (member) {
+      setEditingNewMember(member);
+      setDrawerEditing(false);
       setNewMemberDrawerOpen(true);
     }
   }, [members]);
@@ -1011,6 +1023,7 @@ const GenogramEditor: React.FC = () => {
                 onDragStart={handleDragStart}
                 onCreateRelated={handleCreateRelated}
                 onEdit={handleEdit}
+                onView={handleView}
                 onHover={setHoveredMember}
                 onLinkDragStart={handleLinkDragStart}
                 onCancelAnchor={handleCancelAnchor}
@@ -1095,6 +1108,7 @@ const GenogramEditor: React.FC = () => {
           <MemberEditDrawer
             member={editingNewMember}
             open={newMemberDrawerOpen}
+            initialEditing={drawerEditing}
             onClose={() => { setNewMemberDrawerOpen(false); setEditingNewMember(null); }}
             onSave={handleSaveMember}
             onDelete={handleDeleteMember}
