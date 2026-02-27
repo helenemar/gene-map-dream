@@ -179,11 +179,6 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                       <FamilyLinkIcon status={link.id} />
                     </div>
                     <span className="flex-1">{link.label}</span>
-                    {count > 0 && (
-                      <span className="text-[10px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                        {count}
-                      </span>
-                    )}
                   </div>
                 );
               })}
@@ -219,11 +214,6 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                       <EmotionalLinkPreview type={link.id} width={60} height={16} />
                     </div>
                     <div className="flex items-center gap-1">
-                      {count > 0 && (
-                        <span className="text-[10px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                          {count}
-                        </span>
-                      )}
                       <button
                         onClick={() => onToggleSoloEmotional(link.id)}
                         className={`p-1 rounded-md transition-all ${
