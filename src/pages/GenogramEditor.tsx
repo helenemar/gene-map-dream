@@ -368,6 +368,9 @@ const GenogramEditor: React.FC = () => {
     open: boolean;
   } | null>(null);
 
+  // ─── Standalone parent-child links (no union) ───
+  const [standaloneLinks, setStandaloneLinks] = useState<{ parentId: string; childId: string }[]>([]);
+
   /** Center canvas on a specific member with smooth animation */
   const centerOnMember = useCallback((member: FamilyMember) => {
     const canvas = canvasRef.current;
@@ -441,6 +444,7 @@ const GenogramEditor: React.FC = () => {
     if (standalone) {
       // Standalone child — no union, just placed below parent
       setMembers(prev => [...prev, newChild]);
+      setStandaloneLinks(prev => [...prev, { parentId: sourceId, childId: newChild.id }]);
       setSelectedMember(newChild.id);
       setEditingNewMember(newChild);
       setNewMemberDrawerOpen(true);
@@ -844,7 +848,31 @@ const GenogramEditor: React.FC = () => {
             }}
           >
             <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} />
-            {/* Emotional links SVG overlay — z-index 50, ABOVE cards (z-10) */}
+            {/* Standalone parent-child grey lines */}
+            <svg className="absolute pointer-events-none" style={{ zIndex: 5, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
+              {standaloneLinks.map(({ parentId, childId }) => {
+                const parent = members.find(m => m.id === parentId);
+                const child = members.find(m => m.id === childId);
+                if (!parent || !child) return null;
+                const x1 = parent.x + CARD_W / 2;
+                const y1 = parent.y + CARD_H;
+                const x2 = child.x + CARD_W / 2;
+                const y2 = child.y;
+                const midY = (y1 + y2) / 2;
+                return (
+                  <g key={`standalone-${parentId}-${childId}`}>
+                    <path
+                      d={`M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`}
+                      fill="none"
+                      stroke="hsl(var(--muted-foreground))"
+                      strokeWidth={1.5}
+                      strokeOpacity={0.3}
+                      strokeDasharray="6 4"
+                    />
+                  </g>
+                );
+              })}
+            </svg>
             <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
               {/* Over-card transparency mask: full opacity in void, reduced over cards & union badges */}
               <defs>
