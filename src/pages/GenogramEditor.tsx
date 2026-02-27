@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import EditorHeader from '@/components/EditorHeader';
 import EditorSidebar from '@/components/EditorSidebar';
 import MemberCard from '@/components/MemberCard';
@@ -23,6 +23,9 @@ import { computeAutoLayout } from '@/utils/autoLayout';
 import { exportAsPng, exportAsSvg, exportAsPdf } from '@/utils/exportCanvas';
 import { useFamilySearch } from '@/hooks/useFamilySearch';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
+import { useAutoSave } from '@/hooks/useAutoSave';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Undo2, Redo2 } from 'lucide-react';
 
@@ -120,8 +123,13 @@ function getDirectionalAnchors(from: FamilyMember, to: FamilyMember) {
 
 
 const GenogramEditor: React.FC = () => {
-  // Load saved positions from localStorage
+  const { id: genogramId } = useParams<{ id: string }>();
+  const { user } = useAuth();
+  const [dbLoaded, setDbLoaded] = useState(false);
+
+  // Initialize with empty state — will be populated from DB or sample data
   const [members, setMembers] = useState<FamilyMember[]>(() => {
+    if (genogramId) return []; // Will load from DB
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -134,11 +142,11 @@ const GenogramEditor: React.FC = () => {
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
   const [anchorActiveMember, setAnchorActiveMember] = useState<string | null>(null);
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
-  const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(SAMPLE_EMOTIONAL_LINKS);
-  const [unions, setUnions] = useState<Union[]>(SAMPLE_UNIONS);
+  const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(() => genogramId ? [] : SAMPLE_EMOTIONAL_LINKS);
+  const [unions, setUnions] = useState<Union[]>(() => genogramId ? [] : SAMPLE_UNIONS);
   const search = useFamilySearch(members, unions, emotionalLinks);
   const [editingUnionId, setEditingUnionId] = useState<string | null>(null);
-  const [fileName, setFileName] = useState('Nouveau fichier');
+  const [fileName, setFileName] = useState('Sans titre');
   const [isAnimating, setIsAnimating] = useState(false);
   const [snapToGrid, setSnapToGrid] = useState(false);
   const [highlightedUnionStatus, setHighlightedUnionStatus] = useState<UnionStatus | null>(null);
@@ -165,6 +173,40 @@ const GenogramEditor: React.FC = () => {
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  // ─── Auto-save ───
+  const { saveStatus, debouncedSave } = useAutoSave(genogramId ?? null);
+
+  // ─── Load genogram from DB ───
+  useEffect(() => {
+    if (!genogramId || !user) return;
+    const load = async () => {
+      const { data, error } = await supabase
+        .from('genograms')
+        .select('*')
+        .eq('id', genogramId)
+        .eq('user_id', user.id)
+        .single();
+      if (error || !data) {
+        toast.error('Génogramme introuvable');
+        navigate('/');
+        return;
+      }
+      setFileName(data.name);
+      const gData = data.data as any;
+      if (gData?.members) setMembers(gData.members);
+      if (gData?.unions) setUnions(gData.unions);
+      if (gData?.emotionalLinks) setEmotionalLinks(gData.emotionalLinks);
+      setDbLoaded(true);
+    };
+    load();
+  }, [genogramId, user]);
+
+  // ─── Trigger auto-save on data changes ───
+  useEffect(() => {
+    if (!genogramId || !dbLoaded) return;
+    debouncedSave({ members, unions, emotionalLinks }, fileName);
+  }, [members, unions, emotionalLinks, fileName, genogramId, dbLoaded]);
 
   // ─── Undo/Redo system ───
   type CanvasSnapshot = { members: FamilyMember[]; unions: Union[]; emotionalLinks: EmotionalLink[] };
@@ -980,6 +1022,7 @@ const GenogramEditor: React.FC = () => {
             toast('Export PDF en cours…', { duration: 2000 });
           }
         }}
+        saveStatus={genogramId ? saveStatus : undefined}
       />
       <div className="flex flex-1 overflow-hidden">
         {!presentationMode && (

@@ -3,6 +3,8 @@ import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image,
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { SearchSuggestion } from '@/hooks/useFamilySearch';
+import SaveIndicator from '@/components/SaveIndicator';
+import { SaveStatus } from '@/hooks/useAutoSave';
 import gogyIcon from '@/assets/genogy-icon.svg';
 
 interface EditorHeaderProps {
@@ -15,6 +17,7 @@ interface EditorHeaderProps {
   onExportPng?: () => void;
   onExportSvg?: () => void;
   onExportPdf?: () => void;
+  saveStatus?: SaveStatus;
 }
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -41,6 +44,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   onExportPng,
   onExportSvg,
   onExportPdf,
+  saveStatus = 'idle',
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -72,9 +76,10 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
 
   return (
     <header className="h-14 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
-      {/* Left: Logo + actions */}
+      {/* Left: Logo + save status */}
       <div className="flex items-center gap-3">
         <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
+        <SaveIndicator status={saveStatus} />
       </div>
 
       {/* Center: Search */}
