@@ -10,12 +10,12 @@
 
 import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 
-const CARD_W = 186;
+const CARD_W = 220;       // Must match MEMBER_CARD_W (min-width of actual cards)
 const CARD_H = 64;
 const LEVEL_SPACING = 250;
-const BASE_COUPLE_GAP = 100;
-const MIN_BADGE_GAP = 200;   // Minimum gap when a union has dates/status
-const BADGE_SAFETY = 60;     // Extra breathing room around badge
+const BASE_COUPLE_GAP = 120;
+const MIN_BADGE_GAP = 220;   // Minimum gap when a union has dates/status
+const BADGE_SAFETY = 60;     // 30px breathing room on each side of badge
 const SIBLING_GAP = 80;
 const BLOCK_GAP = 80;
 const VERTICAL_STAGGER = 30; // Cumulative Y-offset per sibling for "escalier" effect
@@ -25,19 +25,21 @@ interface LayoutResult {
   positions: Map<string, { x: number; y: number }>;
 }
 
-/** Compute dynamic gap between couple cards based on badge width */
+/** Compute dynamic gap between couple cards based on badge width.
+ *  Gap = badgeWidth + 60px (30px each side). Badge never overlaps a card. */
 function coupleGap(union: Union): number {
   let labelLen = 0;
   if (union.marriageYear) labelLen += `R: ${union.marriageYear}`.length;
   if (union.divorceYear) labelLen += `   D: ${union.divorceYear}`.length;
   if (labelLen > 0) {
-    // Match UnionBadge hug-content formula: charWidth × count + padding × 2
-    const badgeW = Math.max(labelLen * 6.8 + 32, 56);
+    // Match UnionBadge: charWidth × count + padding × 2
+    const badgeW = Math.max(labelLen * 6.8 + 36, 56);
+    // Gap = badge + 30px breathing on each side
     return Math.max(badgeW + BADGE_SAFETY, MIN_BADGE_GAP);
   }
-  // Has status icon but no dates
+  // Has status icon but no dates — icon circle is ~28px
   const hasIcon = ['divorced', 'separated', 'widowed', 'love_affair', 'common_law'].includes(union.status);
-  return hasIcon ? Math.max(BASE_COUPLE_GAP, 140) : BASE_COUPLE_GAP;
+  return hasIcon ? Math.max(BASE_COUPLE_GAP, 160) : BASE_COUPLE_GAP;
 }
 
 export function computeAutoLayout(

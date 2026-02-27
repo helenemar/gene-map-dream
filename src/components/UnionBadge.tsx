@@ -92,14 +92,14 @@ function hasStatusIcon(status: UnionStatus): boolean {
  * to avoid foreignObject alignment quirks across browsers.
  */
 
-const PILL_H = 28;
-const PILL_RX = 14;
-const PILL_PAD_X = 16;   // horizontal padding each side
-const ICON_R = 13;       // circle radius
+const PILL_H = 32;
+const PILL_RX = 16;
+const PILL_PAD_X = 18;   // horizontal padding each side
+const ICON_R = 14;       // circle radius
 const ICON_D = ICON_R * 2;
-const OVERLAP = 0;       // no overlap — pill sits clearly above icon with gap
-const GAP = 3;           // gap between pill bottom and icon top
-const FONT_SIZE = 10;
+const OVERLAP = 0;
+const GAP = 4;           // gap between pill bottom and icon top
+const FONT_SIZE = 11;
 
 const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
   const label = getDateLabel(union);
@@ -128,6 +128,13 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
       style={{ cursor: 'pointer', pointerEvents: 'auto' }}
       onClick={(e) => { e.stopPropagation(); onClick?.(); }}
     >
+      {/* Drop shadow filter */}
+      <defs>
+        <filter id={`badge-shadow-${union.id}`} x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="1" stdDeviation="2" floodColor="rgba(0,0,0,0.08)" />
+        </filter>
+      </defs>
+
       {/* ── Date pill ── */}
       {label && (
         <>
@@ -140,7 +147,8 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
             fill={bg}
             stroke={stroke}
             strokeWidth={0.8}
-            strokeOpacity={0.5}
+            strokeOpacity={0.4}
+            filter={`url(#badge-shadow-${union.id})`}
           />
           <text
             x={blockW / 2}
