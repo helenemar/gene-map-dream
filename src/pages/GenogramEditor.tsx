@@ -463,7 +463,7 @@ const GenogramEditor: React.FC = () => {
           u.id === existingUnion.id ? { ...u, children: [...u.children, newMember.id] } : u
         ));
       } else {
-        // No union exists → create placeholder partner + union
+        // No union exists → create placeholder partner + union + push colliders
         const SPOUSE_GAP = CARD_W + 120;
         const placeholderId = `m-ph-${Date.now()}`;
         const sourceX = source?.x ?? 200;
@@ -488,6 +488,47 @@ const GenogramEditor: React.FC = () => {
         const coupleCenterX = (sourceX + placeholderX + CARD_W) / 2 - CARD_W / 2;
         newMember.x = coupleCenterX;
 
+        // ── Dynamic Gap: push members that collide with new block ──
+        const PUSH_MARGIN = 40; // breathing room
+        const blockRects = [
+          { x: sourceX, y: sourceY, w: CARD_W, h: CARD_H },             // source (already exists)
+          { x: placeholderX, y: sourceY, w: CARD_W, h: CARD_H },        // placeholder
+          { x: coupleCenterX, y: sourceY + 250, w: CARD_W, h: CARD_H }, // child
+        ];
+        // Bounding box of the entire new block
+        const blockLeft = Math.min(...blockRects.map(r => r.x));
+        const blockRight = Math.max(...blockRects.map(r => r.x + r.w));
+        const blockTop = Math.min(...blockRects.map(r => r.y));
+        const blockBottom = Math.max(...blockRects.map(r => r.y + r.h));
+
+        const newIds = new Set([sourceId, placeholderId, newMember.id]);
+
+        setMembers(prev => {
+          const pushed = prev.map(m => {
+            if (newIds.has(m.id)) return m;
+            // Check overlap with block bounding box (with margin)
+            const mRight = m.x + CARD_W;
+            const mBottom = m.y + CARD_H;
+            const overlapX = m.x < blockRight + PUSH_MARGIN && mRight > blockLeft - PUSH_MARGIN;
+            const overlapY = m.y < blockBottom + PUSH_MARGIN && mBottom > blockTop - PUSH_MARGIN;
+            if (!overlapX || !overlapY) return m;
+
+            // Push horizontally: left or right depending on which side the member is
+            const memberCenterX = m.x + CARD_W / 2;
+            const blockCenterX = (blockLeft + blockRight) / 2;
+            if (memberCenterX < blockCenterX) {
+              // Push left
+              const pushTo = blockLeft - PUSH_MARGIN - CARD_W;
+              return { ...m, x: Math.min(m.x, pushTo) };
+            } else {
+              // Push right
+              const pushTo = blockRight + PUSH_MARGIN;
+              return { ...m, x: Math.max(m.x, pushTo) };
+            }
+          });
+          return [...pushed, placeholder];
+        });
+
         const newUnion: Union = {
           id: `u-${Date.now()}`,
           partner1: sourceId,
@@ -495,8 +536,11 @@ const GenogramEditor: React.FC = () => {
           status: 'married',
           children: [newMember.id],
         };
-        setMembers(prev => [...prev, placeholder]);
         setUnions(prev => [...prev, newUnion]);
+
+        // Animate pushed members smoothly
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), 600);
       }
     }
 
