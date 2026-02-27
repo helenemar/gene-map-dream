@@ -150,31 +150,28 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
       <SheetContent side="right" className="w-[340px] sm:w-[380px] p-0 flex flex-col border-l border-border/50">
         {/* ── Header with live preview ── */}
-        <div className="px-6 pt-6 pb-4">
+        <div className="px-4 pt-4 pb-3">
           <SheetHeader>
             <div className="flex items-center justify-between">
-              <SheetTitle className="text-base font-semibold">
+              <SheetTitle className="text-sm font-semibold">
                 {!isEditing ? 'Fiche membre' : isExisting ? 'Modifier le membre' : 'Nouveau membre'}
               </SheetTitle>
               {!isEditing && isExisting && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-xs gap-1.5 text-muted-foreground hover:text-foreground"
+                  className="text-xs gap-1.5 h-7 text-muted-foreground hover:text-foreground"
                   onClick={() => setIsEditing(true)}
                 >
-                  <Pencil className="w-3.5 h-3.5" />
+                  <Pencil className="w-3 h-3" />
                   Modifier
                 </Button>
               )}
             </div>
-            <p className="text-sm text-muted-foreground">
-              {!isEditing ? `${member.firstName} ${member.lastName}` : isExisting ? `${member.firstName} ${member.lastName}` : 'Saisissez les informations du membre'}
-            </p>
           </SheetHeader>
 
           {/* ── Live icon preview ── */}
-          <div className="flex items-center gap-4 mt-4 p-4 rounded-2xl bg-accent/20 border border-border/50">
+          <div className="flex items-center gap-3 mt-3 px-3 py-2.5 rounded-xl bg-accent/20 border border-border/50">
             <div className="shrink-0">
               <MemberIcon
                 gender={gender}
@@ -187,7 +184,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     .filter(p => selectedPathologies.includes(p.id))
                     .map(p => `hsl(var(--pathology-${p.id}))`)
                 }
-                size={56}
+                size={44}
                 className="text-foreground"
               />
             </div>
@@ -206,67 +203,92 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
         <Separator />
 
         <ScrollArea className="flex-1 px-3">
-          <div className="flex flex-col gap-5 py-5 px-3">
-            {/* ── Identité ── */}
-            <div className="flex flex-col gap-2">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Genre</Label>
-              <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female')} disabled={!isEditing}>
-                <SelectTrigger className="h-9 border-border/50 bg-card"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="male">Homme</SelectItem>
-                  <SelectItem value="female">Femme</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Prénom</Label>
-              <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Marie" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus disabled={!isEditing} />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Nom</Label>
-              <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={!isEditing} />
+          <div className="flex flex-col gap-3 py-3 px-3">
+            {/* ── Identité – grille 2 colonnes ── */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1">
+                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Prénom</Label>
+                <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Marie" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus disabled={!isEditing} />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Nom</Label>
+                <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={!isEditing} />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1.5">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Naissance</Label>
-                <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="1985" min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} disabled={!isEditing} />
+              <div className="flex flex-col gap-1">
+                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Genre</Label>
+                <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female')} disabled={!isEditing}>
+                  <SelectTrigger className="h-8 text-sm border-border/50 bg-card"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Homme</SelectItem>
+                    <SelectItem value="female">Femme</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="flex flex-col gap-1.5">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Décès</Label>
-                <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="Vivant" min={1900} max={2100} value={deathYear} onChange={(e) => setDeathYear(e.target.value)} disabled={!isEditing} />
+              <div className="flex flex-col gap-1">
+                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Profession</Label>
+                <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} disabled={!isEditing} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1">
+                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Naissance</Label>
+                <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="1985" min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} disabled={!isEditing} />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Décès</Label>
+                <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="Vivant" min={1900} max={2100} value={deathYear} onChange={(e) => setDeathYear(e.target.value)} disabled={!isEditing} />
               </div>
             </div>
             {isDeceased && (
-              <p className="text-xs text-muted-foreground -mt-3">⚰️ Décédé(e) — {age} ans</p>
+              <p className="text-xs text-muted-foreground -mt-1">⚰️ Décédé(e) — {age} ans</p>
             )}
-
-            <div className="flex flex-col gap-1.5">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Profession</Label>
-              <Input className="h-9 border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} disabled={!isEditing} />
-            </div>
 
             <Separator className="opacity-50" />
 
-            {/* ── Identité de genre & orientation ── */}
-            <div className="flex flex-col gap-3">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Identité & Orientation</Label>
-
-              <div className="flex items-center justify-between py-1">
-                <span className="text-sm text-foreground">Personne transgenre</span>
-                <Switch checked={isTransgender} onCheckedChange={setIsTransgender} disabled={!isEditing} />
-              </div>
-
-              <div className="flex items-center justify-between py-1">
-                <span className="text-sm text-foreground">Homosexuel(le)</span>
-                <Switch checked={isGay} onCheckedChange={(v) => { setIsGay(v); if (v) setIsBisexual(false); }} disabled={!isEditing} />
-              </div>
-
-              <div className="flex items-center justify-between py-1">
-                <span className="text-sm text-foreground">Bisexuel(le)</span>
-                <Switch checked={isBisexual} onCheckedChange={(v) => { setIsBisexual(v); if (v) setIsGay(false); }} disabled={!isEditing} />
+            {/* ── Identité de genre & orientation – badges cliquables ── */}
+            <div className="flex flex-col gap-2">
+              <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Identité & Orientation</Label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled={!isEditing}
+                  onClick={() => setIsTransgender(!isTransgender)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                    isTransgender
+                      ? 'bg-primary/15 border-primary/40 text-primary'
+                      : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  🏳️‍⚧️ Transgenre
+                </button>
+                <button
+                  type="button"
+                  disabled={!isEditing}
+                  onClick={() => { setIsGay(!isGay); if (!isGay) setIsBisexual(false); }}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                    isGay
+                      ? 'bg-primary/15 border-primary/40 text-primary'
+                      : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  🏳️‍🌈 Homosexuel(le)
+                </button>
+                <button
+                  type="button"
+                  disabled={!isEditing}
+                  onClick={() => { setIsBisexual(!isBisexual); if (!isBisexual) setIsGay(false); }}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                    isBisexual
+                      ? 'bg-primary/15 border-primary/40 text-primary'
+                      : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  💜 Bisexuel(le)
+                </button>
               </div>
             </div>
 
