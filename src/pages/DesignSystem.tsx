@@ -7,6 +7,7 @@ import MemberCard from '@/components/MemberCard';
 import type { MemberCardState } from '@/components/MemberCard';
 import { EmotionalLinkPreview } from '@/components/EmotionalLinkLine';
 import { FamilyLinkPreview } from '@/components/FamilyLinkLines';
+import { UnionBadgePreview } from '@/components/UnionBadge';
 
 /* ============================================================
    Design System – Genogy
@@ -386,6 +387,33 @@ const DesignSystemPage: React.FC = () => {
                   <p className="text-xs text-muted-foreground">Tige de descente + barre horizontale + gouttes individuelles</p>
                 </div>
               </div>
+            </div>
+          </div>
+        </SubSection>
+
+        {/* Union Badges */}
+        <SubSection title="Badges d'union (UnionBadge)">
+          <p className="text-sm text-muted-foreground mb-4">
+            Badge de spécification positionné sur la ligne d'union. Pilule de texte (dates) + icône circulaire de statut en dessous. Z-index 60 sur le canvas.
+          </p>
+          <div className="bg-card rounded-2xl border border-border p-8">
+            <div className="grid grid-cols-3 gap-8">
+              {[
+                { status: 'married' as const, label: 'Mariage', year: 1996, end: undefined },
+                { status: 'divorced' as const, label: 'Divorce', year: 1981, end: 2005 },
+                { status: 'separated' as const, label: 'Séparation', year: 1990, end: 2010 },
+                { status: 'widowed' as const, label: 'Veuvage', year: 1968, end: 2020 },
+                { status: 'love_affair' as const, label: 'Liaison', year: 2015, end: undefined },
+                { status: 'common_law' as const, label: 'Union libre', year: 2000, end: undefined },
+              ].map(({ status, label, year, end }) => (
+                <div key={status} className="flex flex-col items-center gap-3">
+                  <UnionBadgePreview status={status} marriageYear={year} endYear={end} />
+                  <div className="text-center">
+                    <span className="text-sm font-semibold text-foreground">{label}</span>
+                    <p className="text-xs text-muted-foreground font-mono">{status}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </SubSection>

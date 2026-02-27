@@ -1,6 +1,6 @@
 import React from 'react';
 import { FamilyMember, Union, UnionStatus } from '@/types/genogram';
-import RelationshipBadge from './RelationshipBadge';
+import UnionBadge from './UnionBadge';
 
 const CARD_W = 186;
 const CARD_H = 64;
@@ -69,12 +69,15 @@ const UnionLine: React.FC<{
               stroke={stroke} strokeWidth={2} strokeOpacity={opacity} />
           </>
         );
+      case 'love_affair':
+        // No structural mark — the dotted line is sufficient
+        return null;
       default:
         return null;
     }
   };
 
-  const dashArray = status === 'common_law' ? '8 4' : undefined;
+  const dashArray = (status === 'common_law' || status === 'love_affair') ? '8 4' : undefined;
 
   return (
     <g>
@@ -184,23 +187,27 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
 
   const combYMap = new Map(combInfos.map(c => [c.unionId, c.finalY]));
 
-  return (
-    <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: 0.9 }}>
-      {unions.map(union => {
-        const p1 = getMember(union.partner1);
-        const p2 = getMember(union.partner2);
-        if (!p1 || !p2) return null;
+  // Collect badge data for the overlay layer
+  const badgeData: { unionObj: Union; midX: number; midY: number }[] = [];
 
-        const [left, right] = p1.x < p2.x ? [p1, p2] : [p2, p1];
-        const leftAnchor = getAnchor(left, 'right');
-        const rightAnchor = getAnchor(right, 'left');
-        const unionLineY = (leftAnchor.y + rightAnchor.y) / 2;
-        const unionMidX = (leftAnchor.x + rightAnchor.x) / 2;
+  const linesContent = unions.map(union => {
+    const p1 = getMember(union.partner1);
+    const p2 = getMember(union.partner2);
+    if (!p1 || !p2) return null;
 
-        const childMembers = union.children
-          .map(getMember)
-          .filter((m): m is FamilyMember => !!m)
-          .sort((a, b) => a.x - b.x);
+    const [left, right] = p1.x < p2.x ? [p1, p2] : [p2, p1];
+    const leftAnchor = getAnchor(left, 'right');
+    const rightAnchor = getAnchor(right, 'left');
+    const unionLineY = (leftAnchor.y + rightAnchor.y) / 2;
+    const unionMidX = (leftAnchor.x + rightAnchor.x) / 2;
+
+    // Collect badge data
+    badgeData.push({ unionObj: union, midX: unionMidX, midY: unionLineY });
+
+    const childMembers = union.children
+      .map(getMember)
+      .filter((m): m is FamilyMember => !!m)
+      .sort((a, b) => a.x - b.x);
 
         if (childMembers.length === 0) {
           return (
@@ -209,13 +216,6 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
                 x1={leftAnchor.x} y1={leftAnchor.y}
                 x2={rightAnchor.x} y2={rightAnchor.y}
                 status={union.status}
-              />
-              <RelationshipBadge
-                union={union}
-                x={unionMidX}
-                y={unionLineY}
-                offsetForMark={union.status === 'divorced' || union.status === 'separated'}
-                onClick={() => console.log('Edit union', union.id)}
               />
             </g>
           );
@@ -255,13 +255,6 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
               x1={leftAnchor.x} y1={leftAnchor.y}
               x2={rightAnchor.x} y2={rightAnchor.y}
               status={union.status}
-            />
-            <RelationshipBadge
-              union={union}
-              x={unionMidX}
-              y={unionLineY}
-              offsetForMark={union.status === 'divorced' || union.status === 'separated'}
-              onClick={() => console.log('Edit union', union.id)}
             />
 
             {/* 2. Vertical stem: union midpoint → comb Y */}
@@ -353,8 +346,28 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
             })()}
           </g>
         );
-      })}
-    </svg>
+      });
+
+  return (
+    <>
+      {/* Structural lines layer — z-index 0 */}
+      <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: 0.9 }}>
+        {linesContent}
+      </svg>
+
+      {/* Union badges layer — z-index 60, above cards and emotional links */}
+      <svg className="absolute pointer-events-none" style={{ zIndex: 60, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
+        {badgeData.map(({ unionObj, midX, midY }) => (
+          <UnionBadge
+            key={`badge-${unionObj.id}`}
+            union={unionObj}
+            x={midX}
+            y={midY}
+            onClick={() => console.log('Edit union', unionObj.id)}
+          />
+        ))}
+      </svg>
+    </>
   );
 };
 
