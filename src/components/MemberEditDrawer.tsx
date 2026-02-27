@@ -259,15 +259,15 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <div className="flex flex-wrap gap-2">
                   <button type="button" onClick={() => setIsTransgender(!isTransgender)}
                     className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${isTransgender ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'}`}>
-                    🏳️‍⚧️ Transgenre
+                    Transgenre
                   </button>
                   <button type="button" onClick={() => { setIsGay(!isGay); if (!isGay) setIsBisexual(false); }}
                     className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${isGay ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'}`}>
-                    🏳️‍🌈 Homosexuel(le)
+                    Homosexuel(le)
                   </button>
                   <button type="button" onClick={() => { setIsBisexual(!isBisexual); if (!isBisexual) setIsGay(false); }}
                     className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${isBisexual ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'}`}>
-                    💜 Bisexuel(le)
+                    Bisexuel(le)
                   </button>
                 </div>
               </div>
@@ -486,9 +486,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   <div className="flex flex-col gap-1.5">
                     <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité & Orientation</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {isTransgender && <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/15 border border-primary/30 text-primary">🏳️‍⚧️ Transgenre</span>}
-                      {isGay && <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/15 border border-primary/30 text-primary">🏳️‍🌈 Homosexuel(le)</span>}
-                      {isBisexual && <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/15 border border-primary/30 text-primary">💜 Bisexuel(le)</span>}
+                      {isTransgender && <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/15 border border-primary/30 text-primary">Transgenre</span>}
+                      {isGay && <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/15 border border-primary/30 text-primary">Homosexuel(le)</span>}
+                      {isBisexual && <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/15 border border-primary/30 text-primary">Bisexuel(le)</span>}
                     </div>
                   </div>
                 </>
