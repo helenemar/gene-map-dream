@@ -931,6 +931,30 @@ const GenogramEditor: React.FC = () => {
                 {(() => {
                    // Build card rects for collision avoidance
                     const cardRects = members.map(m => ({ id: m.id, x: m.x, y: m.y, w: CARD_W, h: CARD_H }));
+
+                  // ── Corridor routing for long inter-generational links ──
+                  const CORRIDOR_THRESHOLD = 200; // Y-diff to trigger corridor
+                  const CORRIDOR_MARGIN = 60;     // Distance from tree edge
+                  const CORRIDOR_LANE_GAP = 20;   // Gap between parallel corridors
+
+                  // Compute tree bounds
+                  let treeMinX = Infinity, treeMaxX = -Infinity;
+                  for (const m of members) {
+                    treeMinX = Math.min(treeMinX, m.x);
+                    treeMaxX = Math.max(treeMaxX, m.x + CARD_W);
+                  }
+
+                  // Identify long links and assign corridor lanes
+                  interface CorridorInfo {
+                    side: 'left' | 'right';
+                    lane: number;
+                    waypoints: { x: number; y: number }[];
+                  }
+                  const corridorMap = new Map<number, CorridorInfo>();
+
+                  let leftLaneCount = 0;
+                  let rightLaneCount = 0;
+
                   const pairMap = new Map<string, number[]>();
                   emotionalLinks.forEach((link, i) => {
                     const key = [link.from, link.to].sort().join('|');
@@ -938,11 +962,56 @@ const GenogramEditor: React.FC = () => {
                     pairMap.get(key)!.push(i);
                   });
 
+                  emotionalLinks.forEach((link, idx) => {
+                    const from = members.find(m => m.id === link.from);
+                    const to = members.find(m => m.id === link.to);
+                    if (!from || !to) return;
+
+                    const yDiff = Math.abs(from.y - to.y);
+                    if (yDiff < CORRIDOR_THRESHOLD) return; // Short link → straight line
+
+                    // Determine corridor side: route through the closer side
+                    const avgX = (from.x + CARD_W / 2 + to.x + CARD_W / 2) / 2;
+                    const treeMid = (treeMinX + treeMaxX) / 2;
+                    const side: 'left' | 'right' = avgX < treeMid ? 'left' : 'right';
+
+                    let lane: number;
+                    if (side === 'left') {
+                      lane = leftLaneCount++;
+                    } else {
+                      lane = rightLaneCount++;
+                    }
+
+                    const corridorX = side === 'left'
+                      ? treeMinX - CORRIDOR_MARGIN - lane * CORRIDOR_LANE_GAP
+                      : treeMaxX + CORRIDOR_MARGIN + lane * CORRIDOR_LANE_GAP;
+
+                    // Anchor points on the card edges facing the corridor
+                    const fromAnchorX = side === 'left' ? from.x : from.x + CARD_W;
+                    const fromAnchorY = from.y + CARD_H / 2;
+                    const toAnchorX = side === 'left' ? to.x : to.x + CARD_W;
+                    const toAnchorY = to.y + CARD_H / 2;
+
+                    const waypoints = [
+                      { x: fromAnchorX, y: fromAnchorY },
+                      { x: corridorX, y: fromAnchorY },
+                      { x: corridorX, y: toAnchorY },
+                      { x: toAnchorX, y: toAnchorY },
+                    ];
+
+                    corridorMap.set(idx, { side, lane, waypoints });
+                  });
+
                   return emotionalLinks.map((link, globalIdx) => {
                     const from = members.find(m => m.id === link.from);
                     const to = members.find(m => m.id === link.to);
                     if (!from || !to) return null;
-                    const anchors = getEmotionalAnchors(from, to);
+
+                    const corridor = corridorMap.get(globalIdx);
+                    const anchors = corridor
+                      ? { x1: corridor.waypoints[0].x, y1: corridor.waypoints[0].y, x2: corridor.waypoints[corridor.waypoints.length - 1].x, y2: corridor.waypoints[corridor.waypoints.length - 1].y }
+                      : getEmotionalAnchors(from, to);
+
                     const key = [link.from, link.to].sort().join('|');
                     const group = pairMap.get(key)!;
                     const linkIndex = group.indexOf(globalIdx);
@@ -962,6 +1031,7 @@ const GenogramEditor: React.FC = () => {
                         dimmed={isDimmed}
                         searchHighlighted={isSearchHighlighted}
                         searchDimmed={isSearchDimmed}
+                        waypoints={corridor?.waypoints}
                         onClick={() => console.log('Edit emotional link', link.id)}
                       />
                     );

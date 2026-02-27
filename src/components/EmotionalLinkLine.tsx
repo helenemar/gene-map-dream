@@ -31,6 +31,8 @@ interface EmotionalLinkLineProps {
   searchHighlighted?: boolean;
   /** When true and not highlighted, heavy dim for search context */
   searchDimmed?: boolean;
+  /** Corridor waypoints for long inter-generational links (orthogonal routing) */
+  waypoints?: { x: number; y: number }[];
 }
 
 // ─── Core Bézier Math ───────────────────────────────────────────────
@@ -190,6 +192,99 @@ function arrowHead(
 
 // ─── Main Component ─────────────────────────────────────────────────
 
+// ─── Multi-segment (corridor) helpers ────────────────────────────────
+
+/** Build SVG path string through waypoints */
+function waypointsToPath(pts: { x: number; y: number }[]): string {
+  if (pts.length === 0) return '';
+  return pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+}
+
+/** Parallel polyline through waypoints at perpendicular offset */
+function parallelWaypoints(pts: { x: number; y: number }[], offset: number): string {
+  if (pts.length < 2) return waypointsToPath(pts);
+  const result: { x: number; y: number }[] = [];
+  for (let i = 0; i < pts.length; i++) {
+    // Use local segment direction for perpendicular
+    const prev = pts[Math.max(0, i - 1)];
+    const next = pts[Math.min(pts.length - 1, i + 1)];
+    const sdx = next.x - prev.x;
+    const sdy = next.y - prev.y;
+    const slen = Math.sqrt(sdx * sdx + sdy * sdy);
+    if (slen === 0) { result.push(pts[i]); continue; }
+    result.push({ x: pts[i].x + (-sdy / slen) * offset, y: pts[i].y + (sdx / slen) * offset });
+  }
+  return waypointsToPath(result);
+}
+
+/** Zigzag along waypoints */
+function zigzagWaypoints(pts: { x: number; y: number }[], amplitude: number, segCount: number): string {
+  if (pts.length < 2) return pts.map(p => `${p.x},${p.y}`).join(' ');
+  // Compute total length and sample points along the polyline
+  const lengths: number[] = [0];
+  for (let i = 1; i < pts.length; i++) {
+    lengths.push(lengths[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
+  }
+  const totalLen = lengths[lengths.length - 1];
+  if (totalLen === 0) return pts.map(p => `${p.x},${p.y}`).join(' ');
+
+  const result: string[] = [];
+  for (let si = 0; si <= segCount + 1; si++) {
+    const t = si / (segCount + 1);
+    const dist = t * totalLen;
+    // Find which segment this falls on
+    let segIdx = 0;
+    for (let i = 1; i < lengths.length; i++) {
+      if (lengths[i] >= dist) { segIdx = i - 1; break; }
+      if (i === lengths.length - 1) segIdx = i - 1;
+    }
+    const segLen = lengths[segIdx + 1] - lengths[segIdx];
+    const localT = segLen > 0 ? (dist - lengths[segIdx]) / segLen : 0;
+    const bx = pts[segIdx].x + (pts[segIdx + 1].x - pts[segIdx].x) * localT;
+    const by = pts[segIdx].y + (pts[segIdx + 1].y - pts[segIdx].y) * localT;
+
+    if (si === 0 || si === segCount + 1) {
+      result.push(`${bx},${by}`);
+    } else {
+      const sdx = pts[segIdx + 1].x - pts[segIdx].x;
+      const sdy = pts[segIdx + 1].y - pts[segIdx].y;
+      const slen = Math.sqrt(sdx * sdx + sdy * sdy);
+      if (slen === 0) { result.push(`${bx},${by}`); continue; }
+      const nx = -sdy / slen;
+      const ny = sdx / slen;
+      const dir = si % 2 === 1 ? 1 : -1;
+      result.push(`${bx + nx * amplitude * dir},${by + ny * amplitude * dir}`);
+    }
+  }
+  return result.join(' ');
+}
+
+/** Compute midpoint along a polyline */
+function waypointsMidpoint(pts: { x: number; y: number }[]): { x: number; y: number; ux: number; uy: number } {
+  if (pts.length < 2) return { x: pts[0]?.x ?? 0, y: pts[0]?.y ?? 0, ux: 1, uy: 0 };
+  const lengths: number[] = [0];
+  for (let i = 1; i < pts.length; i++) {
+    lengths.push(lengths[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
+  }
+  const half = lengths[lengths.length - 1] / 2;
+  for (let i = 1; i < lengths.length; i++) {
+    if (lengths[i] >= half) {
+      const segLen = lengths[i] - lengths[i - 1];
+      const t = segLen > 0 ? (half - lengths[i - 1]) / segLen : 0;
+      const dx = pts[i].x - pts[i - 1].x;
+      const dy = pts[i].y - pts[i - 1].y;
+      const len = Math.sqrt(dx * dx + dy * dy);
+      return {
+        x: pts[i - 1].x + dx * t,
+        y: pts[i - 1].y + dy * t,
+        ux: len > 0 ? dx / len : 1,
+        uy: len > 0 ? dy / len : 0,
+      };
+    }
+  }
+  return { x: pts[0].x, y: pts[0].y, ux: 1, uy: 0 };
+}
+
 const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   x1, y1, x2, y2, type, onClick,
   linkIndex = 0, linkCount = 1,
@@ -197,53 +292,48 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   dimmed = false,
   searchHighlighted = false,
   searchDimmed = false,
+  waypoints,
 }) => {
   const [hovered, setHovered] = useState(false);
 
-  const mainPath = `M ${x1} ${y1} L ${x2} ${y2}`;
+  // If waypoints provided, use corridor routing
+  const useCorridor = waypoints && waypoints.length >= 2;
+  const pts = useCorridor ? waypoints! : [{ x: x1, y: y1 }, { x: x2, y: y2 }];
+
+  const mainPath = waypointsToPath(pts);
   const segments = 16;
   const amp = 6;
 
-  // Straight-line helpers
+  // Straight-line helpers (for non-corridor or fallback)
   const dx = x2 - x1;
   const dy = y2 - y1;
   const dist = Math.sqrt(dx * dx + dy * dy);
   const ux = dist > 0 ? dx / dist : 1;
   const uy = dist > 0 ? dy / dist : 0;
-  const px = -uy; // perpendicular
+  const px = -uy;
   const py = ux;
 
-  const midX = (x1 + x2) / 2;
-  const midY = (y1 + y2) / 2;
+  const mid = waypointsMidpoint(pts);
+  const midX = mid.x;
+  const midY = mid.y;
 
-  function parallelLine(offset: number) {
-    return `M ${x1 + px * offset} ${y1 + py * offset} L ${x2 + px * offset} ${y2 + py * offset}`;
-  }
+  // Last segment direction for arrow heads
+  const lastPt = pts[pts.length - 1];
+  const prevPt = pts[pts.length - 2] || pts[0];
+  const lastDx = lastPt.x - prevPt.x;
+  const lastDy = lastPt.y - prevPt.y;
+  const lastLen = Math.sqrt(lastDx * lastDx + lastDy * lastDy);
+  const lastUx = lastLen > 0 ? lastDx / lastLen : 1;
+  const lastUy = lastLen > 0 ? lastDy / lastLen : 0;
 
-  function zigzagStraight(amplitude: number, segs: number, lineOffset = 0) {
-    const ox1 = x1 + px * lineOffset, oy1 = y1 + py * lineOffset;
-    const ox2 = x2 + px * lineOffset, oy2 = y2 + py * lineOffset;
-    const odx = ox2 - ox1, ody = oy2 - oy1;
-    const pts: string[] = [];
-    for (let i = 0; i <= segs + 1; i++) {
-      const t = i / (segs + 1);
-      const bx = ox1 + odx * t;
-      const by = oy1 + ody * t;
-      if (i === 0 || i === segs + 1) {
-        pts.push(`${bx},${by}`);
-      } else {
-        const dir = i % 2 === 1 ? 1 : -1;
-        pts.push(`${bx + px * amplitude * dir},${by + py * amplitude * dir}`);
-      }
-    }
-    return pts.join(' ');
-  }
-
-  function straightArrowHead(size: number, color: string) {
-    if (dist === 0) return null;
-    const left = { x: x2 - ux * size + px * size * 0.5, y: y2 - uy * size + py * size * 0.5 };
-    const right = { x: x2 - ux * size - px * size * 0.5, y: y2 - uy * size - py * size * 0.5 };
-    return <polygon points={`${x2},${y2} ${left.x},${left.y} ${right.x},${right.y}`} fill={color} />;
+  function corridorArrowHead(size: number, color: string) {
+    if (lastLen === 0) return null;
+    const lpx = -lastUy;
+    const lpy = lastUx;
+    const tip = lastPt;
+    const left = { x: tip.x - lastUx * size + lpx * size * 0.5, y: tip.y - lastUy * size + lpy * size * 0.5 };
+    const right = { x: tip.x - lastUx * size - lpx * size * 0.5, y: tip.y - lastUy * size - lpy * size * 0.5 };
+    return <polygon points={`${tip.x},${tip.y} ${left.x},${left.y} ${right.x},${right.y}`} fill={color} />;
   }
 
   const renderLine = () => {
@@ -251,8 +341,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       case 'fusional':
         return (
           <>
-            <path d={parallelLine(2)} fill="none" stroke="hsl(var(--link-fusional))" strokeWidth={1} />
-            <path d={parallelLine(-2)} fill="none" stroke="hsl(var(--link-fusional))" strokeWidth={1} />
+            <path d={parallelWaypoints(pts, 2)} fill="none" stroke="hsl(var(--link-fusional))" strokeWidth={1} />
+            <path d={parallelWaypoints(pts, -2)} fill="none" stroke="hsl(var(--link-fusional))" strokeWidth={1} />
           </>
         );
       case 'distant':
@@ -260,58 +350,58 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       case 'conflictual':
         return (
           <>
-            <path d={parallelLine(2.5)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={1} strokeDasharray="8 5" />
-            <path d={parallelLine(-2.5)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={1} strokeDasharray="8 5" />
+            <path d={parallelWaypoints(pts, 2.5)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={1} strokeDasharray="8 5" />
+            <path d={parallelWaypoints(pts, -2.5)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={1} strokeDasharray="8 5" />
           </>
         );
       case 'ambivalent':
         return (
           <>
             <path d={mainPath} fill="none" stroke="hsl(var(--link-ambivalent))" strokeWidth={1} />
-            <polyline points={zigzagStraight(amp, segments)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={1} />
+            <polyline points={zigzagWaypoints(pts, amp, segments)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={1} />
           </>
         );
       case 'cutoff': {
-        const barGap = 4;
         const barH = 10;
+        const mpx = -mid.uy;
+        const mpy = mid.ux;
+        const barGap = 4;
         return (
           <>
             <path d={mainPath} fill="none" stroke="hsl(var(--link-cutoff))" strokeWidth={1} strokeDasharray="4 3" />
             <line
-              x1={midX - ux * barGap + px * barH} y1={midY - uy * barGap + py * barH}
-              x2={midX - ux * barGap - px * barH} y2={midY - uy * barGap - py * barH}
+              x1={midX - mid.ux * barGap + mpx * barH} y1={midY - mid.uy * barGap + mpy * barH}
+              x2={midX - mid.ux * barGap - mpx * barH} y2={midY - mid.uy * barGap - mpy * barH}
               stroke="hsl(var(--link-cutoff))" strokeWidth={1.5} />
             <line
-              x1={midX + ux * barGap + px * barH} y1={midY + uy * barGap + py * barH}
-              x2={midX + ux * barGap - px * barH} y2={midY + uy * barGap - py * barH}
+              x1={midX + mid.ux * barGap + mpx * barH} y1={midY + mid.uy * barGap + mpy * barH}
+              x2={midX + mid.ux * barGap - mpx * barH} y2={midY + mid.uy * barGap - mpy * barH}
               stroke="hsl(var(--link-cutoff))" strokeWidth={1.5} />
           </>
         );
       }
       case 'violence':
-        return <polyline points={zigzagStraight(amp, segments)} fill="none" stroke="hsl(var(--link-violence))" strokeWidth={1} />;
+        return <polyline points={zigzagWaypoints(pts, amp, segments)} fill="none" stroke="hsl(var(--link-violence))" strokeWidth={1} />;
       case 'emotional_abuse':
         return (
           <>
-            <polyline points={zigzagStraight(amp * 0.8, segments, 0)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={1} />
-            <polyline points={zigzagStraight(amp * 0.8, segments, 5)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={1} />
-            <polyline points={zigzagStraight(amp * 0.8, segments, -5)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={1} />
+            <polyline points={zigzagWaypoints(pts, amp * 0.8, segments)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={1} />
+            <path d={parallelWaypoints(pts, 5)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={1} />
+            <path d={parallelWaypoints(pts, -5)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={1} />
           </>
         );
       case 'physical_violence':
         return (
           <>
             <path d={mainPath} fill="none" stroke="hsl(var(--link-physical-violence))" strokeWidth={1} />
-            <polyline points={zigzagStraight(amp, segments)} fill="none" stroke="hsl(var(--link-physical-violence))" strokeWidth={1} strokeOpacity={0.7} />
+            <polyline points={zigzagWaypoints(pts, amp, segments)} fill="none" stroke="hsl(var(--link-physical-violence))" strokeWidth={1} strokeOpacity={0.7} />
           </>
         );
       case 'sexual_abuse':
         return (
           <>
             {[-7, -2.5, 2.5, 7].map((off, i) => (
-              <polyline key={i}
-                points={zigzagStraight(amp * 0.7, segments, off)}
-                fill="none" stroke="hsl(var(--link-sexual-abuse))" strokeWidth={1} />
+              <path key={i} d={parallelWaypoints(pts, off)} fill="none" stroke="hsl(var(--link-sexual-abuse))" strokeWidth={1} />
             ))}
           </>
         );
@@ -319,12 +409,12 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
         return (
           <>
             <path d={mainPath} fill="none" stroke="hsl(var(--link-neglect))" strokeWidth={1} />
-            {straightArrowHead(8, 'hsl(var(--link-neglect))')}
+            {corridorArrowHead(8, 'hsl(var(--link-neglect))')}
           </>
         );
       case 'controlling': {
         const sq = 8;
-        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+        const angle = Math.atan2(mid.uy, mid.ux) * 180 / Math.PI;
         return (
           <>
             <path d={mainPath} fill="none" stroke="hsl(var(--link-controlling))" strokeWidth={1} />
@@ -337,7 +427,7 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
               stroke="hsl(var(--link-controlling))" strokeWidth={1} transform={`rotate(${angle}, ${midX}, ${midY})`} />
             <line x1={midX + sq * 0.6} y1={midY - sq * 0.6} x2={midX - sq * 0.6} y2={midY + sq * 0.6}
               stroke="hsl(var(--link-controlling))" strokeWidth={1} transform={`rotate(${angle}, ${midX}, ${midY})`} />
-            {straightArrowHead(8, 'hsl(var(--link-controlling))')}
+            {corridorArrowHead(8, 'hsl(var(--link-controlling))')}
           </>
         );
       }
@@ -345,9 +435,6 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
         return null;
     }
   };
-
-  const vizMidX = midX;
-  const vizMidY = midY;
 
   return (
     <g
@@ -358,8 +445,6 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
     >
       {/* Invisible fat hit area */}
       <path d={mainPath} fill="none" stroke="transparent" strokeWidth={20} />
-      {/* Bridge halo — removed for hollow/transparent look */}
-      {/* Glow filter for hover */}
       {hovered && (
         <defs>
           <filter id={`glow-${type}`} x="-20%" y="-20%" width="140%" height="140%">
@@ -371,7 +456,6 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
           </filter>
         </defs>
       )}
-      {/* Rendered line — thicker on hover with glow */}
       <g
         style={{
           opacity: searchHighlighted
@@ -388,9 +472,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       >
         {renderLine()}
       </g>
-      {/* Hover edit icon */}
       {hovered && (
-        <foreignObject x={vizMidX - 14} y={vizMidY - 14} width={28} height={28}>
+        <foreignObject x={midX - 14} y={midY - 14} width={28} height={28}>
           <div className="w-7 h-7 rounded-full bg-card border border-border shadow-soft flex items-center justify-center">
             <Pencil className="w-3.5 h-3.5 text-foreground" />
           </div>
