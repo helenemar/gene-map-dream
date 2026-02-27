@@ -158,8 +158,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
 
         <Separator />
 
-        <ScrollArea className="flex-1 px-6">
-          <div className="flex flex-col gap-5 py-5">
+        <ScrollArea className="flex-1 px-3">
+          <div className="flex flex-col gap-5 py-5 px-3">
             {/* ── Identité ── */}
             <div className="flex flex-col gap-2">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Genre</Label>
