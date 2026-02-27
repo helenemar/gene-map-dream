@@ -19,6 +19,7 @@ export interface FamilyMember {
   isPlaceholder?: boolean; // Auto-created empty partner placeholder
   twinGroup?: string;   // Shared ID among twins (e.g. "twin-1")
   twinType?: TwinType;  // monozygotic (identical) or dizygotic (fraternal)
+  notes?: string;       // Free-text clinical notes, indexed by search
 }
 
 export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed' | 'love_affair';
