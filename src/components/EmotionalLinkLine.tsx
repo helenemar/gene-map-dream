@@ -368,8 +368,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       {/* Rendered line — thicker on hover with glow */}
       <g
         style={{
-          opacity: dimmed ? 0.15 : (hovered ? 1 : 0.8),
-          strokeWidth: hovered ? 1.5 : undefined,
+          opacity: dimmed ? 0.1 : (hovered ? 0.9 : 0.55),
+          strokeWidth: hovered ? 1.2 : undefined,
           filter: hovered ? `url(#glow-${type})` : 'none',
         }}
         className="transition-all duration-150"
