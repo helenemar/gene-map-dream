@@ -109,7 +109,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       {/* Card body — fixed width, dots are INSIDE this relative container */}
       <div
         className={`
-          relative flex items-center gap-3 rounded-xl p-2 bg-card border transition-all
+          relative overflow-visible flex items-center gap-3 rounded-xl p-2 bg-card border transition-all
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
           ${borderClasses}
         `}
@@ -119,8 +119,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
         {showDots && CORNER_DOTS.map(({ side, className }) => (
           <div
             key={side}
-            className={`absolute ${className} w-3 h-3 rounded-full border-2 border-primary z-10 cursor-crosshair transition-all duration-150 ${
-              dotsFilled ? 'bg-primary scale-110' : 'bg-card hover:bg-primary/30'
+            className={`absolute ${className} w-4 h-4 rounded-full border-2 border-primary z-20 cursor-crosshair transition-all duration-150 shadow-md ${
+              dotsFilled ? 'bg-primary scale-125' : 'bg-card hover:bg-primary/30'
             }`}
             onMouseDown={(e) => handleDotClick(side, e)}
           />
