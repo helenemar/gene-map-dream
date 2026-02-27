@@ -151,6 +151,7 @@ const GenogramEditor: React.FC = () => {
     snapTargetId?: string;
   } | null>(null);
   const [linkModalTarget, setLinkModalTarget] = useState<{ fromId: string; toId: string } | null>(null);
+  const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   // ─── Persist positions to localStorage ───
@@ -1007,7 +1008,7 @@ const GenogramEditor: React.FC = () => {
                         dimmed={isDimmed}
                         searchHighlighted={isSearchHighlighted}
                         searchDimmed={isSearchDimmed}
-                        onClick={() => console.log('Edit emotional link', link.id)}
+                        onClick={() => setEditingLinkId(link.id)}
                       />
                     );
                   });
@@ -1100,6 +1101,25 @@ const GenogramEditor: React.FC = () => {
               setLinkModalTarget(null);
             }}
             onClose={() => setLinkModalTarget(null)}
+          />
+
+          {/* Edit existing emotional link modal */}
+          <LinkTypeModal
+            open={!!editingLinkId}
+            currentType={emotionalLinks.find(l => l.id === editingLinkId)?.type}
+            onSelect={(type: EmotionalLinkType) => {
+              if (editingLinkId) {
+                setEmotionalLinks(prev => prev.map(l => l.id === editingLinkId ? { ...l, type } : l));
+              }
+              setEditingLinkId(null);
+            }}
+            onDelete={() => {
+              if (editingLinkId) {
+                setEmotionalLinks(prev => prev.filter(l => l.id !== editingLinkId));
+              }
+              setEditingLinkId(null);
+            }}
+            onClose={() => setEditingLinkId(null)}
           />
 
           <UnionEditDrawer
