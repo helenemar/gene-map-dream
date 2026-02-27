@@ -4,8 +4,8 @@ import UnionBadge from './UnionBadge';
 
 const CARD_W = 220;
 const CARD_H = 64;
-const RAIL_OFFSET = 20;
-const JOG_OFFSET = 12; // Horizontal jog to route around crossings
+const CORRIDOR_GAP = 30; // Minimum vertical gap between comb corridors
+const CARD_CLEARANCE = 20; // Horizontal clearance around cards for rerouting
 
 interface FamilyLinkLinesProps {
   members: FamilyMember[];
@@ -23,6 +23,8 @@ const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') =
     case 'right': return { x: m.x + CARD_W, y: m.y + CARD_H / 2 };
   }
 };
+
+// ─── Union Line (horizontal couple connector) ────────────────────────
 
 const UnionLine: React.FC<{
   x1: number; y1: number; x2: number; y2: number;
@@ -51,7 +53,8 @@ const UnionLine: React.FC<{
   );
 };
 
-/** A horizontal segment for crossing detection */
+// ─── Segment types for global collision tracking ─────────────────────
+
 interface HSegment {
   unionId: string;
   y: number;
@@ -59,15 +62,23 @@ interface HSegment {
   xMax: number;
 }
 
-/**
- * Check if a vertical line at x from y1→y2 crosses a horizontal segment.
- * Returns the crossing Y values (sorted top to bottom).
- */
-function findCrossings(x: number, yTop: number, yBottom: number, segments: HSegment[], excludeUnionId: string): number[] {
+interface VSegment {
+  unionId: string;
+  x: number;
+  yMin: number;
+  yMax: number;
+}
+
+// ─── Collision queries ───────────────────────────────────────────────
+
+/** Find horizontal segments that a vertical line at X would cross */
+function findHCrossings(
+  x: number, yTop: number, yBottom: number,
+  hSegs: HSegment[], excludeId: string
+): number[] {
   const crossings: number[] = [];
-  for (const seg of segments) {
-    if (seg.unionId === excludeUnionId) continue;
-    // Does the vertical line at x pass through this horizontal segment?
+  for (const seg of hSegs) {
+    if (seg.unionId === excludeId) continue;
     if (x >= seg.xMin - 2 && x <= seg.xMax + 2 && seg.y > yTop + 2 && seg.y < yBottom - 2) {
       crossings.push(seg.y);
     }
@@ -75,43 +86,78 @@ function findCrossings(x: number, yTop: number, yBottom: number, segments: HSegm
   return crossings.sort((a, b) => a - b);
 }
 
-/**
- * Build a path that goes from (x, yTop) to (x, yBottom) but jogs around
- * any horizontal segments it would cross.
- */
-function buildAvoidingVerticalPath(
+/** Check if a vertical line at X from yTop→yBottom would overlap an existing vertical segment */
+function findVConflicts(
   x: number, yTop: number, yBottom: number,
-  crossings: number[], jogDir: number = 1
+  vSegs: VSegment[], excludeId: string, tolerance: number = 4
+): VSegment[] {
+  return vSegs.filter(seg => {
+    if (seg.unionId === excludeId) return false;
+    if (Math.abs(seg.x - x) > tolerance) return false;
+    // Y ranges overlap?
+    return seg.yMin < yBottom - 2 && seg.yMax > yTop + 2;
+  });
+}
+
+/**
+ * Build a strict Manhattan vertical path from (x, yTop) to (x, yBottom),
+ * rerouting around any horizontal segments it would cross.
+ * Uses a side-step approach: step left/right, go past the crossing, step back.
+ */
+function buildManhattanVerticalPath(
+  x: number, yTop: number, yBottom: number,
+  hCrossings: number[],
+  vSegs: VSegment[],
+  excludeId: string,
+  preferredDir: number = 1 // +1 = right, -1 = left
 ): string {
-  if (crossings.length === 0) {
+  if (hCrossings.length === 0) {
     return `M ${x} ${yTop} L ${x} ${yBottom}`;
   }
 
-  const jogX = x + JOG_OFFSET * jogDir;
+  // Find a clear X offset to reroute through
+  let offsetX = x + CARD_CLEARANCE * preferredDir;
+  // Check if that X is also occupied by a vertical segment
+  const vConflicts = findVConflicts(offsetX, yTop, yBottom, vSegs, excludeId, 6);
+  if (vConflicts.length > 0) {
+    // Try the other direction
+    offsetX = x - CARD_CLEARANCE * preferredDir;
+    const vConflicts2 = findVConflicts(offsetX, yTop, yBottom, vSegs, excludeId, 6);
+    if (vConflicts2.length > 0) {
+      // Double the offset
+      offsetX = x + CARD_CLEARANCE * 2 * preferredDir;
+    }
+  }
+
   let d = `M ${x} ${yTop}`;
-  
-  for (const crossY of crossings) {
-    // Go down to just above the crossing, jog right, go past, jog back
-    const above = crossY - 6;
-    const below = crossY + 6;
+
+  for (const crossY of hCrossings) {
+    const above = crossY - 8;
+    const below = crossY + 8;
+    // Manhattan detour: vertical → horizontal → vertical → horizontal → vertical
     d += ` L ${x} ${above}`;
-    d += ` L ${jogX} ${above}`;
-    d += ` L ${jogX} ${below}`;
+    d += ` L ${offsetX} ${above}`;
+    d += ` L ${offsetX} ${below}`;
     d += ` L ${x} ${below}`;
   }
-  
+
   d += ` L ${x} ${yBottom}`;
   return d;
 }
 
-const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, searchMatchedUnionIds, isSearchActive }) => {
+// ─── Main Component ─────────────────────────────────────────────────
+
+const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({
+  members, unions, onEditUnion, searchMatchedUnionIds, isSearchActive,
+}) => {
   const getMember = (id: string) => members.find(m => m.id === id);
 
   const stroke = 'hsl(var(--foreground))';
   const opacity = 0.3;
   const sw = 1.5;
 
-  // ═══ PHASE 1: Compute all union line positions & comb data ═══
+  // ═══ PHASE 1: Compute geometry for each union ═══
+
   interface UnionGeometry {
     union: Union;
     leftAnchor: { x: number; y: number };
@@ -131,7 +177,6 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
 
   const geometries: UnionGeometry[] = [];
 
-  // First pass: compute base comb Y for each union
   interface CombInfo {
     unionId: string;
     baseY: number;
@@ -208,58 +253,63 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
     });
   }
 
-  // Rail conflict resolution
+  // ═══ PHASE 2: Corridor allocation (non-overlapping comb Y) ═══
+
   combInfos.sort((a, b) => a.baseY - b.baseY);
   for (let i = 0; i < combInfos.length; i++) {
     for (let j = i + 1; j < combInfos.length; j++) {
       const a = combInfos[i];
       const b = combInfos[j];
-      if (Math.abs(a.finalY - b.finalY) < RAIL_OFFSET &&
-          a.leftX < b.rightX && b.leftX < a.rightX) {
-        b.finalY = a.finalY + RAIL_OFFSET;
+      // Check horizontal overlap between the two comb bars
+      if (a.leftX < b.rightX + 40 && b.leftX < a.rightX + 40) {
+        // They share horizontal space → need different Y corridors
+        if (Math.abs(a.finalY - b.finalY) < CORRIDOR_GAP) {
+          b.finalY = a.finalY + CORRIDOR_GAP;
+        }
       }
     }
   }
 
   const combYMap = new Map(combInfos.map(c => [c.unionId, c.finalY]));
 
-  // Update geometries with resolved combY
   for (const geo of geometries) {
     const resolved = combYMap.get(geo.union.id);
     if (resolved !== undefined) geo.combY = resolved;
   }
 
-  // ═══ PHASE 2: Collect ALL horizontal segments for crossing detection ═══
-  const allHSegments: HSegment[] = [];
+  // ═══ PHASE 3: Collect ALL segments for global collision detection ═══
+
+  const allHSegs: HSegment[] = [];
+  const allVSegs: VSegment[] = [];
 
   for (const geo of geometries) {
-    // Union line segment
-    allHSegments.push({
+    // Union line (horizontal)
+    allHSegs.push({
       unionId: geo.union.id,
       y: geo.unionLineY,
       xMin: Math.min(geo.leftAnchor.x, geo.rightAnchor.x),
       xMax: Math.max(geo.leftAnchor.x, geo.rightAnchor.x),
     });
 
-    // Comb bar segment (if has children and multiple drops)
-    if (geo.childMembers.length > 0 && geo.effectiveDropCount > 1) {
-      allHSegments.push({
+    if (geo.childMembers.length === 0) continue;
+
+    // Comb bar (horizontal)
+    if (geo.effectiveDropCount > 1) {
+      allHSegs.push({
         unionId: geo.union.id,
         y: geo.combY,
         xMin: geo.combLeftX,
         xMax: geo.combRightX,
       });
     }
-  }
 
-  // Also add comb-to-single-child horizontal connectors
-  for (const geo of geometries) {
-    if (geo.effectiveDropCount === 1 && geo.childMembers.length > 0) {
+    // Single-child horizontal connector
+    if (geo.effectiveDropCount === 1) {
       const dropX = geo.nonTwinCount === 1
         ? geo.childAnchors[geo.childMembers.findIndex(c => !c.twinGroup)]?.x ?? geo.unionMidX
         : geo.twinForkXs[0] ?? geo.unionMidX;
       if (Math.abs(geo.unionMidX - dropX) > 1) {
-        allHSegments.push({
+        allHSegs.push({
           unionId: geo.union.id,
           y: geo.combY,
           xMin: Math.min(geo.unionMidX, dropX),
@@ -267,9 +317,28 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
         });
       }
     }
+
+    // Vertical stem (union mid → comb)
+    allVSegs.push({
+      unionId: geo.union.id,
+      x: geo.unionMidX,
+      yMin: geo.unionLineY,
+      yMax: geo.combY,
+    });
+
+    // Vertical drops (comb → each child)
+    for (const anchor of geo.childAnchors) {
+      allVSegs.push({
+        unionId: geo.union.id,
+        x: anchor.x,
+        yMin: geo.combY,
+        yMax: anchor.y,
+      });
+    }
   }
 
-  // ═══ PHASE 3: Render with crossing avoidance ═══
+  // ═══ PHASE 4: Render with Manhattan routing ═══
+
   const badgeData: { unionObj: Union; midX: number; midY: number }[] = [];
 
   const linesContent = geometries.map((geo) => {
@@ -291,20 +360,22 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
       );
     }
 
-    // Stem: union midpoint → combY (with crossing avoidance)
-    const stemCrossings = findCrossings(unionMidX, unionLineY, combY, allHSegments, union.id);
-    const stemPath = buildAvoidingVerticalPath(unionMidX, unionLineY, combY, stemCrossings, 1);
+    // Stem: union midpoint → combY
+    const stemCrossings = findHCrossings(unionMidX, unionLineY, combY, allHSegs, union.id);
+    const stemPath = buildManhattanVerticalPath(
+      unionMidX, unionLineY, combY, stemCrossings, allVSegs, union.id, 1
+    );
 
     return (
       <g key={union.id}>
-        {/* 1. Union line (horizontal) */}
+        {/* 1. Union line (horizontal couple connector) */}
         <UnionLine
           x1={leftAnchor.x} y1={leftAnchor.y}
           x2={rightAnchor.x} y2={rightAnchor.y}
           status={union.status}
         />
 
-        {/* 2. Vertical stem with crossing avoidance */}
+        {/* 2. Vertical stem (Manhattan routed) */}
         <path d={stemPath} fill="none"
           stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} />
 
@@ -317,7 +388,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
           />
         )}
 
-        {/* 4. Vertical drops with crossing avoidance */}
+        {/* 4. Vertical drops (Manhattan routed, chronological L→R) */}
         {(() => {
           const elements: React.ReactNode[] = [];
           const processed = new Set<number>();
@@ -327,6 +398,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
 
             const child = childMembers[i];
             if (child.twinGroup) {
+              // Twin group: shared fork point
               const twinIndices = childMembers
                 .map((c, idx) => ({ c, idx }))
                 .filter(({ c }) => c.twinGroup === child.twinGroup)
@@ -338,14 +410,17 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
               const forkX = twinAnchorsLocal.reduce((sum, a) => sum + a.x, 0) / twinAnchorsLocal.length;
               const forkY = combY + 20;
 
-              // Stem from comb to fork (with avoidance)
-              const forkCrossings = findCrossings(forkX, combY, forkY, allHSegments, union.id);
-              const forkStemPath = buildAvoidingVerticalPath(forkX, combY, forkY, forkCrossings);
+              // Stem from comb to fork
+              const forkCrossings = findHCrossings(forkX, combY, forkY, allHSegs, union.id);
+              const forkStemPath = buildManhattanVerticalPath(
+                forkX, combY, forkY, forkCrossings, allVSegs, union.id
+              );
               elements.push(
                 <path key={`twin-stem-${child.twinGroup}`} d={forkStemPath} fill="none"
                   stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} />
               );
 
+              // Twin branches (diagonal lines are acceptable for twin notation)
               twinAnchorsLocal.forEach((anchor, ti) => {
                 elements.push(
                   <line key={`twin-branch-${child.twinGroup}-${ti}`}
@@ -360,10 +435,16 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
               const dropX = childAnchors[i].x;
               const dropYTop = combY;
               const dropYBottom = childAnchors[i].y;
-              const dropCrossings = findCrossings(dropX, dropYTop, dropYBottom, allHSegments, union.id);
-              // Alternate jog direction based on position relative to union center
+
+              // Find crossings for this drop
+              const dropCrossings = findHCrossings(dropX, dropYTop, dropYBottom, allHSegs, union.id);
+
+              // Direction preference: oldest children (left) jog left, youngest (right) jog right
               const jogDir = dropX >= unionMidX ? 1 : -1;
-              const dropPath = buildAvoidingVerticalPath(dropX, dropYTop, dropYBottom, dropCrossings, jogDir);
+
+              const dropPath = buildManhattanVerticalPath(
+                dropX, dropYTop, dropYBottom, dropCrossings, allVSegs, union.id, jogDir
+              );
               elements.push(
                 <path key={`drop-${i}`} d={dropPath} fill="none"
                   stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} />
@@ -373,7 +454,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
           return elements;
         })()}
 
-        {/* Single drop connector */}
+        {/* Single drop horizontal connector */}
         {effectiveDropCount === 1 && (() => {
           const dropX = nonTwinCount === 1
             ? childAnchors[childMembers.findIndex(c => !c.twinGroup)]?.x
