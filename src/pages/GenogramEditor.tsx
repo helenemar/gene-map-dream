@@ -16,6 +16,7 @@ import { SAMPLE_MEMBERS, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sa
 import { FamilyMember, EmotionalLink, EmotionalLinkType, Union, UnionStatus } from '@/types/genogram';
 import { computeAutoLayout } from '@/utils/autoLayout';
 import { useFamilySearch } from '@/hooks/useFamilySearch';
+import { computeEmotionalRoutes, LinkRoute } from '@/utils/emotionalLinkRouter';
 
 // Card bounding box
 const CARD_W = MEMBER_CARD_W;
@@ -929,19 +930,18 @@ const GenogramEditor: React.FC = () => {
               </defs>
               <g style={{ pointerEvents: 'auto' }} mask="url(#card-depth-mask)">
                 {(() => {
-                   // Build card rects for collision avoidance
-                    const cardRects = members.map(m => ({ id: m.id, x: m.x, y: m.y, w: CARD_W, h: CARD_H }));
+                  // Compute routed paths for all emotional links
+                  const emotionalRoutes = computeEmotionalRoutes(members, emotionalLinks);
                   const pairMap = new Map<string, number[]>();
                   emotionalLinks.forEach((link, i) => {
                     const key = [link.from, link.to].sort().join('|');
                     if (!pairMap.has(key)) pairMap.set(key, []);
                     pairMap.get(key)!.push(i);
                   });
+                  const cardRects = members.map(m => ({ id: m.id, x: m.x, y: m.y, w: CARD_W, h: CARD_H }));
                   return emotionalLinks.map((link, globalIdx) => {
-                    const from = members.find(m => m.id === link.from);
-                    const to = members.find(m => m.id === link.to);
-                    if (!from || !to) return null;
-                    const anchors = getEmotionalAnchors(from, to);
+                    const route = emotionalRoutes.get(link.id);
+                    if (!route) return null;
                     const key = [link.from, link.to].sort().join('|');
                     const group = pairMap.get(key)!;
                     const linkIndex = group.indexOf(globalIdx);
@@ -951,8 +951,8 @@ const GenogramEditor: React.FC = () => {
                     return (
                       <EmotionalLinkLine
                         key={link.id}
-                        x1={anchors.x1} y1={anchors.y1}
-                        x2={anchors.x2} y2={anchors.y2}
+                        x1={route.x1} y1={route.y1}
+                        x2={route.x2} y2={route.y2}
                         type={link.type}
                         linkIndex={linkIndex}
                         linkCount={group.length}
@@ -961,6 +961,7 @@ const GenogramEditor: React.FC = () => {
                         dimmed={isDimmed}
                         searchHighlighted={isSearchHighlighted}
                         searchDimmed={isSearchDimmed}
+                        curveControl={route.mx !== undefined ? { mx: route.mx, my: route.my! } : undefined}
                         onClick={() => console.log('Edit emotional link', link.id)}
                       />
                     );
