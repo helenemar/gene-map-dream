@@ -29,59 +29,6 @@ interface EditorSidebarProps {
   onToggleSoloEmotional: (type: EmotionalLinkType) => void;
 }
 
-/* ─── Family Link Status Icons (inline SVG for sidebar legend) ─── */
-const FamilyLinkIcon: React.FC<{ status: UnionStatus }> = ({ status }) => {
-  const s = 16;
-  const half = s / 2;
-  const stroke = 'currentColor';
-  const sw = 1.8;
-
-  switch (status) {
-    case 'married':
-      return (
-        <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} className="text-foreground/70">
-          <line x1={2} y1={half} x2={s - 2} y2={half} stroke={stroke} strokeWidth={2} />
-        </svg>
-      );
-    case 'common_law':
-      return (
-        <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} className="text-foreground/70">
-          <line x1={2} y1={half} x2={s - 2} y2={half} stroke={stroke} strokeWidth={1.5} strokeDasharray="4 3" />
-        </svg>
-      );
-    case 'divorced':
-      return (
-        <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} className="text-foreground/70">
-          <line x1={half - 3} y1={half + 4} x2={half + 1} y2={half - 4} stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <line x1={half - 1} y1={half + 4} x2={half + 3} y2={half - 4} stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-        </svg>
-      );
-    case 'separated':
-      return (
-        <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} className="text-foreground/70">
-          <line x1={half + 3} y1={half - 4} x2={half - 3} y2={half + 4} stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-        </svg>
-      );
-    case 'widowed':
-      return (
-        <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} className="text-foreground/70">
-          <line x1={half - 3} y1={half - 3} x2={half + 3} y2={half + 3} stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-          <line x1={half + 3} y1={half - 3} x2={half - 3} y2={half + 3} stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
-        </svg>
-      );
-    case 'love_affair':
-      return (
-        <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} className="text-foreground/70">
-          <path
-            d={`M ${half} ${half + 3} C ${half - 1} ${half + 1}, ${half - 4} ${half - 2}, ${half - 3} ${half - 3} C ${half - 2} ${half - 5}, ${half} ${half - 5}, ${half} ${half - 2} C ${half} ${half - 5}, ${half + 2} ${half - 5}, ${half + 3} ${half - 3} C ${half + 4} ${half - 2}, ${half + 1} ${half + 1}, ${half} ${half + 3} Z`}
-            fill="none" stroke={stroke} strokeWidth={1.2} strokeDasharray="2 1.5" strokeLinecap="round"
-          />
-        </svg>
-      );
-    default:
-      return null;
-  }
-};
 
 const EditorSidebar: React.FC<EditorSidebarProps> = ({
   members, unions, emotionalLinks, fileName,
@@ -168,16 +115,12 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
           <AccordionContent className="px-4 pb-3">
             <div className="space-y-1">
               {FAMILY_LINK_TYPES.map(link => {
-                const count = unionStatusCounts.get(link.id) ?? 0;
-                const isHighlighted = highlightedUnionStatus === link.id;
                 return (
                   <div
                     key={link.id}
                     className="flex items-center gap-2.5 text-sm py-1.5 px-1.5 -mx-1.5 rounded-md text-foreground/80"
                   >
-                    <div className="w-5 flex items-center justify-center shrink-0">
-                      <FamilyLinkIcon status={link.id} />
-                    </div>
+                    <FamilyLinkPreview status={link.id} width={48} height={20} />
                     <span className="flex-1">{link.label}</span>
                   </div>
                 );
