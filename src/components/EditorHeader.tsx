@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Search, Download, Share2, Undo2, Redo2, X, User, Briefcase, HeartPulse } from 'lucide-react';
+import { Search, Download, Share2, Undo2, Redo2, X, User, Briefcase, HeartPulse, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchSuggestion } from '@/hooks/useFamilySearch';
 
@@ -16,12 +16,14 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   name: <User className="w-3.5 h-3.5" />,
   profession: <Briefcase className="w-3.5 h-3.5" />,
   pathology: <HeartPulse className="w-3.5 h-3.5" />,
+  relation: <Link2 className="w-3.5 h-3.5" />,
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
   name: 'Nom',
   profession: 'Profession',
   pathology: 'Pathologie',
+  relation: 'Relations',
 };
 
 const EditorHeader: React.FC<EditorHeaderProps> = ({
@@ -126,9 +128,18 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                       onClick={() => handleSelect(item.value)}
                       className="flex items-center justify-between w-full px-3 py-2 hover:bg-accent/50 transition-colors text-left"
                     >
-                      <span className="text-sm text-foreground">{item.label}</span>
+                      <div className="flex items-center gap-2">
+                        {/* Color dot for relation category */}
+                        {item.color && (
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: item.color }}
+                          />
+                        )}
+                        <span className="text-sm text-foreground">{item.label}</span>
+                      </div>
                       <span className="text-[10px] text-muted-foreground/60">
-                        {item.count} membre{item.count !== 1 ? 's' : ''}
+                        {item.count} {category === 'relation' ? 'lien' : 'membre'}{item.count !== 1 ? 's' : ''}
                       </span>
                     </button>
                   ))}
