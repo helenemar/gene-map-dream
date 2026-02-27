@@ -36,6 +36,8 @@ interface MemberCardProps {
   searchDimmed?: boolean;
   /** Search: glowing when this card matches search */
   searchHighlighted?: boolean;
+  /** Presentation mode: hide controls, disable drag, click opens view */
+  presentationMode?: boolean;
   onSelect?: (id: string) => void;
   onDragStart?: (id: string, e: React.MouseEvent) => void;
   onCreateRelated?: (id: string, relationship: RelationshipChoice) => void;
@@ -65,6 +67,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   isFadingOut = false,
   searchDimmed = false,
   searchHighlighted = false,
+  presentationMode = false,
   onSelect,
   onDragStart,
   onCreateRelated,
@@ -87,7 +90,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
     isSelected && state === 'default' ? 'selected' : state;
 
   const isHighlighted = activeState === 'hover' || activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget;
-  const showDots = activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget;
+  const showDots = !presentationMode && (activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget);
   const dotsFilled = activeState === 'anchor-active';
 
   // Border & ring logic
@@ -198,7 +201,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         </div>
       </div>
 
-      {activeState === 'selected' && (
+      {activeState === 'selected' && !presentationMode && (
         <TooltipProvider delayDuration={300}>
           <div className="flex items-center gap-2 justify-center mt-2">
             <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)}>
@@ -237,7 +240,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       )}
 
       {/* Action menu — State: Anchor-Active */}
-      {activeState === 'anchor-active' && (
+      {activeState === 'anchor-active' && !presentationMode && (
         <div className="flex items-center gap-2 justify-center mt-2">
           <button
             onMouseDown={(e) => {
@@ -284,10 +287,12 @@ const MemberCard: React.FC<MemberCardProps> = ({
       style={{ zIndex: isFadingOut ? 5 : 10, pointerEvents: isFadingOut ? 'none' : 'auto' }}
       onMouseDown={(e) => {
         e.stopPropagation();
-        onDragStart?.(member.id, e);
+        if (!presentationMode) onDragStart?.(member.id, e);
       }}
       onClick={() => {
-        if (isPlaceholder) {
+        if (presentationMode) {
+          if (!isPlaceholder) onView?.(member.id);
+        } else if (isPlaceholder) {
           onEdit?.(member.id);
         } else {
           onSelect?.(member.id);

@@ -134,6 +134,7 @@ const GenogramEditor: React.FC = () => {
   const [highlightedUnionStatus, setHighlightedUnionStatus] = useState<UnionStatus | null>(null);
   const [soloEmotionalType, setSoloEmotionalType] = useState<EmotionalLinkType | null>(null);
   const [zoom, setZoom] = useState(1);
+  const [presentationMode, setPresentationMode] = useState(false);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [isSpaceDown, setIsSpaceDown] = useState(false);
@@ -866,20 +867,24 @@ const GenogramEditor: React.FC = () => {
   }, [zoom, pan]);
 
   // ─── Dynamic cursor ───
-  const cursorClass = linkDrag
-    ? 'cursor-crosshair'
-    : isSpaceDown || isPanning
-      ? (isPanning ? 'cursor-grabbing' : 'cursor-grab')
-      : 'cursor-default';
+  const cursorClass = presentationMode
+    ? 'cursor-default'
+    : linkDrag
+      ? 'cursor-crosshair'
+      : isSpaceDown || isPanning
+        ? (isPanning ? 'cursor-grabbing' : 'cursor-grab')
+        : 'cursor-default';
 
   // ─── Dynamic dot grid background style ───
   const dotSize = DOT_SPACING * zoom;
-  const dotGridStyle: React.CSSProperties = {
-    backgroundImage: `radial-gradient(circle, hsl(var(--canvas-dot)) ${Math.max(0.5, zoom * 1)}px, transparent ${Math.max(0.5, zoom * 1)}px)`,
-    backgroundSize: `${dotSize}px ${dotSize}px`,
-    backgroundPosition: `${pan.x % dotSize}px ${pan.y % dotSize}px`,
-    backgroundColor: 'hsl(var(--canvas-bg))',
-  };
+  const dotGridStyle: React.CSSProperties = presentationMode
+    ? { backgroundColor: 'hsl(var(--canvas-bg))' }
+    : {
+        backgroundImage: `radial-gradient(circle, hsl(var(--canvas-dot)) ${Math.max(0.5, zoom * 1)}px, transparent ${Math.max(0.5, zoom * 1)}px)`,
+        backgroundSize: `${dotSize}px ${dotSize}px`,
+        backgroundPosition: `${pan.x % dotSize}px ${pan.y % dotSize}px`,
+        backgroundColor: 'hsl(var(--canvas-bg))',
+      };
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -892,17 +897,19 @@ const GenogramEditor: React.FC = () => {
         matchCount={search.matchedMemberIds.size + search.matchedEmotionalLinkIds.size}
       />
       <div className="flex flex-1 overflow-hidden">
-        <EditorSidebar
-          members={members}
-          unions={unions}
-          emotionalLinks={emotionalLinks}
-          fileName="Nouveau fichier"
-          onFocusMember={handleFocusMember}
-          highlightedUnionStatus={highlightedUnionStatus}
-          onHighlightUnionStatus={setHighlightedUnionStatus}
-          soloEmotionalType={soloEmotionalType}
-          onToggleSoloEmotional={handleToggleSoloEmotional}
-        />
+        {!presentationMode && (
+          <EditorSidebar
+            members={members}
+            unions={unions}
+            emotionalLinks={emotionalLinks}
+            fileName="Nouveau fichier"
+            onFocusMember={handleFocusMember}
+            highlightedUnionStatus={highlightedUnionStatus}
+            onHighlightUnionStatus={setHighlightedUnionStatus}
+            soloEmotionalType={soloEmotionalType}
+            onToggleSoloEmotional={handleToggleSoloEmotional}
+          />
+        )}
 
         {/* Canvas */}
         <div
@@ -925,7 +932,7 @@ const GenogramEditor: React.FC = () => {
           >
             <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} searchMatchedUnionIds={search.matchedUnionIds} isSearchActive={search.isActive} highlightedUnionStatus={highlightedUnionStatus} />
             {/* All children go through unions now */}
-            <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: (search.isActive && search.matchedEmotionalLinkIds.size === 0) ? 0.1 : 1, transition: 'opacity 0.3s' }}>
+            <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: presentationMode ? 1 : (search.isActive && search.matchedEmotionalLinkIds.size === 0) ? 0.1 : 1, transition: 'opacity 0.3s' }}>
               {/* Over-card transparency mask: full opacity in void, reduced over cards & union badges */}
               <defs>
                 <mask id="card-depth-mask">
@@ -1019,6 +1026,7 @@ const GenogramEditor: React.FC = () => {
                 isFadingOut={fadingOutIds.has(member.id)}
                 searchDimmed={search.isActive && !search.matchedMemberIds.has(member.id)}
                 searchHighlighted={search.isActive && search.matchedMemberIds.has(member.id)}
+                presentationMode={presentationMode}
                 onSelect={handleSelect}
                 onDragStart={handleDragStart}
                 onCreateRelated={handleCreateRelated}
@@ -1135,8 +1143,14 @@ const GenogramEditor: React.FC = () => {
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
             onFitToScreen={handleFitToScreen}
-            onAutoLayout={handleAutoLayout}
+            onAutoLayout={presentationMode ? undefined : handleAutoLayout}
             zoom={zoom}
+            presentationMode={presentationMode}
+            onTogglePresentation={() => {
+              setPresentationMode(prev => !prev);
+              setSelectedMember(null);
+              setAnchorActiveMember(null);
+            }}
           />
         </div>
       </div>
