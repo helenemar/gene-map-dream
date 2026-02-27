@@ -20,7 +20,7 @@ export interface FamilyMember {
   twinType?: TwinType;  // monozygotic (identical) or dizygotic (fraternal)
 }
 
-export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed';
+export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed' | 'love_affair';
 
 /**
  * A Union represents a couple relationship between two members.
@@ -82,6 +82,7 @@ export const FAMILY_LINK_TYPES: { id: UnionStatus; label: string; icon: string }
   { id: 'separated', label: 'Séparation', icon: '∕' },
   { id: 'divorced', label: 'Divorce', icon: '⊘' },
   { id: 'widowed', label: 'Veuvage', icon: '✕' },
+  { id: 'love_affair', label: 'Liaison', icon: '♡' },
 ];
 
 export const EMOTIONAL_LINK_TYPES: { id: EmotionalLinkType; label: string; color: string }[] = [

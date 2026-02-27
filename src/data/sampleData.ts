@@ -89,7 +89,7 @@ export const SAMPLE_UNIONS: Union[] = [
   // Gen 0 → Gen 1
   {
     id: 'u-gp', partner1: 'gp-m', partner2: 'gp-f',
-    status: 'widowed', marriageYear: 1968,
+    status: 'widowed', marriageYear: 1968, divorceYear: 2020,
     children: ['p1', 'p2'],
   },
   // Gen 1 → Gen 2 (Philippe)
