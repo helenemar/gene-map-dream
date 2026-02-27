@@ -227,7 +227,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
                   <Eye className="w-4 h-4 text-foreground" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom"><span className="text-xs">Voir la fiche</span></TooltipContent>
+              <TooltipContent side="top" sideOffset={8} align="center"><span className="text-xs">Voir la fiche</span></TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -238,7 +238,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
                   <PencilLine className="w-4 h-4 text-foreground" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom"><span className="text-xs">Modifier</span></TooltipContent>
+              <TooltipContent side="top" sideOffset={8} align="center"><span className="text-xs">Modifier</span></TooltipContent>
             </Tooltip>
           </motion.div>
         </TooltipProvider>
