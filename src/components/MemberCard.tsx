@@ -4,7 +4,10 @@ import { FamilyMember, PATHOLOGIES } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
 import { Plus, Pencil, Link } from 'lucide-react';
 
-export type MemberCardState = 'default' | 'hover' | 'edition' | 'linkable';
+export type MemberCardState = 'default' | 'hover' | 'edition';
+
+/** Fixed card width — must match CARD_W in GenogramEditor */
+export const MEMBER_CARD_W = 250;
 
 interface MemberCardProps {
   member: FamilyMember;
@@ -14,11 +17,14 @@ interface MemberCardProps {
   state?: MemberCardState;
   /** When true, renders inline (no absolute positioning or motion) for use in the Design System */
   static?: boolean;
+  /** Highlight when a link drag hovers over this card */
+  isLinkTarget?: boolean;
   onSelect?: (id: string) => void;
   onDragStart?: (id: string, e: React.MouseEvent) => void;
   onCreateRelated?: (id: string) => void;
   onEdit?: (id: string) => void;
   onHover?: (id: string | null) => void;
+  onLinkDragStart?: (id: string, e: React.MouseEvent) => void;
 }
 
 const MemberCard: React.FC<MemberCardProps> = ({
@@ -28,21 +34,22 @@ const MemberCard: React.FC<MemberCardProps> = ({
   isColliding = false,
   state = 'default',
   static: isStatic = false,
+  isLinkTarget = false,
   onSelect,
   onDragStart,
   onCreateRelated,
   onEdit,
   onHover,
+  onLinkDragStart,
 }) => {
   const isDeceased = !!member.deathYear;
   const memberPathologies = PATHOLOGIES.filter(p => member.pathologies.includes(p.id));
 
   const activeState = isSelected && state === 'default' ? 'hover' : state;
 
-  const showRing = activeState === 'hover' || activeState === 'edition' || activeState === 'linkable';
-  const showAnchors = activeState === 'edition' || activeState === 'linkable';
+  const showRing = activeState === 'hover' || activeState === 'edition' || isLinkTarget;
+  const showAnchors = activeState === 'edition';
   const showActions = activeState === 'edition';
-  const showLinkIcon = activeState === 'linkable';
 
   const cardContent = (
     <>
@@ -56,12 +63,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
         </>
       )}
 
-      {/* Card body */}
+      {/* Card body — fixed width */}
       <div
         className={`
           relative flex items-center gap-3 rounded-xl p-2 bg-card border shadow-card transition-all ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
-          ${isColliding ? 'border-destructive ring-2 ring-destructive/30' : showRing ? 'border-primary ring-2 ring-primary/30' : 'border-border'}
+          ${isColliding ? 'border-destructive ring-2 ring-destructive/30' : isLinkTarget ? 'border-primary ring-2 ring-primary/40' : showRing ? 'border-primary ring-2 ring-primary/30' : 'border-border'}
         `}
+        style={{ width: MEMBER_CARD_W }}
       >
         {/* Icon with pathology fills */}
         <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
@@ -77,26 +85,19 @@ const MemberCard: React.FC<MemberCardProps> = ({
           />
         </div>
 
-        {/* Info */}
-        <div className="whitespace-nowrap">
+        {/* Info — overflow ellipsis */}
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-6">
-            <span className="font-semibold text-sm text-foreground">{member.firstName}</span>
-            <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+            <span className="font-semibold text-sm text-foreground truncate">{member.firstName}</span>
+            <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">
               {member.age} ans
             </span>
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-muted-foreground truncate">
             {member.birthYear}{member.deathYear ? ` - ${member.deathYear}` : ' -'}
           </div>
-          <div className="text-xs text-muted-foreground">{member.profession}</div>
+          <div className="text-xs text-muted-foreground truncate">{member.profession}</div>
         </div>
-
-        {/* Linkable icon */}
-        {showLinkIcon && (
-          <div className="ml-1 w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0">
-            <Link className="w-3.5 h-3.5 text-muted-foreground" />
-          </div>
-        )}
       </div>
 
       {/* Floating action buttons (Edition state) */}
@@ -107,7 +108,15 @@ const MemberCard: React.FC<MemberCardProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
-            Create related member
+            Créer un membre
+          </button>
+          <button
+            onMouseDown={(e) => { e.stopPropagation(); onLinkDragStart?.(member.id, e); }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border text-foreground text-xs font-semibold shadow-soft hover:bg-accent transition-colors cursor-crosshair"
+            title="Maintenir et glisser vers une autre carte"
+          >
+            <Link className="w-3.5 h-3.5" />
+            Créer un lien
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onEdit?.(member.id); }}

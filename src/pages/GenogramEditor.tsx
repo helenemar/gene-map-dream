@@ -2,17 +2,18 @@ import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import EditorHeader from '@/components/EditorHeader';
 import EditorSidebar from '@/components/EditorSidebar';
 import MemberCard from '@/components/MemberCard';
+import { MEMBER_CARD_W } from '@/components/MemberCard';
 import FamilyLinkLines from '@/components/FamilyLinkLines';
 import EmotionalLinkLine from '@/components/EmotionalLinkLine';
+import ElasticLinkLine from '@/components/ElasticLinkLine';
+import LinkTypeModal from '@/components/LinkTypeModal';
 import FloatingControls from '@/components/FloatingControls';
 import { SAMPLE_MEMBERS, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sampleData';
-import { FamilyMember } from '@/types/genogram';
+import { FamilyMember, EmotionalLink, EmotionalLinkType } from '@/types/genogram';
 import { computeAutoLayout } from '@/utils/autoLayout';
 
-type EditorMode = 'select' | 'link';
-
 // Card bounding box
-const CARD_W = 186;
+const CARD_W = MEMBER_CARD_W;
 const CARD_H = 64;
 const MARGIN = 5;
 const MIN_ZOOM = 0.15;
@@ -103,7 +104,7 @@ const GenogramEditor: React.FC = () => {
   });
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
-  const [mode, setMode] = useState<EditorMode>('select');
+  const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(SAMPLE_EMOTIONAL_LINKS);
   const [isAnimating, setIsAnimating] = useState(false);
   const [snapToGrid, setSnapToGrid] = useState(false);
   const [zoom, setZoom] = useState(1);
@@ -113,6 +114,14 @@ const GenogramEditor: React.FC = () => {
   const [dragInfo, setDragInfo] = useState<{
     id: string; startX: number; startY: number; memberX: number; memberY: number;
   } | null>(null);
+
+  // Link drag state
+  const [linkDrag, setLinkDrag] = useState<{
+    fromId: string;
+    startX: number; startY: number; // world-space origin (center of source card)
+    cursorX: number; cursorY: number; // world-space current cursor
+  } | null>(null);
+  const [linkModalTarget, setLinkModalTarget] = useState<{ fromId: string; toId: string } | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   // ─── Persist positions to localStorage ───
@@ -202,12 +211,21 @@ const GenogramEditor: React.FC = () => {
   }, [members, isSpaceDown]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    // Link drag in progress — update cursor position in world space
+    if (linkDrag) {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const cursorX = (e.clientX - rect.left - pan.x) / zoom;
+      const cursorY = (e.clientY - rect.top - pan.y) / zoom;
+      setLinkDrag(prev => prev ? { ...prev, cursorX, cursorY } : null);
+      return;
+    }
     if (dragInfo) {
       const dx = (e.clientX - dragInfo.startX) / zoom;
       const dy = (e.clientY - dragInfo.startY) / zoom;
       let newX = dragInfo.memberX + dx;
       let newY = dragInfo.memberY + dy;
-      // Live snap while dragging
       if (snapToGrid) {
         newX = Math.round(newX / SNAP_GRID) * SNAP_GRID;
         newY = Math.round(newY / SNAP_GRID) * SNAP_GRID;
@@ -218,9 +236,28 @@ const GenogramEditor: React.FC = () => {
     } else if (isPanning) {
       setPan(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }));
     }
-  }, [dragInfo, isPanning, zoom, snapToGrid]);
+  }, [dragInfo, linkDrag, isPanning, zoom, pan, snapToGrid]);
 
-  const handleMouseUp = useCallback(() => {
+  const handleMouseUp = useCallback((e: React.MouseEvent) => {
+    // Link drag release — find target card under cursor
+    if (linkDrag) {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const worldX = (e.clientX - rect.left - pan.x) / zoom;
+        const worldY = (e.clientY - rect.top - pan.y) / zoom;
+        const target = members.find(m =>
+          m.id !== linkDrag.fromId &&
+          worldX >= m.x && worldX <= m.x + CARD_W &&
+          worldY >= m.y && worldY <= m.y + CARD_H
+        );
+        if (target) {
+          setLinkModalTarget({ fromId: linkDrag.fromId, toId: target.id });
+        }
+      }
+      setLinkDrag(null);
+      return;
+    }
     // Snap on release if enabled
     if (dragInfo && snapToGrid) {
       setMembers(prev => prev.map(m =>
@@ -231,7 +268,7 @@ const GenogramEditor: React.FC = () => {
     }
     setDragInfo(null);
     setIsPanning(false);
-  }, [dragInfo, snapToGrid]);
+  }, [dragInfo, linkDrag, snapToGrid, members, pan, zoom]);
 
   // ─── Canvas mouse down: space+click or middle-click = pan, else deselect ───
   const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
@@ -259,16 +296,10 @@ const GenogramEditor: React.FC = () => {
   }, []);
 
   const getMemberState = useCallback((memberId: string) => {
-    if (mode === 'link') return 'linkable';
     if (selectedMember === memberId) return 'edition';
     if (hoveredMember === memberId) return 'hover';
     return 'default';
-  }, [mode, selectedMember, hoveredMember]);
-
-  const handleToggleMode = useCallback(() => {
-    setMode(prev => prev === 'select' ? 'link' : 'select');
-    setSelectedMember(null);
-  }, []);
+  }, [selectedMember, hoveredMember]);
 
   const handleCreateRelated = useCallback((id: string) => {
     console.log('Create related member for', id);
@@ -277,6 +308,22 @@ const GenogramEditor: React.FC = () => {
   const handleEdit = useCallback((id: string) => {
     console.log('Edit member', id);
   }, []);
+
+  // ─── Link drag handlers ───
+  const handleLinkDragStart = useCallback((fromId: string, e: React.MouseEvent) => {
+    const member = members.find(m => m.id === fromId);
+    if (!member) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    // Source anchor = center of card in world space
+    const cx = member.x + CARD_W / 2;
+    const cy = member.y + CARD_H / 2;
+    // Cursor in world space
+    const cursorWorldX = (e.clientX - rect.left - pan.x) / zoom;
+    const cursorWorldY = (e.clientY - rect.top - pan.y) / zoom;
+    setLinkDrag({ fromId, startX: cx, startY: cy, cursorX: cursorWorldX, cursorY: cursorWorldY });
+  }, [members, pan, zoom]);
 
 
   // ─── Fit to screen: compute bounding box of all members and center ───
@@ -312,7 +359,7 @@ const GenogramEditor: React.FC = () => {
 
   // ─── Auto-layout: reorganize tree ───
   const handleAutoLayout = useCallback(() => {
-    const result = computeAutoLayout(members, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS);
+    const result = computeAutoLayout(members, SAMPLE_UNIONS, emotionalLinks);
     setIsAnimating(true);
     setMembers(prev => prev.map(m => {
       const pos = result.positions.get(m.id);
@@ -322,7 +369,7 @@ const GenogramEditor: React.FC = () => {
       setIsAnimating(false);
       handleFitToScreen();
     }, 900); // Match spring animation duration
-  }, [members, handleFitToScreen]);
+  }, [members, emotionalLinks, handleFitToScreen]);
 
   // ─── Button zoom (centered on viewport center) ───
   const handleZoomIn = useCallback(() => {
@@ -352,9 +399,11 @@ const GenogramEditor: React.FC = () => {
   }, [zoom, pan]);
 
   // ─── Dynamic cursor ───
-  const cursorClass = isSpaceDown || isPanning
-    ? (isPanning ? 'cursor-grabbing' : 'cursor-grab')
-    : 'cursor-default';
+  const cursorClass = linkDrag
+    ? 'cursor-crosshair'
+    : isSpaceDown || isPanning
+      ? (isPanning ? 'cursor-grabbing' : 'cursor-grab')
+      : 'cursor-default';
 
   // ─── Dynamic dot grid background style ───
   const dotSize = DOT_SPACING * zoom;
@@ -396,15 +445,14 @@ const GenogramEditor: React.FC = () => {
               <g style={{ pointerEvents: 'auto' }}>
                 {(() => {
                   // Build card rects for collision avoidance
-                  const cardRects = members.map(m => ({ id: m.id, x: m.x, y: m.y, w: CARD_W, h: CARD_H }));
-                  // Group links by pair for "onion" offset
+                   const cardRects = members.map(m => ({ id: m.id, x: m.x, y: m.y, w: CARD_W, h: CARD_H }));
                   const pairMap = new Map<string, number[]>();
-                  SAMPLE_EMOTIONAL_LINKS.forEach((link, i) => {
+                  emotionalLinks.forEach((link, i) => {
                     const key = [link.from, link.to].sort().join('|');
                     if (!pairMap.has(key)) pairMap.set(key, []);
                     pairMap.get(key)!.push(i);
                   });
-                  return SAMPLE_EMOTIONAL_LINKS.map((link, globalIdx) => {
+                  return emotionalLinks.map((link, globalIdx) => {
                     const from = members.find(m => m.id === link.from);
                     const to = members.find(m => m.id === link.to);
                     if (!from || !to) return null;
@@ -437,14 +485,41 @@ const GenogramEditor: React.FC = () => {
                 isAnimating={isAnimating}
                 isColliding={collisions.has(member.id)}
                 state={getMemberState(member.id)}
+                isLinkTarget={!!linkDrag && linkDrag.fromId !== member.id}
                 onSelect={handleSelect}
                 onDragStart={handleDragStart}
                 onCreateRelated={handleCreateRelated}
                 onEdit={handleEdit}
                 onHover={setHoveredMember}
+                onLinkDragStart={handleLinkDragStart}
               />
             ))}
+            {/* Elastic link line while dragging */}
+            {linkDrag && (
+              <ElasticLinkLine
+                x1={linkDrag.startX} y1={linkDrag.startY}
+                x2={linkDrag.cursorX} y2={linkDrag.cursorY}
+              />
+            )}
           </div>
+
+          {/* Link type selection modal */}
+          <LinkTypeModal
+            open={!!linkModalTarget}
+            onSelect={(type: EmotionalLinkType) => {
+              if (linkModalTarget) {
+                const newLink: EmotionalLink = {
+                  id: `el-${Date.now()}`,
+                  from: linkModalTarget.fromId,
+                  to: linkModalTarget.toId,
+                  type,
+                };
+                setEmotionalLinks(prev => [...prev, newLink]);
+              }
+              setLinkModalTarget(null);
+            }}
+            onClose={() => setLinkModalTarget(null)}
+          />
 
           <FloatingControls
             onZoomIn={handleZoomIn}
@@ -452,8 +527,6 @@ const GenogramEditor: React.FC = () => {
             onFitToScreen={handleFitToScreen}
             onAutoLayout={handleAutoLayout}
             zoom={zoom}
-            mode={mode}
-            onToggleMode={handleToggleMode}
             snapToGrid={snapToGrid}
             onToggleSnap={() => setSnapToGrid(prev => !prev)}
           />
