@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Search, Download, Share2, Undo2, Redo2, X, User, Briefcase, HeartPulse, Link2 } from 'lucide-react';
+import { Search, Download, Share2, Undo2, Redo2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { SearchSuggestion } from '@/hooks/useFamilySearch';
 import gogyIcon from '@/assets/genogy-icon.svg';
 
@@ -15,6 +16,8 @@ interface EditorHeaderProps {
   onRedo: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  onExportPng?: () => void;
+  onExportSvg?: () => void;
 }
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -42,6 +45,8 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   onRedo,
   canUndo,
   canRedo,
+  onExportPng,
+  onExportSvg,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -169,10 +174,24 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" className="gap-2 rounded-full text-xs">
-          <Download className="w-3.5 h-3.5" />
-          Exporter en PDF
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-2 rounded-full text-xs">
+              <Download className="w-3.5 h-3.5" />
+              Exporter
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-[160px]">
+            <DropdownMenuItem onClick={onExportPng} className="gap-2 cursor-pointer">
+              <Image className="w-4 h-4" />
+              Exporter en PNG
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onExportSvg} className="gap-2 cursor-pointer">
+              <FileCode className="w-4 h-4" />
+              Exporter en SVG
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button variant="brand" size="sm" className="gap-2 text-xs">
           <Share2 className="w-3.5 h-3.5" />
           Partager
