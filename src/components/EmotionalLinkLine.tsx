@@ -25,6 +25,8 @@ interface EmotionalLinkLineProps {
   /** IDs of the two connected members (to exclude from collision) */
   excludeIds?: [string, string];
   onClick?: () => void;
+  /** When true, dim this link (card hover mode) */
+  dimmed?: boolean;
 }
 
 // ─── Core Bézier Math ───────────────────────────────────────────────
@@ -188,6 +190,7 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   x1, y1, x2, y2, type, onClick,
   linkIndex = 0, linkCount = 1,
   cardRects = [], excludeIds = ['', ''],
+  dimmed = false,
 }) => {
   const [hovered, setHovered] = useState(false);
 
@@ -365,7 +368,7 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       {/* Rendered line — thicker on hover with glow */}
       <g
         style={{
-          opacity: hovered ? 1 : 0.8,
+          opacity: dimmed ? 0.15 : (hovered ? 1 : 0.8),
           strokeWidth: hovered ? 1.5 : undefined,
           filter: hovered ? `url(#glow-${type})` : 'none',
         }}
