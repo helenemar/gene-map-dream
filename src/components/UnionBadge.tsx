@@ -109,22 +109,14 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
   const pillW = label ? Math.max(label.length * 5.6 + 16, 56) : 0;
   const blockW = Math.max(pillW, showIcon ? ICON_D : 0);
 
-  // Anchor: the ICON CENTER sits on the union line Y.
-  // The pill floats above the icon, overlapping by OVERLAP px.
-  // If no icon, the pill itself is centered on Y.
-  const iconCenterLocal = showIcon ? ICON_R : 0;
-  const pillBottom = showIcon ? iconCenterLocal - ICON_R + OVERLAP : PILL_H;
-  const pillTopLocal = pillBottom - PILL_H;
+  // Layout: pill on top, icon below with overlap.
+  // The TOP of the group is anchored at the union line Y (badge hangs below the line).
+  const pillTopLocal = 0;
+  const iconCenterLocal = label ? PILL_H - OVERLAP + ICON_R : ICON_R;
 
-  // Total bounds
-  const topEdge = label ? pillTopLocal : (showIcon ? 0 : 0);
-  const bottomEdge = showIcon ? ICON_D : (label ? PILL_H : 0);
-
-  // Translate so icon center = line Y, horizontally centered on x
+  // Horizontally centered on x, top edge at y + small gap
   const groupX = x - blockW / 2;
-  const groupY = showIcon
-    ? y - ICON_R   // icon center on line Y
-    : y - PILL_H / 2; // pill center on line Y
+  const groupY = y + 2; // sits just below the union line
 
   const stroke = 'hsl(var(--border))';
   const bg = 'hsl(var(--card))';
@@ -172,7 +164,7 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
           {/* White opaque background — hides the union line behind it */}
           <circle
             cx={blockW / 2}
-            cy={ICON_R}
+            cy={iconCenterLocal}
             r={ICON_R}
             fill={bg}
             stroke={stroke}
@@ -182,14 +174,14 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
           {/* Drop shadow simulation */}
           <circle
             cx={blockW / 2}
-            cy={ICON_R + 0.5}
+            cy={iconCenterLocal + 0.5}
             r={ICON_R + 0.5}
             fill="none"
             stroke="hsla(0,0%,0%,0.06)"
             strokeWidth={1.5}
           />
           {/* Icon positioned inside the circle */}
-          <g transform={`translate(${blockW / 2 - 8}, ${ICON_R - 8})`}>
+          <g transform={`translate(${blockW / 2 - 8}, ${iconCenterLocal - 8})`}>
             <StatusIcon status={union.status} size={16} />
           </g>
         </>
