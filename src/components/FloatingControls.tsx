@@ -24,8 +24,9 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-        {!presentationMode && (
+      {/* Undo/Redo — top-left of canvas */}
+      {!presentationMode && (
+        <div className="absolute top-4 left-4 z-20">
           <div className="flex items-center gap-1 bg-card rounded-full shadow-float border border-border p-1.5">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -37,7 +38,7 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
                   <Undo2 className="w-3.5 h-3.5 text-muted-foreground" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="top">Annuler (Ctrl+Z)</TooltipContent>
+              <TooltipContent side="bottom">Annuler (Ctrl+Z)</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -49,10 +50,14 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
                   <Redo2 className="w-3.5 h-3.5 text-muted-foreground" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="top">Rétablir (Ctrl+Shift+Z)</TooltipContent>
+              <TooltipContent side="bottom">Rétablir (Ctrl+Shift+Z)</TooltipContent>
             </Tooltip>
           </div>
-        )}
+        </div>
+      )}
+
+      {/* Bottom bar — auto layout, zoom, presentation */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
         {!presentationMode && (
           <Tooltip>
             <TooltipTrigger asChild>
