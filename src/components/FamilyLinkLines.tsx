@@ -30,54 +30,9 @@ const UnionLine: React.FC<{
   status: UnionStatus;
 }> = ({ x1, y1, x2, y2, status }) => {
   const lineY = (y1 + y2) / 2;
-  const midX = (x1 + x2) / 2;
   const stroke = 'hsl(var(--foreground))';
   const opacity = 0.5;
   const needsConnectors = Math.abs(y1 - y2) > 1;
-
-  const renderStatusMark = () => {
-    const markSize = 6;
-    switch (status) {
-      case 'separated':
-        return (
-          <line
-            x1={midX - markSize} y1={lineY + markSize}
-            x2={midX + markSize} y2={lineY - markSize}
-            stroke={stroke} strokeWidth={2} strokeOpacity={opacity}
-          />
-        );
-      case 'divorced':
-        return (
-          <>
-            <line
-              x1={midX - markSize - 3} y1={lineY + markSize}
-              x2={midX + markSize - 3} y2={lineY - markSize}
-              stroke={stroke} strokeWidth={2} strokeOpacity={opacity}
-            />
-            <line
-              x1={midX - markSize + 3} y1={lineY + markSize}
-              x2={midX + markSize + 3} y2={lineY - markSize}
-              stroke={stroke} strokeWidth={2} strokeOpacity={opacity}
-            />
-          </>
-        );
-      case 'widowed':
-        return (
-          <>
-            <line x1={midX - 5} y1={lineY - 5} x2={midX + 5} y2={lineY + 5}
-              stroke={stroke} strokeWidth={2} strokeOpacity={opacity} />
-            <line x1={midX + 5} y1={lineY - 5} x2={midX - 5} y2={lineY + 5}
-              stroke={stroke} strokeWidth={2} strokeOpacity={opacity} />
-          </>
-        );
-      case 'love_affair':
-        // No structural mark — the dotted line is sufficient
-        return null;
-      default:
-        return null;
-    }
-  };
-
   const dashArray = (status === 'common_law' || status === 'love_affair') ? '8 4' : undefined;
 
   return (
@@ -93,7 +48,6 @@ const UnionLine: React.FC<{
             stroke={stroke} strokeWidth={1.5} strokeOpacity={opacity * 0.6} />
         </>
       )}
-      {renderStatusMark()}
     </g>
   );
 };
