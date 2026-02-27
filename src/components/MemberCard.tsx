@@ -106,25 +106,26 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
   const cardContent = (
     <>
-      {/* Corner anchor dots — visible from State 3 */}
-      {showDots && CORNER_DOTS.map(({ side, className }) => (
-        <div
-          key={side}
-          className={`absolute ${className} w-2.5 h-2.5 rounded-full border-2 border-primary z-10 cursor-crosshair transition-colors ${
-            dotsFilled ? 'bg-primary' : 'bg-card'
-          }`}
-          onMouseDown={(e) => handleDotClick(side, e)}
-        />
-      ))}
-
-      {/* Card body — fixed width */}
+      {/* Card body — fixed width, dots are INSIDE this relative container */}
       <div
         className={`
-          relative flex items-center gap-3 rounded-xl p-2 bg-card border transition-all ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
+          relative flex items-center gap-3 rounded-xl p-2 bg-card border transition-all
+          ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
           ${borderClasses}
         `}
         style={{ width: MEMBER_CARD_W }}
       >
+        {/* Corner anchor dots — absolutely positioned at card corners */}
+        {showDots && CORNER_DOTS.map(({ side, className }) => (
+          <div
+            key={side}
+            className={`absolute ${className} w-3 h-3 rounded-full border-2 border-primary z-10 cursor-crosshair transition-all duration-150 ${
+              dotsFilled ? 'bg-primary scale-110' : 'bg-card hover:bg-primary/30'
+            }`}
+            onMouseDown={(e) => handleDotClick(side, e)}
+          />
+        ))}
+
         {/* Icon with pathology fills */}
         <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
           <MemberIcon
@@ -154,7 +155,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         </div>
       </div>
 
-      {/* Action menu — changes based on state */}
+      {/* Action menu — State: Selected */}
       {activeState === 'selected' && (
         <div className="flex items-center gap-2 justify-center mt-2">
           <button
@@ -173,6 +174,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         </div>
       )}
 
+      {/* Action menu — State: Anchor-Active */}
       {activeState === 'anchor-active' && (
         <div className="flex items-center gap-2 justify-center mt-2">
           <button
