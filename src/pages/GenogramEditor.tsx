@@ -996,10 +996,7 @@ const GenogramEditor: React.FC = () => {
                     executeChildCreation(parentPickerState.sourceId);
                     setParentPickerState(null);
                   }}
-                  onSelectExistingPartner={(partnerId) => {
-                    executeChildCreationWithExisting(parentPickerState.sourceId, partnerId);
-                    setParentPickerState(null);
-                  }}
+                
                 >
                   <div
                     className="absolute pointer-events-none"

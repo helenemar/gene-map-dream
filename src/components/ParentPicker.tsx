@@ -6,13 +6,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import MemberIcon from '@/components/MemberIcon';
-import { UserPlus, Baby, User } from 'lucide-react';
-
-export interface ParentPickerOption {
-  type: 'existing-union';
-  union: Union;
-  partner: FamilyMember;
-}
+import { Baby, UserPlus } from 'lucide-react';
 
 interface ParentPickerProps {
   sourceMember: FamilyMember;
@@ -20,7 +14,6 @@ interface ParentPickerProps {
   members: FamilyMember[];
   onSelectUnion: (unionId: string) => void;
   onSelectNewPartner: () => void;
-  onSelectExistingPartner: (memberId: string) => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
@@ -40,23 +33,10 @@ const ParentPicker: React.FC<ParentPickerProps> = ({
   members,
   onSelectUnion,
   onSelectNewPartner,
-  onSelectExistingPartner,
   open,
   onOpenChange,
   children,
 }) => {
-  // Find existing partners (already in a union with source)
-  const existingPartnerIds = new Set(
-    unions.map(u => u.partner1 === sourceMember.id ? u.partner2 : u.partner1)
-  );
-
-  // Potential other partners: all non-placeholder members except source and existing partners
-  const potentialPartners = members.filter(m =>
-    m.id !== sourceMember.id &&
-    !m.isPlaceholder &&
-    !existingPartnerIds.has(m.id)
-  );
-
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
@@ -78,8 +58,9 @@ const ParentPicker: React.FC<ParentPickerProps> = ({
           </p>
         </div>
 
-        {/* Union options */}
+        {/* Options */}
         <div className="flex flex-col py-1">
+          {/* Existing unions */}
           {unions.map(union => {
             const partnerId = union.partner1 === sourceMember.id ? union.partner2 : union.partner1;
             const partner = members.find(m => m.id === partnerId);
@@ -125,50 +106,20 @@ const ParentPicker: React.FC<ParentPickerProps> = ({
           {/* Separator */}
           <div className="h-px bg-border/50 mx-3 my-1" />
 
-          {/* Section: Autre partenaire */}
+          {/* Autre partenaire — creates a placeholder card */}
           <div className="px-4 py-2">
             <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Autre partenaire</p>
           </div>
-
-          {/* Existing members as potential partners */}
-          {potentialPartners.map(member => (
-            <button
-              key={member.id}
-              onClick={() => { onSelectExistingPartner(member.id); onOpenChange(false); }}
-              className="flex items-center gap-3 px-4 py-2 hover:bg-accent/50 transition-colors text-left w-full"
-            >
-              <div className="shrink-0">
-                <MemberIcon
-                  gender={member.gender}
-                  isDead={!!member.deathYear}
-                  size={24}
-                  className="text-foreground"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {member.firstName} {member.lastName}
-                </p>
-                {member.birthYear > 0 && (
-                  <p className="text-[10px] text-muted-foreground">
-                    {member.birthYear}
-                  </p>
-                )}
-              </div>
-            </button>
-          ))}
-
-          {/* New placeholder partner option */}
           <button
             onClick={() => { onSelectNewPartner(); onOpenChange(false); }}
             className="flex items-center gap-3 px-4 py-2.5 hover:bg-accent/50 transition-colors text-left w-full"
           >
-            <div className="w-6 h-6 rounded border-2 border-dashed border-muted-foreground/30 flex items-center justify-center shrink-0">
-              <UserPlus className="w-3 h-3 text-muted-foreground/50" />
+            <div className="w-7 h-7 rounded border-2 border-dashed border-muted-foreground/30 flex items-center justify-center shrink-0">
+              <UserPlus className="w-3.5 h-3.5 text-muted-foreground/50" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-foreground">Nouveau partenaire inconnu</p>
-              <p className="text-[10px] text-muted-foreground">Crée une carte vierge en pointillés</p>
+              <p className="text-sm font-medium text-foreground">Nouveau partenaire</p>
+              <p className="text-[10px] text-muted-foreground">Crée une carte membre non éditée</p>
             </div>
           </button>
         </div>
