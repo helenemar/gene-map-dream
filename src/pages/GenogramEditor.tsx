@@ -962,10 +962,6 @@ const GenogramEditor: React.FC = () => {
         suggestions={search.suggestions}
         isSearchActive={search.isActive}
         matchCount={search.matchedMemberIds.size + search.matchedEmotionalLinkIds.size}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-        canUndo={history.canUndo}
-        canRedo={history.canRedo}
         onExportPng={() => {
           if (canvasRef.current) {
             exportAsPng(canvasRef.current, fileName);
@@ -1281,6 +1277,10 @@ const GenogramEditor: React.FC = () => {
               setSelectedMember(null);
               setAnchorActiveMember(null);
             }}
+            onUndo={handleUndo}
+            onRedo={handleRedo}
+            canUndo={history.canUndo}
+            canRedo={history.canRedo}
           />
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ZoomIn, ZoomOut, Maximize, Wand2, Presentation } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize, Wand2, Presentation, Undo2, Redo2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface FloatingControlsProps {
@@ -10,16 +10,49 @@ interface FloatingControlsProps {
   zoom?: number;
   presentationMode?: boolean;
   onTogglePresentation?: () => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 const FloatingControls: React.FC<FloatingControlsProps> = ({
   onZoomIn, onZoomOut, onFitToScreen, onAutoLayout, zoom = 1, presentationMode = false, onTogglePresentation,
+  onUndo, onRedo, canUndo = false, canRedo = false,
 }) => {
   const zoomPercent = Math.round(zoom * 100);
 
   return (
     <TooltipProvider delayDuration={300}>
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+        {!presentationMode && (
+          <div className="flex items-center gap-1 bg-card rounded-full shadow-float border border-border p-1.5">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onUndo}
+                  disabled={!canUndo}
+                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <Undo2 className="w-3.5 h-3.5 text-muted-foreground" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Annuler (Ctrl+Z)</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onRedo}
+                  disabled={!canRedo}
+                  className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-accent transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <Redo2 className="w-3.5 h-3.5 text-muted-foreground" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Rétablir (Ctrl+Shift+Z)</TooltipContent>
+            </Tooltip>
+          </div>
+        )}
         {!presentationMode && (
           <Tooltip>
             <TooltipTrigger asChild>
