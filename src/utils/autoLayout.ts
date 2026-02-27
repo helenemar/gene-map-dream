@@ -31,7 +31,8 @@ function coupleGap(union: Union): number {
   if (union.marriageYear) labelLen += `R: ${union.marriageYear}`.length;
   if (union.divorceYear) labelLen += `   D: ${union.divorceYear}`.length;
   if (labelLen > 0) {
-    const badgeW = Math.max(labelLen * 5.6 + 16, 56);
+    // Match UnionBadge hug-content formula: charWidth × count + padding × 2
+    const badgeW = Math.max(labelLen * 6.8 + 32, 56);
     return Math.max(badgeW + BADGE_SAFETY, MIN_BADGE_GAP);
   }
   // Has status icon but no dates
