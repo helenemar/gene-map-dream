@@ -150,7 +150,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
       <SheetContent side="right" className="w-[340px] sm:w-[380px] p-0 flex flex-col border-l border-border/50 bg-background">
         {/* ── Header with live preview ── */}
-        <div className="px-4 pt-4 pb-3">
+        <div className="px-4 pt-4 pb-3 pr-14">
           <SheetHeader>
             <div className="flex items-center justify-between">
               <SheetTitle className="text-sm font-semibold">
@@ -160,7 +160,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-xs gap-1.5 h-7 text-muted-foreground hover:text-foreground"
+                  className="text-xs gap-1.5 h-7 text-muted-foreground hover:text-foreground mr-1"
                   onClick={() => setIsEditing(true)}
                 >
                   <Pencil className="w-3 h-3" />
