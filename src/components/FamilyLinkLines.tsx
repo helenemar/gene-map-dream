@@ -227,8 +227,10 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
         // Use resolved comb Y (with rail offset if needed)
         const combY = combYMap.get(union.id) ?? unionLineY + 60;
 
-        const combLeftX = Math.min(unionMidX, ...childDropXs);
-        const combRightX = Math.max(unionMidX, ...childDropXs);
+        const childLeftX = Math.min(...childDropXs);
+        const childRightX = Math.max(...childDropXs);
+        const combLeftX = Math.min(unionMidX, childLeftX);
+        const combRightX = Math.max(unionMidX, childRightX);
 
         return (
           <g key={union.id}>
@@ -253,11 +255,19 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
               stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
             />
 
-            {/* 3. Horizontal comb bar */}
+            {/* 3. Horizontal comb bar (stem to children range only) */}
             {childMembers.length > 1 && (
               <line
                 x1={combLeftX} y1={combY}
-                x2={combRightX} y2={combY}
+                x2={childRightX} y2={combY}
+                stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+              />
+            )}
+            {/* Horizontal connector from stem to comb if stem is outside children range */}
+            {childMembers.length > 1 && unionMidX < childLeftX && (
+              <line
+                x1={unionMidX} y1={combY}
+                x2={childLeftX} y2={combY}
                 stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
               />
             )}
@@ -305,23 +315,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
                     );
                   });
 
-                  // Monozygotic: horizontal bar across branches
-                  const isMonozygotic = child.twinType === 'monozygotic';
-                  if (isMonozygotic && twinAnchors.length >= 2) {
-                    const barY = forkY + (twinAnchors[0].y - forkY) * 0.4;
-                    // Interpolate X at barY for each branch
-                    const barXs = twinAnchors.map(a => {
-                      const t = (barY - forkY) / (a.y - forkY);
-                      return forkX + t * (a.x - forkX);
-                    });
-                    elements.push(
-                      <line key={`twin-mono-${child.twinGroup}`}
-                        x1={Math.min(...barXs)} y1={barY}
-                        x2={Math.max(...barXs)} y2={barY}
-                        stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-                      />
-                    );
-                  }
+                  // Monozygotic bar removed per user request
                 } else {
                   // Standard vertical drop
                   processed.add(i);
