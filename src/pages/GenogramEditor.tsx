@@ -503,6 +503,7 @@ const GenogramEditor: React.FC = () => {
                     const key = [link.from, link.to].sort().join('|');
                     const group = pairMap.get(key)!;
                     const linkIndex = group.indexOf(globalIdx);
+                    const isDimmed = !!hoveredMember && link.from !== hoveredMember && link.to !== hoveredMember;
                     return (
                       <EmotionalLinkLine
                         key={link.id}
@@ -513,6 +514,7 @@ const GenogramEditor: React.FC = () => {
                         linkCount={group.length}
                         cardRects={cardRects}
                         excludeIds={[link.from, link.to]}
+                        dimmed={isDimmed}
                         onClick={() => console.log('Edit emotional link', link.id)}
                       />
                     );
