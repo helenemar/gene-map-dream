@@ -92,22 +92,22 @@ export const SAMPLE_UNIONS: Union[] = [
     status: 'widowed', marriageYear: 1968, divorceYear: 2020,
     children: ['p1', 'p2'],
   },
-  // Gen 1 → Gen 2 (Philippe)
+  // Gen 1 → Gen 2 (Philippe — divorcé)
   {
     id: 'u-p1', partner1: 'p1', partner2: 'p1-w',
-    status: 'married', marriageYear: 1996,
+    status: 'divorced', marriageYear: 1996, divorceYear: 2015,
     children: ['c1', 'c2', 'c2b'],
   },
-  // Gen 1 → Gen 2 (Sylvie)
+  // Gen 1 → Gen 2 (Sylvie — séparée)
   {
     id: 'u-p2', partner1: 'p2-h', partner2: 'p2',
-    status: 'married', marriageYear: 1998,
+    status: 'separated', marriageYear: 1998, divorceYear: 2021,
     children: ['c3', 'c4'],
   },
-  // Gen 2 → Gen 3 (Julien)
+  // Gen 2 → Gen 3 (Julien — liaison / love affair)
   {
     id: 'u-c1', partner1: 'c1', partner2: 'c1-w',
-    status: 'married', marriageYear: 2022,
+    status: 'love_affair', marriageYear: 2022,
     children: ['gc1', 'gc2'],
   },
 ];
