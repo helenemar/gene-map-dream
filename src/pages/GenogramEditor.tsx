@@ -137,6 +137,7 @@ const GenogramEditor: React.FC = () => {
   const [unions, setUnions] = useState<Union[]>(SAMPLE_UNIONS);
   const search = useFamilySearch(members, unions, emotionalLinks);
   const [editingUnionId, setEditingUnionId] = useState<string | null>(null);
+  const [fileName, setFileName] = useState('Nouveau fichier');
   const [isAnimating, setIsAnimating] = useState(false);
   const [snapToGrid, setSnapToGrid] = useState(false);
   const [highlightedUnionStatus, setHighlightedUnionStatus] = useState<UnionStatus | null>(null);
@@ -971,7 +972,8 @@ const GenogramEditor: React.FC = () => {
             members={members}
             unions={unions}
             emotionalLinks={emotionalLinks}
-            fileName="Nouveau fichier"
+            fileName={fileName}
+            onFileNameChange={setFileName}
             onFocusMember={handleFocusMember}
             onBack={() => setShowLeaveDialog(true)}
             highlightedUnionStatus={highlightedUnionStatus}

@@ -1,5 +1,5 @@
-import React from 'react';
-import { ArrowLeft, Crosshair, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowLeft, Crosshair, Eye, EyeOff, Pencil } from 'lucide-react';
 import {
   FamilyMember, Union, EmotionalLink,
   PATHOLOGIES, FAMILY_LINK_TYPES, EMOTIONAL_LINK_TYPES,
@@ -19,6 +19,7 @@ interface EditorSidebarProps {
   unions: Union[];
   emotionalLinks: EmotionalLink[];
   fileName: string;
+  onFileNameChange: (name: string) => void;
   /** Center canvas on a member */
   onFocusMember: (member: FamilyMember) => void;
   /** Called when user clicks "Retour" */
@@ -31,9 +32,49 @@ interface EditorSidebarProps {
   onToggleSoloEmotional: (type: EmotionalLinkType) => void;
 }
 
+/** Inline editable file name */
+const EditableFileName: React.FC<{ value: string; onChange: (v: string) => void }> = ({ value, onChange }) => {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { setDraft(value); }, [value]);
+  useEffect(() => { if (editing) inputRef.current?.select(); }, [editing]);
+
+  const commit = () => {
+    const trimmed = draft.trim();
+    onChange(trimmed || value);
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={e => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') { setDraft(value); setEditing(false); } }}
+        className="font-semibold text-foreground bg-muted/50 border border-border rounded-lg px-2 py-1 w-full text-sm focus:outline-none focus:ring-2 focus:ring-ring/30"
+        autoFocus
+      />
+    );
+  }
+
+  return (
+    <button
+      onClick={() => setEditing(true)}
+      className="group flex items-center gap-2 w-full text-left"
+      title="Renommer"
+    >
+      <h2 className="font-semibold text-foreground truncate">{value}</h2>
+      <Pencil className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+    </button>
+  );
+};
 
 const EditorSidebar: React.FC<EditorSidebarProps> = ({
-  members, unions, emotionalLinks, fileName,
+  members, unions, emotionalLinks, fileName, onFileNameChange,
   onFocusMember, onBack,
   highlightedUnionStatus, onHighlightUnionStatus,
   soloEmotionalType, onToggleSoloEmotional,
@@ -58,7 +99,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
           <ArrowLeft className="w-4 h-4" />
           <span>Retour</span>
         </button>
-        <h2 className="font-semibold text-foreground">{fileName}</h2>
+        <EditableFileName value={fileName} onChange={onFileNameChange} />
       </div>
 
       <Accordion type="multiple" defaultValue={['members', 'pathologies', 'family-links', 'emotional-links']}>
