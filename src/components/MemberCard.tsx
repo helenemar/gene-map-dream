@@ -118,7 +118,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         {showDots && CORNER_DOTS.map(({ side, style }) => (
           <div
             key={side}
-            className={`absolute w-4 h-4 rounded-full border-2 border-primary z-20 cursor-crosshair transition-all duration-150 shadow-md ${
+            className={`absolute w-4 h-4 rounded-full border-2 border-primary cursor-crosshair transition-all duration-150 shadow-md ${
               dotsFilled ? 'bg-primary scale-125' : 'bg-card hover:bg-primary/30'
             }`}
             style={style}
