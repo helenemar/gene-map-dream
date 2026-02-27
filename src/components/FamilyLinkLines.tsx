@@ -10,6 +10,9 @@ interface FamilyLinkLinesProps {
   members: FamilyMember[];
   unions: Union[];
   onEditUnion?: (unionId: string) => void;
+  /** Set of union IDs that match the search — others get dimmed */
+  searchMatchedUnionIds?: Set<string>;
+  isSearchActive?: boolean;
 }
 
 /** Snap exactly to card border — zero gap */
@@ -68,7 +71,7 @@ const UnionLine: React.FC<{
  *   - ZERO diagonal lines. Every segment is strictly H or V.
  *   - Drops go straight down from the child's center X.
  */
-const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion }) => {
+const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, searchMatchedUnionIds, isSearchActive }) => {
   const getMember = (id: string) => members.find(m => m.id === id);
 
   const stroke = 'hsl(var(--foreground))';
@@ -306,8 +309,15 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
   return (
     <>
       {/* Structural lines layer — z-index 0 */}
-      <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: 0.9 }}>
-        {linesContent}
+      <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: 0.9, transition: 'opacity 0.3s' }}>
+        {unions.map((union, idx) => {
+          const dimmed = isSearchActive && searchMatchedUnionIds && !searchMatchedUnionIds.has(union.id);
+          return (
+            <g key={union.id} style={{ opacity: dimmed ? 0.08 : 1, transition: 'opacity 0.3s' }}>
+              {linesContent[idx]}
+            </g>
+          );
+        })}
       </svg>
 
       {/* Union badges layer — z-index 60, above cards and emotional links */}

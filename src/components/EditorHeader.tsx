@@ -1,8 +1,65 @@
-import React from 'react';
-import { Search, Download, Share2, Undo2, Redo2 } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { Search, Download, Share2, Undo2, Redo2, X, User, Briefcase, HeartPulse } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { SearchSuggestion } from '@/hooks/useFamilySearch';
 
-const EditorHeader: React.FC = () => {
+interface EditorHeaderProps {
+  searchQuery: string;
+  onSearchChange: (q: string) => void;
+  onSearchClear: () => void;
+  suggestions: SearchSuggestion[];
+  isSearchActive: boolean;
+  matchCount: number;
+}
+
+const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+  name: <User className="w-3.5 h-3.5" />,
+  profession: <Briefcase className="w-3.5 h-3.5" />,
+  pathology: <HeartPulse className="w-3.5 h-3.5" />,
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  name: 'Nom',
+  profession: 'Profession',
+  pathology: 'Pathologie',
+};
+
+const EditorHeader: React.FC<EditorHeaderProps> = ({
+  searchQuery,
+  onSearchChange,
+  onSearchClear,
+  suggestions,
+  isSearchActive,
+  matchCount,
+}) => {
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleSelect = (value: string) => {
+    onSearchChange(value);
+    setShowSuggestions(false);
+    inputRef.current?.blur();
+  };
+
+  // Group suggestions by category
+  const grouped = suggestions.reduce<Record<string, SearchSuggestion[]>>((acc, s) => {
+    if (!acc[s.category]) acc[s.category] = [];
+    acc[s.category].push(s);
+    return acc;
+  }, {});
+
   return (
     <header className="h-14 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
       {/* Left: Logo + actions */}
@@ -21,14 +78,64 @@ const EditorHeader: React.FC = () => {
       </div>
 
       {/* Center: Search */}
-      <div className="flex-1 max-w-md mx-4">
+      <div className="flex-1 max-w-md mx-4" ref={containerRef}>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
+            ref={inputRef}
             type="text"
+            value={searchQuery}
+            onChange={(e) => {
+              onSearchChange(e.target.value);
+              setShowSuggestions(true);
+            }}
+            onFocus={() => setShowSuggestions(true)}
             placeholder="Rechercher un membre, une pathologie, un lien, etc..."
-            className="w-full pl-9 pr-4 py-2 text-sm bg-muted/50 border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-ring/20 placeholder:text-muted-foreground/50"
+            className="w-full pl-9 pr-10 py-2 text-sm bg-muted/50 border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-ring/20 placeholder:text-muted-foreground/50"
           />
+          {isSearchActive && (
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+              <span className="text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
+                {matchCount}
+              </span>
+              <button
+                onClick={onSearchClear}
+                className="p-1 rounded-full hover:bg-accent transition-colors"
+              >
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          )}
+
+          {/* Suggestions dropdown */}
+          {showSuggestions && suggestions.length > 0 && searchQuery.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-popover border border-border rounded-xl shadow-lg overflow-hidden z-[200]">
+              {Object.entries(grouped).map(([category, items]) => (
+                <div key={category}>
+                  <div className="px-3 py-1.5 bg-accent/30">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground">{CATEGORY_ICONS[category]}</span>
+                      <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+                        {CATEGORY_LABELS[category] || category}
+                      </span>
+                    </div>
+                  </div>
+                  {items.map((item, i) => (
+                    <button
+                      key={`${category}-${i}`}
+                      onClick={() => handleSelect(item.value)}
+                      className="flex items-center justify-between w-full px-3 py-2 hover:bg-accent/50 transition-colors text-left"
+                    >
+                      <span className="text-sm text-foreground">{item.label}</span>
+                      <span className="text-[10px] text-muted-foreground/60">
+                        {item.count} membre{item.count !== 1 ? 's' : ''}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
