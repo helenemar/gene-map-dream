@@ -1,12 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, Download, Share2, Undo2, Redo2, X, User, Briefcase, HeartPulse, Link2, ArrowLeft } from 'lucide-react';
+import { Search, Download, Share2, Undo2, Redo2, X, User, Briefcase, HeartPulse, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchSuggestion } from '@/hooks/useFamilySearch';
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import gogyIcon from '@/assets/genogy-icon.svg';
 
 interface EditorHeaderProps {
@@ -40,9 +35,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   isSearchActive,
   matchCount,
 }) => {
-  const navigate = useNavigate();
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -74,13 +67,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
     <header className="h-14 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
       {/* Left: Logo + actions */}
       <div className="flex items-center gap-3">
-        <button
-          onClick={() => setShowLeaveDialog(true)}
-          className="p-1.5 rounded-full hover:bg-muted transition-colors"
-          title="Retour à l'accueil"
-        >
-          <ArrowLeft className="w-5 h-5 text-foreground" />
-        </button>
         <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
         <div className="flex items-center gap-1 bg-muted rounded-full p-1">
           <button className="p-1.5 rounded-full hover:bg-accent transition-colors">
@@ -175,25 +161,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
         </Button>
       </div>
 
-      {/* Save confirmation dialog */}
-      <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Enregistrer les modifications ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Vous avez apporté des modifications à ce génogramme. Souhaitez-vous les enregistrer avant de quitter ?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => navigate('/')}>
-              Non, quitter
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={() => navigate('/')}>
-              Oui, enregistrer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </header>
   );
 };
