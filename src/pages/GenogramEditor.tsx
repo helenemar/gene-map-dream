@@ -928,11 +928,20 @@ const GenogramEditor: React.FC = () => {
             onDelete={handleDeleteMember}
             emotionalLinks={emotionalLinks}
             members={members}
+            unions={unions}
             onUpdateEmotionalLink={(linkId, newType) => {
               setEmotionalLinks(prev => prev.map(l => l.id === linkId ? { ...l, type: newType } : l));
             }}
             onDeleteEmotionalLink={(linkId) => {
               setEmotionalLinks(prev => prev.filter(l => l.id !== linkId));
+            }}
+            onUpdateUnion={(unionId, updates) => {
+              setUnions(prev => prev.map(u => u.id === unionId ? { ...u, ...updates } : u));
+            }}
+            onLiveUpdate={(updated) => {
+              const currentYear = new Date().getFullYear();
+              const age = updated.birthYear ? currentYear - updated.birthYear : updated.age;
+              setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age } : m));
             }}
           />
 
