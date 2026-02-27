@@ -94,7 +94,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
         {/* Info */}
         <div className="whitespace-nowrap">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-6">
             <span className="font-semibold text-sm text-foreground">{member.firstName}</span>
             <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
               {member.age} ans
