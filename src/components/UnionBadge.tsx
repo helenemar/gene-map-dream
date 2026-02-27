@@ -107,8 +107,8 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
 
   if (!label && !showIcon) return null;
 
-  // Hug-content width: char width × count + padding
-  const pillW = label ? Math.max(label.length * 6.8 + PILL_PAD_X * 2, 56) : 0;
+  // Hug-content width: char width × count + padding (7.2px per char at font-size 11)
+  const pillW = label ? Math.max(label.length * 7.2 + PILL_PAD_X * 2, 56) : 0;
   const blockW = Math.max(pillW, showIcon ? ICON_D : 0);
 
   // Layout: icon center ON the union line Y, pill ABOVE with a gap

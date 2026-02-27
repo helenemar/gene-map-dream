@@ -33,7 +33,7 @@ function coupleGap(union: Union): number {
   if (union.divorceYear) labelLen += `   D: ${union.divorceYear}`.length;
   if (labelLen > 0) {
     // Match UnionBadge: charWidth × count + padding × 2
-    const badgeW = Math.max(labelLen * 6.8 + 36, 56);
+    const badgeW = Math.max(labelLen * 7.2 + 24, 56);
     // Gap = badge + 30px breathing on each side
     return Math.max(badgeW + BADGE_SAFETY, MIN_BADGE_GAP);
   }
