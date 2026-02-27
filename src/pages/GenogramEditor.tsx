@@ -296,9 +296,9 @@ const GenogramEditor: React.FC = () => {
   }, []);
 
   const getMemberState = useCallback((memberId: string) => {
-    if (selectedMember === memberId) return 'edition';
-    if (hoveredMember === memberId) return 'hover';
-    return 'default';
+    if (selectedMember === memberId) return 'selected' as const;
+    if (hoveredMember === memberId) return 'hover' as const;
+    return 'default' as const;
   }, [selectedMember, hoveredMember]);
 
   const handleCreateRelated = useCallback((id: string) => {

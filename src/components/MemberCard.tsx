@@ -4,7 +4,14 @@ import { FamilyMember, PATHOLOGIES } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
 import { Plus, Pencil, Link } from 'lucide-react';
 
-export type MemberCardState = 'default' | 'hover' | 'edition';
+/**
+ * 4 visual states:
+ *   default        – grey border, no shadow, no anchors, no buttons
+ *   hover          – purple border + subtle halo
+ *   selected       – purple border + halo + anchor dots (outline) + action buttons
+ *   anchor-active  – same as selected but anchor dots are filled (drag mode)
+ */
+export type MemberCardState = 'default' | 'hover' | 'selected' | 'anchor-active';
 
 /** Fixed card width — must match CARD_W in GenogramEditor */
 export const MEMBER_CARD_W = 250;
@@ -45,29 +52,56 @@ const MemberCard: React.FC<MemberCardProps> = ({
   const isDeceased = !!member.deathYear;
   const memberPathologies = PATHOLOGIES.filter(p => member.pathologies.includes(p.id));
 
-  const activeState = isSelected && state === 'default' ? 'hover' : state;
+  // Derive effective state: if selected via prop but state not explicitly set beyond default
+  const activeState: MemberCardState =
+    isSelected && state === 'default' ? 'selected' : state;
 
-  const showRing = activeState === 'hover' || activeState === 'edition' || isLinkTarget;
-  const showAnchors = activeState === 'edition';
-  const showActions = activeState === 'edition';
+  const isHighlighted = activeState === 'hover' || activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget;
+  const showAnchors = activeState === 'selected' || activeState === 'anchor-active';
+  const showActions = activeState === 'selected' || activeState === 'anchor-active';
+  const anchorsFilled = activeState === 'anchor-active';
+
+  // Border & ring logic
+  const borderClasses = isColliding
+    ? 'border-destructive ring-2 ring-destructive/30'
+    : isLinkTarget
+      ? 'border-primary ring-2 ring-primary/40'
+      : isHighlighted
+        ? 'border-primary ring-2 ring-primary/30'
+        : 'border-border';
 
   const cardContent = (
     <>
-      {/* Anchor points */}
+      {/* Anchor points — visible in selected & anchor-active */}
       {showAnchors && (
         <>
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-card z-10" />
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-card z-10" />
-          <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-card z-10" />
-          <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-card z-10" />
+          {(['top', 'bottom', 'left', 'right'] as const).map(side => {
+            const posClass =
+              side === 'top'    ? 'top-0 left-1/2 -translate-x-1/2 -translate-y-1/2' :
+              side === 'bottom' ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' :
+              side === 'left'   ? 'left-0 top-1/2 -translate-x-1/2 -translate-y-1/2' :
+                                  'right-0 top-1/2 translate-x-1/2 -translate-y-1/2';
+            return (
+              <div
+                key={side}
+                className={`absolute ${posClass} w-2.5 h-2.5 rounded-full border-2 border-primary z-10 cursor-crosshair transition-colors ${
+                  anchorsFilled ? 'bg-primary' : 'bg-card'
+                }`}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  onLinkDragStart?.(member.id, e);
+                }}
+              />
+            );
+          })}
         </>
       )}
 
       {/* Card body — fixed width */}
       <div
         className={`
-          relative flex items-center gap-3 rounded-xl p-2 bg-card border shadow-card transition-all ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
-          ${isColliding ? 'border-destructive ring-2 ring-destructive/30' : isLinkTarget ? 'border-primary ring-2 ring-primary/40' : showRing ? 'border-primary ring-2 ring-primary/30' : 'border-border'}
+          relative flex items-center gap-3 rounded-xl p-2 bg-card border transition-all ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
+          ${activeState === 'default' ? '' : ''} ${borderClasses}
         `}
         style={{ width: MEMBER_CARD_W }}
       >
@@ -100,7 +134,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         </div>
       </div>
 
-      {/* Floating action buttons (Edition state) */}
+      {/* Action buttons (Selected & Anchor-active states) */}
       {showActions && (
         <div className="flex items-center gap-2 justify-center mt-2">
           <button
