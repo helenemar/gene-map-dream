@@ -11,6 +11,7 @@ import FloatingControls from '@/components/FloatingControls';
 import UnionEditDrawer from '@/components/UnionEditDrawer';
 import MemberEditDrawer from '@/components/MemberEditDrawer';
 import { RelationshipChoice } from '@/components/CreateMemberDropdown';
+import ParentPicker from '@/components/ParentPicker';
 import { SAMPLE_MEMBERS, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sampleData';
 import { FamilyMember, EmotionalLink, EmotionalLinkType, Union, UnionStatus } from '@/types/genogram';
 import { computeAutoLayout } from '@/utils/autoLayout';
@@ -361,6 +362,12 @@ const GenogramEditor: React.FC = () => {
   const [editingNewMember, setEditingNewMember] = useState<FamilyMember | null>(null);
   const [newMemberDrawerOpen, setNewMemberDrawerOpen] = useState(false);
 
+  // ─── Parent picker state (for child creation with multiple unions) ───
+  const [parentPickerState, setParentPickerState] = useState<{
+    sourceId: string;
+    open: boolean;
+  } | null>(null);
+
   /** Center canvas on a specific member with smooth animation */
   const centerOnMember = useCallback((member: FamilyMember) => {
     const canvas = canvasRef.current;
@@ -412,7 +419,153 @@ const GenogramEditor: React.FC = () => {
     }
   }, [members]);
 
+  /** Create a child and attach it to a specific union, or create a new placeholder union */
+  const executeChildCreation = useCallback((sourceId: string, targetUnionId?: string) => {
+    const source = members.find(m => m.id === sourceId);
+    const currentYear = new Date().getFullYear();
+    const LEVEL_Y = 250;
+
+    const newChild: FamilyMember = {
+      id: `m-${Date.now()}`,
+      firstName: 'Nouveau',
+      lastName: source?.lastName || '',
+      birthYear: currentYear - 5,
+      age: 5,
+      profession: '',
+      gender: 'female',
+      x: source?.x ?? 200,
+      y: (source?.y ?? 200) + LEVEL_Y,
+      pathologies: [],
+    };
+
+    if (targetUnionId) {
+      // Add child to an existing union
+      const union = unions.find(u => u.id === targetUnionId);
+      if (union) {
+        // Position child centered under the couple
+        const p1 = members.find(m => m.id === union.partner1);
+        const p2 = members.find(m => m.id === union.partner2);
+        if (p1 && p2) {
+          const coupleLeft = Math.min(p1.x, p2.x);
+          const coupleRight = Math.max(p1.x, p2.x) + CARD_W;
+          newChild.x = (coupleLeft + coupleRight) / 2 - CARD_W / 2;
+          newChild.y = Math.max(p1.y, p2.y) + LEVEL_Y;
+        }
+      }
+      setMembers(prev => [...prev, newChild]);
+      setUnions(prev => prev.map(u =>
+        u.id === targetUnionId ? { ...u, children: [...u.children, newChild.id] } : u
+      ));
+    } else {
+      // No union → create placeholder partner + union + push colliders
+      const SPOUSE_GAP = CARD_W + 120;
+      const placeholderId = `m-ph-${Date.now()}`;
+      const sourceX = source?.x ?? 200;
+      const sourceY = source?.y ?? 200;
+      const placeholderX = sourceX + SPOUSE_GAP;
+
+      const placeholder: FamilyMember = {
+        id: placeholderId,
+        firstName: '',
+        lastName: '',
+        birthYear: 0,
+        age: 0,
+        profession: '',
+        gender: source?.gender === 'male' ? 'female' : 'male',
+        x: placeholderX,
+        y: sourceY,
+        pathologies: [],
+        isPlaceholder: true,
+      };
+
+      // Center child under the couple
+      const coupleCenterX = (sourceX + placeholderX + CARD_W) / 2 - CARD_W / 2;
+      newChild.x = coupleCenterX;
+      newChild.y = sourceY + LEVEL_Y;
+
+      // ── Dynamic Gap: push members that collide with new block ──
+      const PUSH_MARGIN = 40;
+      const blockRects = [
+        { x: sourceX, y: sourceY, w: CARD_W, h: CARD_H },
+        { x: placeholderX, y: sourceY, w: CARD_W, h: CARD_H },
+        { x: coupleCenterX, y: sourceY + LEVEL_Y, w: CARD_W, h: CARD_H },
+      ];
+      const blockLeft = Math.min(...blockRects.map(r => r.x));
+      const blockRight = Math.max(...blockRects.map(r => r.x + r.w));
+      const blockTop = Math.min(...blockRects.map(r => r.y));
+      const blockBottom = Math.max(...blockRects.map(r => r.y + r.h));
+
+      const newIds = new Set([sourceId, placeholderId, newChild.id]);
+
+      setMembers(prev => {
+        const pushed = prev.map(m => {
+          if (newIds.has(m.id)) return m;
+          const mRight = m.x + CARD_W;
+          const mBottom = m.y + CARD_H;
+          const overlapX = m.x < blockRight + PUSH_MARGIN && mRight > blockLeft - PUSH_MARGIN;
+          const overlapY = m.y < blockBottom + PUSH_MARGIN && mBottom > blockTop - PUSH_MARGIN;
+          if (!overlapX || !overlapY) return m;
+          const memberCenterX = m.x + CARD_W / 2;
+          const blockCenterX = (blockLeft + blockRight) / 2;
+          if (memberCenterX < blockCenterX) {
+            return { ...m, x: Math.min(m.x, blockLeft - PUSH_MARGIN - CARD_W) };
+          } else {
+            return { ...m, x: Math.max(m.x, blockRight + PUSH_MARGIN) };
+          }
+        });
+        return [...pushed, placeholder, newChild];
+      });
+
+      const newUnion: Union = {
+        id: `u-${Date.now()}`,
+        partner1: sourceId,
+        partner2: placeholderId,
+        status: 'married',
+        children: [newChild.id],
+      };
+      setUnions(prev => [...prev, newUnion]);
+
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 600);
+
+      // Select and open drawer for new child
+      setSelectedMember(newChild.id);
+      setEditingNewMember(newChild);
+      setNewMemberDrawerOpen(true);
+      setTimeout(() => centerOnMember(newChild), 100);
+      return;
+    }
+
+    // Select and open drawer for new child (existing union path)
+    setSelectedMember(newChild.id);
+    setEditingNewMember(newChild);
+    setNewMemberDrawerOpen(true);
+    setTimeout(() => centerOnMember(newChild), 100);
+  }, [members, unions, centerOnMember]);
+
   const handleCreateRelated = useCallback((sourceId: string, relationship: RelationshipChoice) => {
+    // ── Filiation check for child creation ──
+    if (relationship === 'child') {
+      const sourceUnions = unions.filter(u => u.partner1 === sourceId || u.partner2 === sourceId);
+
+      if (sourceUnions.length === 0) {
+        // No unions → directly create placeholder + child
+        executeChildCreation(sourceId);
+        return;
+      }
+
+      if (sourceUnions.length === 1) {
+        // Exactly 1 union → directly add child to that union
+        executeChildCreation(sourceId, sourceUnions[0].id);
+        return;
+      }
+
+      // Multiple unions → show parent picker popover
+      setParentPickerState({ sourceId, open: true });
+      return;
+    }
+
+    // ── Non-child relationships (spouse, parent, sibling) ──
     const pos = computeNewPosition(sourceId, relationship);
     const source = members.find(m => m.id === sourceId);
     const currentYear = new Date().getFullYear();
@@ -454,96 +607,6 @@ const GenogramEditor: React.FC = () => {
       setUnions(prev => [...prev, newUnion]);
     }
 
-    // For child: find or create a union that includes sourceId, add child
-    if (relationship === 'child') {
-      const existingUnion = unions.find(u => u.partner1 === sourceId || u.partner2 === sourceId);
-      if (existingUnion) {
-        // Add child to existing union
-        setUnions(prev => prev.map(u =>
-          u.id === existingUnion.id ? { ...u, children: [...u.children, newMember.id] } : u
-        ));
-      } else {
-        // No union exists → create placeholder partner + union + push colliders
-        const SPOUSE_GAP = CARD_W + 120;
-        const placeholderId = `m-ph-${Date.now()}`;
-        const sourceX = source?.x ?? 200;
-        const sourceY = source?.y ?? 200;
-        const placeholderX = sourceX + SPOUSE_GAP;
-
-        const placeholder: FamilyMember = {
-          id: placeholderId,
-          firstName: '',
-          lastName: '',
-          birthYear: 0,
-          age: 0,
-          profession: '',
-          gender: source?.gender === 'male' ? 'female' : 'male',
-          x: placeholderX,
-          y: sourceY,
-          pathologies: [],
-          isPlaceholder: true,
-        };
-
-        // Center child under the couple
-        const coupleCenterX = (sourceX + placeholderX + CARD_W) / 2 - CARD_W / 2;
-        newMember.x = coupleCenterX;
-
-        // ── Dynamic Gap: push members that collide with new block ──
-        const PUSH_MARGIN = 40; // breathing room
-        const blockRects = [
-          { x: sourceX, y: sourceY, w: CARD_W, h: CARD_H },             // source (already exists)
-          { x: placeholderX, y: sourceY, w: CARD_W, h: CARD_H },        // placeholder
-          { x: coupleCenterX, y: sourceY + 250, w: CARD_W, h: CARD_H }, // child
-        ];
-        // Bounding box of the entire new block
-        const blockLeft = Math.min(...blockRects.map(r => r.x));
-        const blockRight = Math.max(...blockRects.map(r => r.x + r.w));
-        const blockTop = Math.min(...blockRects.map(r => r.y));
-        const blockBottom = Math.max(...blockRects.map(r => r.y + r.h));
-
-        const newIds = new Set([sourceId, placeholderId, newMember.id]);
-
-        setMembers(prev => {
-          const pushed = prev.map(m => {
-            if (newIds.has(m.id)) return m;
-            // Check overlap with block bounding box (with margin)
-            const mRight = m.x + CARD_W;
-            const mBottom = m.y + CARD_H;
-            const overlapX = m.x < blockRight + PUSH_MARGIN && mRight > blockLeft - PUSH_MARGIN;
-            const overlapY = m.y < blockBottom + PUSH_MARGIN && mBottom > blockTop - PUSH_MARGIN;
-            if (!overlapX || !overlapY) return m;
-
-            // Push horizontally: left or right depending on which side the member is
-            const memberCenterX = m.x + CARD_W / 2;
-            const blockCenterX = (blockLeft + blockRight) / 2;
-            if (memberCenterX < blockCenterX) {
-              // Push left
-              const pushTo = blockLeft - PUSH_MARGIN - CARD_W;
-              return { ...m, x: Math.min(m.x, pushTo) };
-            } else {
-              // Push right
-              const pushTo = blockRight + PUSH_MARGIN;
-              return { ...m, x: Math.max(m.x, pushTo) };
-            }
-          });
-          return [...pushed, placeholder];
-        });
-
-        const newUnion: Union = {
-          id: `u-${Date.now()}`,
-          partner1: sourceId,
-          partner2: placeholderId,
-          status: 'married',
-          children: [newMember.id],
-        };
-        setUnions(prev => [...prev, newUnion]);
-
-        // Animate pushed members smoothly
-        setIsAnimating(true);
-        setTimeout(() => setIsAnimating(false), 600);
-      }
-    }
-
     // For sibling: find union where source is a child, add new member as sibling
     if (relationship === 'sibling') {
       setUnions(prev => {
@@ -578,7 +641,7 @@ const GenogramEditor: React.FC = () => {
 
     // Center on new member after a tick
     setTimeout(() => centerOnMember(newMember), 100);
-  }, [members, unions, computeNewPosition, centerOnMember]);
+  }, [members, unions, computeNewPosition, centerOnMember, executeChildCreation]);
 
   const handleEdit = useCallback((id: string) => {
     const member = members.find(m => m.id === id);
@@ -880,6 +943,41 @@ const GenogramEditor: React.FC = () => {
                 onCancelAnchor={handleCancelAnchor}
               />
             ))}
+            {/* Parent picker popover for multi-union child creation */}
+            {parentPickerState && (() => {
+              const pickerSource = members.find(m => m.id === parentPickerState.sourceId);
+              if (!pickerSource) return null;
+              const sourceUnions = unions.filter(u => u.partner1 === parentPickerState.sourceId || u.partner2 === parentPickerState.sourceId);
+              return (
+                <ParentPicker
+                  sourceMember={pickerSource}
+                  unions={sourceUnions}
+                  members={members}
+                  open={parentPickerState.open}
+                  onOpenChange={(open) => {
+                    if (!open) setParentPickerState(null);
+                  }}
+                  onSelectUnion={(unionId) => {
+                    executeChildCreation(parentPickerState.sourceId, unionId);
+                    setParentPickerState(null);
+                  }}
+                  onSelectNewPartner={() => {
+                    executeChildCreation(parentPickerState.sourceId);
+                    setParentPickerState(null);
+                  }}
+                >
+                  <div
+                    className="absolute pointer-events-none"
+                    style={{
+                      left: pickerSource.x + CARD_W / 2,
+                      top: pickerSource.y + CARD_H + 40,
+                      width: 1,
+                      height: 1,
+                    }}
+                  />
+                </ParentPicker>
+              );
+            })()}
             {/* Elastic link line while dragging */}
             {linkDrag && (
               <ElasticLinkLine
