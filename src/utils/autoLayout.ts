@@ -402,66 +402,6 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ EMOTIONAL LINK CROSSING MINIMIZATION ═══
-  // After structural placement, try swapping sibling order within unions
-  // to reduce emotional link crossings
-  if (_emotionalLinks.length > 0) {
-    const CARD_CX = CARD_W / 2;
-    const CARD_CY = CARD_H / 2;
-
-    function countCrossings(): number {
-      let crossings = 0;
-      for (let i = 0; i < _emotionalLinks.length; i++) {
-        const a = _emotionalLinks[i];
-        const pa = positions.get(a.from);
-        const pb = positions.get(a.to);
-        if (!pa || !pb) continue;
-        for (let j = i + 1; j < _emotionalLinks.length; j++) {
-          const b = _emotionalLinks[j];
-          const pc = positions.get(b.from);
-          const pd = positions.get(b.to);
-          if (!pc || !pd) continue;
-          if (segsCross(
-            pa.x + CARD_CX, pa.y + CARD_CY, pb.x + CARD_CX, pb.y + CARD_CY,
-            pc.x + CARD_CX, pc.y + CARD_CY, pd.x + CARD_CX, pd.y + CARD_CY
-          )) crossings++;
-        }
-      }
-      return crossings;
-    }
-
-    // Try swapping children within each union to reduce crossings
-    let best = countCrossings();
-    if (best > 0) {
-      for (const u of unions) {
-        const children = u.children.filter(c => positions.has(c));
-        if (children.length < 2) continue;
-        // Try all pairwise swaps within this union's children
-        for (let i = 0; i < children.length; i++) {
-          for (let j = i + 1; j < children.length; j++) {
-            const pi = positions.get(children[i])!;
-            const pj = positions.get(children[j])!;
-            // Swap X positions (and their subtrees)
-            const tmpX = pi.x;
-            pi.x = pj.x;
-            pj.x = tmpX;
-            const newCount = countCrossings();
-            if (newCount < best) {
-              best = newCount;
-            } else {
-              // Revert
-              pj.x = pi.x;
-              pi.x = tmpX;
-            }
-            if (best === 0) break;
-          }
-          if (best === 0) break;
-        }
-        if (best === 0) break;
-      }
-    }
-  }
-
   // ═══ Center around origin ═══
   if (positions.size > 0) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -476,18 +416,4 @@ export function computeAutoLayout(
   }
 
   return { positions };
-}
-
-/** Check if two line segments cross */
-function segsCross(
-  ax1: number, ay1: number, ax2: number, ay2: number,
-  bx1: number, by1: number, bx2: number, by2: number
-): boolean {
-  const d1x = ax2 - ax1, d1y = ay2 - ay1;
-  const d2x = bx2 - bx1, d2y = by2 - by1;
-  const cross = d1x * d2y - d1y * d2x;
-  if (Math.abs(cross) < 1e-9) return false;
-  const t = ((bx1 - ax1) * d2y - (by1 - ay1) * d2x) / cross;
-  const u = ((bx1 - ax1) * d1y - (by1 - ay1) * d1x) / cross;
-  return t > 0.05 && t < 0.95 && u > 0.05 && u < 0.95;
 }
