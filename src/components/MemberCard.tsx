@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FamilyMember, PATHOLOGIES } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
 import CreateMemberDropdown, { RelationshipChoice } from '@/components/CreateMemberDropdown';
-import { Plus, Pencil, Link, X, Eye } from 'lucide-react';
+import { Plus, PencilLine, Link, X, Eye, UserPlus } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 
 /**
@@ -203,13 +203,18 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
       {activeState === 'selected' && !presentationMode && (
         <TooltipProvider delayDuration={300}>
-          <div className="flex items-center gap-2 justify-center mt-2">
+          <motion.div
+            className="flex items-center gap-2 justify-center mt-2"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
             <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)}>
               <button
                 onClick={(e) => e.stopPropagation()}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <UserPlus className="w-3.5 h-3.5" />
                 Créer un membre
               </button>
             </CreateMemberDropdown>
@@ -217,25 +222,25 @@ const MemberCard: React.FC<MemberCardProps> = ({
               <TooltipTrigger asChild>
                 <button
                   onClick={(e) => { e.stopPropagation(); onView?.(member.id); }}
-                  className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
+                  className="w-8 h-8 min-w-[40px] min-h-[40px] rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
                 >
-                  <Eye className="w-3.5 h-3.5 text-foreground" />
+                  <Eye className="w-4 h-4 text-foreground" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom"><span className="text-xs">Voir la fiche membre</span></TooltipContent>
+              <TooltipContent side="bottom"><span className="text-xs">Voir la fiche</span></TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={(e) => { e.stopPropagation(); onEdit?.(member.id); }}
-                  className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
+                  className="w-8 h-8 min-w-[40px] min-h-[40px] rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
                 >
-                  <Pencil className="w-3.5 h-3.5 text-foreground" />
+                  <PencilLine className="w-4 h-4 text-foreground" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom"><span className="text-xs">Modifier le membre</span></TooltipContent>
+              <TooltipContent side="bottom"><span className="text-xs">Modifier</span></TooltipContent>
             </Tooltip>
-          </div>
+          </motion.div>
         </TooltipProvider>
       )}
 
