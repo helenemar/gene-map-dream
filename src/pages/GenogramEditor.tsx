@@ -28,12 +28,13 @@ interface AnchorPoint { x: number; y: number; side: Side; }
 
 /** Corner anchors for emotional links — corners only, never center/sides */
 type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+const CORNER_INSET = 10; // compensate for rounded-xl border-radius
 function cardCorners(m: FamilyMember): { corner: Corner; x: number; y: number }[] {
   return [
-    { corner: 'top-left',     x: m.x,          y: m.y },
-    { corner: 'top-right',    x: m.x + CARD_W, y: m.y },
-    { corner: 'bottom-left',  x: m.x,          y: m.y + CARD_H },
-    { corner: 'bottom-right', x: m.x + CARD_W, y: m.y + CARD_H },
+    { corner: 'top-left',     x: m.x + CORNER_INSET,          y: m.y + CORNER_INSET },
+    { corner: 'top-right',    x: m.x + CARD_W - CORNER_INSET, y: m.y + CORNER_INSET },
+    { corner: 'bottom-left',  x: m.x + CORNER_INSET,          y: m.y + CARD_H - CORNER_INSET },
+    { corner: 'bottom-right', x: m.x + CARD_W - CORNER_INSET, y: m.y + CARD_H - CORNER_INSET },
   ];
 }
 
