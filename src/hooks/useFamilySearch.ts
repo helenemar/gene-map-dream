@@ -106,7 +106,7 @@ export function useFamilySearch(
     for (const m of members) {
       if (m.isPlaceholder) continue;
       const haystack = normalize(
-        [m.firstName, m.lastName, m.profession, ...m.pathologies.map(p => {
+        [m.firstName, m.lastName, m.profession, m.notes || '', ...m.pathologies.map(p => {
           const found = PATHOLOGIES.find(pp => pp.id === p);
           return found ? found.name : p;
         })].join(' ')

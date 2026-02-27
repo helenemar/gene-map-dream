@@ -67,6 +67,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [selectedPathologies, setSelectedPathologies] = useState<string[]>([]);
   const [twinGroup, setTwinGroup] = useState('');
   const [twinType, setTwinType] = useState<TwinType | ''>('');
+  const [notes, setNotes] = useState('');
 
   useEffect(() => {
     if (member) {
@@ -82,6 +83,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setSelectedPathologies(member.pathologies || []);
       setTwinGroup(member.twinGroup || '');
       setTwinType(member.twinType || '');
+      setNotes(member.notes || '');
     }
   }, [member]);
 
@@ -113,8 +115,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       pathologies: selectedPathologies,
       twinGroup: twinGroup || undefined,
       twinType: (twinType as TwinType) || undefined,
+      notes: notes || undefined,
     };
-  }, [member, firstName, lastName, parsedBirthYear, parsedDeathYear, age, profession, gender, isGay, isBisexual, isTransgender, selectedPathologies, twinGroup, twinType, currentYear]);
+  }, [member, firstName, lastName, parsedBirthYear, parsedDeathYear, age, profession, gender, isGay, isBisexual, isTransgender, selectedPathologies, twinGroup, twinType, notes, currentYear]);
 
   /** Fire live update to canvas */
   useEffect(() => {
@@ -122,7 +125,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthYear, deathYear, profession, gender, isGay, isBisexual, isTransgender, selectedPathologies, twinGroup, twinType]);
+  }, [firstName, lastName, birthYear, deathYear, profession, gender, isGay, isBisexual, isTransgender, selectedPathologies, twinGroup, twinType, notes]);
 
   if (!member) return null;
 
@@ -456,6 +459,19 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 </>
               );
             })()}
+
+            <Separator className="opacity-50" />
+
+            {/* ── Notes cliniques ── */}
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Notes</Label>
+              <textarea
+                className="min-h-[80px] w-full rounded-lg border border-border/50 bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 resize-y"
+                placeholder="Notes cliniques, observations, contexte familial…"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div>
 
             <Separator className="opacity-50" />
 
