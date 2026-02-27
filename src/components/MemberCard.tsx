@@ -1,20 +1,22 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FamilyMember, PATHOLOGIES } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
-import { Plus, Pencil, Link } from 'lucide-react';
+import { Plus, Pencil, Link, X } from 'lucide-react';
 
 /**
  * 4 visual states:
  *   default        – grey border, no shadow, no anchors, no buttons
  *   hover          – purple border + subtle halo
- *   selected       – purple border + halo + anchor dots (outline) + action buttons
- *   anchor-active  – same as selected but anchor dots are filled (drag mode)
+ *   selected       – purple border + halo + corner dots (outline) + action menu [+ Créer un membre] [✎]
+ *   anchor-active  – dots filled, menu changes to [🔗 Créer un lien] [X], drag mode
  */
 export type MemberCardState = 'default' | 'hover' | 'selected' | 'anchor-active';
 
 /** Fixed card width — must match CARD_W in GenogramEditor */
 export const MEMBER_CARD_W = 250;
+
+type AnchorSide = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 interface MemberCardProps {
   member: FamilyMember;
@@ -32,7 +34,16 @@ interface MemberCardProps {
   onEdit?: (id: string) => void;
   onHover?: (id: string | null) => void;
   onLinkDragStart?: (id: string, e: React.MouseEvent) => void;
+  /** Called when user wants to cancel anchor-active and go back to selected */
+  onCancelAnchor?: (id: string) => void;
 }
+
+const CORNER_DOTS: { side: AnchorSide; className: string }[] = [
+  { side: 'top-left',     className: 'top-0 left-0 -translate-x-1/2 -translate-y-1/2' },
+  { side: 'top-right',    className: 'top-0 right-0 translate-x-1/2 -translate-y-1/2' },
+  { side: 'bottom-left',  className: 'bottom-0 left-0 -translate-x-1/2 translate-y-1/2' },
+  { side: 'bottom-right', className: 'bottom-0 right-0 translate-x-1/2 translate-y-1/2' },
+];
 
 const MemberCard: React.FC<MemberCardProps> = ({
   member,
@@ -48,18 +59,22 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onEdit,
   onHover,
   onLinkDragStart,
+  onCancelAnchor,
 }) => {
   const isDeceased = !!member.deathYear;
   const memberPathologies = PATHOLOGIES.filter(p => member.pathologies.includes(p.id));
 
-  // Derive effective state: if selected via prop but state not explicitly set beyond default
+  // Internal anchor-active state for static/DS usage
+  const [internalAnchorActive, setInternalAnchorActive] = useState(false);
+
+  // Derive effective state
   const activeState: MemberCardState =
+    internalAnchorActive && isStatic ? 'anchor-active' :
     isSelected && state === 'default' ? 'selected' : state;
 
   const isHighlighted = activeState === 'hover' || activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget;
-  const showAnchors = activeState === 'selected' || activeState === 'anchor-active';
-  const showActions = activeState === 'selected' || activeState === 'anchor-active';
-  const anchorsFilled = activeState === 'anchor-active';
+  const showDots = activeState === 'selected' || activeState === 'anchor-active';
+  const dotsFilled = activeState === 'anchor-active';
 
   // Border & ring logic
   const borderClasses = isColliding
@@ -70,38 +85,43 @@ const MemberCard: React.FC<MemberCardProps> = ({
         ? 'border-primary ring-2 ring-primary/30'
         : 'border-border';
 
+  const handleDotClick = useCallback((side: AnchorSide, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isStatic) {
+      setInternalAnchorActive(true);
+      return;
+    }
+    // In editor: initiate link drag from this anchor
+    onLinkDragStart?.(member.id, e);
+  }, [isStatic, member.id, onLinkDragStart]);
+
+  const handleCancelAnchor = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isStatic) {
+      setInternalAnchorActive(false);
+      return;
+    }
+    onCancelAnchor?.(member.id);
+  }, [isStatic, member.id, onCancelAnchor]);
+
   const cardContent = (
     <>
-      {/* Anchor points — visible in selected & anchor-active */}
-      {showAnchors && (
-        <>
-          {(['top', 'bottom', 'left', 'right'] as const).map(side => {
-            const posClass =
-              side === 'top'    ? 'top-0 left-1/2 -translate-x-1/2 -translate-y-1/2' :
-              side === 'bottom' ? 'bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' :
-              side === 'left'   ? 'left-0 top-1/2 -translate-x-1/2 -translate-y-1/2' :
-                                  'right-0 top-1/2 translate-x-1/2 -translate-y-1/2';
-            return (
-              <div
-                key={side}
-                className={`absolute ${posClass} w-2.5 h-2.5 rounded-full border-2 border-primary z-10 cursor-crosshair transition-colors ${
-                  anchorsFilled ? 'bg-primary' : 'bg-card'
-                }`}
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                  onLinkDragStart?.(member.id, e);
-                }}
-              />
-            );
-          })}
-        </>
-      )}
+      {/* Corner anchor dots — visible from State 3 */}
+      {showDots && CORNER_DOTS.map(({ side, className }) => (
+        <div
+          key={side}
+          className={`absolute ${className} w-2.5 h-2.5 rounded-full border-2 border-primary z-10 cursor-crosshair transition-colors ${
+            dotsFilled ? 'bg-primary' : 'bg-card'
+          }`}
+          onMouseDown={(e) => handleDotClick(side, e)}
+        />
+      ))}
 
       {/* Card body — fixed width */}
       <div
         className={`
           relative flex items-center gap-3 rounded-xl p-2 bg-card border transition-all ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
-          ${activeState === 'default' ? '' : ''} ${borderClasses}
+          ${borderClasses}
         `}
         style={{ width: MEMBER_CARD_W }}
       >
@@ -134,8 +154,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
         </div>
       </div>
 
-      {/* Action buttons (Selected & Anchor-active states) */}
-      {showActions && (
+      {/* Action menu — changes based on state */}
+      {activeState === 'selected' && (
         <div className="flex items-center gap-2 justify-center mt-2">
           <button
             onClick={(e) => { e.stopPropagation(); onCreateRelated?.(member.id); }}
@@ -145,18 +165,33 @@ const MemberCard: React.FC<MemberCardProps> = ({
             Créer un membre
           </button>
           <button
-            onMouseDown={(e) => { e.stopPropagation(); onLinkDragStart?.(member.id, e); }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border text-foreground text-xs font-semibold shadow-soft hover:bg-accent transition-colors cursor-crosshair"
+            onClick={(e) => { e.stopPropagation(); onEdit?.(member.id); }}
+            className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
+          >
+            <Pencil className="w-3.5 h-3.5 text-foreground" />
+          </button>
+        </div>
+      )}
+
+      {activeState === 'anchor-active' && (
+        <div className="flex items-center gap-2 justify-center mt-2">
+          <button
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              onLinkDragStart?.(member.id, e);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors cursor-crosshair"
             title="Maintenir et glisser vers une autre carte"
           >
             <Link className="w-3.5 h-3.5" />
             Créer un lien
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); onEdit?.(member.id); }}
-            className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
+            onClick={handleCancelAnchor}
+            className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-destructive/10 hover:border-destructive/30 transition-colors"
+            title="Annuler"
           >
-            <Pencil className="w-3.5 h-3.5 text-foreground" />
+            <X className="w-3.5 h-3.5 text-foreground" />
           </button>
         </div>
       )}
