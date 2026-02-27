@@ -518,6 +518,20 @@ const GenogramEditor: React.FC = () => {
     setEditingNewMember(null);
   }, []);
 
+  const handleDeleteMember = useCallback((id: string) => {
+    setMembers(prev => prev.filter(m => m.id !== id));
+    setUnions(prev => prev
+      .map(u => ({
+        ...u,
+        children: u.children.filter(c => c !== id),
+      }))
+      .filter(u => u.partner1 !== id && u.partner2 !== id)
+    );
+    setEmotionalLinks(prev => prev.filter(l => l.from !== id && l.to !== id));
+    setSelectedMember(null);
+    setEditingNewMember(null);
+  }, []);
+
   const handleCancelAnchor = useCallback((id: string) => {
     setAnchorActiveMember(null);
   }, []);
@@ -792,6 +806,7 @@ const GenogramEditor: React.FC = () => {
             open={newMemberDrawerOpen}
             onClose={() => { setNewMemberDrawerOpen(false); setEditingNewMember(null); }}
             onSave={handleSaveMember}
+            onDelete={handleDeleteMember}
           />
 
           <FloatingControls

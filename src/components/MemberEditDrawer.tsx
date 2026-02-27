@@ -6,6 +6,17 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -23,9 +34,10 @@ interface MemberEditDrawerProps {
   open: boolean;
   onClose: () => void;
   onSave: (updated: FamilyMember) => void;
+  onDelete?: (id: string) => void;
 }
 
-const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClose, onSave }) => {
+const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClose, onSave, onDelete }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [birthYear, setBirthYear] = useState('');
@@ -106,6 +118,33 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
           <Button onClick={handleSave} className="mt-2 w-full">
             Enregistrer
           </Button>
+
+          {onDelete && member && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" className="w-full text-destructive hover:text-destructive hover:bg-destructive/10">
+                  Supprimer ce membre
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Supprimer {member.firstName} {member.lastName} ?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cette action est irréversible. Le membre sera supprimé du génogramme ainsi que tous ses liens associés.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={() => { onDelete(member.id); onClose(); }}
+                  >
+                    Supprimer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </SheetContent>
     </Sheet>
