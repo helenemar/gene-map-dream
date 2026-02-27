@@ -56,9 +56,9 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
         {!presentationMode && (
           <Tooltip>
             <TooltipTrigger asChild>
-          <button
+              <button
                 onClick={onAutoLayout}
-                className="h-8 px-3 rounded-full bg-card shadow-float border border-border flex items-center justify-center gap-1.5 hover:bg-accent transition-colors"
+                className="h-[44px] px-4 rounded-full bg-card shadow-float border border-border flex items-center justify-center gap-2 hover:bg-accent transition-colors"
               >
                 <Wand2 className="w-4 h-4 text-foreground" />
                 <span className="text-xs font-medium text-foreground">Réorganiser</span>
