@@ -419,8 +419,8 @@ const GenogramEditor: React.FC = () => {
     }
   }, [members]);
 
-  /** Create a child and attach it to a specific union, or create a new placeholder union */
-  const executeChildCreation = useCallback((sourceId: string, targetUnionId?: string) => {
+  /** Create a child and attach it to a specific union, create a new placeholder union, or create standalone */
+  const executeChildCreation = useCallback((sourceId: string, targetUnionId?: string, standalone?: boolean) => {
     const source = members.find(m => m.id === sourceId);
     const currentYear = new Date().getFullYear();
     const LEVEL_Y = 250;
@@ -437,6 +437,16 @@ const GenogramEditor: React.FC = () => {
       y: (source?.y ?? 200) + LEVEL_Y,
       pathologies: [],
     };
+
+    if (standalone) {
+      // Standalone child — no union, just placed below parent
+      setMembers(prev => [...prev, newChild]);
+      setSelectedMember(newChild.id);
+      setEditingNewMember(newChild);
+      setNewMemberDrawerOpen(true);
+      setTimeout(() => centerOnMember(newChild), 100);
+      return;
+    }
 
     if (targetUnionId) {
       // Add child to an existing union
@@ -544,23 +554,8 @@ const GenogramEditor: React.FC = () => {
   }, [members, unions, centerOnMember]);
 
   const handleCreateRelated = useCallback((sourceId: string, relationship: RelationshipChoice) => {
-    // ── Filiation check for child creation ──
+    // ── Always show parent picker for child creation ──
     if (relationship === 'child') {
-      const sourceUnions = unions.filter(u => u.partner1 === sourceId || u.partner2 === sourceId);
-
-      if (sourceUnions.length === 0) {
-        // No unions → directly create placeholder + child
-        executeChildCreation(sourceId);
-        return;
-      }
-
-      if (sourceUnions.length === 1) {
-        // Exactly 1 union → directly add child to that union
-        executeChildCreation(sourceId, sourceUnions[0].id);
-        return;
-      }
-
-      // Multiple unions → show parent picker popover
       setParentPickerState({ sourceId, open: true });
       return;
     }
@@ -963,6 +958,10 @@ const GenogramEditor: React.FC = () => {
                   }}
                   onSelectNewPartner={() => {
                     executeChildCreation(parentPickerState.sourceId);
+                    setParentPickerState(null);
+                  }}
+                  onSelectAlone={() => {
+                    executeChildCreation(parentPickerState.sourceId, undefined, true);
                     setParentPickerState(null);
                   }}
                 >
