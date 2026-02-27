@@ -13,11 +13,11 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 const CARD_W = 220;       // Must match MEMBER_CARD_W (min-width of actual cards)
 const CARD_H = 64;
 const LEVEL_SPACING = 250;
-const BASE_COUPLE_GAP = 120;
-const MIN_BADGE_GAP = 220;   // Minimum gap when a union has dates/status
-const BADGE_SAFETY = 60;     // 30px breathing room on each side of badge
-const SIBLING_GAP = 80;
-const BLOCK_GAP = 80;
+const BASE_COUPLE_GAP = 200;
+const MIN_BADGE_GAP = 280;   // Minimum gap when a union has dates/status
+const BADGE_SAFETY = 80;     // 40px breathing room on each side of badge
+const SIBLING_GAP = 100;
+const BLOCK_GAP = 120;
 const VERTICAL_STAGGER = 30; // Cumulative Y-offset per sibling for "escalier" effect
 const MAX_STAGGER = 150; // Cap to avoid colliding with next generation
 
