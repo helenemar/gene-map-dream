@@ -1,17 +1,32 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Share2, Plus, UserPlus, Pencil, ZoomIn, ZoomOut, X, Search, ChevronDown, ChevronUp, ArrowLeft, Link } from 'lucide-react';
-import { PATHOLOGIES, FAMILY_LINK_TYPES, EMOTIONAL_LINK_TYPES } from '@/types/genogram';
+import { PATHOLOGIES, FAMILY_LINK_TYPES, EMOTIONAL_LINK_TYPES, FamilyMember } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
+import MemberCard from '@/components/MemberCard';
+import type { MemberCardState } from '@/components/MemberCard';
 import { EmotionalLinkPreview } from '@/components/EmotionalLinkLine';
 import { FamilyLinkPreview } from '@/components/FamilyLinkLines';
-import type { MemberCardState } from '@/components/MemberCard';
 
 /* ============================================================
    Design System – Genogy
    Source of truth for all visual components.
    Route: /design-system (manual access only)
    ============================================================ */
+
+/** Helper to build a FamilyMember for DS demos */
+function dsMember(overrides: Partial<FamilyMember> & { firstName: string; gender: 'male' | 'female' }): FamilyMember {
+  return {
+    id: overrides.firstName.toLowerCase(),
+    lastName: '',
+    birthYear: 1990,
+    age: 34,
+    profession: '',
+    x: 0, y: 0,
+    pathologies: [],
+    ...overrides,
+  };
+}
 
 // --------------- Helpers ---------------
 const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -510,11 +525,15 @@ const DesignSystemPage: React.FC = () => {
           <p className="text-sm text-muted-foreground mb-4">Composant complet avec MemberIcon + infos. L'icône change selon genre, orientation, identité et statut vital.</p>
           <div className="dot-grid rounded-2xl border border-border p-8">
             <div className="flex flex-wrap gap-8 items-start">
-              <MemberCardDemo name="François" age={39} birthYear={1889} profession="Ingénieur" gender="male" pathologies={[]} />
-              <MemberCardDemo name="Hélène" age={33} birthYear={1992} profession="Product Designer" gender="female" pathologies={[]} />
-              <MemberCardDemo name="Philippe" age={58} birthYear={1963} deathYear={2018} profession="Dentiste" gender="male" pathologies={['cardiovascular', 'depression']} isDead />
-              <MemberCardDemo name="Elisabeth" age={63} birthYear={1962} profession="Psychologue" gender="female" pathologies={['cancer']} isTransgender />
-              <MemberCardDemo name="Jona" age={28} birthYear={1996} profession="Psychologue" gender="female" pathologies={[]} selected isGay />
+              {[
+                dsMember({ firstName: 'François', age: 39, birthYear: 1889, profession: 'Ingénieur', gender: 'male' }),
+                dsMember({ firstName: 'Hélène', age: 33, birthYear: 1992, profession: 'Product Designer', gender: 'female' }),
+                dsMember({ firstName: 'Philippe', age: 58, birthYear: 1963, deathYear: 2018, profession: 'Dentiste', gender: 'male', pathologies: ['cardiovascular', 'depression'] }),
+                dsMember({ firstName: 'Elisabeth', age: 63, birthYear: 1962, profession: 'Psychologue', gender: 'female', pathologies: ['cancer'], isTransgender: true }),
+                dsMember({ firstName: 'Jona', age: 28, birthYear: 1996, profession: 'Psychologue', gender: 'female', isGay: true }),
+              ].map(m => (
+                <MemberCard key={m.id} member={m} static />
+              ))}
             </div>
           </div>
         </SubSection>
@@ -532,16 +551,19 @@ const DesignSystemPage: React.FC = () => {
                   <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
                     State: {st}
                   </span>
-                  <MemberCardStatic
-                    name="Firstname"
-                    age={24}
-                    birthYear={1962}
-                    deathYear={1998}
-                    profession="Data analyste"
-                    gender="male"
-                    pathologies={['depression']}
-                    isTransgender
+                  <MemberCard
+                    member={dsMember({
+                      firstName: 'Firstname',
+                      age: 24,
+                      birthYear: 1962,
+                      deathYear: 1998,
+                      profession: 'Data analyste',
+                      gender: 'male',
+                      pathologies: ['depression'],
+                      isTransgender: true,
+                    })}
                     state={st}
+                    static
                   />
                 </div>
               ))}
@@ -820,120 +842,6 @@ function generateCombinations(_gender: 'male' | 'female') {
   return combos;
 }
 
-// ================== Sub-components for the DS page ==================
-
-const MemberCardDemo: React.FC<{
-  name: string;
-  age: number;
-  birthYear: number;
-  deathYear?: number;
-  profession: string;
-  gender: 'male' | 'female';
-  pathologies: string[];
-  selected?: boolean;
-  isDead?: boolean;
-  isGay?: boolean;
-  isBisexual?: boolean;
-  isTransgender?: boolean;
-}> = ({ name, age, birthYear, deathYear, profession, gender, pathologies, selected, isDead, isGay, isBisexual, isTransgender }) => {
-  const isDeceased = !!deathYear || isDead;
-  const matchedPathologies = PATHOLOGIES.filter(p => pathologies.includes(p.id));
-
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <div className={`flex items-center gap-3 ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''} rounded-xl p-2 bg-card border border-border shadow-card transition-shadow`}>
-        <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
-          <MemberIcon gender={gender} isGay={isGay} isBisexual={isBisexual} isTransgender={isTransgender} isDead={isDeceased} pathologyColors={matchedPathologies.map(p => `hsl(var(--pathology-${p.id}))`)} size={48} className="text-foreground" />
-        </div>
-        <div className="whitespace-nowrap">
-          <div className="flex items-center gap-6">
-            <span className="font-semibold text-sm text-foreground">{name}</span>
-            <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">{age} ans</span>
-          </div>
-          <div className="text-xs text-muted-foreground">{birthYear}{deathYear ? ` - ${deathYear}` : ' -'}</div>
-          <div className="text-xs text-muted-foreground">{profession}</div>
-        </div>
-      </div>
-      <span className="text-[10px] text-muted-foreground">
-        {gender === 'male' ? '♂ Homme' : '♀ Femme'}
-        {isDeceased ? ' · Décédé' : ''}
-        {isGay ? ' · Gay' : ''}{isBisexual ? ' · Bi' : ''}{isTransgender ? ' · Trans' : ''}
-        {selected ? ' · Sélectionné' : ''}
-      </span>
-    </div>
-  );
-};
-
-// Static MemberCard with state rendering (for design system showcase — not positioned absolute)
-const MemberCardStatic: React.FC<{
-  name: string;
-  age: number;
-  birthYear: number;
-  deathYear?: number;
-  profession: string;
-  gender: 'male' | 'female';
-  pathologies: string[];
-  isDead?: boolean;
-  isGay?: boolean;
-  isBisexual?: boolean;
-  isTransgender?: boolean;
-  state?: MemberCardState;
-}> = ({ name, age, birthYear, deathYear, profession, gender, pathologies, isDead, isGay, isBisexual, isTransgender, state = 'default' }) => {
-  const isDeceased = !!deathYear || isDead;
-  const matchedPathologies = PATHOLOGIES.filter(p => pathologies.includes(p.id));
-
-  const showRing = state === 'hover' || state === 'edition' || state === 'linkable';
-  const showAnchors = state === 'edition' || state === 'linkable';
-  const showActions = state === 'edition';
-  const showLinkIcon = state === 'linkable';
-
-  return (
-    <div className="relative inline-block">
-      {/* Anchor points */}
-      {showAnchors && (
-        <>
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-card z-10" />
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-card z-10" />
-          <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-card z-10" />
-          <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-card z-10" />
-        </>
-      )}
-
-      {/* Card body */}
-      <div className={`relative flex items-center gap-3 rounded-xl p-2 bg-card border shadow-card transition-all ${showRing ? 'border-primary ring-2 ring-primary/30' : 'border-border'}`}>
-        <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
-          <MemberIcon gender={gender} isGay={isGay} isBisexual={isBisexual} isTransgender={isTransgender} isDead={isDeceased} pathologyColors={matchedPathologies.map(p => `hsl(var(--pathology-${p.id}))`)} size={48} className="text-foreground" />
-        </div>
-        <div className="whitespace-nowrap">
-          <div className="flex items-center gap-6">
-            <span className="font-semibold text-sm text-foreground">{name}</span>
-            <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">{age} ans</span>
-          </div>
-          <div className="text-xs text-muted-foreground">{birthYear}{deathYear ? ` - ${deathYear}` : ' -'}</div>
-          <div className="text-xs text-muted-foreground">{profession}</div>
-        </div>
-        {showLinkIcon && (
-          <div className="ml-1 w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0">
-            <Link className="w-3.5 h-3.5 text-muted-foreground" />
-          </div>
-        )}
-      </div>
-
-      {/* Floating action buttons */}
-      {showActions && (
-        <div className="flex items-center gap-2 justify-center mt-2">
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors">
-            <Plus className="w-3.5 h-3.5" />
-            Create related member
-          </button>
-          <button className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors">
-            <Pencil className="w-3.5 h-3.5 text-foreground" />
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
 
 const SidebarSection: React.FC<{
   title: string;
