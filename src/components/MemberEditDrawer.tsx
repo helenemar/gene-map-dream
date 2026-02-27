@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FamilyMember, PATHOLOGIES } from '@/types/genogram';
+import { FamilyMember, PATHOLOGIES, TwinType } from '@/types/genogram';
 import {
   Sheet,
   SheetContent,
@@ -51,6 +51,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
   const [isBisexual, setIsBisexual] = useState(false);
   const [isTransgender, setIsTransgender] = useState(false);
   const [selectedPathologies, setSelectedPathologies] = useState<string[]>([]);
+  const [twinGroup, setTwinGroup] = useState('');
+  const [twinType, setTwinType] = useState<TwinType | ''>('');
 
   useEffect(() => {
     if (member) {
@@ -64,6 +66,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
       setIsBisexual(!!member.isBisexual);
       setIsTransgender(!!member.isTransgender);
       setSelectedPathologies(member.pathologies || []);
+      setTwinGroup(member.twinGroup || '');
+      setTwinType(member.twinType || '');
     }
   }, [member]);
 
@@ -99,8 +103,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
       isBisexual,
       isTransgender,
       pathologies: selectedPathologies,
+      twinGroup: twinGroup || undefined,
+      twinType: (twinType as TwinType) || undefined,
     });
-    onClose();
   };
 
   return (
@@ -181,6 +186,39 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({ member, open, onClo
                 <span className="text-sm text-foreground">Bisexuel(le)</span>
                 <Switch checked={isBisexual} onCheckedChange={(v) => { setIsBisexual(v); if (v) setIsGay(false); }} />
               </div>
+            </div>
+
+            <Separator />
+
+            {/* ── Jumeaux ── */}
+            <div className="flex flex-col gap-3">
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Jumeaux / Triplés</Label>
+
+              <div className="flex flex-col gap-2">
+                <Label className="text-xs text-muted-foreground">Groupe de jumeaux</Label>
+                <Input
+                  className="h-9"
+                  placeholder="ex: twin-1 (vide si pas jumeau)"
+                  value={twinGroup}
+                  onChange={(e) => setTwinGroup(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Les membres partageant le même identifiant seront affichés comme jumeaux/triplés.
+                </p>
+              </div>
+
+              {twinGroup && (
+                <div className="flex flex-col gap-2">
+                  <Label className="text-xs text-muted-foreground">Type de jumeaux</Label>
+                  <Select value={twinType} onValueChange={(v) => setTwinType(v as TwinType)}>
+                    <SelectTrigger className="h-9"><SelectValue placeholder="Choisir le type" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="monozygotic">Monozygote (vrais jumeaux)</SelectItem>
+                      <SelectItem value="dizygotic">Dizygote (faux jumeaux)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
             <Separator />
