@@ -456,15 +456,48 @@ const GenogramEditor: React.FC = () => {
 
     // For child: find or create a union that includes sourceId, add child
     if (relationship === 'child') {
-      setUnions(prev => {
-        const parentUnion = prev.find(u => u.partner1 === sourceId || u.partner2 === sourceId);
-        if (parentUnion) {
-          return prev.map(u =>
-            u.id === parentUnion.id ? { ...u, children: [...u.children, newMember.id] } : u
-          );
-        }
-        return prev;
-      });
+      const existingUnion = unions.find(u => u.partner1 === sourceId || u.partner2 === sourceId);
+      if (existingUnion) {
+        // Add child to existing union
+        setUnions(prev => prev.map(u =>
+          u.id === existingUnion.id ? { ...u, children: [...u.children, newMember.id] } : u
+        ));
+      } else {
+        // No union exists → create placeholder partner + union
+        const SPOUSE_GAP = CARD_W + 120;
+        const placeholderId = `m-ph-${Date.now()}`;
+        const sourceX = source?.x ?? 200;
+        const sourceY = source?.y ?? 200;
+        const placeholderX = sourceX + SPOUSE_GAP;
+
+        const placeholder: FamilyMember = {
+          id: placeholderId,
+          firstName: '',
+          lastName: '',
+          birthYear: 0,
+          age: 0,
+          profession: '',
+          gender: source?.gender === 'male' ? 'female' : 'male',
+          x: placeholderX,
+          y: sourceY,
+          pathologies: [],
+          isPlaceholder: true,
+        };
+
+        // Center child under the couple
+        const coupleCenterX = (sourceX + placeholderX + CARD_W) / 2 - CARD_W / 2;
+        newMember.x = coupleCenterX;
+
+        const newUnion: Union = {
+          id: `u-${Date.now()}`,
+          partner1: sourceId,
+          partner2: placeholderId,
+          status: 'married',
+          children: [newMember.id],
+        };
+        setMembers(prev => [...prev, placeholder]);
+        setUnions(prev => [...prev, newUnion]);
+      }
     }
 
     // For sibling: find union where source is a child, add new member as sibling
@@ -514,7 +547,8 @@ const GenogramEditor: React.FC = () => {
   const handleSaveMember = useCallback((updated: FamilyMember) => {
     const currentYear = new Date().getFullYear();
     const age = updated.birthYear ? currentYear - updated.birthYear : updated.age;
-    setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age } : m));
+    // Clear placeholder flag when user fills in data
+    setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false } : m));
     setEditingNewMember(null);
   }, []);
 

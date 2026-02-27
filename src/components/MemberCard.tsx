@@ -63,6 +63,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onCancelAnchor,
 }) => {
   const isDeceased = !!member.deathYear;
+  const isPlaceholder = !!member.isPlaceholder;
   const memberPathologies = PATHOLOGIES.filter(p => member.pathologies.includes(p.id));
 
   // Internal anchor-active state for static/DS usage
@@ -131,33 +132,48 @@ const MemberCard: React.FC<MemberCardProps> = ({
           />
         ))}
 
-        {/* Icon with pathology fills */}
+        {/* Icon with pathology fills or placeholder */}
         <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
-          <MemberIcon
-            gender={member.gender}
-            isGay={member.isGay}
-            isBisexual={member.isBisexual}
-            isTransgender={member.isTransgender}
-            isDead={isDeceased}
-            pathologyColors={memberPathologies.map(p => `hsl(var(--pathology-${p.id}))`)}
-            size={48}
-            className="text-foreground"
-          />
+          {isPlaceholder ? (
+            <div className="w-12 h-12 rounded border-2 border-dashed border-muted-foreground/40 flex items-center justify-center">
+              <Plus className="w-5 h-5 text-muted-foreground/50" />
+            </div>
+          ) : (
+            <MemberIcon
+              gender={member.gender}
+              isGay={member.isGay}
+              isBisexual={member.isBisexual}
+              isTransgender={member.isTransgender}
+              isDead={isDeceased}
+              pathologyColors={memberPathologies.map(p => `hsl(var(--pathology-${p.id}))`)}
+              size={48}
+              className="text-foreground"
+            />
+          )}
         </div>
 
         {/* Info block */}
         <div className="min-w-0 flex-1">
-          {/* Header: Prénom left, Âge right — space-between */}
-          <div className="flex items-center justify-between gap-3">
-            <span className="font-semibold text-sm text-foreground whitespace-nowrap">{member.firstName}</span>
-            <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">
-              {member.age} ans
-            </span>
-          </div>
-          <div className="text-xs text-muted-foreground whitespace-nowrap">
-            {member.birthYear}{member.deathYear ? ` - ${member.deathYear}` : ' -'}
-          </div>
-          <div className="text-xs text-muted-foreground whitespace-nowrap">{member.profession}</div>
+          {isPlaceholder ? (
+            <div className="flex flex-col gap-0.5">
+              <span className="font-medium text-sm text-muted-foreground/60 italic whitespace-nowrap">Non renseigné</span>
+              <span className="text-[11px] text-muted-foreground/40">Cliquer pour éditer</span>
+            </div>
+          ) : (
+            <>
+              {/* Header: Prénom left, Âge right — space-between */}
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-semibold text-sm text-foreground whitespace-nowrap">{member.firstName}</span>
+                <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">
+                  {member.age} ans
+                </span>
+              </div>
+              <div className="text-xs text-muted-foreground whitespace-nowrap">
+                {member.birthYear}{member.deathYear ? ` - ${member.deathYear}` : ' -'}
+              </div>
+              <div className="text-xs text-muted-foreground whitespace-nowrap">{member.profession}</div>
+            </>
+          )}
         </div>
       </div>
 
