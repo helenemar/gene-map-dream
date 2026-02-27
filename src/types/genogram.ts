@@ -1,3 +1,5 @@
+export type TwinType = 'monozygotic' | 'dizygotic';
+
 export interface FamilyMember {
   id: string;
   firstName: string;
@@ -14,6 +16,8 @@ export interface FamilyMember {
   y: number;
   pathologies: string[];
   avatar?: string;
+  twinGroup?: string;   // Shared ID among twins (e.g. "twin-1")
+  twinType?: TwinType;  // monozygotic (identical) or dizygotic (fraternal)
 }
 
 export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed';

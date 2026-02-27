@@ -30,16 +30,24 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
     gender: 'female', x: 500, y: 350, pathologies: ['neurodegeneration', 'depression'],
   },
 
-  // ── Génération 2 (Petits-enfants — 3 enfants de Philippe) ──
+  // ── Génération 2 (Petits-enfants — 4 enfants de Philippe) ──
   {
     id: 'c1', firstName: 'Julien', lastName: 'Lefèvre',
     birthYear: 1998, age: 28, profession: 'Kinésithérapeute',
     gender: 'male', x: 0, y: 700, pathologies: ['bipolar'],
   },
+  // Jumeaux monozygotes (vrais jumeaux)
   {
     id: 'c2', firstName: 'Camille', lastName: 'Lefèvre',
     birthYear: 2001, age: 25, profession: 'Graphiste',
     gender: 'female', x: 250, y: 700, pathologies: [],
+    twinGroup: 'twin-1', twinType: 'monozygotic',
+  },
+  {
+    id: 'c2b', firstName: 'Clara', lastName: 'Lefèvre',
+    birthYear: 2001, age: 25, profession: 'Architecte',
+    gender: 'female', x: 450, y: 700, pathologies: ['psychogenic'],
+    twinGroup: 'twin-1', twinType: 'monozygotic',
   },
   {
     id: 'c3', firstName: 'Raphaël', lastName: 'Lefèvre',
@@ -49,17 +57,15 @@ export const SAMPLE_MEMBERS: FamilyMember[] = [
 ];
 
 export const SAMPLE_UNIONS: Union[] = [
-  // Gen 0: Henri + Madeleine → 2 enfants
   {
     id: 'u-gp', partner1: 'gp-m', partner2: 'gp-f',
     status: 'widowed', marriageYear: 1968,
     children: ['p1', 'p2'],
   },
-  // Gen 1: Philippe + Nathalie → 3 enfants
   {
     id: 'u-p1', partner1: 'p1', partner2: 'p1-w',
     status: 'married', marriageYear: 1996,
-    children: ['c1', 'c2', 'c3'],
+    children: ['c1', 'c2', 'c2b', 'c3'],
   },
 ];
 
