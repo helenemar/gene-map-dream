@@ -14,8 +14,8 @@ const CARD_W = 186;
 const CARD_H = 64;
 const LEVEL_SPACING = 250;
 const BASE_COUPLE_GAP = 100;
-const MIN_BADGE_GAP = 160;   // Minimum gap when a union has dates/status
-const BADGE_SAFETY = 40;     // Extra breathing room around badge
+const MIN_BADGE_GAP = 200;   // Minimum gap when a union has dates/status
+const BADGE_SAFETY = 60;     // Extra breathing room around badge
 const SIBLING_GAP = 50;
 const BLOCK_GAP = 80;
 const VERTICAL_STAGGER = 30; // Cumulative Y-offset per sibling for "escalier" effect
@@ -36,7 +36,7 @@ function coupleGap(union: Union): number {
   }
   // Has status icon but no dates
   const hasIcon = ['divorced', 'separated', 'widowed', 'love_affair', 'common_law'].includes(union.status);
-  return hasIcon ? Math.max(BASE_COUPLE_GAP, 120) : BASE_COUPLE_GAP;
+  return hasIcon ? Math.max(BASE_COUPLE_GAP, 140) : BASE_COUPLE_GAP;
 }
 
 export function computeAutoLayout(
