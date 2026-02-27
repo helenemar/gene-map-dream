@@ -12,10 +12,10 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 
 const CARD_W = 186;
 const CARD_H = 64;
-const LEVEL_SPACING = 350;
+const LEVEL_SPACING = 250;
 const COUPLE_GAP = 40;
 const SIBLING_GAP = 50;
-const BLOCK_GAP = 120;
+const BLOCK_GAP = 80;
 const VERTICAL_STAGGER = 30; // Cumulative Y-offset per sibling for "escalier" effect
 const MAX_STAGGER = 150; // Cap to avoid colliding with next generation
 
@@ -107,10 +107,14 @@ export function computeAutoLayout(
   // Track rightmost X used globally at each generation
   const genRightEdge = new Map<number, number>();
   function getRightEdge(gen: number): number {
-    return genRightEdge.get(gen) ?? 0;
+    return genRightEdge.get(gen) ?? -Infinity;
   }
   function updateRightEdge(gen: number, x: number) {
-    genRightEdge.set(gen, Math.max(getRightEdge(gen), x));
+    const cur = genRightEdge.get(gen);
+    genRightEdge.set(gen, cur === undefined ? x : Math.max(cur, x));
+  }
+  function hasPlacedAt(gen: number): boolean {
+    return genRightEdge.has(gen);
   }
 
   const placed = new Set<string>();
@@ -173,7 +177,7 @@ export function computeAutoLayout(
 
     if (children.length === 0) {
       // Childless couple
-      const x = Math.max(startX, getRightEdge(gen) + BLOCK_GAP);
+      const x = hasPlacedAt(gen) ? getRightEdge(gen) + BLOCK_GAP : startX;
       placeCouple(union, x, gen);
       const rightX = x + CARD_W * 2 + COUPLE_GAP;
       updateRightEdge(gen, rightX);
@@ -181,7 +185,7 @@ export function computeAutoLayout(
     }
 
     // ─── Place children first (left to right) with twin detection ───
-    let childCursor = Math.max(startX, getRightEdge(childGen) + BLOCK_GAP);
+    let childCursor = hasPlacedAt(childGen) ? getRightEdge(childGen) + BLOCK_GAP : startX;
     const childXPositions: { id: string; left: number; right: number }[] = [];
 
     // Compute stagger rank: twins share the same rank
@@ -201,7 +205,9 @@ export function computeAutoLayout(
       const cid = children[childIdx];
 
       // Ensure no overlap at child gen
-      childCursor = Math.max(childCursor, getRightEdge(childGen) + SIBLING_GAP);
+      if (hasPlacedAt(childGen)) {
+        childCursor = Math.max(childCursor, getRightEdge(childGen) + SIBLING_GAP);
+      }
       
       // Vertical stagger: twins share rank → same Y
       const yStagger = Math.min(staggerRanks[childIdx] * VERTICAL_STAGGER, MAX_STAGGER);
@@ -211,16 +217,33 @@ export function computeAutoLayout(
       const childSubUnions = getParentingUnions(cid).filter(u => !processedUnions.has(u.id));
 
       if (childSubUnions.length > 0) {
-        const subStart = childCursor;
         let subRight = childCursor;
         for (const cu of childSubUnions) {
           subRight = placeUnion(cu, subRight);
         }
         const childPos = positions.get(cid);
-        if (childPos) childPos.y = childY;
-        const left = childPos ? childPos.x : subStart;
-        childXPositions.push({ id: cid, left, right: subRight });
-        childCursor = subRight + SIBLING_GAP;
+        // Don't override Y when child has sub-family (couple Y was set by placeCouple)
+        // But DO apply stagger to the child AND their partner
+        if (childPos) {
+          const dy = childY - childGen * LEVEL_SPACING;
+          childPos.y = childY;
+          // Also shift partner to maintain same Y
+          for (const cu of childSubUnions) {
+            const u = unionMap.get(cu.id)!;
+            const partnerId = u.partner1 === cid ? u.partner2 : u.partner1;
+            const partnerPos = positions.get(partnerId);
+            if (partnerPos) partnerPos.y = childY;
+            // Shift children of this sub-union down too
+            for (const gcid of u.children) {
+              const gcPos = positions.get(gcid);
+              if (gcPos) gcPos.y += dy;
+            }
+          }
+        }
+        const left = childPos ? childPos.x : childCursor;
+        const right = Math.max(subRight, (childPos ? childPos.x + CARD_W : subRight));
+        childXPositions.push({ id: cid, left, right });
+        childCursor = right + SIBLING_GAP;
       } else {
         if (!placed.has(cid)) {
           positions.set(cid, { x: childCursor, y: childY });
@@ -242,7 +265,7 @@ export function computeAutoLayout(
     let coupleLeft = blockCenter - coupleWidth / 2;
 
     // Don't overlap previously placed members at this gen
-    const minCoupleLeft = placed.size > 0 ? getRightEdge(gen) + BLOCK_GAP : startX;
+    const minCoupleLeft = hasPlacedAt(gen) ? getRightEdge(gen) + BLOCK_GAP : startX;
     if (coupleLeft < minCoupleLeft) {
       const shift = minCoupleLeft - coupleLeft;
       coupleLeft = minCoupleLeft;
@@ -330,7 +353,7 @@ export function computeAutoLayout(
   for (const m of members) {
     if (!placed.has(m.id)) {
       const gen = generation.get(m.id) ?? 0;
-      const x = getRightEdge(gen) + BLOCK_GAP;
+      const x = hasPlacedAt(gen) ? getRightEdge(gen) + BLOCK_GAP : 0;
       positions.set(m.id, { x, y: gen * LEVEL_SPACING });
       placed.add(m.id);
       updateRightEdge(gen, x + CARD_W);
