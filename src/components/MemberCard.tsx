@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { FamilyMember, PATHOLOGIES } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
 import CreateMemberDropdown, { RelationshipChoice } from '@/components/CreateMemberDropdown';
-import { Plus, Pencil, Link, X } from 'lucide-react';
+import { Plus, Pencil, Link, X, Eye } from 'lucide-react';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 
 /**
  * 4 visual states:
@@ -39,6 +40,7 @@ interface MemberCardProps {
   onDragStart?: (id: string, e: React.MouseEvent) => void;
   onCreateRelated?: (id: string, relationship: RelationshipChoice) => void;
   onEdit?: (id: string) => void;
+  onView?: (id: string) => void;
   onHover?: (id: string | null) => void;
   onLinkDragStart?: (id: string, e: React.MouseEvent) => void;
   /** Called when user wants to cancel anchor-active and go back to selected */
@@ -67,6 +69,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onDragStart,
   onCreateRelated,
   onEdit,
+  onView,
   onHover,
   onLinkDragStart,
   onCancelAnchor,
@@ -196,23 +199,41 @@ const MemberCard: React.FC<MemberCardProps> = ({
       </div>
 
       {activeState === 'selected' && (
-        <div className="flex items-center gap-2 justify-center mt-2">
-          <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)}>
-            <button
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Créer un membre
-            </button>
-          </CreateMemberDropdown>
-          <button
-            onClick={(e) => { e.stopPropagation(); onEdit?.(member.id); }}
-            className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
-          >
-            <Pencil className="w-3.5 h-3.5 text-foreground" />
-          </button>
-        </div>
+        <TooltipProvider delayDuration={300}>
+          <div className="flex items-center gap-2 justify-center mt-2">
+            <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)}>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Créer un membre
+              </button>
+            </CreateMemberDropdown>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onView?.(member.id); }}
+                  className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
+                >
+                  <Eye className="w-3.5 h-3.5 text-foreground" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom"><span className="text-xs">Voir la fiche membre</span></TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onEdit?.(member.id); }}
+                  className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
+                >
+                  <Pencil className="w-3.5 h-3.5 text-foreground" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom"><span className="text-xs">Modifier le membre</span></TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
       )}
 
       {/* Action menu — State: Anchor-Active */}
