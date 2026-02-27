@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode } from 'lucide-react';
+import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { SearchSuggestion } from '@/hooks/useFamilySearch';
@@ -14,6 +14,7 @@ interface EditorHeaderProps {
   matchCount: number;
   onExportPng?: () => void;
   onExportSvg?: () => void;
+  onExportPdf?: () => void;
 }
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -39,6 +40,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   matchCount,
   onExportPng,
   onExportSvg,
+  onExportPdf,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -163,6 +165,10 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
             <DropdownMenuItem onClick={onExportSvg} className="gap-2 cursor-pointer">
               <FileCode className="w-4 h-4" />
               Exporter en SVG
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onExportPdf} className="gap-2 cursor-pointer">
+              <FileText className="w-4 h-4" />
+              Exporter en PDF
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

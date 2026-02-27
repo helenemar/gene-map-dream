@@ -1,4 +1,5 @@
 import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 /**
  * Compute the bounding box of all members on the canvas.
@@ -68,6 +69,96 @@ export async function exportAsPng(
     canvas.toBlob((blob) => {
       if (blob) downloadBlob(blob, `${fileName}.png`);
     }, 'image/png');
+  } finally {
+    contentDiv.style.transform = originalTransform;
+    contentDiv.style.transformOrigin = originalTransformOrigin;
+    canvasRef.style.backgroundImage = originalBg;
+  }
+}
+
+/**
+ * Export the canvas content as a PDF in A4 landscape with a header showing the file name.
+ */
+export async function exportAsPdf(
+  canvasRef: HTMLDivElement,
+  fileName: string,
+) {
+  const contentDiv = canvasRef.querySelector('.absolute') as HTMLElement;
+  if (!contentDiv) return;
+
+  // Temporarily reset transform for clean capture
+  const originalTransform = contentDiv.style.transform;
+  const originalTransformOrigin = contentDiv.style.transformOrigin;
+  contentDiv.style.transform = 'none';
+  contentDiv.style.transformOrigin = '0 0';
+
+  const originalBg = canvasRef.style.backgroundImage;
+  canvasRef.style.backgroundImage = 'none';
+
+  try {
+    const canvas = await html2canvas(contentDiv, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      width: contentDiv.scrollWidth,
+      height: contentDiv.scrollHeight,
+    });
+
+    // A4 landscape dimensions in mm
+    const pageW = 297;
+    const pageH = 210;
+    const margin = 10;
+    const headerH = 14;
+
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+    // Header
+    pdf.setFillColor(245, 245, 245);
+    pdf.rect(0, 0, pageW, headerH + 4, 'F');
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(12);
+    pdf.setTextColor(30, 30, 30);
+    pdf.text(fileName, margin, headerH - 2);
+
+    // Date on the right
+    const dateStr = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.setTextColor(120, 120, 120);
+    pdf.text(dateStr, pageW - margin, headerH - 2, { align: 'right' });
+
+    // Thin separator line
+    pdf.setDrawColor(200, 200, 200);
+    pdf.setLineWidth(0.3);
+    pdf.line(margin, headerH + 2, pageW - margin, headerH + 2);
+
+    // Image area
+    const imgAreaW = pageW - margin * 2;
+    const imgAreaH = pageH - headerH - 4 - margin;
+    const imgAreaY = headerH + 4;
+
+    const imgData = canvas.toDataURL('image/png');
+    const imgRatio = canvas.width / canvas.height;
+    const areaRatio = imgAreaW / imgAreaH;
+
+    let drawW: number, drawH: number, drawX: number, drawY: number;
+    if (imgRatio > areaRatio) {
+      // Fit by width
+      drawW = imgAreaW;
+      drawH = imgAreaW / imgRatio;
+      drawX = margin;
+      drawY = imgAreaY + (imgAreaH - drawH) / 2;
+    } else {
+      // Fit by height
+      drawH = imgAreaH;
+      drawW = imgAreaH * imgRatio;
+      drawX = margin + (imgAreaW - drawW) / 2;
+      drawY = imgAreaY;
+    }
+
+    pdf.addImage(imgData, 'PNG', drawX, drawY, drawW, drawH);
+    pdf.save(`${fileName}.pdf`);
   } finally {
     contentDiv.style.transform = originalTransform;
     contentDiv.style.transformOrigin = originalTransformOrigin;
