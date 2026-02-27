@@ -227,10 +227,26 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
         // Use resolved comb Y (with rail offset if needed)
         const combY = combYMap.get(union.id) ?? unionLineY + 60;
 
+        // Count effective drop points: each non-twin child = 1, each twin group = 1
+        const twinGroups = new Set(childMembers.filter(c => c.twinGroup).map(c => c.twinGroup));
+        const nonTwinCount = childMembers.filter(c => !c.twinGroup).length;
+        const effectiveDropCount = nonTwinCount + twinGroups.size;
+
         const childLeftX = Math.min(...childDropXs);
         const childRightX = Math.max(...childDropXs);
         const combLeftX = Math.min(unionMidX, childLeftX);
         const combRightX = Math.max(unionMidX, childRightX);
+
+        // Compute twin fork positions for single-group connector
+        const twinForkXs: number[] = [];
+        if (twinGroups.size > 0) {
+          for (const tg of twinGroups) {
+            const twins = childMembers.filter(c => c.twinGroup === tg);
+            const twinAnchorsForGroup = twins.map(t => getAnchor(t, 'top'));
+            const forkX = twinAnchorsForGroup.reduce((sum, a) => sum + a.x, 0) / twinAnchorsForGroup.length;
+            twinForkXs.push(forkX);
+          }
+        }
 
         return (
           <g key={union.id}>
@@ -255,19 +271,11 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
               stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
             />
 
-            {/* 3. Horizontal comb bar (stem to children range only) */}
-            {childMembers.length > 1 && (
+            {/* 3. Horizontal comb bar — only when multiple effective drop points */}
+            {effectiveDropCount > 1 && (
               <line
                 x1={combLeftX} y1={combY}
-                x2={childRightX} y2={combY}
-                stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-              />
-            )}
-            {/* Horizontal connector from stem to comb if stem is outside children range */}
-            {childMembers.length > 1 && unionMidX < childLeftX && (
-              <line
-                x1={unionMidX} y1={combY}
-                x2={childLeftX} y2={combY}
+                x2={combRightX} y2={combY}
                 stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
               />
             )}
@@ -292,8 +300,8 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
                   twinIndices.forEach(idx => processed.add(idx));
 
                   // Inverted V: single fork point on comb, branches to each twin
-                  const twinAnchors = twinIndices.map(idx => childAnchors[idx]);
-                  const forkX = twinAnchors.reduce((sum, a) => sum + a.x, 0) / twinAnchors.length;
+                  const twinAnchorsLocal = twinIndices.map(idx => childAnchors[idx]);
+                  const forkX = twinAnchorsLocal.reduce((sum, a) => sum + a.x, 0) / twinAnchorsLocal.length;
                   const forkY = combY + 20; // Fork point slightly below comb
 
                   // Stem from comb to fork
@@ -305,7 +313,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
                   );
 
                   // Branches from fork to each twin
-                  twinAnchors.forEach((anchor, ti) => {
+                  twinAnchorsLocal.forEach((anchor, ti) => {
                     elements.push(
                       <line key={`twin-branch-${child.twinGroup}-${ti}`}
                         x1={forkX} y1={forkY}
@@ -314,8 +322,6 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
                       />
                     );
                   });
-
-                  // Monozygotic bar removed per user request
                 } else {
                   // Standard vertical drop
                   processed.add(i);
@@ -331,14 +337,20 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
               return elements;
             })()}
 
-            {/* Single child: horizontal connector from stem to child if offset */}
-            {childMembers.length === 1 && Math.abs(unionMidX - childDropXs[0]) > 1 && (
-              <line
-                x1={unionMidX} y1={combY}
-                x2={childDropXs[0]} y2={combY}
-                stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-              />
-            )}
+            {/* Single drop point: horizontal connector from stem if offset */}
+            {effectiveDropCount === 1 && (() => {
+              // Find the single drop X: either a single child or a single twin fork
+              const dropX = nonTwinCount === 1
+                ? childAnchors[childMembers.findIndex(c => !c.twinGroup)].x
+                : twinForkXs[0];
+              return Math.abs(unionMidX - dropX) > 1 ? (
+                <line
+                  x1={unionMidX} y1={combY}
+                  x2={dropX} y2={combY}
+                  stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                />
+              ) : null;
+            })()}
           </g>
         );
       })}
