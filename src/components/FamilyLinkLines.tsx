@@ -262,15 +262,80 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions }) =>
               />
             )}
 
-            {/* 4. Vertical drops: comb → each child */}
-            {childAnchors.map((anchor, i) => (
-              <line
-                key={i}
-                x1={anchor.x} y1={combY}
-                x2={anchor.x} y2={anchor.y}
-                stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-              />
-            ))}
+            {/* 4. Vertical drops: comb → each child (with twin inverted-V) */}
+            {(() => {
+              const elements: React.ReactNode[] = [];
+              const processed = new Set<number>();
+
+              for (let i = 0; i < childMembers.length; i++) {
+                if (processed.has(i)) continue;
+
+                const child = childMembers[i];
+                // Detect twin group
+                if (child.twinGroup) {
+                  // Find all siblings in same twin group
+                  const twinIndices = childMembers
+                    .map((c, idx) => ({ c, idx }))
+                    .filter(({ c }) => c.twinGroup === child.twinGroup)
+                    .map(({ idx }) => idx);
+
+                  twinIndices.forEach(idx => processed.add(idx));
+
+                  // Inverted V: single fork point on comb, branches to each twin
+                  const twinAnchors = twinIndices.map(idx => childAnchors[idx]);
+                  const forkX = twinAnchors.reduce((sum, a) => sum + a.x, 0) / twinAnchors.length;
+                  const forkY = combY + 20; // Fork point slightly below comb
+
+                  // Stem from comb to fork
+                  elements.push(
+                    <line key={`twin-stem-${child.twinGroup}`}
+                      x1={forkX} y1={combY} x2={forkX} y2={forkY}
+                      stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                    />
+                  );
+
+                  // Branches from fork to each twin
+                  twinAnchors.forEach((anchor, ti) => {
+                    elements.push(
+                      <line key={`twin-branch-${child.twinGroup}-${ti}`}
+                        x1={forkX} y1={forkY}
+                        x2={anchor.x} y2={anchor.y}
+                        stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                      />
+                    );
+                  });
+
+                  // Monozygotic: horizontal bar across branches
+                  const isMonozygotic = child.twinType === 'monozygotic';
+                  if (isMonozygotic && twinAnchors.length >= 2) {
+                    const barY = forkY + (twinAnchors[0].y - forkY) * 0.4;
+                    // Interpolate X at barY for each branch
+                    const barXs = twinAnchors.map(a => {
+                      const t = (barY - forkY) / (a.y - forkY);
+                      return forkX + t * (a.x - forkX);
+                    });
+                    elements.push(
+                      <line key={`twin-mono-${child.twinGroup}`}
+                        x1={Math.min(...barXs)} y1={barY}
+                        x2={Math.max(...barXs)} y2={barY}
+                        stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                      />
+                    );
+                  }
+                } else {
+                  // Standard vertical drop
+                  processed.add(i);
+                  elements.push(
+                    <line key={`drop-${i}`}
+                      x1={childAnchors[i].x} y1={combY}
+                      x2={childAnchors[i].x} y2={childAnchors[i].y}
+                      stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                    />
+                  );
+                }
+              }
+              return elements;
+            })()}
 
             {/* Single child: horizontal connector from stem to child if offset */}
             {childMembers.length === 1 && Math.abs(unionMidX - childDropXs[0]) > 1 && (

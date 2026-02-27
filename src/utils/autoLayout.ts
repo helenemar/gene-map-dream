@@ -180,9 +180,22 @@ export function computeAutoLayout(
       return rightX;
     }
 
-    // ─── Place children first (left to right) ───
+    // ─── Place children first (left to right) with twin detection ───
     let childCursor = Math.max(startX, getRightEdge(childGen) + BLOCK_GAP);
     const childXPositions: { id: string; left: number; right: number }[] = [];
+
+    // Compute stagger rank: twins share the same rank
+    const staggerRanks: number[] = [];
+    let currentRank = 0;
+    for (let i = 0; i < children.length; i++) {
+      const child = memberMap.get(children[i])!;
+      if (i > 0) {
+        const prev = memberMap.get(children[i - 1])!;
+        const sameTwin = child.twinGroup && prev.twinGroup && child.twinGroup === prev.twinGroup;
+        if (!sameTwin) currentRank++;
+      }
+      staggerRanks.push(currentRank);
+    }
 
     for (let childIdx = 0; childIdx < children.length; childIdx++) {
       const cid = children[childIdx];
@@ -190,28 +203,25 @@ export function computeAutoLayout(
       // Ensure no overlap at child gen
       childCursor = Math.max(childCursor, getRightEdge(childGen) + SIBLING_GAP);
       
-      // Vertical stagger: cumulative Y offset, capped to MAX_STAGGER
-      const yStagger = Math.min(childIdx * VERTICAL_STAGGER, MAX_STAGGER);
+      // Vertical stagger: twins share rank → same Y
+      const yStagger = Math.min(staggerRanks[childIdx] * VERTICAL_STAGGER, MAX_STAGGER);
       const childY = childGen * LEVEL_SPACING + yStagger;
 
       // Check if this child has their own sub-family
       const childSubUnions = getParentingUnions(cid).filter(u => !processedUnions.has(u.id));
 
       if (childSubUnions.length > 0) {
-        // Recursive: place each sub-union
         const subStart = childCursor;
         let subRight = childCursor;
         for (const cu of childSubUnions) {
           subRight = placeUnion(cu, subRight);
         }
-        // The child was placed by placeUnion → update Y with stagger
         const childPos = positions.get(cid);
         if (childPos) childPos.y = childY;
         const left = childPos ? childPos.x : subStart;
         childXPositions.push({ id: cid, left, right: subRight });
         childCursor = subRight + SIBLING_GAP;
       } else {
-        // Leaf child
         if (!placed.has(cid)) {
           positions.set(cid, { x: childCursor, y: childY });
           placed.add(cid);
