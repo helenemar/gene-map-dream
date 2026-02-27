@@ -21,6 +21,8 @@ interface EditorSidebarProps {
   fileName: string;
   /** Center canvas on a member */
   onFocusMember: (member: FamilyMember) => void;
+  /** Called when user clicks "Retour" */
+  onBack: () => void;
   /** Hover a union status to highlight matching links on canvas */
   highlightedUnionStatus: UnionStatus | null;
   onHighlightUnionStatus: (status: UnionStatus | null) => void;
@@ -32,7 +34,7 @@ interface EditorSidebarProps {
 
 const EditorSidebar: React.FC<EditorSidebarProps> = ({
   members, unions, emotionalLinks, fileName,
-  onFocusMember,
+  onFocusMember, onBack,
   highlightedUnionStatus, onHighlightUnionStatus,
   soloEmotionalType, onToggleSoloEmotional,
 }) => {
@@ -52,7 +54,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
     <div className="w-[260px] bg-card border-r border-border h-full overflow-y-auto shrink-0">
       {/* Header */}
       <div className="px-4 py-4 border-b border-border">
-        <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-1">
+        <button onClick={onBack} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-1">
           <ArrowLeft className="w-4 h-4" />
           <span>Retour</span>
         </button>

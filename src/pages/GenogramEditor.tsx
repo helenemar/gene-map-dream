@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import EditorHeader from '@/components/EditorHeader';
 import EditorSidebar from '@/components/EditorSidebar';
 import MemberCard from '@/components/MemberCard';
@@ -12,6 +13,10 @@ import UnionEditDrawer from '@/components/UnionEditDrawer';
 import MemberEditDrawer from '@/components/MemberEditDrawer';
 import { RelationshipChoice } from '@/components/CreateMemberDropdown';
 import ParentPicker from '@/components/ParentPicker';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { SAMPLE_MEMBERS, SAMPLE_UNIONS, SAMPLE_EMOTIONAL_LINKS } from '@/data/sampleData';
 import { FamilyMember, EmotionalLink, EmotionalLinkType, Union, UnionStatus } from '@/types/genogram';
 import { computeAutoLayout } from '@/utils/autoLayout';
@@ -152,6 +157,8 @@ const GenogramEditor: React.FC = () => {
   } | null>(null);
   const [linkModalTarget, setLinkModalTarget] = useState<{ fromId: string; toId: string } | null>(null);
   const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const navigate = useNavigate();
   const canvasRef = useRef<HTMLDivElement>(null);
 
   // ─── Persist positions to localStorage ───
@@ -905,6 +912,7 @@ const GenogramEditor: React.FC = () => {
             emotionalLinks={emotionalLinks}
             fileName="Nouveau fichier"
             onFocusMember={handleFocusMember}
+            onBack={() => setShowLeaveDialog(true)}
             highlightedUnionStatus={highlightedUnionStatus}
             onHighlightUnionStatus={setHighlightedUnionStatus}
             soloEmotionalType={soloEmotionalType}
@@ -1121,6 +1129,26 @@ const GenogramEditor: React.FC = () => {
             }}
             onClose={() => setEditingLinkId(null)}
           />
+
+          {/* Leave confirmation dialog */}
+          <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Enregistrer les modifications ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Vous avez apporté des modifications à ce génogramme. Souhaitez-vous les enregistrer avant de quitter ?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => navigate('/')}>
+                  Non, quitter
+                </AlertDialogCancel>
+                <AlertDialogAction onClick={() => navigate('/')}>
+                  Oui, enregistrer
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           <UnionEditDrawer
             union={unions.find(u => u.id === editingUnionId) ?? null}
