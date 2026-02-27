@@ -13,7 +13,7 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 const CARD_W = 186;
 const CARD_H = 64;
 const LEVEL_SPACING = 250;
-const COUPLE_GAP = 40;
+const COUPLE_GAP = 100;
 const SIBLING_GAP = 50;
 const BLOCK_GAP = 80;
 const VERTICAL_STAGGER = 30; // Cumulative Y-offset per sibling for "escalier" effect
