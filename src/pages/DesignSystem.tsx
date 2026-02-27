@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Share2, Plus, UserPlus, Pencil, ZoomIn, ZoomOut, X, Search, ChevronDown, ChevronUp, ArrowLeft, Link } from 'lucide-react';
+import { Download, Share2, Plus, UserPlus, Pencil, ZoomIn, ZoomOut, X, Search, ChevronDown, ChevronUp, ArrowLeft, Link, Atom } from 'lucide-react';
 import { PATHOLOGIES, FAMILY_LINK_TYPES, EMOTIONAL_LINK_TYPES, FamilyMember } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
 import MemberCard from '@/components/MemberCard';
@@ -249,6 +249,18 @@ const DesignSystemPage: React.FC = () => {
               <Button variant="brand" size="sm">Partager</Button>
               <Button variant="brand-outline" size="default">
                 Créer à partir d'un nouveau modèle
+              </Button>
+            </div>
+
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Bouton Beta</h4>
+            <div className="flex flex-wrap items-center gap-4 mb-8">
+              <Button variant="beta" size="default">
+                <Atom className="w-4 h-4" />
+                BETA Test
+              </Button>
+              <Button variant="beta" size="sm">
+                <Atom className="w-3.5 h-3.5" />
+                BETA
               </Button>
             </div>
 
