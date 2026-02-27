@@ -125,16 +125,16 @@ const MemberCard: React.FC<MemberCardProps> = ({
       {/* Card body — hug contents with min-width, dots inside relative container */}
       <div
         className={`
-          relative overflow-visible flex items-center gap-2 rounded-lg bg-card transition-all
+          relative overflow-visible flex items-center gap-3 rounded-xl bg-card transition-all
           ${isPlaceholder ? 'border-2 border-dashed' : 'border'}
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
           ${isPlaceholder && !isHighlighted ? 'border-muted-foreground/30' : borderClasses}
           ${searchHighlighted ? 'border-2 border-primary ring-4 ring-primary/25' : ''}
         `}
         style={{
-          minWidth: 180,
+          minWidth: MEMBER_CARD_W,
           width: 'fit-content',
-          padding: '8px 12px',
+          padding: '12px 16px',
           ...(searchHighlighted ? { boxShadow: '0 0 20px hsl(var(--primary) / 0.35), 0 0 40px hsl(var(--primary) / 0.15)' } : {}),
         }}
       >
@@ -155,12 +155,12 @@ const MemberCard: React.FC<MemberCardProps> = ({
         ))}
 
         {/* Icon with pathology fills or placeholder */}
-        <div className="relative w-9 h-9 shrink-0 flex items-center justify-center">
+        <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
           {isPlaceholder ? (
-            <div className={`w-9 h-9 flex items-center justify-center ${
+            <div className={`w-12 h-12 flex items-center justify-center ${
               member.gender === 'female' ? 'rounded-full' : 'rounded'
             } bg-muted/30`}>
-              <Plus className="w-4 h-4 text-muted-foreground/40" />
+              <Plus className="w-5 h-5 text-muted-foreground/40" />
             </div>
           ) : (
             <MemberIcon
@@ -170,7 +170,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
               isTransgender={member.isTransgender}
               isDead={isDeceased}
               pathologyColors={memberPathologies.map(p => `hsl(var(--pathology-${p.id}))`)}
-              size={36}
+              size={48}
               className="text-foreground"
             />
           )}
@@ -185,15 +185,17 @@ const MemberCard: React.FC<MemberCardProps> = ({
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-semibold text-xs text-foreground whitespace-nowrap">{member.firstName}</span>
-                <span className="text-[10px] font-medium text-muted-foreground bg-muted px-1 py-0.5 rounded-full shrink-0 leading-none">
+              {/* Header: Prénom left, Âge right — space-between */}
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-semibold text-sm text-foreground whitespace-nowrap">{member.firstName}</span>
+                <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">
                   {member.age} ans
                 </span>
               </div>
-              <div className="text-[11px] text-muted-foreground whitespace-nowrap leading-tight">
-                {member.birthYear}{member.deathYear ? ` - ${member.deathYear}` : ''} · {member.profession}
+              <div className="text-xs text-muted-foreground whitespace-nowrap">
+                {member.birthYear}{member.deathYear ? ` - ${member.deathYear}` : ' -'}
               </div>
+              <div className="text-xs text-muted-foreground whitespace-nowrap">{member.profession}</div>
             </>
           )}
         </div>

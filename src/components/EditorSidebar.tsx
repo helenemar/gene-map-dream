@@ -179,7 +179,6 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                       <FamilyLinkIcon status={link.id} />
                     </div>
                     <span className="flex-1">{link.label}</span>
-                    <FamilyLinkPreview status={link.id} width={50} height={14} />
                   </div>
                 );
               })}
