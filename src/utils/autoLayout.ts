@@ -18,8 +18,8 @@ const MIN_BADGE_GAP = 280;   // Minimum gap when a union has dates/status
 const BADGE_SAFETY = 80;     // 40px breathing room on each side of badge
 const SIBLING_GAP = 100;
 const BLOCK_GAP = 120;
-const VERTICAL_STAGGER = 30; // Cumulative Y-offset per sibling for "escalier" effect
-const MAX_STAGGER = 150; // Cap to avoid colliding with next generation
+const VERTICAL_STAGGER = 0; // Disabled for strict orthogonal routing
+const MAX_STAGGER = 0;
 
 interface LayoutResult {
   positions: Map<string, { x: number; y: number }>;
