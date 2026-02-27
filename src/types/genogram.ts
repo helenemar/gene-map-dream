@@ -87,11 +87,11 @@ export const FAMILY_LINK_TYPES: { id: UnionStatus; label: string; icon: string }
 ];
 
 export const EMOTIONAL_LINK_TYPES: { id: EmotionalLinkType; label: string; color: string }[] = [
-  { id: 'fusional', label: 'Fusionnel (VeryClose)', color: 'link-fusional' },
+  { id: 'fusional', label: 'Fusionnel', color: 'link-fusional' },
   { id: 'distant', label: 'Distant', color: 'link-distant' },
   { id: 'conflictual', label: 'Conflit', color: 'link-conflictual' },
   { id: 'ambivalent', label: 'Ambivalent', color: 'link-ambivalent' },
-  { id: 'cutoff', label: 'Lien rompu (CutOff)', color: 'link-cutoff' },
+  { id: 'cutoff', label: 'Lien rompu', color: 'link-cutoff' },
   { id: 'violence', label: 'Violence', color: 'link-violence' },
   { id: 'emotional_abuse', label: 'Abus émotionnel', color: 'link-emotional-abuse' },
   { id: 'physical_violence', label: 'Violence physique', color: 'link-physical-violence' },
