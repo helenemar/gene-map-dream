@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pencil, Plus, ZoomIn, ZoomOut, Maximize, Wand2, Magnet } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize, Wand2 } from 'lucide-react';
 
 interface FloatingControlsProps {
   onZoomIn?: () => void;
@@ -7,41 +7,22 @@ interface FloatingControlsProps {
   onFitToScreen?: () => void;
   onAutoLayout?: () => void;
   zoom?: number;
-  snapToGrid?: boolean;
-  onToggleSnap?: () => void;
 }
 
 const FloatingControls: React.FC<FloatingControlsProps> = ({
-  onZoomIn, onZoomOut, onFitToScreen, onAutoLayout, zoom = 1, snapToGrid = false, onToggleSnap,
+  onZoomIn, onZoomOut, onFitToScreen, onAutoLayout, zoom = 1,
 }) => {
   const zoomPercent = Math.round(zoom * 100);
 
   return (
     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-      <div className="flex items-center gap-1 bg-card rounded-full shadow-float border border-border p-1.5">
-        <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-accent transition-colors">
-          <Pencil className="w-4 h-4 text-foreground" />
-        </button>
-        <button
-          onClick={onAutoLayout}
-          className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
-          title="Réorganiser l'arbre"
-        >
-          <Wand2 className="w-4 h-4 text-foreground" />
-        </button>
-        <button
-          onClick={onToggleSnap}
-          className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-            snapToGrid ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'
-          }`}
-          title={snapToGrid ? 'Magnétisme activé (20px)' : 'Activer le magnétisme'}
-        >
-          <Magnet className="w-4 h-4" />
-        </button>
-        <button className="w-10 h-10 rounded-full bg-primary flex items-center justify-center hover:bg-primary/80 transition-colors">
-          <Plus className="w-4 h-4 text-primary-foreground" />
-        </button>
-      </div>
+      <button
+        onClick={onAutoLayout}
+        className="w-10 h-10 rounded-full bg-card shadow-float border border-border flex items-center justify-center hover:bg-accent transition-colors"
+        title="Réorganiser l'arbre"
+      >
+        <Wand2 className="w-4 h-4 text-foreground" />
+      </button>
 
       <div className="flex items-center gap-1 bg-card rounded-full shadow-float border border-border p-1.5">
         <button onClick={onZoomOut} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-accent transition-colors" title="Dézoomer">
