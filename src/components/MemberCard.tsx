@@ -43,6 +43,7 @@ interface MemberCardProps {
   onCreateRelated?: (id: string, relationship: RelationshipChoice) => void;
   onEdit?: (id: string) => void;
   disabledOptions?: DisabledOptions;
+  showParentSplit?: boolean;
   onView?: (id: string) => void;
   onHover?: (id: string | null) => void;
   onLinkDragStart?: (id: string, e: React.MouseEvent) => void;
@@ -78,6 +79,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onLinkDragStart,
   onCancelAnchor,
   disabledOptions,
+  showParentSplit = false,
 }) => {
   const isDeceased = !!member.deathYear;
   const isPlaceholder = !!member.isPlaceholder;
@@ -231,7 +233,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
-          <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)} disabledOptions={disabledOptions}>
+          <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)} disabledOptions={disabledOptions} showParentSplit={showParentSplit}>
             <button
               onClick={(e) => e.stopPropagation()}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors"
