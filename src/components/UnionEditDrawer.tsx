@@ -98,7 +98,7 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
           {/* Marriage / Rencontre year */}
           <div className="flex flex-col gap-2">
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Année de rencontre / mariage
+              {union.status === 'married' ? 'Année de mariage' : 'Année de rencontre'}
             </Label>
             <Input
               type="number"
