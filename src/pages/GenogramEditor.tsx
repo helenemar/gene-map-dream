@@ -525,18 +525,37 @@ const GenogramEditor: React.FC = () => {
   /** Compute disabled dropdown options for a member (guard clauses) */
   const getDisabledOptions = useCallback((memberId: string): DisabledOptions => {
     const disabled: DisabledOptions = {};
-    // Find unions where this member is a child
-    const parentUnion = unions.find(u => u.children.includes(memberId));
-    if (parentUnion) {
-      const p1 = members.find(m => m.id === parentUnion.partner1);
-      const p2 = members.find(m => m.id === parentUnion.partner2);
-      const realParents = [p1, p2].filter(p => p && !p.isPlaceholder && !p.isDraft);
-      if (realParents.length >= 2) {
-        disabled.parent = 'Ce membre a déjà ses deux parents configurés';
+    // Find all unions where this member is a child
+    const parentUnions = unions.filter(u => u.children.includes(memberId));
+    const bioUnion = parentUnions.find(u => !u.isAdoption);
+    const adoptiveUnion = parentUnions.find(u => u.isAdoption);
+
+    if (parentUnions.length === 0) {
+      // No parents at all — single 'parent' option is fine
+    } else if (bioUnion && adoptiveUnion) {
+      // Has both bio + adoptive parents — disable all parent options
+      disabled.parent = 'Ce membre a déjà ses parents biologiques et adoptifs';
+      disabled.parent_bio = 'Ce membre a déjà ses parents biologiques';
+      disabled.parent_adoptive = 'Ce membre a déjà ses parents adoptifs';
+    } else {
+      // Has one pair — disable the existing one, keep the other
+      disabled.parent = 'Ce membre a déjà une paire de parents';
+      if (bioUnion) {
+        disabled.parent_bio = 'Ce membre a déjà ses parents biologiques';
+      }
+      if (adoptiveUnion) {
+        disabled.parent_adoptive = 'Ce membre a déjà ses parents adoptifs';
       }
     }
     return disabled;
   }, [members, unions]);
+
+  /** Should show split parent options (bio/adoptive) in dropdown */
+  const shouldShowParentSplit = useCallback((memberId: string): boolean => {
+    const parentUnions = unions.filter(u => u.children.includes(memberId));
+    // Show split when member already has one pair of parents (to add the other type)
+    return parentUnions.length > 0;
+  }, [unions]);
 
   /** Smart placement: compute position for new member based on relationship */
   const computeNewPosition = useCallback((
@@ -811,21 +830,23 @@ const GenogramEditor: React.FC = () => {
       });
     }
 
-    // For parent: duo-parenting with guard clauses
-    if (relationship === 'parent') {
-      const existingParentUnion = unions.find(u => u.children.includes(sourceId));
+    // For parent / parent_bio / parent_adoptive: duo-parenting with guard clauses
+    if (relationship === 'parent' || relationship === 'parent_bio' || relationship === 'parent_adoptive') {
+      const isAdoption = relationship === 'parent_adoptive';
+      const existingParentUnion = unions.find(u =>
+        u.children.includes(sourceId) && (relationship === 'parent' || u.isAdoption === isAdoption)
+      );
       const SPOUSE_GAP = CARD_W + 120;
       const LEVEL_Y = 250;
 
       if (existingParentUnion) {
-        // Already has a parent union — check if one parent is placeholder/draft
+        // Already has a parent union of this type — check if one parent is placeholder/draft
         const p1 = members.find(m => m.id === existingParentUnion.partner1);
         const p2 = members.find(m => m.id === existingParentUnion.partner2);
         const placeholderParent = [p1, p2].find(p => p && (p.isPlaceholder || p.isDraft));
         const realParent = [p1, p2].find(p => p && !p.isPlaceholder && !p.isDraft);
 
         if (!placeholderParent) {
-          // Both parents are real — should be disabled in dropdown, but guard anyway
           toast.error('Ce membre a déjà ses deux parents configurés');
           return;
         }
@@ -836,11 +857,10 @@ const GenogramEditor: React.FC = () => {
         newMember.x = placeholderParent.x;
         newMember.y = placeholderParent.y;
         newMember.isDraft = true;
+        if (isAdoption) newMember.isAdoptiveParent = true;
 
         recordSnapshot();
-        // Replace placeholder with new member in members array
         setMembers(prev => prev.map(m => m.id === placeholderParent.id ? newMember : m));
-        // Update union to reference new member instead of placeholder
         setUnions(prev => prev.map(u => {
           if (u.id !== existingParentUnion.id) return u;
           return {
@@ -849,24 +869,28 @@ const GenogramEditor: React.FC = () => {
             partner2: u.partner2 === placeholderParent.id ? newMember.id : u.partner2,
           };
         }));
-        // Update emotional links referencing the placeholder
         setEmotionalLinks(prev => prev.map(l => ({
           ...l,
           from: l.from === placeholderParent.id ? newMember.id : l.from,
           to: l.to === placeholderParent.id ? newMember.id : l.to,
         })));
       } else {
-        // No parent union — create both parents (duo-parenting)
+        // No parent union of this type — create both parents (duo-parenting)
         const sourceM = members.find(m => m.id === sourceId);
         const sourceX = sourceM?.x ?? 200;
         const sourceY = sourceM?.y ?? 200;
 
-        // Parent 1 (the editable one)
-        newMember.x = sourceX - SPOUSE_GAP / 2;
-        newMember.y = sourceY - LEVEL_Y;
-        newMember.gender = 'male';
+        // If member already has a pair, offset the new pair further up
+        const existingOtherPairUnion = unions.find(u => u.children.includes(sourceId));
+        const yOffset = existingOtherPairUnion ? LEVEL_Y + 100 : LEVEL_Y;
+        // Offset horizontally if there's already a pair above
+        const xShift = existingOtherPairUnion ? (isAdoption ? SPOUSE_GAP + 80 : -(SPOUSE_GAP + 80)) : 0;
 
-        // Parent 2 (draft)
+        newMember.x = sourceX - SPOUSE_GAP / 2 + xShift;
+        newMember.y = sourceY - yOffset;
+        newMember.gender = 'male';
+        if (isAdoption) newMember.isAdoptiveParent = true;
+
         const draftParent: FamilyMember = {
           id: `m-draft-${Date.now() + 1}`,
           firstName: '',
@@ -875,10 +899,11 @@ const GenogramEditor: React.FC = () => {
           age: 30,
           profession: '',
           gender: 'female',
-          x: sourceX + SPOUSE_GAP / 2,
-          y: sourceY - LEVEL_Y,
+          x: sourceX + SPOUSE_GAP / 2 + xShift,
+          y: sourceY - yOffset,
           pathologies: [],
           isDraft: true,
+          ...(isAdoption ? { isAdoptiveParent: true } : {}),
         };
 
         const newUnion: Union = {
@@ -887,6 +912,7 @@ const GenogramEditor: React.FC = () => {
           partner2: draftParent.id,
           status: 'married',
           children: [sourceId],
+          ...(isAdoption ? { isAdoption: true } : {}),
         };
 
         recordSnapshot();
@@ -1282,6 +1308,7 @@ const GenogramEditor: React.FC = () => {
                 onLinkDragStart={handleLinkDragStart}
                 onCancelAnchor={handleCancelAnchor}
                 disabledOptions={getDisabledOptions(member.id)}
+                showParentSplit={shouldShowParentSplit(member.id)}
               />
             ))}
             {/* Parent picker popover for multi-union child creation */}
