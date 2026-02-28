@@ -192,9 +192,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
             </div>
           ) : isDraft ? (
             <div className="flex flex-col gap-0.5">
-              <span className="font-medium text-sm text-muted-foreground/60 whitespace-nowrap">
-                {member.gender === 'male' ? 'Père' : 'Mère'}
-              </span>
+              <span className="font-medium text-sm text-muted-foreground/60 whitespace-nowrap">Parent</span>
               <span className="text-[11px] text-muted-foreground/30 italic">Cliquer pour éditer</span>
             </div>
           ) : (
