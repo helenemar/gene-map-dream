@@ -136,6 +136,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       twinGroup: twinGroup || undefined,
       twinType: (twinType as TwinType) || undefined,
       notes: notes || undefined,
+      isDraft: false,
     };
   }, [member, firstName, lastName, parsedBirthYear, parsedDeathYear, age, profession, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, currentYear]);
 
