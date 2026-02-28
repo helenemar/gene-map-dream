@@ -335,6 +335,11 @@ const MemberCard: React.FC<MemberCardProps> = ({
           onSelect?.(member.id);
         }
       }}
+      onDoubleClick={() => {
+        if (!presentationMode && !isPlaceholder && !isDraft) {
+          onView?.(member.id);
+        }
+      }}
       onMouseEnter={() => onHover?.(member.id)}
       onMouseLeave={() => onHover?.(null)}
     >
