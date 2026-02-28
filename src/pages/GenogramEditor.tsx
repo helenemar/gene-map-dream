@@ -850,7 +850,7 @@ const GenogramEditor: React.FC = () => {
       const existingParentUnion = unions.find(u =>
         u.children.includes(sourceId) && (relationship === 'parent' || u.isAdoption === isAdoption)
       );
-      const SPOUSE_GAP = CARD_W + 120;
+      const SPOUSE_GAP = 200;
       const LEVEL_Y = 250;
 
       if (existingParentUnion) {
@@ -894,11 +894,11 @@ const GenogramEditor: React.FC = () => {
         const sourceX = sourceM?.x ?? 200;
         const sourceY = sourceM?.y ?? 200;
 
-        // If member already has a pair, offset the new pair further up
+        // If member already has a pair, offset the new pair further up and slightly to the side
         const existingOtherPairUnion = unions.find(u => u.children.includes(sourceId));
         const yOffset = existingOtherPairUnion ? LEVEL_Y + 100 : LEVEL_Y;
-        // Offset horizontally if there's already a pair above
-        const xShift = existingOtherPairUnion ? (isAdoption ? SPOUSE_GAP + 80 : -(SPOUSE_GAP + 80)) : 0;
+        // Moderate horizontal offset — keep adoptive parents close to the child
+        const xShift = existingOtherPairUnion ? (isAdoption ? SPOUSE_GAP + 40 : -(SPOUSE_GAP + 40)) : 0;
 
         newMember.x = sourceX - SPOUSE_GAP / 2 + xShift;
         newMember.y = sourceY - yOffset;
