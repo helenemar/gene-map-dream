@@ -161,12 +161,20 @@ const MemberIcon: React.FC<MemberIconProps> = ({
       )}
 
       {/* Layer 5: Dead X cross */}
-      {isDead && (
-        <>
-          <line x1={sqX} y1={sqY} x2={sqX + sqW} y2={sqY + sqH} stroke={mainStroke} strokeWidth={sw} />
-          <line x1={sqX + sqW} y1={sqY} x2={sqX} y2={sqY + sqH} stroke={mainStroke} strokeWidth={sw} />
-        </>
-      )}
+      {isDead && (() => {
+        // For circles, clip cross to circle boundary (45° intersection)
+        const offset = gender === 'female' ? circleR * 0.707 : sqW / 2;
+        const x1 = cx - offset;
+        const y1 = cy - offset;
+        const x2 = cx + offset;
+        const y2 = cy + offset;
+        return (
+          <>
+            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={mainStroke} strokeWidth={sw} />
+            <line x1={x2} y1={y1} x2={x1} y2={y2} stroke={mainStroke} strokeWidth={sw} />
+          </>
+        );
+      })()}
     </svg>
   );
 };
