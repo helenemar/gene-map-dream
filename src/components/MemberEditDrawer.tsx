@@ -491,10 +491,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <button
                   type="button"
                   onClick={() => setAddPathologyModalOpen(true)}
-                  className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors py-1"
+                  className="w-full flex items-center justify-center gap-2 mt-1 py-2 rounded-lg border border-border bg-background text-sm font-medium text-foreground/70 hover:text-foreground hover:border-foreground/30 transition-colors"
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  Ajouter
+                  <Plus className="w-4 h-4" />
+                  Ajouter une pathologie
                 </button>
               </div>
 
