@@ -144,7 +144,7 @@ const Dashboard: React.FC = () => {
       {/* ── Main Content ── */}
       <main className="px-8 py-8">
         {/* Hero / CTA Section */}
-        <div className="bg-card border border-border rounded-2xl px-10 py-9 mb-6">
+        <div className="dot-grid border border-border rounded-2xl px-10 py-9 mb-6">
           <h1 className="text-[26px] font-bold text-foreground leading-tight mb-1.5">
             Créer un nouveau génogramme
           </h1>
