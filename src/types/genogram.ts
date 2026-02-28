@@ -17,7 +17,9 @@ export interface FamilyMember {
   firstName: string;
   lastName: string;
   birthYear: number;
+  birthYearUnsure?: boolean;
   deathYear?: number;
+  deathYearUnsure?: boolean;
   age: number;
   profession: string;
   gender: 'male' | 'female' | 'non-binary';

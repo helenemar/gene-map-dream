@@ -32,7 +32,13 @@ import {
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { Trash2, Heart, Pencil, FileText, Check } from 'lucide-react';
+import { Trash2, Heart, Pencil, FileText, Check, HelpCircle } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from '@/components/ui/tooltip';
 import MemberIcon from '@/components/MemberIcon';
 
 interface MemberEditDrawerProps {
@@ -79,13 +85,18 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [twinType, setTwinType] = useState<TwinType | ''>('');
   const [notes, setNotes] = useState('');
 
+  const [birthYearUnsure, setBirthYearUnsure] = useState(false);
+  const [deathYearUnsure, setDeathYearUnsure] = useState(false);
+
   useEffect(() => {
     if (member) {
       setIsEditing(initialEditing);
       setFirstName(member.firstName);
       setLastName(member.lastName);
       setBirthYear(member.birthYear ? String(member.birthYear) : '');
+      setBirthYearUnsure(!!member.birthYearUnsure);
       setDeathYear(member.deathYear ? String(member.deathYear) : '');
+      setDeathYearUnsure(!!member.deathYearUnsure);
       setProfession(member.profession);
       setGender(member.gender);
       // Migrate legacy fields to new model
@@ -121,7 +132,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       firstName: firstName || 'Nouveau',
       lastName: lastName || member.lastName,
       birthYear: parsedBirthYear && !isNaN(parsedBirthYear) ? parsedBirthYear : currentYear - 30,
+      birthYearUnsure: birthYearUnsure || undefined,
       deathYear: parsedDeathYear && !isNaN(parsedDeathYear) ? parsedDeathYear : undefined,
+      deathYearUnsure: deathYearUnsure || undefined,
       age: age || 30,
       profession,
       gender,
@@ -138,7 +151,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       notes: notes || undefined,
       isDraft: false,
     };
-  }, [member, firstName, lastName, parsedBirthYear, parsedDeathYear, age, profession, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, currentYear]);
+  }, [member, firstName, lastName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, currentYear]);
 
   /** Fire live update to canvas */
   useEffect(() => {
@@ -146,7 +159,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthYear, deathYear, profession, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes]);
+  }, [firstName, lastName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes]);
 
   if (!member) return null;
 
@@ -260,11 +273,55 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Naissance</Label>
-                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="1985" min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} />
+                  <div className="flex items-center gap-1">
+                    <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30 flex-1" type="number" placeholder="1985" min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} />
+                    <TooltipProvider delayDuration={200}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={() => setBirthYearUnsure(prev => !prev)}
+                            className={`shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${
+                              birthYearUnsure
+                                ? 'bg-primary/10 border-primary/30 text-primary'
+                                : 'border-border/50 text-muted-foreground/40 hover:text-muted-foreground hover:border-border'
+                            }`}
+                          >
+                            <HelpCircle className="w-3.5 h-3.5" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="text-xs">
+                          {birthYearUnsure ? 'Date marquée incertaine' : 'Marquer comme incertain'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 </div>
                 <div className="flex flex-col gap-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Décès</Label>
-                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" type="number" placeholder="Vivant" min={1900} max={2100} value={deathYear} onChange={(e) => setDeathYear(e.target.value)} />
+                  <div className="flex items-center gap-1">
+                    <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30 flex-1" type="number" placeholder="Vivant" min={1900} max={2100} value={deathYear} onChange={(e) => setDeathYear(e.target.value)} />
+                    <TooltipProvider delayDuration={200}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={() => setDeathYearUnsure(prev => !prev)}
+                            className={`shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center transition-colors ${
+                              deathYearUnsure
+                                ? 'bg-primary/10 border-primary/30 text-primary'
+                                : 'border-border/50 text-muted-foreground/40 hover:text-muted-foreground hover:border-border'
+                            }`}
+                          >
+                            <HelpCircle className="w-3.5 h-3.5" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="text-xs">
+                          {deathYearUnsure ? 'Date marquée incertaine' : 'Marquer comme incertain'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 </div>
               </div>
               {isDeceased && (
