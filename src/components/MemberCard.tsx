@@ -79,6 +79,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
 }) => {
   const isDeceased = !!member.deathYear;
   const isPlaceholder = !!member.isPlaceholder;
+  const isDraft = !!member.isDraft;
   const memberPathologies = PATHOLOGIES.filter(p => member.pathologies.includes(p.id));
 
   // Internal anchor-active state for static/DS usage
@@ -126,9 +127,9 @@ const MemberCard: React.FC<MemberCardProps> = ({
       <div
         className={`
           relative overflow-visible flex items-center gap-3 rounded-xl bg-card transition-all
-          ${isPlaceholder ? 'border-2 border-dashed' : 'border'}
+          ${(isPlaceholder || isDraft) ? 'border-2 border-dashed' : 'border'}
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
-          ${isPlaceholder && !isHighlighted ? 'border-muted-foreground/30' : borderClasses}
+          ${(isPlaceholder || isDraft) && !isHighlighted ? 'border-muted-foreground/30' : borderClasses}
           ${searchHighlighted ? 'border-2 border-primary ring-4 ring-primary/25' : ''}
         `}
         style={{
@@ -154,13 +155,19 @@ const MemberCard: React.FC<MemberCardProps> = ({
           />
         ))}
 
-        {/* Icon with pathology fills or placeholder */}
+        {/* Icon with pathology fills, placeholder, or draft */}
         <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
           {isPlaceholder ? (
             <div className={`w-12 h-12 flex items-center justify-center ${
               member.gender === 'female' ? 'rounded-full' : 'rounded'
             } bg-muted/30`}>
               <Plus className="w-5 h-5 text-muted-foreground/40" />
+            </div>
+          ) : isDraft ? (
+            <div className={`w-12 h-12 flex items-center justify-center ${
+              member.gender === 'female' ? 'rounded-full' : 'rounded'
+            } bg-muted/20 border border-dashed border-muted-foreground/20`}>
+              <PencilLine className="w-4 h-4 text-muted-foreground/30" />
             </div>
           ) : (
             <MemberIcon
@@ -182,6 +189,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
             <div className="flex flex-col gap-0.5">
               <span className="font-medium text-sm text-muted-foreground/50 italic whitespace-nowrap">Ajouter le parent</span>
               <span className="text-[11px] text-muted-foreground/30">Cliquer pour compléter</span>
+            </div>
+          ) : isDraft ? (
+            <div className="flex flex-col gap-0.5">
+              <span className="font-medium text-sm text-muted-foreground/60 whitespace-nowrap">
+                {member.gender === 'male' ? 'Père' : 'Mère'}
+              </span>
+              <span className="text-[11px] text-muted-foreground/30 italic">Cliquer pour éditer</span>
             </div>
           ) : (
             <>
@@ -289,8 +303,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
       }}
       onClick={() => {
         if (presentationMode) {
-          if (!isPlaceholder) onView?.(member.id);
-        } else if (isPlaceholder) {
+          if (!isPlaceholder && !isDraft) onView?.(member.id);
+        } else if (isPlaceholder || isDraft) {
           onEdit?.(member.id);
         } else {
           onSelect?.(member.id);
