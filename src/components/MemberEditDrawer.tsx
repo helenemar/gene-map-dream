@@ -281,7 +281,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     <SelectContent>
                       <SelectItem value="male">Homme</SelectItem>
                       <SelectItem value="female">Femme</SelectItem>
-                      <SelectItem value="non-binary">Non-binaire</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
