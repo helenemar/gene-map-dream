@@ -141,10 +141,10 @@ const LandingPage: React.FC = () => {
               </p>
 
               <div className="flex flex-wrap gap-4">
-                <Button variant="brand" size="lg" onClick={() => navigate(ctaPath)} className="gap-2 px-8">
+                <Button variant="brand" size="lg" onClick={() => navigate(ctaPath)} className="gap-2 px-8 rounded-full">
                   Accéder à la version BETA
                 </Button>
-                <Button size="lg" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="border-primary text-primary hover:bg-primary/5 rounded-full px-8">
+                <Button variant="outline" size="lg" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="border-primary text-primary bg-transparent hover:bg-primary/5 rounded-full px-8">
                   Découvrir l'outil
                 </Button>
               </div>
