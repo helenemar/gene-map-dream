@@ -297,7 +297,12 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
-                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Naissance</Label>
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                    Naissance
+                    {age > 0 && !isDeceased && (
+                      <span className="ml-1 text-[9px] font-normal text-primary/70">({age} ans)</span>
+                    )}
+                  </Label>
                   <div className="flex items-center gap-1">
                     <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30 flex-1" type="number" placeholder="1985" min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} />
                     <TooltipProvider delayDuration={200}>
