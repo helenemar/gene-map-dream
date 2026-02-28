@@ -194,10 +194,25 @@ const GenogramEditor: React.FC = () => {
       }
       setFileName(data.name);
       const gData = data.data as any;
-      if (gData?.members) setMembers(gData.members);
+      const loadedMembers: FamilyMember[] = gData?.members || [];
+      if (loadedMembers.length > 0) setMembers(loadedMembers);
       if (gData?.unions) setUnions(gData.unions);
       if (gData?.emotionalLinks) setEmotionalLinks(gData.emotionalLinks);
       setDbLoaded(true);
+
+      // Center canvas on first member (patient index) after load
+      if (loadedMembers.length > 0) {
+        requestAnimationFrame(() => {
+          const canvas = canvasRef.current;
+          if (!canvas) return;
+          const rect = canvas.getBoundingClientRect();
+          const m = loadedMembers[0];
+          setPan({
+            x: rect.width / 2 - (m.x + CARD_W / 2),
+            y: rect.height / 2 - (m.y + CARD_H / 2),
+          });
+        });
+      }
     };
     load();
   }, [genogramId, user]);
