@@ -282,7 +282,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                       <button
                         key={opt.id}
                         type="button"
-                        onClick={() => setGenderIdentity(opt.id)}
+                        onClick={() => setGenderIdentity(selected ? 'cisgender' : opt.id)}
                         className={`flex items-center gap-1.5 min-h-[32px] px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                           selected
                             ? 'bg-primary/10 border-primary/30 text-primary'
@@ -307,7 +307,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                       <button
                         key={opt.id}
                         type="button"
-                        onClick={() => setSexualOrientation(opt.id)}
+                        onClick={() => setSexualOrientation(selected ? 'heterosexual' : opt.id)}
                         className={`flex items-center gap-1.5 min-h-[32px] px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                           selected
                             ? 'bg-primary/10 border-primary/30 text-primary'
