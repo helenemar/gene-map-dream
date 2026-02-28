@@ -469,14 +469,14 @@ export function computeAutoLayout(
     if (!anyOverlap) break;
   }
 
-  // ═══ POST-FIX: Re-center ALL children under their parent union ═══
+  // ═══ POST-FIX: Re-center ALL children (+ their subtrees) under parent union ═══
   for (const u of unions) {
     if (u.children.length === 0) continue;
     const p1Pos = positions.get(u.partner1);
     const p2Pos = positions.get(u.partner2);
     if (!p1Pos || !p2Pos) continue;
 
-    // Compute union midpoint (between right edge of left card and left edge of right card)
+    // Compute union midpoint
     const unionMidX = (Math.min(p1Pos.x, p2Pos.x) + CARD_W + Math.max(p1Pos.x, p2Pos.x)) / 2;
 
     // Get positioned children
@@ -485,25 +485,15 @@ export function computeAutoLayout(
       .filter((c): c is { id: string; pos: { x: number; y: number } } => !!c.pos);
     if (childPositions.length === 0) continue;
 
-    // Skip children that have their own sub-families (they anchor their own subtree)
-    const freeChildren = childPositions.filter(c => {
-      const childUnions = (partnerUnions.get(c.id) || []).length;
-      return childUnions === 0;
-    });
-    // If all children have sub-families, skip recentering
-    if (freeChildren.length === 0) continue;
-
-    // Compute current block center (using ALL children, not just free ones)
+    // Compute current block center using ALL children
     const blockLeft = Math.min(...childPositions.map(c => c.pos.x));
     const blockRight = Math.max(...childPositions.map(c => c.pos.x + CARD_W));
     const blockCenter = (blockLeft + blockRight) / 2;
 
     const shift = unionMidX - blockCenter;
     if (Math.abs(shift) > 1) {
-      // Only shift free children (those without sub-families)
-      for (const c of freeChildren) {
-        c.pos.x += shift;
-      }
+      // Shift ALL children and their entire subtrees
+      shiftDescendants(u.children.filter(cid => positions.has(cid)), shift);
     }
   }
 
