@@ -41,6 +41,7 @@ const Dashboard: React.FC = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [notesModal, setNotesModal] = useState<{ open: boolean; genogramId: string; genogramName: string }>({ open: false, genogramId: '', genogramName: '' });
   const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
+  const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
 
   const { data: genograms, isLoading } = useQuery({
     queryKey: ['genograms', user?.id],
@@ -55,21 +56,25 @@ const Dashboard: React.FC = () => {
     enabled: !!user,
   });
 
-  // Fetch note counts for all genograms
+  // Fetch note counts and latest note dates for all genograms
   useEffect(() => {
     if (!genograms?.length) return;
     const ids = genograms.map(g => g.id);
     supabase
       .from('genogram_notes')
-      .select('genogram_id')
+      .select('genogram_id, created_at')
       .in('genogram_id', ids)
+      .order('created_at', { ascending: false })
       .then(({ data }) => {
         if (!data) return;
         const counts: Record<string, number> = {};
-        for (const row of data as { genogram_id: string }[]) {
+        const latest: Record<string, string> = {};
+        for (const row of data as { genogram_id: string; created_at: string }[]) {
           counts[row.genogram_id] = (counts[row.genogram_id] ?? 0) + 1;
+          if (!latest[row.genogram_id]) latest[row.genogram_id] = row.created_at;
         }
         setNoteCounts(counts);
+        setLatestNoteDates(latest);
       });
   }, [genograms]);
 
@@ -276,18 +281,26 @@ const Dashboard: React.FC = () => {
                       </TableCell>
                       <TableCell className="text-right pr-6">
                         <div className="flex items-center justify-end gap-1">
-                          {(noteCounts[file.id] ?? 0) > 0 && (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setNotesModal({ open: true, genogramId: file.id, genogramName: file.name }); }}
-                              className="relative w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
-                              title="Notes du dossier"
-                            >
-                              <FileText className="w-4 h-4 text-muted-foreground" />
-                              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center">
-                                {noteCounts[file.id]}
-                              </span>
-                            </button>
-                          )}
+                          {(() => {
+                            const count = noteCounts[file.id] ?? 0;
+                            const latestNote = latestNoteDates[file.id];
+                            const hasNew = latestNote && new Date(latestNote) > new Date(file.updated_at);
+                            if (count === 0) return null;
+                            return (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setNotesModal({ open: true, genogramId: file.id, genogramName: file.name }); }}
+                                className="relative w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
+                                title="Notes du dossier"
+                              >
+                                <FileText className={`w-4 h-4 ${hasNew ? 'text-primary' : 'text-muted-foreground'}`} />
+                                <span className={`absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full text-[9px] font-bold flex items-center justify-center ${
+                                  hasNew ? 'bg-primary text-primary-foreground animate-pulse' : 'bg-muted-foreground/20 text-muted-foreground'
+                                }`}>
+                                  {count}
+                                </span>
+                              </button>
+                            );
+                          })()}
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
