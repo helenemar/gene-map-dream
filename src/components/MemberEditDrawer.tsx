@@ -64,7 +64,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [birthYear, setBirthYear] = useState('');
   const [deathYear, setDeathYear] = useState('');
   const [profession, setProfession] = useState('');
-  const [gender, setGender] = useState<'male' | 'female'>('male');
+  const [gender, setGender] = useState<'male' | 'female' | 'non-binary'>('male');
   const [isGay, setIsGay] = useState(false);
   const [isBisexual, setIsBisexual] = useState(false);
   const [isTransgender, setIsTransgender] = useState(false);
@@ -223,11 +223,12 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Genre</Label>
-                  <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female')}>
+                  <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female' | 'non-binary')}>
                     <SelectTrigger className="h-8 text-sm border-border/50 bg-card"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="male">Homme</SelectItem>
                       <SelectItem value="female">Femme</SelectItem>
+                      <SelectItem value="non-binary">Non-binaire</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
