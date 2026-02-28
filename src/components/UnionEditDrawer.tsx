@@ -96,10 +96,10 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
             </Select>
           </div>
 
-          {/* Marriage / Rencontre year */}
+          {/* Marriage year — always shown */}
           <div className="flex flex-col gap-2">
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              {union.status === 'married' ? 'Année de mariage' : 'Année de rencontre'}
+              Année de mariage
             </Label>
             <Input
               type="number"
@@ -127,22 +127,6 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
                 min={1900}
                 max={2100}
               />
-            </div>
-          )}
-
-          {/* Adoption toggle */}
-          {union.children.length > 0 && (
-            <div className="flex items-center gap-2.5 pt-2">
-              <Checkbox
-                id="union-adoption"
-                checked={!!union.isAdoption}
-                onCheckedChange={(checked) =>
-                  onUpdate({ ...union, isAdoption: checked === true })
-                }
-              />
-              <Label htmlFor="union-adoption" className="text-sm font-normal cursor-pointer">
-                Enfant(s) adopté(s)
-              </Label>
             </div>
           )}
 
