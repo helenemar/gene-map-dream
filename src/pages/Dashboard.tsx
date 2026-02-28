@@ -136,7 +136,7 @@ const Dashboard: React.FC = () => {
       </header>
 
       {/* ── Main Content ── */}
-      <main className="max-w-[1200px] mx-auto px-8 py-8">
+      <main className="px-8 py-8">
         {/* Hero / CTA Section */}
         <div className="bg-card border border-border rounded-2xl px-10 py-9 mb-6">
           <h1 className="text-[26px] font-bold text-foreground leading-tight mb-1.5">
@@ -198,13 +198,13 @@ const Dashboard: React.FC = () => {
                         Créateur
                       </span>
                     </TableHead>
-                    <TableHead>
-                      <button onClick={() => toggleSort('updated_at')} className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    <TableHead className="text-right">
+                      <button onClick={() => toggleSort('updated_at')} className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider ml-auto">
                         Dernière modifications <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </TableHead>
-                    <TableHead>
-                      <button onClick={() => toggleSort('created_at')} className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                    <TableHead className="text-right">
+                      <button onClick={() => toggleSort('created_at')} className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider ml-auto">
                         Date de création <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </TableHead>
@@ -241,10 +241,10 @@ const Dashboard: React.FC = () => {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-right">
                         <span className="text-[13px] text-foreground">{formatDate(file.updated_at)}</span>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-right">
                         <span className="text-[13px] text-foreground">{formatDate(file.created_at)}</span>
                       </TableCell>
                       <TableCell className="text-right pr-6">
