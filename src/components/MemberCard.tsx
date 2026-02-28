@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FamilyMember, PATHOLOGIES } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
 import CreateMemberDropdown, { RelationshipChoice } from '@/components/CreateMemberDropdown';
-import { Plus, PencilLine, Link, X, Eye, UserPlus } from 'lucide-react';
+import { Plus, PencilLine, Link, X, Eye, UserPlus, FileText } from 'lucide-react';
 
 
 /**
@@ -192,8 +192,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
                   {member.age} ans
                 </span>
               </div>
-              <div className="text-xs text-muted-foreground whitespace-nowrap">
-                {member.birthYear}{member.deathYear ? ` - ${member.deathYear}` : ' -'}
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <span className="whitespace-nowrap">
+                  {member.birthYear}{member.deathYear ? ` - ${member.deathYear}` : ' -'}
+                </span>
+                {member.notes && (
+                  <FileText className="w-3 h-3 text-primary/60 shrink-0" />
+                )}
               </div>
               <div className="text-xs text-muted-foreground whitespace-nowrap">{member.profession}</div>
             </>

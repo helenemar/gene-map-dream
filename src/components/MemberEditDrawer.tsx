@@ -31,7 +31,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Trash2, Heart, Pencil } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Trash2, Heart, Pencil, FileText } from 'lucide-react';
 import MemberIcon from '@/components/MemberIcon';
 
 interface MemberEditDrawerProps {
@@ -71,6 +72,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [selectedPathologies, setSelectedPathologies] = useState<string[]>([]);
   const [twinGroup, setTwinGroup] = useState('');
   const [twinType, setTwinType] = useState<TwinType | ''>('');
+  const [notes, setNotes] = useState('');
 
   useEffect(() => {
     if (member) {
@@ -87,6 +89,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setSelectedPathologies(member.pathologies || []);
       setTwinGroup(member.twinGroup || '');
       setTwinType(member.twinType || '');
+      setNotes(member.notes || '');
     }
   }, [member]);
 
@@ -118,8 +121,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       pathologies: selectedPathologies,
       twinGroup: twinGroup || undefined,
       twinType: (twinType as TwinType) || undefined,
+      notes: notes || undefined,
     };
-  }, [member, firstName, lastName, parsedBirthYear, parsedDeathYear, age, profession, gender, isGay, isBisexual, isTransgender, selectedPathologies, twinGroup, twinType, currentYear]);
+  }, [member, firstName, lastName, parsedBirthYear, parsedDeathYear, age, profession, gender, isGay, isBisexual, isTransgender, selectedPathologies, twinGroup, twinType, notes, currentYear]);
 
   /** Fire live update to canvas */
   useEffect(() => {
@@ -127,7 +131,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthYear, deathYear, profession, gender, isGay, isBisexual, isTransgender, selectedPathologies, twinGroup, twinType]);
+  }, [firstName, lastName, birthYear, deathYear, profession, gender, isGay, isBisexual, isTransgender, selectedPathologies, twinGroup, twinType, notes]);
 
   if (!member) return null;
 
@@ -365,6 +369,31 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 </div>
               </div>
 
+              <Separator className="opacity-50" />
+
+              {/* ── Notes cliniques ── */}
+              <div className="flex flex-col gap-2">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5" />
+                  Notes cliniques
+                </Label>
+                <Textarea
+                  className="min-h-[80px] text-sm border-border/50 bg-card focus-visible:ring-primary/30 resize-none overflow-hidden"
+                  placeholder="Observations, antécédents, contexte familial particulier..."
+                  value={notes}
+                  onChange={(e) => {
+                    setNotes(e.target.value);
+                    // Auto-resize
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                  }}
+                />
+              </div>
+
               {/* ── Liens émotionnels (edit) ── */}
               {member && (() => {
                 const memberLinks = emotionalLinks.filter(l => l.from === member.id || l.to === member.id);
@@ -573,6 +602,28 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   </div>
                 )}
               </div>
+
+              {/* ── Notes cliniques (read-only) ── */}
+              {notes && (
+                <>
+                  <Separator className="opacity-50" />
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider flex items-center gap-1.5">
+                      <FileText className="w-3 h-3" /> Notes
+                    </span>
+                    <div className="rounded-xl bg-accent/20 border border-border/40 px-3 py-2.5">
+                      <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed"
+                         dangerouslySetInnerHTML={{
+                           __html: notes
+                             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                             .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                             .replace(/^- (.+)$/gm, '• $1')
+                         }}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
 
               {/* ── Liens émotionnels (read-only) ── */}
               {member && (() => {
