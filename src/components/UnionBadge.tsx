@@ -222,8 +222,10 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
               strokeOpacity={0.4}
             />
             <svg width={noteSize} height={noteSize} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 20h9" />
-              <path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z" />
+              <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+              <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+              <path d="M10 13h4" />
+              <path d="M10 17h4" />
             </svg>
           </g>
         );
