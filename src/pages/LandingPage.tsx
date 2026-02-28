@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import heroEditor from '@/assets/hero-editor.png';
 import heroDashboard from '@/assets/hero-dashboard.png';
+import aboutIllustration from '@/assets/about-illustration.png';
 import abstract160 from '@/assets/abstract-160.svg';
 import abstract122 from '@/assets/abstract-122.svg';
 import abstract206 from '@/assets/abstract-206.svg';
@@ -222,9 +223,9 @@ const LandingPage: React.FC = () => {
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="dot-grid rounded-xl border border-border aspect-[4/3] flex items-center justify-center"
+              className="dot-grid rounded-xl border border-border p-8 flex items-center justify-center"
             >
-              <img src={abstract65} alt="" className="w-24 h-24 opacity-60" />
+              <img src={aboutIllustration} alt="Symboles et liens émotionnels d'un génogramme" className="w-full h-auto max-w-md" />
             </motion.div>
 
             {/* Right – copy */}
