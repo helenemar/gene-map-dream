@@ -126,7 +126,7 @@ const Dashboard: React.FC = () => {
     .slice(0, 2);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-card">
       {/* ── Top Nav ── */}
       <header className="h-[64px] bg-card border-b border-border flex items-center justify-between px-8">
         <div className="flex items-center gap-2.5">
@@ -165,7 +165,7 @@ const Dashboard: React.FC = () => {
       {/* ── Main Content ── */}
       <main className="px-8 py-8">
         {/* Hero / CTA Section */}
-        <div className="dot-grid border border-border rounded-xl px-10 py-9 mb-6">
+        <div className="dot-grid bg-background border border-border rounded-xl px-10 py-9 mb-6">
           <h1 className="text-[26px] font-bold text-foreground leading-tight mb-1.5">
             Créer un nouveau génogramme
           </h1>
