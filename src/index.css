@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --background: 220 14% 96%;
+    --background: 0 0% 100%;
     --foreground: 224 20% 14%;
 
     --card: 0 0% 100%;
@@ -41,8 +41,8 @@
     --brand-orange-foreground: 0 0% 100%;
 
     /* Canvas */
-    --canvas-bg: 220 14% 96%;
-    --canvas-dot: 220 10% 82%;
+    --canvas-bg: 47 100% 98%;
+    --canvas-dot: 40 30% 85%;
 
     /* Pathology colors */
     --pathology-depression: 270 60% 55%;
