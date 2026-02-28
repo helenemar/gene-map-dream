@@ -196,15 +196,20 @@ const DesignSystemPage: React.FC = () => {
         </SubSection>
 
         {/* Border Radius */}
-        <SubSection title="Border Radius">
-          <div className="flex flex-wrap gap-6">
+        <SubSection title="Border Radius — Logique adaptative">
+          <p className="text-sm text-muted-foreground mb-6">
+            Le radius suit une <strong>logique adaptative</strong> : les grands conteneurs (modales, drawers, cartes) utilisent <code className="bg-muted px-1.5 py-0.5 rounded text-xs">rounded-xl</code> (12px), les éléments standards (boutons, inputs) utilisent <code className="bg-muted px-1.5 py-0.5 rounded text-xs">rounded-lg</code> (8px), et les petits éléments (badges, tags) utilisent <code className="bg-muted px-1.5 py-0.5 rounded text-xs">rounded-md</code> ou <code className="bg-muted px-1.5 py-0.5 rounded text-xs">rounded-full</code>.
+          </p>
+
+          <div className="flex flex-wrap gap-6 mb-10">
             {[
-              { name: 'sm', val: 'calc(0.75rem - 4px)', px: '8px' },
-              { name: 'md', val: 'calc(0.75rem - 2px)', px: '10px' },
-              { name: 'lg (default)', val: '0.75rem', px: '12px' },
-              { name: 'xl', val: 'calc(0.75rem + 4px)', px: '16px' },
-              { name: '2xl', val: '1rem', px: '16px' },
-              { name: 'full', val: '9999px', px: '∞' },
+              { name: 'sm', tailwind: 'rounded-sm', val: 'calc(var(--radius) - 4px)', px: '4px' },
+              { name: 'md', tailwind: 'rounded-md', val: 'calc(var(--radius) - 2px)', px: '6px' },
+              { name: 'lg', tailwind: 'rounded-lg', val: 'var(--radius)', px: '8px' },
+              { name: 'xl', tailwind: 'rounded-xl', val: 'calc(var(--radius) + 4px)', px: '12px' },
+              { name: '2xl', tailwind: 'rounded-2xl', val: '1rem', px: '16px' },
+              { name: '3xl', tailwind: 'rounded-3xl', val: '1.25rem', px: '20px' },
+              { name: 'full', tailwind: 'rounded-full', val: '9999px', px: '∞' },
             ].map(r => (
               <div key={r.name} className="flex flex-col items-center gap-2">
                 <div
@@ -212,9 +217,43 @@ const DesignSystemPage: React.FC = () => {
                   style={{ borderRadius: r.val }}
                 />
                 <span className="text-xs font-semibold text-foreground">{r.name}</span>
+                <code className="text-[10px] text-muted-foreground">{r.tailwind}</code>
                 <code className="text-[10px] text-muted-foreground">{r.px}</code>
               </div>
             ))}
+          </div>
+
+          {/* Usage guide */}
+          <h4 className="text-sm font-semibold text-foreground mb-3">Guide d'utilisation</h4>
+          <div className="bg-card rounded-xl border border-border overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/30">
+                  <th className="text-left px-4 py-3 font-semibold text-foreground">Composant</th>
+                  <th className="text-left px-4 py-3 font-semibold text-foreground">Radius</th>
+                  <th className="text-left px-4 py-3 font-semibold text-foreground">Classe Tailwind</th>
+                </tr>
+              </thead>
+              <tbody className="text-muted-foreground">
+                {[
+                  { comp: 'Modales / AlertDialog / Drawers', radius: '12px', tw: 'rounded-xl' },
+                  { comp: 'Cartes de section (Features, FAQ)', radius: '12px', tw: 'rounded-xl' },
+                  { comp: 'Boutons grands (CTA, lg, xl)', radius: '12px', tw: 'rounded-xl' },
+                  { comp: 'Bouton Beta', radius: '12px', tw: 'rounded-xl' },
+                  { comp: 'Menus contextuels / Dropdowns', radius: '8px', tw: 'rounded-lg' },
+                  { comp: 'Boutons standards (default, sm)', radius: '8px', tw: 'rounded-lg' },
+                  { comp: 'Inputs / Selects', radius: '8px', tw: 'rounded-lg' },
+                  { comp: 'Badges / Tags', radius: '∞', tw: 'rounded-full' },
+                  { comp: 'Boutons icône circulaires', radius: '∞', tw: 'rounded-full' },
+                ].map((row, i) => (
+                  <tr key={i} className="border-b border-border last:border-0">
+                    <td className="px-4 py-2.5 text-foreground">{row.comp}</td>
+                    <td className="px-4 py-2.5"><code className="bg-muted px-1.5 py-0.5 rounded text-xs">{row.radius}</code></td>
+                    <td className="px-4 py-2.5"><code className="bg-muted px-1.5 py-0.5 rounded text-xs">{row.tw}</code></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </SubSection>
 
