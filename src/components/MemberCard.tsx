@@ -207,8 +207,18 @@ const MemberCard: React.FC<MemberCardProps> = ({
           ) : (
             <>
               {/* Header: Prénom left, badges right — space-between */}
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-semibold text-sm text-foreground whitespace-nowrap">{member.firstName}</span>
+               <div className="flex items-center justify-between gap-2">
+                <div className="flex items-baseline gap-1 min-w-0">
+                  <span className="font-semibold text-sm text-foreground whitespace-nowrap">
+                    {member.firstName.split(',')[0].trim()}
+                  </span>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap truncate">
+                    {member.lastName}
+                    {member.birthName && member.birthName !== member.lastName && (
+                      <span className="text-muted-foreground/60"> (née {member.birthName})</span>
+                    )}
+                  </span>
+                </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
                     {isDeceased && member.deathYear ? `${member.deathYear - member.birthYear} ans` : `${member.age} ans`}

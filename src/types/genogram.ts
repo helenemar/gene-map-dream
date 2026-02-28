@@ -16,6 +16,8 @@ export interface FamilyMember {
   id: string;
   firstName: string;
   lastName: string;
+  /** Nom de naissance / nom de jeune fille */
+  birthName?: string;
   birthYear: number;
   birthYearUnsure?: boolean;
   deathYear?: number;

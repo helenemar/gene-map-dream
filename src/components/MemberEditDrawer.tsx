@@ -68,6 +68,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [isEditing, setIsEditing] = useState(initialEditing);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [birthName, setBirthName] = useState('');
   const [birthYear, setBirthYear] = useState('');
   const [deathYear, setDeathYear] = useState('');
   const [profession, setProfession] = useState('');
@@ -93,6 +94,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setIsEditing(initialEditing);
       setFirstName(member.firstName);
       setLastName(member.lastName);
+      setBirthName(member.birthName || '');
       setBirthYear(member.birthYear ? String(member.birthYear) : '');
       setBirthYearUnsure(!!member.birthYearUnsure);
       setDeathYear(member.deathYear ? String(member.deathYear) : '');
@@ -131,6 +133,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       ...member,
       firstName: firstName || 'Nouveau',
       lastName: lastName || member.lastName,
+      birthName: birthName || undefined,
       birthYear: parsedBirthYear && !isNaN(parsedBirthYear) ? parsedBirthYear : currentYear - 30,
       birthYearUnsure: birthYearUnsure || undefined,
       deathYear: parsedDeathYear && !isNaN(parsedDeathYear) ? parsedDeathYear : undefined,
@@ -151,7 +154,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       notes: notes || undefined,
       isDraft: false,
     };
-  }, [member, firstName, lastName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, currentYear]);
+  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, currentYear]);
 
   /** Fire live update to canvas */
   useEffect(() => {
@@ -159,7 +162,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes]);
+  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes]);
 
   if (!member) return null;
 
@@ -243,13 +246,21 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               {/* ── Identité – grille 2 colonnes ── */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
-                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Prénom</Label>
-                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Marie" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus />
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Prénoms</Label>
+                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Marie, Jeanne" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus />
+                  <span className="text-[9px] text-muted-foreground/60">Séparez les prénoms par une virgule</span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Nom</Label>
                   <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <Label className={`text-[10px] font-medium uppercase tracking-wider ${gender === 'female' ? 'text-primary' : 'text-muted-foreground'}`}>
+                  Nom de naissance / jeune fille
+                </Label>
+                <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Martin" value={birthName} onChange={(e) => setBirthName(e.target.value)} />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -586,6 +597,12 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Nom</span>
                     <span className="text-sm font-medium text-foreground">{lastName}</span>
+                  </div>
+                )}
+                {birthName && birthName !== lastName && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Nom de naissance</span>
+                    <span className="text-sm text-foreground">{birthName}</span>
                   </div>
                 )}
                 <div className="flex flex-col gap-0.5">
