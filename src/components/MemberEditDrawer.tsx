@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FamilyMember, PATHOLOGIES, TwinType, EmotionalLink, EmotionalLinkType, EMOTIONAL_LINK_TYPES, Union, UnionStatus, FAMILY_LINK_TYPES } from '@/types/genogram';
+import { FamilyMember, PATHOLOGIES, TwinType, EmotionalLink, EmotionalLinkType, EMOTIONAL_LINK_TYPES, Union, UnionStatus, FAMILY_LINK_TYPES, GenderIdentity, SexualOrientation, GENDER_IDENTITY_OPTIONS, SEXUAL_ORIENTATION_OPTIONS } from '@/types/genogram';
 import {
   Sheet,
   SheetContent,
@@ -32,7 +32,7 @@ import {
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { Trash2, Heart, Pencil, FileText } from 'lucide-react';
+import { Trash2, Heart, Pencil, FileText, Check } from 'lucide-react';
 import MemberIcon from '@/components/MemberIcon';
 
 interface MemberEditDrawerProps {
@@ -66,9 +66,14 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [deathYear, setDeathYear] = useState('');
   const [profession, setProfession] = useState('');
   const [gender, setGender] = useState<'male' | 'female' | 'non-binary'>('male');
-  const [isGay, setIsGay] = useState(false);
-  const [isBisexual, setIsBisexual] = useState(false);
-  const [isTransgender, setIsTransgender] = useState(false);
+  const [genderIdentity, setGenderIdentity] = useState<GenderIdentity>('cisgender');
+  const [genderIdentityCustom, setGenderIdentityCustom] = useState('');
+  const [sexualOrientation, setSexualOrientation] = useState<SexualOrientation>('heterosexual');
+  const [sexualOrientationCustom, setSexualOrientationCustom] = useState('');
+  // Legacy compat
+  const isGay = sexualOrientation === 'homosexual';
+  const isBisexual = sexualOrientation === 'bisexual';
+  const isTransgender = genderIdentity === 'transgender';
   const [selectedPathologies, setSelectedPathologies] = useState<string[]>([]);
   const [twinGroup, setTwinGroup] = useState('');
   const [twinType, setTwinType] = useState<TwinType | ''>('');
@@ -83,9 +88,14 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setDeathYear(member.deathYear ? String(member.deathYear) : '');
       setProfession(member.profession);
       setGender(member.gender);
-      setIsGay(!!member.isGay);
-      setIsBisexual(!!member.isBisexual);
-      setIsTransgender(!!member.isTransgender);
+      // Migrate legacy fields to new model
+      setGenderIdentity(member.genderIdentity ?? (member.isTransgender ? 'transgender' : 'cisgender'));
+      setGenderIdentityCustom(member.genderIdentityCustom ?? '');
+      setSexualOrientation(
+        member.sexualOrientation ??
+        (member.isGay ? 'homosexual' : member.isBisexual ? 'bisexual' : 'heterosexual')
+      );
+      setSexualOrientationCustom(member.sexualOrientationCustom ?? '');
       setSelectedPathologies(member.pathologies || []);
       setTwinGroup(member.twinGroup || '');
       setTwinType(member.twinType || '');
@@ -118,12 +128,16 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       isGay,
       isBisexual,
       isTransgender,
+      genderIdentity,
+      genderIdentityCustom: genderIdentity === 'other' ? genderIdentityCustom : undefined,
+      sexualOrientation,
+      sexualOrientationCustom: sexualOrientation === 'other' ? sexualOrientationCustom : undefined,
       pathologies: selectedPathologies,
       twinGroup: twinGroup || undefined,
       twinType: (twinType as TwinType) || undefined,
       notes: notes || undefined,
     };
-  }, [member, firstName, lastName, parsedBirthYear, parsedDeathYear, age, profession, gender, isGay, isBisexual, isTransgender, selectedPathologies, twinGroup, twinType, notes, currentYear]);
+  }, [member, firstName, lastName, parsedBirthYear, parsedDeathYear, age, profession, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, currentYear]);
 
   /** Fire live update to canvas */
   useEffect(() => {
@@ -131,7 +145,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthYear, deathYear, profession, gender, isGay, isBisexual, isTransgender, selectedPathologies, twinGroup, twinType, notes]);
+  }, [firstName, lastName, birthYear, deathYear, profession, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes]);
 
   if (!member) return null;
 
@@ -258,23 +272,70 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               <Separator className="opacity-50" />
 
-              {/* ── Identité de genre & orientation – badges cliquables ── */}
+              {/* ── Identité de genre ── */}
               <div className="flex flex-col gap-2">
-                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Identité & Orientation</Label>
+                <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Identité de genre</Label>
                 <div className="flex flex-wrap gap-2">
-                  <button type="button" onClick={() => setIsTransgender(!isTransgender)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${isTransgender ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'}`}>
-                    Transgenre
-                  </button>
-                  <button type="button" onClick={() => { setIsGay(!isGay); if (!isGay) setIsBisexual(false); }}
-                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${isGay ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'}`}>
-                    Homosexuel(le)
-                  </button>
-                  <button type="button" onClick={() => { setIsBisexual(!isBisexual); if (!isBisexual) setIsGay(false); }}
-                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${isBisexual ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-muted/50 border-border/50 text-muted-foreground hover:bg-accent/50'}`}>
-                    Bisexuel(le)
-                  </button>
+                  {GENDER_IDENTITY_OPTIONS.map(opt => {
+                    const selected = genderIdentity === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setGenderIdentity(opt.id)}
+                        className={`flex items-center gap-1.5 min-h-[32px] px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                          selected
+                            ? 'bg-primary/10 border-primary/30 text-primary'
+                            : 'bg-muted/40 border-transparent text-muted-foreground hover:bg-accent/50'
+                        }`}
+                      >
+                        {selected && <Check className="w-3 h-3 shrink-0" />}
+                        {opt.label}
+                      </button>
+                    );
+                  })}
                 </div>
+                {genderIdentity === 'other' && (
+                  <Input
+                    className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30 mt-1"
+                    placeholder="Préciser…"
+                    value={genderIdentityCustom}
+                    onChange={(e) => setGenderIdentityCustom(e.target.value)}
+                  />
+                )}
+              </div>
+
+              {/* ── Orientation sexuelle ── */}
+              <div className="flex flex-col gap-2">
+                <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Orientation sexuelle</Label>
+                <div className="flex flex-wrap gap-2">
+                  {SEXUAL_ORIENTATION_OPTIONS.map(opt => {
+                    const selected = sexualOrientation === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setSexualOrientation(opt.id)}
+                        className={`flex items-center gap-1.5 min-h-[32px] px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                          selected
+                            ? 'bg-primary/10 border-primary/30 text-primary'
+                            : 'bg-muted/40 border-transparent text-muted-foreground hover:bg-accent/50'
+                        }`}
+                      >
+                        {selected && <Check className="w-3 h-3 shrink-0" />}
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {sexualOrientation === 'other' && (
+                  <Input
+                    className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30 mt-1"
+                    placeholder="Préciser…"
+                    value={sexualOrientationCustom}
+                    onChange={(e) => setSexualOrientationCustom(e.target.value)}
+                  />
+                )}
               </div>
 
               <Separator className="opacity-50" />
@@ -509,17 +570,29 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 )}
               </div>
 
-              {/* ── Identité & Orientation (only if any active) ── */}
-              {(isTransgender || isGay || isBisexual) && (
+              {/* ── Identité & Orientation (read-only) ── */}
+              {(genderIdentity !== 'cisgender' || sexualOrientation !== 'heterosexual') && (
                 <>
                   <Separator className="opacity-50" />
-                  <div className="flex flex-col gap-1.5">
-                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité & Orientation</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {isTransgender && <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/15 border border-primary/30 text-primary">Transgenre</span>}
-                      {isGay && <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/15 border border-primary/30 text-primary">Homosexuel(le)</span>}
-                      {isBisexual && <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/15 border border-primary/30 text-primary">Bisexuel(le)</span>}
-                    </div>
+                  <div className="flex flex-col gap-3">
+                    {genderIdentity !== 'cisgender' && (
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider">Identité de genre</span>
+                        <span className="text-sm font-medium text-foreground">
+                          {GENDER_IDENTITY_OPTIONS.find(o => o.id === genderIdentity)?.label}
+                          {genderIdentity === 'other' && genderIdentityCustom ? ` — ${genderIdentityCustom}` : ''}
+                        </span>
+                      </div>
+                    )}
+                    {sexualOrientation !== 'heterosexual' && (
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider">Orientation sexuelle</span>
+                        <span className="text-sm font-medium text-foreground">
+                          {SEXUAL_ORIENTATION_OPTIONS.find(o => o.id === sexualOrientation)?.label}
+                          {sexualOrientation === 'other' && sexualOrientationCustom ? ` — ${sexualOrientationCustom}` : ''}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
