@@ -129,9 +129,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       isBisexual,
       isTransgender,
       genderIdentity,
-      genderIdentityCustom: genderIdentity === 'other' ? genderIdentityCustom : undefined,
+      genderIdentityCustom: undefined,
       sexualOrientation,
-      sexualOrientationCustom: sexualOrientation === 'other' ? sexualOrientationCustom : undefined,
+      sexualOrientationCustom: undefined,
       pathologies: selectedPathologies,
       twinGroup: twinGroup || undefined,
       twinType: (twinType as TwinType) || undefined,
@@ -295,14 +295,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     );
                   })}
                 </div>
-                {genderIdentity === 'other' && (
-                  <Input
-                    className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30 mt-1"
-                    placeholder="Préciser…"
-                    value={genderIdentityCustom}
-                    onChange={(e) => setGenderIdentityCustom(e.target.value)}
-                  />
-                )}
               </div>
 
               {/* ── Orientation sexuelle ── */}
@@ -328,14 +320,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     );
                   })}
                 </div>
-                {sexualOrientation === 'other' && (
-                  <Input
-                    className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30 mt-1"
-                    placeholder="Préciser…"
-                    value={sexualOrientationCustom}
-                    onChange={(e) => setSexualOrientationCustom(e.target.value)}
-                  />
-                )}
               </div>
 
               <Separator className="opacity-50" />
@@ -580,7 +564,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                         <span className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider">Identité de genre</span>
                         <span className="text-sm font-medium text-foreground">
                           {GENDER_IDENTITY_OPTIONS.find(o => o.id === genderIdentity)?.label}
-                          {genderIdentity === 'other' && genderIdentityCustom ? ` — ${genderIdentityCustom}` : ''}
                         </span>
                       </div>
                     )}
@@ -589,7 +572,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                         <span className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider">Orientation sexuelle</span>
                         <span className="text-sm font-medium text-foreground">
                           {SEXUAL_ORIENTATION_OPTIONS.find(o => o.id === sexualOrientation)?.label}
-                          {sexualOrientation === 'other' && sexualOrientationCustom ? ` — ${sexualOrientationCustom}` : ''}
                         </span>
                       </div>
                     )}
