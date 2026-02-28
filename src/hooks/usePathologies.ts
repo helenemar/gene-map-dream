@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { DEFAULT_PATHOLOGIES } from '@/constants/defaultPathologies';
 
 export interface DynamicPathology {
   id: string;
@@ -21,7 +22,23 @@ export function usePathologies(genogramId: string | undefined) {
       .eq('genogram_id', genogramId)
       .order('created_at', { ascending: true });
     if (!error && data) {
-      setPathologies(data as DynamicPathology[]);
+      // Backfill: seed defaults if genogram has zero pathologies
+      if (data.length === 0) {
+        const rows = DEFAULT_PATHOLOGIES.map(p => ({
+          genogram_id: genogramId,
+          name: p.name,
+          color_hex: p.color_hex,
+        }));
+        const { data: seeded } = await supabase
+          .from('pathologies')
+          .insert(rows)
+          .select();
+        if (seeded) {
+          setPathologies(seeded as DynamicPathology[]);
+        }
+      } else {
+        setPathologies(data as DynamicPathology[]);
+      }
     }
     setLoading(false);
   }, [genogramId]);
