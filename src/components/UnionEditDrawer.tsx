@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
 
 interface UnionEditDrawerProps {
   union: Union | null;
@@ -144,6 +145,19 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
               </Label>
             </div>
           )}
+
+          {/* Notes */}
+          <div className="flex flex-col gap-2 pt-2">
+            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Notes
+            </Label>
+            <Textarea
+              placeholder="Notes sur la relation..."
+              className="min-h-[100px] text-sm resize-y"
+              value={union.notes ?? ''}
+              onChange={(e) => onUpdate({ ...union, notes: e.target.value })}
+            />
+          </div>
         </div>
       </SheetContent>
     </Sheet>
