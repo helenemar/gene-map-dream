@@ -1055,6 +1055,7 @@ const GenogramEditor: React.FC = () => {
 
 
   // ─── Fit to screen: compute bounding box of all members and center ───
+  // ─── Fit to screen: compute bounding box of all members and center ───
   const handleFitToScreen = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas || members.length === 0) return;
@@ -1099,6 +1100,19 @@ const GenogramEditor: React.FC = () => {
       handleFitToScreen();
     }, 900); // Match spring animation duration
   }, [members, emotionalLinks, handleFitToScreen]);
+
+  // ─── Auto-layout on member count change (skip initial load) ───
+  const prevMemberCountRef = React.useRef<number | null>(null);
+  useEffect(() => {
+    if (prevMemberCountRef.current === null) {
+      prevMemberCountRef.current = members.length;
+      return;
+    }
+    if (members.length > prevMemberCountRef.current) {
+      handleAutoLayout();
+    }
+    prevMemberCountRef.current = members.length;
+  }, [members.length, handleAutoLayout]);
 
   // ─── Button zoom (centered on viewport center) ───
   const handleZoomIn = useCallback(() => {
