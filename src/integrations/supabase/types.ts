@@ -73,6 +73,38 @@ export type Database = {
         }
         Relationships: []
       }
+      pathologies: {
+        Row: {
+          color_hex: string
+          created_at: string
+          genogram_id: string
+          id: string
+          name: string
+        }
+        Insert: {
+          color_hex: string
+          created_at?: string
+          genogram_id: string
+          id?: string
+          name: string
+        }
+        Update: {
+          color_hex?: string
+          created_at?: string
+          genogram_id?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pathologies_genogram_id_fkey"
+            columns: ["genogram_id"]
+            isOneToOne: false
+            referencedRelation: "genograms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

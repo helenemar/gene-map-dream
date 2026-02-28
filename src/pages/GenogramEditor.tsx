@@ -28,6 +28,7 @@ import { useUndoRedo } from '@/hooks/useUndoRedo';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { usePathologies } from '@/hooks/usePathologies';
 import { toast } from 'sonner';
 import { Undo2, Redo2 } from 'lucide-react';
 
@@ -147,6 +148,7 @@ const GenogramEditor: React.FC = () => {
   const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(() => genogramId ? [] : SAMPLE_EMOTIONAL_LINKS);
   const [unions, setUnions] = useState<Union[]>(() => genogramId ? [] : SAMPLE_UNIONS);
   const search = useFamilySearch(members, unions, emotionalLinks);
+  const { pathologies: dynamicPathologies, addPathology, deletePathology } = usePathologies(genogramId);
   const [editingUnionId, setEditingUnionId] = useState<string | null>(null);
   const [fileName, setFileName] = useState('Sans titre');
   const [isAnimating, setIsAnimating] = useState(false);
@@ -1214,6 +1216,7 @@ const GenogramEditor: React.FC = () => {
             onHighlightUnionStatus={setHighlightedUnionStatus}
             soloEmotionalType={soloEmotionalType}
             onToggleSoloEmotional={handleToggleSoloEmotional}
+            dynamicPathologies={dynamicPathologies}
           />
         )}
 
@@ -1352,6 +1355,7 @@ const GenogramEditor: React.FC = () => {
                 onLinkDragStart={handleLinkDragStart}
                 onCancelAnchor={handleCancelAnchor}
                 disabledOptions={getDisabledOptions(member.id)}
+                dynamicPathologies={dynamicPathologies}
                 showParentSplit={shouldShowParentSplit(member.id)}
                 isAdopted={isMemberAdopted(member.id)}
               />
@@ -1485,6 +1489,9 @@ const GenogramEditor: React.FC = () => {
             emotionalLinks={emotionalLinks}
             members={members}
             unions={unions}
+            dynamicPathologies={dynamicPathologies}
+            onAddPathology={addPathology}
+            onDeletePathology={deletePathology}
             onUpdateEmotionalLink={(linkId, newType) => {
               recordSnapshot();
               setEmotionalLinks(prev => prev.map(l => l.id === linkId ? { ...l, type: newType } : l));
