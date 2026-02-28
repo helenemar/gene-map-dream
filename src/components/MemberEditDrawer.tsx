@@ -355,7 +355,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           </Select>
                           <div className="grid grid-cols-2 gap-2">
                             <div className="flex flex-col gap-1">
-                              <span className="text-[10px] text-muted-foreground uppercase">Année union</span>
+                              <span className="text-[10px] text-muted-foreground uppercase">Année de rencontre</span>
                               <Input className="h-7 text-xs border-border/40 bg-card" type="number" placeholder="—" value={union.marriageYear || ''}
                                 onChange={(e) => onUpdateUnion?.(union.id, { marriageYear: e.target.value ? parseInt(e.target.value, 10) : undefined })} />
                             </div>
