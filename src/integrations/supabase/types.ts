@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      genogram_notes: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          genogram_id: string
+          id: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          genogram_id: string
+          id?: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          genogram_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "genogram_notes_genogram_id_fkey"
+            columns: ["genogram_id"]
+            isOneToOne: false
+            referencedRelation: "genograms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       genograms: {
         Row: {
           created_at: string
@@ -76,7 +108,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      owns_genogram: {
+        Args: { _genogram_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

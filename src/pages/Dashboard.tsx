@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown } from 'lucide-react';
+import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText } from 'lucide-react';
 import GenogramThumbnail from '@/components/GenogramThumbnail';
 import CreateGenogramModal from '@/components/CreateGenogramModal';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import DossierNotesModal from '@/components/DossierNotesModal';
 
 interface GenogramRow {
   id: string;
@@ -38,6 +39,8 @@ const Dashboard: React.FC = () => {
   const [sortKey, setSortKey] = useState<SortKey>('updated_at');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [notesModal, setNotesModal] = useState<{ open: boolean; genogramId: string; genogramName: string }>({ open: false, genogramId: '', genogramName: '' });
+  const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
 
   const { data: genograms, isLoading } = useQuery({
     queryKey: ['genograms', user?.id],
@@ -51,6 +54,24 @@ const Dashboard: React.FC = () => {
     },
     enabled: !!user,
   });
+
+  // Fetch note counts for all genograms
+  useEffect(() => {
+    if (!genograms?.length) return;
+    const ids = genograms.map(g => g.id);
+    supabase
+      .from('genogram_notes')
+      .select('genogram_id')
+      .in('genogram_id', ids)
+      .then(({ data }) => {
+        if (!data) return;
+        const counts: Record<string, number> = {};
+        for (const row of data as { genogram_id: string }[]) {
+          counts[row.genogram_id] = (counts[row.genogram_id] ?? 0) + 1;
+        }
+        setNoteCounts(counts);
+      });
+  }, [genograms]);
 
   const filteredFiles = useMemo(() => {
     if (!genograms) return [];
@@ -255,6 +276,18 @@ const Dashboard: React.FC = () => {
                       </TableCell>
                       <TableCell className="text-right pr-6">
                         <div className="flex items-center justify-end gap-1">
+                          {(noteCounts[file.id] ?? 0) > 0 && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setNotesModal({ open: true, genogramId: file.id, genogramName: file.name }); }}
+                              className="relative w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
+                              title="Notes du dossier"
+                            >
+                              <FileText className="w-4 h-4 text-muted-foreground" />
+                              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center">
+                                {noteCounts[file.id]}
+                              </span>
+                            </button>
+                          )}
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
@@ -309,6 +342,13 @@ const Dashboard: React.FC = () => {
             </div>
           )}
         </div>
+
+        <DossierNotesModal
+          open={notesModal.open}
+          onClose={() => setNotesModal(prev => ({ ...prev, open: false }))}
+          genogramId={notesModal.genogramId}
+          genogramName={notesModal.genogramName}
+        />
       </main>
     </div>
   );

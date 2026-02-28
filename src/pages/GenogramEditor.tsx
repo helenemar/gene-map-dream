@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import DossierNotesModal, { useGenogramNoteCount } from '@/components/DossierNotesModal';
 import EditorHeader from '@/components/EditorHeader';
 import EditorSidebar from '@/components/EditorSidebar';
 import MemberCard from '@/components/MemberCard';
@@ -173,6 +174,10 @@ const GenogramEditor: React.FC = () => {
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  // ─── Notes du dossier ───
+  const [notesModalOpen, setNotesModalOpen] = useState(false);
+  const noteCount = useGenogramNoteCount(genogramId);
 
   // ─── Auto-save ───
   const { saveStatus, debouncedSave } = useAutoSave(genogramId ?? null);
@@ -1038,6 +1043,8 @@ const GenogramEditor: React.FC = () => {
           }
         }}
         saveStatus={genogramId ? saveStatus : undefined}
+        onOpenNotes={() => setNotesModalOpen(true)}
+        noteCount={noteCount}
       />
       <div className="flex flex-1 overflow-hidden">
         {!presentationMode && (
@@ -1348,6 +1355,14 @@ const GenogramEditor: React.FC = () => {
           />
         </div>
       </div>
+      {genogramId && (
+        <DossierNotesModal
+          open={notesModalOpen}
+          onClose={() => setNotesModalOpen(false)}
+          genogramId={genogramId}
+          genogramName={fileName}
+        />
+      )}
     </div>
   );
 };

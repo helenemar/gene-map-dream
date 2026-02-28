@@ -19,6 +19,8 @@ interface EditorHeaderProps {
   onExportSvg?: () => void;
   onExportPdf?: () => void;
   saveStatus?: SaveStatus;
+  onOpenNotes?: () => void;
+  noteCount?: number;
 }
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -68,6 +70,8 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   onExportSvg,
   onExportPdf,
   saveStatus = 'idle',
+  onOpenNotes,
+  noteCount = 0,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -178,6 +182,17 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        {onOpenNotes && (
+          <Button variant="outline" size="sm" className="gap-2 rounded-full text-xs relative" onClick={onOpenNotes}>
+            <FileText className="w-3.5 h-3.5" />
+            Notes
+            {noteCount > 0 && (
+              <span className="min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center">
+                {noteCount}
+              </span>
+            )}
+          </Button>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2 rounded-full text-xs">
