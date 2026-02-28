@@ -1217,6 +1217,7 @@ const GenogramEditor: React.FC = () => {
             soloEmotionalType={soloEmotionalType}
             onToggleSoloEmotional={handleToggleSoloEmotional}
             dynamicPathologies={dynamicPathologies}
+            onAddPathology={addPathology}
           />
         )}
 
