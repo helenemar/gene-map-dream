@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FamilyMember, PATHOLOGIES, TwinType, EmotionalLink, EmotionalLinkType, EMOTIONAL_LINK_TYPES, Union, UnionStatus, FAMILY_LINK_TYPES, GenderIdentity, SexualOrientation, GENDER_IDENTITY_OPTIONS, SEXUAL_ORIENTATION_OPTIONS } from '@/types/genogram';
+import { FamilyMember, TwinType, EmotionalLink, EmotionalLinkType, EMOTIONAL_LINK_TYPES, Union, UnionStatus, FAMILY_LINK_TYPES, GenderIdentity, SexualOrientation, GENDER_IDENTITY_OPTIONS, SEXUAL_ORIENTATION_OPTIONS } from '@/types/genogram';
+import type { DynamicPathology } from '@/hooks/usePathologies';
+import AddPathologyModal from '@/components/AddPathologyModal';
 import {
   Sheet,
   SheetContent,
@@ -32,7 +34,7 @@ import {
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { Trash2, Heart, Pencil, FileText, Check, HelpCircle } from 'lucide-react';
+import { Trash2, Heart, Pencil, FileText, Check, HelpCircle, Plus } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -50,6 +52,9 @@ interface MemberEditDrawerProps {
   emotionalLinks?: EmotionalLink[];
   members?: FamilyMember[];
   unions?: Union[];
+  dynamicPathologies?: DynamicPathology[];
+  onAddPathology?: (name: string, colorHex: string) => Promise<{ data: any; error: any } | undefined>;
+  onDeletePathology?: (id: string) => Promise<void>;
   onUpdateEmotionalLink?: (linkId: string, newType: EmotionalLinkType) => void;
   onDeleteEmotionalLink?: (linkId: string) => void;
   onUpdateUnion?: (unionId: string, updates: Partial<Union>) => void;
@@ -62,6 +67,7 @@ interface MemberEditDrawerProps {
 const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   member, open, onClose, onSave, onDelete,
   emotionalLinks = [], members: allMembers = [], unions = [],
+  dynamicPathologies = [], onAddPathology, onDeletePathology,
   onUpdateEmotionalLink, onDeleteEmotionalLink, onUpdateUnion, onLiveUpdate,
   initialEditing = true,
 }) => {
@@ -88,6 +94,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
   const [birthYearUnsure, setBirthYearUnsure] = useState(false);
   const [deathYearUnsure, setDeathYearUnsure] = useState(false);
+  const [addPathologyModalOpen, setAddPathologyModalOpen] = useState(false);
 
   useEffect(() => {
     if (member) {
@@ -215,9 +222,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 isTransgender={isTransgender}
                 isDead={isDeceased}
                 pathologyColors={
-                  PATHOLOGIES
+                  dynamicPathologies
                     .filter(p => selectedPathologies.includes(p.id))
-                    .map(p => `hsl(var(--pathology-${p.id}))`)
+                    .map(p => p.color_hex)
                 }
                 size={44}
                 className="text-foreground"
@@ -473,15 +480,32 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               <div className="flex flex-col gap-3">
                 <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Pathologies ({selectedPathologies.length})</Label>
                 <div className="flex flex-col gap-1">
-                  {PATHOLOGIES.map((p) => (
+                  {dynamicPathologies.map((p) => (
                     <label key={p.id} className="flex items-center gap-3 py-1.5 px-2 rounded-lg hover:bg-accent/50 cursor-pointer transition-colors">
                       <Checkbox checked={selectedPathologies.includes(p.id)} onCheckedChange={() => togglePathology(p.id)} />
-                      <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: `hsl(var(--pathology-${p.id}))` }} />
+                      <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: p.color_hex }} />
                       <span className="text-sm text-foreground">{p.name}</span>
                     </label>
                   ))}
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setAddPathologyModalOpen(true)}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors py-1"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Ajouter
+                </button>
               </div>
+
+              <AddPathologyModal
+                open={addPathologyModalOpen}
+                onClose={() => setAddPathologyModalOpen(false)}
+                onAdd={async (name, colorHex) => {
+                  await onAddPathology?.(name, colorHex);
+                }}
+                usedColors={dynamicPathologies.map(p => p.color_hex)}
+              />
 
               <Separator className="opacity-50" />
 
@@ -715,17 +739,17 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   <p className="text-xs text-muted-foreground italic">Aucune pathologie renseignée</p>
                 ) : (
                   <div className="flex flex-wrap gap-1.5">
-                    {PATHOLOGIES.filter(p => selectedPathologies.includes(p.id)).map(p => (
+                    {dynamicPathologies.filter(p => selectedPathologies.includes(p.id)).map(p => (
                       <span
                         key={p.id}
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border"
                         style={{
-                          backgroundColor: `hsl(var(--pathology-${p.id}) / 0.15)`,
-                          borderColor: `hsl(var(--pathology-${p.id}) / 0.3)`,
-                          color: `hsl(var(--pathology-${p.id}))`,
+                          backgroundColor: `${p.color_hex}20`,
+                          borderColor: `${p.color_hex}50`,
+                          color: p.color_hex,
                         }}
                       >
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: `hsl(var(--pathology-${p.id}))` }} />
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color_hex }} />
                         {p.name}
                       </span>
                     ))}

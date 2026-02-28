@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { FamilyMember, PATHOLOGIES } from '@/types/genogram';
+import { FamilyMember } from '@/types/genogram';
+import type { DynamicPathology } from '@/hooks/usePathologies';
 import MemberIcon from '@/components/MemberIcon';
 import CreateMemberDropdown, { RelationshipChoice, DisabledOptions } from '@/components/CreateMemberDropdown';
 import { Plus, PencilLine, Link, X, Eye, UserPlus, FileText, HeartHandshake, HelpCircle } from 'lucide-react';
@@ -45,6 +46,8 @@ interface MemberCardProps {
   onCreateRelated?: (id: string, relationship: RelationshipChoice) => void;
   onEdit?: (id: string) => void;
   disabledOptions?: DisabledOptions;
+  /** Dynamic pathologies from DB for color resolution */
+  dynamicPathologies?: DynamicPathology[];
   showParentSplit?: boolean;
   /** Member is a child in an adoption union */
   isAdopted?: boolean;
@@ -84,13 +87,14 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onLinkDragStart,
   onCancelAnchor,
   disabledOptions,
+  dynamicPathologies = [],
   showParentSplit = false,
   isAdopted = false,
 }) => {
   const isDeceased = !!member.deathYear;
   const isPlaceholder = !!member.isPlaceholder;
   const isDraft = !!member.isDraft;
-  const memberPathologies = PATHOLOGIES.filter(p => member.pathologies.includes(p.id));
+  const memberPathologies = dynamicPathologies.filter(p => member.pathologies.includes(p.id));
 
   // Internal anchor-active state for static/DS usage
   const [internalAnchorActive, setInternalAnchorActive] = useState(false);
@@ -187,7 +191,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
               isBisexual={member.isBisexual}
               isTransgender={member.isTransgender}
               isDead={isDeceased}
-              pathologyColors={memberPathologies.map(p => `hsl(var(--pathology-${p.id}))`)}
+              pathologyColors={memberPathologies.map(p => p.color_hex)}
               size={compact ? 36 : 48}
               className="text-foreground"
             />

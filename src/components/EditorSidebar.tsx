@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Crosshair, Eye, EyeOff, Pencil } from 'lucide-react';
 import {
   FamilyMember, Union, EmotionalLink,
-  PATHOLOGIES, FAMILY_LINK_TYPES, EMOTIONAL_LINK_TYPES,
+  FAMILY_LINK_TYPES, EMOTIONAL_LINK_TYPES,
   UnionStatus, EmotionalLinkType,
 } from '@/types/genogram';
+import type { DynamicPathology } from '@/hooks/usePathologies';
 import {
   Accordion,
   AccordionContent,
@@ -30,6 +31,7 @@ interface EditorSidebarProps {
   /** Solo emotional link type — only show this type when active */
   soloEmotionalType: EmotionalLinkType | null;
   onToggleSoloEmotional: (type: EmotionalLinkType) => void;
+  dynamicPathologies?: DynamicPathology[];
 }
 
 /** Inline editable file name */
@@ -78,6 +80,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
   onFocusMember, onBack,
   highlightedUnionStatus, onHighlightUnionStatus,
   soloEmotionalType, onToggleSoloEmotional,
+  dynamicPathologies = [],
 }) => {
   // Count unions by status
   const unionStatusCounts = new Map<UnionStatus, number>();
@@ -137,15 +140,18 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-3">
             <div className="space-y-2">
-              {PATHOLOGIES.map(p => (
+              {dynamicPathologies.map(p => (
                 <div key={p.id} className="flex items-center gap-2.5 text-sm">
                   <div
                     className="w-3 h-3 rounded-full shrink-0"
-                    style={{ backgroundColor: `hsl(var(--pathology-${p.id}))` }}
+                    style={{ backgroundColor: p.color_hex }}
                   />
                   <span className="text-foreground/80">{p.name}</span>
                 </div>
               ))}
+              {dynamicPathologies.length === 0 && (
+                <p className="text-xs text-muted-foreground italic">Aucune pathologie créée</p>
+              )}
             </div>
           </AccordionContent>
         </AccordionItem>
