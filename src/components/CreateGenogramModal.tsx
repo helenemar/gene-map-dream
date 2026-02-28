@@ -50,9 +50,15 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
     try {
       const birthYear = new Date(birthDate).getFullYear();
       const age = new Date().getFullYear() - birthYear;
+      const now = Date.now();
+
+      const patientId = `m-${now}`;
+      const fatherId = `m-${now + 1}`;
+      const motherId = `m-${now + 2}`;
+      const unionId = `u-${now}`;
 
       const patientMember = {
-        id: `m-${Date.now()}`,
+        id: patientId,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         birthYear,
@@ -64,6 +70,42 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
         pathologies: [],
       };
 
+      const fatherMember = {
+        id: fatherId,
+        firstName: '',
+        lastName: lastName.trim(),
+        birthYear: 0,
+        age: 0,
+        profession: '',
+        gender: 'male' as Gender,
+        x: -140,
+        y: -200,
+        pathologies: [],
+        isDraft: true,
+      };
+
+      const motherMember = {
+        id: motherId,
+        firstName: '',
+        lastName: '',
+        birthYear: 0,
+        age: 0,
+        profession: '',
+        gender: 'female' as Gender,
+        x: 140,
+        y: -200,
+        pathologies: [],
+        isDraft: true,
+      };
+
+      const parentUnion = {
+        id: unionId,
+        partner1: fatherId,
+        partner2: motherId,
+        status: 'married' as const,
+        children: [patientId],
+      };
+
       const genogramName = `${lastName.trim()} – ${firstName.trim()}`;
 
       const { data, error } = await supabase
@@ -71,7 +113,11 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
         .insert({
           user_id: user.id,
           name: genogramName,
-          data: { members: [patientMember], unions: [], emotionalLinks: [] },
+          data: {
+            members: [patientMember, fatherMember, motherMember],
+            unions: [parentUnion],
+            emotionalLinks: [],
+          },
         })
         .select('id')
         .single();

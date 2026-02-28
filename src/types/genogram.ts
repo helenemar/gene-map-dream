@@ -39,6 +39,8 @@ export interface FamilyMember {
   twinGroup?: string;
   twinType?: TwinType;
   notes?: string;
+  /** Draft member — auto-generated, not yet edited by user */
+  isDraft?: boolean;
 }
 
 export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed' | 'love_affair';
