@@ -13,11 +13,11 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 const CARD_W = 220;       // Must match MEMBER_CARD_W (min-width of actual cards)
 const CARD_H = 64;
 const LEVEL_SPACING = 220;
-const BASE_COUPLE_GAP = 40;
-const MIN_BADGE_GAP = 100;
-const BADGE_SAFETY = 30;
-const SIBLING_GAP = 24;
-const BLOCK_GAP = 32;
+const BASE_COUPLE_GAP = 60;
+const MIN_BADGE_GAP = 120;
+const BADGE_SAFETY = 36;
+const SIBLING_GAP = 36;
+const BLOCK_GAP = 44;
 const VERTICAL_STAGGER = 20;
 const MAX_STAGGER = 150; // Cap to avoid colliding with next generation
 
