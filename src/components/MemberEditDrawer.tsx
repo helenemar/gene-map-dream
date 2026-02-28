@@ -483,7 +483,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   {dynamicPathologies.map((p) => (
                     <label key={p.id} className="flex items-center gap-3 py-1.5 px-2 rounded-lg hover:bg-accent/50 cursor-pointer transition-colors">
                       <Checkbox checked={selectedPathologies.includes(p.id)} onCheckedChange={() => togglePathology(p.id)} />
-                      <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: p.color_hex }} />
+                      <div className="w-4 h-4 rounded-[4px] shrink-0" style={{ backgroundColor: p.color_hex }} />
                       <span className="text-sm text-foreground">{p.name}</span>
                     </label>
                   ))}

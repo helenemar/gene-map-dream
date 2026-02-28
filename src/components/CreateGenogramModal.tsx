@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { DEFAULT_PATHOLOGIES } from '@/constants/defaultPathologies';
 
 type Gender = 'male' | 'female' | 'non-binary';
 
@@ -129,6 +130,14 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
         .single();
 
       if (error) throw error;
+
+      // Seed default pathologies for this genogram
+      const pathologyRows = DEFAULT_PATHOLOGIES.map(p => ({
+        genogram_id: data.id,
+        name: p.name,
+        color_hex: p.color_hex,
+      }));
+      await supabase.from('pathologies').insert(pathologyRows);
 
       queryClient.invalidateQueries({ queryKey: ['genograms'] });
       resetForm();
