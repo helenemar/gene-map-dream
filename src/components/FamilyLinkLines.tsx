@@ -207,7 +207,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
 
     const parentBottom = unionLineY;
     const childTop = Math.min(...childAnchors.map(a => a.y));
-    const baseY = parentBottom + (childTop - parentBottom) / 2;
+    const baseY = parentBottom + (childTop - parentBottom) * 0.75;
 
     // Comb bar bounds use effective drop points (not raw child anchors)
     const combLeftX = Math.min(unionMidX, ...effectiveDropXs);
