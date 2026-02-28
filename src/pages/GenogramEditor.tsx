@@ -13,6 +13,7 @@ import FloatingControls from '@/components/FloatingControls';
 import UnionEditDrawer from '@/components/UnionEditDrawer';
 import MemberEditDrawer from '@/components/MemberEditDrawer';
 import { RelationshipChoice } from '@/components/CreateMemberDropdown';
+import type { DisabledOptions } from '@/components/CreateMemberDropdown';
 import ParentPicker from '@/components/ParentPicker';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -521,6 +522,22 @@ const GenogramEditor: React.FC = () => {
     setSoloEmotionalType(prev => prev === type ? null : type);
   }, []);
 
+  /** Compute disabled dropdown options for a member (guard clauses) */
+  const getDisabledOptions = useCallback((memberId: string): DisabledOptions => {
+    const disabled: DisabledOptions = {};
+    // Find unions where this member is a child
+    const parentUnion = unions.find(u => u.children.includes(memberId));
+    if (parentUnion) {
+      const p1 = members.find(m => m.id === parentUnion.partner1);
+      const p2 = members.find(m => m.id === parentUnion.partner2);
+      const realParents = [p1, p2].filter(p => p && !p.isPlaceholder && !p.isDraft);
+      if (realParents.length >= 2) {
+        disabled.parent = 'Ce membre a déjà ses deux parents configurés';
+      }
+    }
+    return disabled;
+  }, [members, unions]);
+
   /** Smart placement: compute position for new member based on relationship */
   const computeNewPosition = useCallback((
     sourceId: string,
@@ -794,28 +811,105 @@ const GenogramEditor: React.FC = () => {
       });
     }
 
-    // For parent: create a new union with this parent + placeholder, source as child
+    // For parent: duo-parenting with guard clauses
     if (relationship === 'parent') {
       const existingParentUnion = unions.find(u => u.children.includes(sourceId));
+      const SPOUSE_GAP = CARD_W + 120;
+      const LEVEL_Y = 250;
+
       if (existingParentUnion) {
-        // Replace a partner if possible or add as second parent
-        setUnions(prev => prev.map(u =>
-          u.id === existingParentUnion.id
-            ? { ...u, partner2: newMember.id }
-            : u
-        ));
+        // Already has a parent union — check if one parent is placeholder/draft
+        const p1 = members.find(m => m.id === existingParentUnion.partner1);
+        const p2 = members.find(m => m.id === existingParentUnion.partner2);
+        const placeholderParent = [p1, p2].find(p => p && (p.isPlaceholder || p.isDraft));
+        const realParent = [p1, p2].find(p => p && !p.isPlaceholder && !p.isDraft);
+
+        if (!placeholderParent) {
+          // Both parents are real — should be disabled in dropdown, but guard anyway
+          toast.error('Ce membre a déjà ses deux parents configurés');
+          return;
+        }
+
+        // Replace placeholder with a new editable member of opposite gender
+        const oppositeGender = realParent?.gender === 'male' ? 'female' : 'male';
+        newMember.gender = oppositeGender;
+        newMember.x = placeholderParent.x;
+        newMember.y = placeholderParent.y;
+        newMember.isDraft = true;
+
+        recordSnapshot();
+        // Replace placeholder with new member in members array
+        setMembers(prev => prev.map(m => m.id === placeholderParent.id ? newMember : m));
+        // Update union to reference new member instead of placeholder
+        setUnions(prev => prev.map(u => {
+          if (u.id !== existingParentUnion.id) return u;
+          return {
+            ...u,
+            partner1: u.partner1 === placeholderParent.id ? newMember.id : u.partner1,
+            partner2: u.partner2 === placeholderParent.id ? newMember.id : u.partner2,
+          };
+        }));
+        // Update emotional links referencing the placeholder
+        setEmotionalLinks(prev => prev.map(l => ({
+          ...l,
+          from: l.from === placeholderParent.id ? newMember.id : l.from,
+          to: l.to === placeholderParent.id ? newMember.id : l.to,
+        })));
+      } else {
+        // No parent union — create both parents (duo-parenting)
+        const sourceM = members.find(m => m.id === sourceId);
+        const sourceX = sourceM?.x ?? 200;
+        const sourceY = sourceM?.y ?? 200;
+
+        // Parent 1 (the editable one)
+        newMember.x = sourceX - SPOUSE_GAP / 2;
+        newMember.y = sourceY - LEVEL_Y;
+        newMember.gender = 'male';
+
+        // Parent 2 (draft)
+        const draftParent: FamilyMember = {
+          id: `m-draft-${Date.now() + 1}`,
+          firstName: '',
+          lastName: '',
+          birthYear: currentYear - 30,
+          age: 30,
+          profession: '',
+          gender: 'female',
+          x: sourceX + SPOUSE_GAP / 2,
+          y: sourceY - LEVEL_Y,
+          pathologies: [],
+          isDraft: true,
+        };
+
+        const newUnion: Union = {
+          id: `u-${Date.now()}`,
+          partner1: newMember.id,
+          partner2: draftParent.id,
+          status: 'married',
+          children: [sourceId],
+        };
+
+        recordSnapshot();
+        setMembers(prev => [...prev, newMember, draftParent]);
+        setUnions(prev => [...prev, newUnion]);
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), 600);
       }
-      // If no existing parent union, don't auto-create one (user can link manually)
+
+      // Select and open edit drawer
+      setSelectedMember(newMember.id);
+      setEditingNewMember(newMember);
+      setNewMemberDrawerOpen(true);
+      setTimeout(() => centerOnMember(newMember), 100);
+      return;
     }
 
-    // Select and open edit drawer
+    // Select and open edit drawer (non-parent relationships)
     setSelectedMember(newMember.id);
     setEditingNewMember(newMember);
     setNewMemberDrawerOpen(true);
-
-    // Center on new member after a tick
     setTimeout(() => centerOnMember(newMember), 100);
-  }, [members, unions, computeNewPosition, centerOnMember, executeChildCreation]);
+  }, [members, unions, computeNewPosition, centerOnMember, recordSnapshot]);
 
   const [drawerEditing, setDrawerEditing] = useState(true);
 
@@ -1187,6 +1281,7 @@ const GenogramEditor: React.FC = () => {
                 onHover={setHoveredMember}
                 onLinkDragStart={handleLinkDragStart}
                 onCancelAnchor={handleCancelAnchor}
+                disabledOptions={getDisabledOptions(member.id)}
               />
             ))}
             {/* Parent picker popover for multi-union child creation */}
