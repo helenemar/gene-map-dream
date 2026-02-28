@@ -107,8 +107,9 @@ const FONT_SIZE = 11;
 const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
   const label = getDateLabel(union);
   const showIcon = hasStatusIcon(union.status);
+  const hasNotes = !!(union.notes && union.notes.trim().length > 0);
 
-  if (!label && !showIcon) return null;
+  if (!label && !showIcon && !hasNotes) return null;
 
   // Hug-content width: char width × count + padding (7.2px per char at font-size 11)
   const pillW = label ? Math.max(label.length * 7.2 + PILL_PAD_X * 2, 56) : 0;
@@ -198,6 +199,35 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
           </g>
         </>
       )}
+
+      {/* ── Notes indicator ── */}
+      {hasNotes && (() => {
+        const noteY = showIcon
+          ? iconCenterLocal + ICON_R + 6
+          : label
+            ? pillY + PILL_H + 6
+            : 0;
+        const noteSize = 12;
+        return (
+          <g transform={`translate(${blockW / 2 - noteSize / 2}, ${noteY})`}>
+            <rect
+              x={-2}
+              y={-2}
+              width={noteSize + 4}
+              height={noteSize + 4}
+              rx={4}
+              fill={bg}
+              stroke={stroke}
+              strokeWidth={0.6}
+              strokeOpacity={0.4}
+            />
+            <svg width={noteSize} height={noteSize} viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 20h9" />
+              <path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z" />
+            </svg>
+          </g>
+        );
+      })()}
     </g>
   );
 };
