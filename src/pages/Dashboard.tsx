@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -31,6 +31,7 @@ type SortDir = 'asc' | 'desc';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user, signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -83,7 +84,12 @@ const Dashboard: React.FC = () => {
     e.stopPropagation();
     if (!confirm('Supprimer ce génogramme ?')) return;
     const { error } = await supabase.from('genograms').delete().eq('id', id);
-    if (error) toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('Génogramme supprimé');
+      queryClient.invalidateQueries({ queryKey: ['genograms'] });
+    }
   };
 
   const formatDate = (iso: string) =>
