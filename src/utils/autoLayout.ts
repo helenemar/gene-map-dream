@@ -12,7 +12,7 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 
 const CARD_W = 220;       // Must match MEMBER_CARD_W (min-width of actual cards)
 const CARD_H = 64;
-const LEVEL_SPACING = 320;
+const LEVEL_SPACING = 220;
 const BASE_COUPLE_GAP = 200;
 const MIN_BADGE_GAP = 280;   // Minimum gap when a union has dates/status
 const BADGE_SAFETY = 80;     // 40px breathing room on each side of badge
