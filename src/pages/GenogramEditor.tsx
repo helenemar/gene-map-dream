@@ -805,7 +805,7 @@ const GenogramEditor: React.FC = () => {
       birthYear: currentYear - 30,
       age: 30,
       profession: '',
-      gender: 'female',
+      gender: relationship.startsWith('spouse_') ? (source?.gender === 'male' ? 'female' : 'male') : 'female',
       x: pos.x,
       y: pos.y,
       pathologies: [],
