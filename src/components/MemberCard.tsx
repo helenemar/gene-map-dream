@@ -212,12 +212,6 @@ const MemberCard: React.FC<MemberCardProps> = ({
                   <span className="font-semibold text-sm text-foreground whitespace-nowrap">
                     {member.firstName.split(',')[0].trim()}
                   </span>
-                  <span className="text-xs text-muted-foreground whitespace-nowrap truncate">
-                    {member.lastName}
-                    {member.birthName && member.birthName !== member.lastName && (
-                      <span className="text-muted-foreground/60"> (née {member.birthName})</span>
-                    )}
-                  </span>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
