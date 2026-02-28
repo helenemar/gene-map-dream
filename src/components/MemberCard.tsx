@@ -38,6 +38,8 @@ interface MemberCardProps {
   searchHighlighted?: boolean;
   /** Presentation mode: hide controls, disable drag, click opens view */
   presentationMode?: boolean;
+  /** Compact mode: smaller card for bio parents when adoptive parents exist */
+  compact?: boolean;
   onSelect?: (id: string) => void;
   onDragStart?: (id: string, e: React.MouseEvent) => void;
   onCreateRelated?: (id: string, relationship: RelationshipChoice) => void;
@@ -72,6 +74,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   searchDimmed = false,
   searchHighlighted = false,
   presentationMode = false,
+  compact = false,
   onSelect,
   onDragStart,
   onCreateRelated,
@@ -131,16 +134,19 @@ const MemberCard: React.FC<MemberCardProps> = ({
       {/* Card body — hug contents with min-width, dots inside relative container */}
       <div
         className={`
-          relative overflow-visible flex items-center gap-3 rounded-xl bg-card transition-all
+          relative overflow-visible flex items-center ${compact ? 'gap-2' : 'gap-3'} rounded-xl bg-card transition-all
           ${(isPlaceholder || isDraft) ? 'border-2 border-dashed' : 'border'}
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
           ${(isPlaceholder || isDraft) && !isHighlighted ? 'border-muted-foreground/30' : borderClasses}
           ${searchHighlighted ? 'border-2 border-primary ring-4 ring-primary/25' : ''}
+          ${compact ? 'opacity-75' : ''}
         `}
         style={{
-          minWidth: MEMBER_CARD_W,
+          minWidth: compact ? 160 : MEMBER_CARD_W,
           width: 'fit-content',
-          padding: '12px 16px',
+          padding: compact ? '8px 12px' : '12px 16px',
+          transform: compact ? 'scale(0.85)' : undefined,
+          transformOrigin: 'center center',
           ...(searchHighlighted ? { boxShadow: '0 0 20px hsl(var(--primary) / 0.35), 0 0 40px hsl(var(--primary) / 0.15)' } : {}),
         }}
       >
@@ -161,18 +167,18 @@ const MemberCard: React.FC<MemberCardProps> = ({
         ))}
 
         {/* Icon with pathology fills, placeholder, or draft */}
-        <div className="relative w-12 h-12 shrink-0 flex items-center justify-center">
+        <div className={`relative ${compact ? 'w-9 h-9' : 'w-12 h-12'} shrink-0 flex items-center justify-center`}>
           {isPlaceholder ? (
-            <div className={`w-12 h-12 flex items-center justify-center ${
+            <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
               member.gender === 'female' ? 'rounded-full' : 'rounded'
             } bg-muted/30`}>
-              <Plus className="w-5 h-5 text-muted-foreground/40" />
+              <Plus className={`${compact ? 'w-4 h-4' : 'w-5 h-5'} text-muted-foreground/40`} />
             </div>
           ) : isDraft ? (
-            <div className={`w-12 h-12 flex items-center justify-center ${
+            <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
               member.gender === 'female' ? 'rounded-full' : 'rounded'
             } bg-muted/20 border border-dashed border-muted-foreground/20`}>
-              <PencilLine className="w-4 h-4 text-muted-foreground/30" />
+              <PencilLine className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} text-muted-foreground/30`} />
             </div>
           ) : (
             <MemberIcon
@@ -182,7 +188,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
               isTransgender={member.isTransgender}
               isDead={isDeceased}
               pathologyColors={memberPathologies.map(p => `hsl(var(--pathology-${p.id}))`)}
-              size={48}
+              size={compact ? 36 : 48}
               className="text-foreground"
             />
           )}
