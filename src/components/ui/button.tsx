@@ -9,11 +9,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-lg",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-lg",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-lg",
-        ghost: "hover:bg-accent hover:text-accent-foreground rounded-lg",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         // Genogy-specific variants
         brand: "bg-brand-orange text-brand-orange-foreground hover:bg-brand-orange/90 rounded-full font-semibold shadow-soft",
@@ -23,12 +23,12 @@ const buttonVariants = cva(
         "icon-circle": "rounded-full bg-card border border-border shadow-soft hover:bg-accent",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-8 px-3 text-xs",
-        lg: "h-11 px-6",
-        xl: "h-12 px-8 text-base",
-        icon: "h-10 w-10",
-        "icon-sm": "h-8 w-8",
+        default: "h-10 px-4 py-2 rounded-lg",
+        sm: "h-8 px-3 text-xs rounded-md",
+        lg: "h-11 px-6 rounded-xl",
+        xl: "h-12 px-8 text-base rounded-xl",
+        icon: "h-10 w-10 rounded-lg",
+        "icon-sm": "h-8 w-8 rounded-md",
       },
     },
     defaultVariants: {
