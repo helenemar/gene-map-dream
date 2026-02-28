@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FamilyMember, PATHOLOGIES } from '@/types/genogram';
 import MemberIcon from '@/components/MemberIcon';
 import CreateMemberDropdown, { RelationshipChoice, DisabledOptions } from '@/components/CreateMemberDropdown';
-import { Plus, PencilLine, Link, X, Eye, UserPlus, FileText } from 'lucide-react';
+import { Plus, PencilLine, Link, X, Eye, UserPlus, FileText, HeartHandshake } from 'lucide-react';
 
 
 /**
@@ -44,6 +44,8 @@ interface MemberCardProps {
   onEdit?: (id: string) => void;
   disabledOptions?: DisabledOptions;
   showParentSplit?: boolean;
+  /** Member is a child in an adoption union */
+  isAdopted?: boolean;
   onView?: (id: string) => void;
   onHover?: (id: string | null) => void;
   onLinkDragStart?: (id: string, e: React.MouseEvent) => void;
@@ -80,6 +82,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onCancelAnchor,
   disabledOptions,
   showParentSplit = false,
+  isAdopted = false,
 }) => {
   const isDeceased = !!member.deathYear;
   const isPlaceholder = !!member.isPlaceholder;
@@ -205,12 +208,20 @@ const MemberCard: React.FC<MemberCardProps> = ({
             </div>
           ) : (
             <>
-              {/* Header: Prénom left, Âge right — space-between */}
-              <div className="flex items-center justify-between gap-3">
+              {/* Header: Prénom left, badges right — space-between */}
+              <div className="flex items-center justify-between gap-2">
                 <span className="font-semibold text-sm text-foreground whitespace-nowrap">{member.firstName}</span>
-                <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">
-                  {member.age} ans
-                </span>
+                <div className="flex items-center gap-1 shrink-0">
+                  {isAdopted && (
+                    <span className="flex items-center gap-0.5 text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-full" title="Membre adopté">
+                      <HeartHandshake className="w-3 h-3" />
+                      Adopté
+                    </span>
+                  )}
+                  <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+                    {member.age} ans
+                  </span>
+                </div>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <span className="whitespace-nowrap">
