@@ -305,6 +305,21 @@ export function computeAutoLayout(
     }
 
     placeCouple(union, coupleLeft, gen);
+
+    // ─── Re-center single child under couple midpoint ───
+    // When couple is wider than child block, child should be centered under union midpoint
+    const coupleMidX = coupleLeft + coupleWidth / 2;
+    if (children.length === 1) {
+      const childPos = positions.get(children[0]);
+      if (childPos) {
+        const childCenterX = coupleMidX - CARD_W / 2;
+        const childShift = childCenterX - childPos.x;
+        if (Math.abs(childShift) > 1) {
+          childPos.x = childCenterX;
+          updateRightEdge(childGen, childCenterX + CARD_W);
+        }
+      }
+    }
     
     // Recompute block right after potential shifts
     const finalBlockRight = Math.max(...childXPositions.map(c => {
@@ -449,6 +464,24 @@ export function computeAutoLayout(
       }
     }
     if (!anyOverlap) break;
+  }
+
+  // ═══ POST-FIX: Re-center single children under their parent union ═══
+  for (const u of unions) {
+    if (u.children.length !== 1) continue;
+    const childId = u.children[0];
+    const childPos = positions.get(childId);
+    const p1Pos = positions.get(u.partner1);
+    const p2Pos = positions.get(u.partner2);
+    if (!childPos || !p1Pos || !p2Pos) continue;
+    
+    // Skip if child has their own sub-family
+    const childHasUnions = (partnerUnions.get(childId) || []).length > 0;
+    if (childHasUnions) continue;
+    
+    // Compute union midpoint and center child under it
+    const unionMidX = (p1Pos.x + CARD_W + p2Pos.x) / 2;
+    childPos.x = unionMidX - CARD_W / 2;
   }
 
   // ═══ Center around origin ═══
