@@ -210,12 +210,6 @@ const MemberCard: React.FC<MemberCardProps> = ({
               <div className="flex items-center justify-between gap-2">
                 <span className="font-semibold text-sm text-foreground whitespace-nowrap">{member.firstName}</span>
                 <div className="flex items-center gap-1 shrink-0">
-                  {isAdopted && (
-                    <span className="flex items-center gap-0.5 text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-full" title="Membre adopté">
-                      <HeartHandshake className="w-3 h-3" />
-                      Adopté
-                    </span>
-                  )}
                   <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
                     {isDeceased && member.deathYear ? `${member.deathYear - member.birthYear} ans` : `${member.age} ans`}
                   </span>
