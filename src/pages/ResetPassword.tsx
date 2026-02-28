@@ -42,7 +42,7 @@ const ResetPassword: React.FC = () => {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       toast.success('Mot de passe mis à jour !');
-      navigate('/');
+      navigate('/dashboard');
     } catch (error: any) {
       toast.error(error.message || 'Erreur lors de la mise à jour');
     } finally {
