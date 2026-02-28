@@ -343,7 +343,7 @@ const DesignSystemPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Hélène"
-                  className="w-full px-3 py-2.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-muted-foreground/50 transition-all"
+                  className="w-full px-3 py-2.5 text-sm bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-muted-foreground/50 transition-all"
                 />
               </div>
               <div>
@@ -359,7 +359,7 @@ const DesignSystemPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Ex: Product Designer"
-                  className="w-full px-3 py-2.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-muted-foreground/50 transition-all"
+                  className="w-full px-3 py-2.5 text-sm bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-muted-foreground/50 transition-all"
                 />
               </div>
               <div>
@@ -367,7 +367,7 @@ const DesignSystemPage: React.FC = () => {
                 <input
                   type="text"
                   placeholder="25/08/1989"
-                  className="w-full px-3 py-2.5 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-muted-foreground/50 transition-all"
+                  className="w-full px-3 py-2.5 text-sm bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-muted-foreground/50 transition-all"
                 />
               </div>
               <div>
@@ -384,7 +384,7 @@ const DesignSystemPage: React.FC = () => {
                   <input
                     type="text"
                     placeholder="Rechercher un membre, une pathologie, un lien, etc..."
-                    className="w-full pl-9 pr-4 py-2.5 text-sm bg-muted/50 border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-muted-foreground/50 transition-all"
+                    className="w-full pl-9 pr-4 py-2.5 text-sm bg-card border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-muted-foreground/50 transition-all"
                   />
                 </div>
               </div>
@@ -851,7 +851,7 @@ const DesignSystemPage: React.FC = () => {
               <div className="flex-1 max-w-md mx-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input type="text" placeholder="Rechercher un membre, une pathologie, un lien, etc..." className="w-full pl-9 pr-4 py-2 text-sm bg-muted/50 border border-border rounded-full focus:outline-none placeholder:text-muted-foreground/50" />
+                  <input type="text" placeholder="Rechercher un membre, une pathologie, un lien, etc..." className="w-full pl-9 pr-4 py-2 text-sm bg-card border border-border rounded-full focus:outline-none placeholder:text-muted-foreground/50" />
                 </div>
               </div>
               <div className="flex items-center gap-2">

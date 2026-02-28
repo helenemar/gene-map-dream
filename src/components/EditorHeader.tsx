@@ -123,7 +123,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
             }}
             onFocus={() => setShowSuggestions(true)}
             placeholder="Rechercher un membre, une pathologie, un lien, etc..."
-            className="w-full pl-9 pr-10 py-2 text-sm bg-muted/50 border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-ring/20 placeholder:text-muted-foreground/50"
+            className="w-full pl-9 pr-10 py-2 text-sm bg-card border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-ring/20 placeholder:text-muted-foreground/50"
           />
           {isSearchActive && (
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
