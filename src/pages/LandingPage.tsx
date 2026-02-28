@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -73,6 +74,11 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <Helmet>
+        <title>Genogy — Créez vos génogrammes professionnels en ligne</title>
+        <meta name="description" content="Genogy est l'outil en ligne le plus simple pour créer des génogrammes professionnels. Cartographiez les relations familiales et émotionnelles de vos patients en quelques clics." />
+        <link rel="canonical" href="https://genogy.app/" />
+      </Helmet>
       {/* ═══════════ STICKY HEADER ═══════════ */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-6">
