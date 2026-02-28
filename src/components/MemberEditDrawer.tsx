@@ -325,7 +325,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 </div>
               </div>
               {isDeceased && (
-                <p className="text-xs text-muted-foreground -mt-1">⚰️ Décédé(e) — {age} ans</p>
+                <p className="text-xs text-muted-foreground -mt-1">Décédé(e) — {age} ans</p>
               )}
 
               <Separator className="opacity-50" />
