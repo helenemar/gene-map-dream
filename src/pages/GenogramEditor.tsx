@@ -727,6 +727,7 @@ const GenogramEditor: React.FC = () => {
       // Select and open drawer for new child
       setSelectedMember(newChild.id);
       setEditingNewMember(newChild);
+      setDrawerEditing(true);
       setNewMemberDrawerOpen(true);
       setTimeout(() => centerOnMember(newChild), 100);
       return;
@@ -735,6 +736,7 @@ const GenogramEditor: React.FC = () => {
     // Select and open drawer for new child (existing union path)
     setSelectedMember(newChild.id);
     setEditingNewMember(newChild);
+    setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
     setTimeout(() => centerOnMember(newChild), 100);
   }, [members, unions, centerOnMember]);
@@ -779,6 +781,7 @@ const GenogramEditor: React.FC = () => {
     setUnions(prev => [...prev, newUnion]);
     setSelectedMember(newChild.id);
     setEditingNewMember(newChild);
+    setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
     setTimeout(() => centerOnMember(newChild), 100);
   }, [members, centerOnMember]);
@@ -947,6 +950,7 @@ const GenogramEditor: React.FC = () => {
       // Select and open edit drawer
       setSelectedMember(newMember.id);
       setEditingNewMember(newMember);
+      setDrawerEditing(true);
       setNewMemberDrawerOpen(true);
       setTimeout(() => centerOnMember(newMember), 100);
       return;
@@ -955,6 +959,7 @@ const GenogramEditor: React.FC = () => {
     // Select and open edit drawer (non-parent relationships)
     setSelectedMember(newMember.id);
     setEditingNewMember(newMember);
+    setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
     setTimeout(() => centerOnMember(newMember), 100);
   }, [members, unions, computeNewPosition, centerOnMember, recordSnapshot]);
