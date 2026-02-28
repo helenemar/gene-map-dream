@@ -66,7 +66,10 @@ export const StatusIcon: React.FC<{ status: UnionStatus; size?: number }> = ({ s
 /** Get label for the date row */
 function getDateLabel(union: Union): string | null {
   const parts: string[] = [];
-  if (union.marriageYear) parts.push(`R: ${union.marriageYear}`);
+  if (union.marriageYear) {
+    const prefix = union.status === 'married' ? 'M' : 'R';
+    parts.push(`${prefix}: ${union.marriageYear}`);
+  }
   if (union.divorceYear) {
     const prefix =
       union.status === 'widowed' ? 'V' :
