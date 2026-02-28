@@ -30,7 +30,7 @@ const Auth: React.FC = () => {
   }
 
   if (user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   const handleEmailPassword = async (e: React.FormEvent) => {
@@ -40,7 +40,7 @@ const Auth: React.FC = () => {
       if (tab === 'login') {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        navigate('/');
+        navigate('/dashboard');
       } else {
         const { error } = await supabase.auth.signUp({
           email,

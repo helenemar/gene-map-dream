@@ -189,7 +189,7 @@ const GenogramEditor: React.FC = () => {
         .single();
       if (error || !data) {
         toast.error('Génogramme introuvable');
-        navigate('/');
+        navigate('/dashboard');
         return;
       }
       setFileName(data.name);
@@ -1279,10 +1279,10 @@ const GenogramEditor: React.FC = () => {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => navigate('/')}>
+                <AlertDialogCancel onClick={() => navigate('/dashboard')}>
                   Non, quitter
                 </AlertDialogCancel>
-                <AlertDialogAction onClick={() => navigate('/')}>
+                <AlertDialogAction onClick={() => navigate('/dashboard')}>
                   Oui, enregistrer
                 </AlertDialogAction>
               </AlertDialogFooter>
