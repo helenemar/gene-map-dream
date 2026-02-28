@@ -312,6 +312,41 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
       );
     }
 
+    // ── Single child: straight line from union midpoint to child top ──
+    if (effectiveDropCount === 1 && childMembers.length === 1) {
+      const childAnchor = childAnchors[0];
+      const childCenterX = childAnchor.x; // top-center of child card
+
+      // Build an orthogonal path: vertical from unionMidX, horizontal to childCenterX, vertical to child
+      const turnY = unionLineY + (childAnchor.y - unionLineY) * 0.35; // Turn point ~35% down
+
+      const isAligned = Math.abs(unionMidX - childCenterX) <= 1;
+
+      return (
+        <g key={union.id}>
+          <UnionLine
+            x1={leftAnchor.x} y1={leftAnchor.y}
+            x2={rightAnchor.x} y2={rightAnchor.y}
+            status={union.status}
+          />
+          {isAligned ? (
+            // Perfectly aligned → straight vertical
+            <line x1={unionMidX} y1={unionLineY} x2={childCenterX} y2={childAnchor.y}
+              stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+              strokeDasharray={union.isAdoption ? '6 4' : undefined} />
+          ) : (
+            // Not aligned → Z-shape: down, horizontal, down
+            <path
+              d={`M ${unionMidX} ${unionLineY} L ${unionMidX} ${turnY} L ${childCenterX} ${turnY} L ${childCenterX} ${childAnchor.y}`}
+              fill="none"
+              stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+              strokeDasharray={union.isAdoption ? '6 4' : undefined}
+            />
+          )}
+        </g>
+      );
+    }
+
     // Stem: union midpoint → combY (with crossing avoidance)
     const stemCrossings = findCrossings(unionMidX, unionLineY, combY, allHSegments, union.id);
     const stemPath = buildAvoidingVerticalPath(unionMidX, unionLineY, combY, stemCrossings, 1);
