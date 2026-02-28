@@ -66,6 +66,8 @@ export interface Union {
   children: string[]; // member IDs
   /** If true, children in this union are adopted (dashed filiation line with tick) */
   isAdoption?: boolean;
+  /** Free-text clinical notes about this union */
+  notes?: string;
 }
 
 /** @deprecated — use Union instead */
