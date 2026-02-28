@@ -13,6 +13,7 @@ import {
   ChevronDown, ArrowRight, Atom,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Footer from '@/components/Footer';
 
 /* ────────────────────────────────────────────── */
 /*  FAQ data                                      */
@@ -266,7 +267,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* ═══════════ FAQ ═══════════ */}
-      <section className="py-20 lg:py-28">
+      <section id="faq" className="py-20 lg:py-28">
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-center mb-12">FAQ</h2>
           <div className="bg-card border border-border rounded-xl p-6 lg:p-8">
@@ -298,18 +299,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* ═══════════ FOOTER ═══════════ */}
-      <footer className="bg-foreground text-background/40 border-t border-background/10 py-8">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <img src={gogyIcon} alt="Genogy" className="w-5 h-5 brightness-0 invert opacity-40" />
-            <span className="text-sm">© {new Date().getFullYear()} Genogy. Tous droits réservés.</span>
-          </div>
-          <div className="flex items-center gap-4 text-sm">
-            <a href="#" className="hover:text-background/70 transition-colors">Mentions légales</a>
-            <a href="#" className="hover:text-background/70 transition-colors">Politique de confidentialité</a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
