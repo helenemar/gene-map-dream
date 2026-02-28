@@ -16,7 +16,6 @@ type Gender = 'male' | 'female' | 'non-binary';
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
   { value: 'male', label: 'Homme' },
   { value: 'female', label: 'Femme' },
-  { value: 'non-binary', label: 'Non-binaire' },
 ];
 
 interface Props {
