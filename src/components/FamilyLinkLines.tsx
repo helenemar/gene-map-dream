@@ -312,38 +312,6 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
       );
     }
 
-    // For single-child unions, draw a straight vertical from union midpoint down to child
-    if (effectiveDropCount === 1) {
-      const singleChildAnchor = childAnchors[0];
-      // Straight vertical from union midpoint to child top
-      const directX = unionMidX;
-      const directCrossings = findCrossings(directX, unionLineY, singleChildAnchor.y, allHSegments, union.id);
-      const directPath = buildAvoidingVerticalPath(directX, unionLineY, singleChildAnchor.y, directCrossings, 1);
-
-      return (
-        <g key={union.id}>
-          <UnionLine
-            x1={leftAnchor.x} y1={leftAnchor.y}
-            x2={rightAnchor.x} y2={rightAnchor.y}
-            status={union.status}
-          />
-          <path d={directPath} fill="none"
-            stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-            strokeDasharray={union.isAdoption ? '6 4' : undefined} />
-          {/* Horizontal connector from stem to child if not aligned */}
-          {Math.abs(unionMidX - singleChildAnchor.x) > 1 && (
-            <>
-              <line
-                x1={unionMidX} y1={singleChildAnchor.y}
-                x2={singleChildAnchor.x} y2={singleChildAnchor.y}
-                stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-              />
-            </>
-          )}
-        </g>
-      );
-    }
-
     // Stem: union midpoint → combY (with crossing avoidance)
     const stemCrossings = findCrossings(unionMidX, unionLineY, combY, allHSegments, union.id);
     const stemPath = buildAvoidingVerticalPath(unionMidX, unionLineY, combY, stemCrossings, 1);
