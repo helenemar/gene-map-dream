@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Crosshair, Eye, EyeOff, Pencil } from 'lucide-react';
+import { ArrowLeft, Crosshair, Eye, EyeOff, Pencil, Plus } from 'lucide-react';
+import AddPathologyModal from '@/components/AddPathologyModal';
 import {
   FamilyMember, Union, EmotionalLink,
   FAMILY_LINK_TYPES, EMOTIONAL_LINK_TYPES,
@@ -32,6 +33,7 @@ interface EditorSidebarProps {
   soloEmotionalType: EmotionalLinkType | null;
   onToggleSoloEmotional: (type: EmotionalLinkType) => void;
   dynamicPathologies?: DynamicPathology[];
+  onAddPathology?: (name: string, colorHex: string) => Promise<{ data: any; error: any } | undefined>;
 }
 
 /** Inline editable file name */
@@ -80,8 +82,9 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
   onFocusMember, onBack,
   highlightedUnionStatus, onHighlightUnionStatus,
   soloEmotionalType, onToggleSoloEmotional,
-  dynamicPathologies = [],
+  dynamicPathologies = [], onAddPathology,
 }) => {
+  const [addPathologyModalOpen, setAddPathologyModalOpen] = useState(false);
   // Count unions by status
   const unionStatusCounts = new Map<UnionStatus, number>();
   for (const u of unions) {
@@ -152,6 +155,22 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
               {dynamicPathologies.length === 0 && (
                 <p className="text-xs text-muted-foreground italic">Aucune pathologie créée</p>
               )}
+              <button
+                type="button"
+                onClick={() => setAddPathologyModalOpen(true)}
+                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors pt-1"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Ajouter
+              </button>
+              <AddPathologyModal
+                open={addPathologyModalOpen}
+                onClose={() => setAddPathologyModalOpen(false)}
+                onAdd={async (name, colorHex) => {
+                  await onAddPathology?.(name, colorHex);
+                }}
+                usedColors={dynamicPathologies.map(p => p.color_hex)}
+              />
             </div>
           </AccordionContent>
         </AccordionItem>
