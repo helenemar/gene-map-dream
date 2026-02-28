@@ -119,23 +119,30 @@ const LandingPage: React.FC = () => {
               <img src={gogyIcon} alt="" className="w-16 h-16 mb-8" />
 
               <h1 className="text-4xl lg:text-[44px] font-extrabold leading-[1.15] tracking-tight mb-6">
-                Le meilleur outil en ligne pour créer des{' '}
-                <span className="text-brand-orange">génogrammes</span>{' '}
+                Le meilleur outil en ligne pour{' '}
+                <br className="hidden sm:block" />
+                créer des{' '}
+                <span className="text-primary">génogrammes</span>
+                <br />
                 professionnels
               </h1>
 
               <p className="text-muted-foreground leading-relaxed mb-2 max-w-lg">
-                Cartographiez les relations familiales et émotionnelles de vos patients ou clients.
+                Cartographiez les relations familiales et émotionnelles
+                <br className="hidden sm:block" />
+                de vos patients ou clients.
               </p>
-              <p className="text-foreground text-sm leading-relaxed mb-8 max-w-lg">
-                Conçu pour les psychologues, travailleurs sociaux, thérapeutes et professionnels de l'accompagnement.
+              <p className="text-foreground/70 text-sm leading-relaxed mb-10 max-w-lg">
+                Conçu pour les psychologues, travailleurs sociaux, thérapeutes et
+                <br className="hidden sm:block" />
+                professionnels de l'accompagnement.
               </p>
 
-              <div className="flex flex-wrap gap-3">
-                <Button variant="brand" size="lg" onClick={() => navigate(ctaPath)} className="gap-2">
+              <div className="flex flex-wrap gap-4">
+                <Button variant="brand" size="lg" onClick={() => navigate(ctaPath)} className="gap-2 px-8">
                   Accéder à la version BETA
                 </Button>
-                <Button variant="brand-outline" size="lg" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}>
+                <Button size="lg" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="border-primary text-primary hover:bg-primary/5 rounded-full px-8">
                   Découvrir l'outil
                 </Button>
               </div>
