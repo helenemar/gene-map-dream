@@ -894,10 +894,16 @@ const GenogramEditor: React.FC = () => {
         const sourceX = sourceM?.x ?? 200;
         const sourceY = sourceM?.y ?? 200;
 
-        // If member already has a pair, offset the new pair further up and slightly to the side
+        // If member already has a pair, position based on type:
+        // - Adoptive parents go HIGHER (further from child)
+        // - Bio parents go CLOSER to child (just above)
         const existingOtherPairUnion = unions.find(u => u.children.includes(sourceId));
-        const yOffset = existingOtherPairUnion ? LEVEL_Y + 100 : LEVEL_Y;
-        // Moderate horizontal offset — keep adoptive parents close to the child
+        let yOffset = LEVEL_Y;
+        if (existingOtherPairUnion) {
+          // Adoptive pair goes higher up; bio pair stays closer to child
+          yOffset = isAdoption ? LEVEL_Y + 120 : LEVEL_Y - 40;
+        }
+        // Moderate horizontal offset — keep both pairs centered on the child
         const xShift = existingOtherPairUnion ? (isAdoption ? SPOUSE_GAP + 40 : -(SPOUSE_GAP + 40)) : 0;
 
         newMember.x = sourceX - SPOUSE_GAP / 2 + xShift;
@@ -1314,7 +1320,16 @@ const GenogramEditor: React.FC = () => {
                 })()}
               </g>
             </svg>
-            {members.map(member => (
+            {members.map(member => {
+              // Detect if this member is a bio parent of a child who also has adoptive parents
+              const isBioParentOfAdoptedChild = unions.some(bioUnion =>
+                !bioUnion.isAdoption &&
+                (bioUnion.partner1 === member.id || bioUnion.partner2 === member.id) &&
+                bioUnion.children.some(childId =>
+                  unions.some(adoptUnion => adoptUnion.isAdoption && adoptUnion.children.includes(childId))
+                )
+              );
+              return (
               <MemberCard
                 key={member.id}
                 member={member}
@@ -1327,6 +1342,7 @@ const GenogramEditor: React.FC = () => {
                 searchDimmed={search.isActive && !search.matchedMemberIds.has(member.id)}
                 searchHighlighted={search.isActive && search.matchedMemberIds.has(member.id)}
                 presentationMode={presentationMode}
+                compact={isBioParentOfAdoptedChild}
                 onSelect={handleSelect}
                 onDragStart={handleDragStart}
                 onCreateRelated={handleCreateRelated}
@@ -1339,7 +1355,8 @@ const GenogramEditor: React.FC = () => {
                 showParentSplit={shouldShowParentSplit(member.id)}
                 isAdopted={isMemberAdopted(member.id)}
               />
-            ))}
+              );
+            })}
             {/* Parent picker popover for multi-union child creation */}
             {parentPickerState && (() => {
               const pickerSource = members.find(m => m.id === parentPickerState.sourceId);
