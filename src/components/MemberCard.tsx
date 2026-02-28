@@ -194,8 +194,12 @@ const MemberCard: React.FC<MemberCardProps> = ({
             </div>
           ) : isDraft ? (
             <div className="flex flex-col gap-0.5">
-              <span className="font-medium text-sm text-muted-foreground/60 whitespace-nowrap">Parent</span>
-              <span className="text-[11px] text-muted-foreground/30 italic">Cliquer pour éditer</span>
+              <span className="font-medium text-sm text-muted-foreground/60 whitespace-nowrap">
+                {member.isAdoptiveParent ? 'Parent adoptif' : 'Parent'}
+              </span>
+              <span className="text-[11px] text-muted-foreground/30 italic">
+                {member.isAdoptiveParent ? 'À compléter' : 'Cliquer pour éditer'}
+              </span>
             </div>
           ) : (
             <>

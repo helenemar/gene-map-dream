@@ -326,10 +326,33 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
         />
 
         {/* 2. Vertical stem with crossing avoidance */}
-        <path d={stemPath} fill="none"
-          stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} />
-
-        {/* 3. Horizontal comb bar */}
+        <g>
+          <path d={stemPath} fill="none"
+            stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+            strokeDasharray={union.isAdoption ? '6 4' : undefined} />
+          {/* Adoption tick + hover badge on stem */}
+          {union.isAdoption && (() => {
+            const stemMidY = (unionLineY + combY) / 2;
+            return (
+              <>
+                <line
+                  x1={unionMidX - 6} y1={stemMidY}
+                  x2={unionMidX + 6} y2={stemMidY}
+                  stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                />
+                {/* Invisible hover area + tooltip */}
+                <rect
+                  x={unionMidX - 20} y={stemMidY - 12}
+                  width={40} height={24}
+                  fill="transparent"
+                  style={{ pointerEvents: 'all', cursor: 'default' }}
+                >
+                  <title>Lien adoptif</title>
+                </rect>
+              </>
+            );
+          })()}
+        </g>
         {effectiveDropCount > 1 && (
           <line
             x1={combLeftX} y1={combY}
@@ -338,10 +361,13 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
           />
         )}
 
-        {/* 4. Vertical drops with crossing avoidance */}
+        {/* 4. Vertical drops with crossing avoidance + adoption style */}
         {(() => {
           const elements: React.ReactNode[] = [];
           const processed = new Set<number>();
+          const isAdoption = !!union.isAdoption;
+          const adoptionDash = '6 4';
+          const tickLen = 6; // half-length of transversal tick
 
           for (let i = 0; i < childMembers.length; i++) {
             if (processed.has(i)) continue;
@@ -359,12 +385,12 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
               const forkX = twinAnchorsLocal.reduce((sum, a) => sum + a.x, 0) / twinAnchorsLocal.length;
               const forkY = combY + 20;
 
-              // Stem from comb to fork (with avoidance)
               const forkCrossings = findCrossings(forkX, combY, forkY, allHSegments, union.id);
               const forkStemPath = buildAvoidingVerticalPath(forkX, combY, forkY, forkCrossings);
               elements.push(
                 <path key={`twin-stem-${child.twinGroup}`} d={forkStemPath} fill="none"
-                  stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} />
+                  stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                  strokeDasharray={isAdoption ? adoptionDash : undefined} />
               );
 
               twinAnchorsLocal.forEach((anchor, ti) => {
@@ -373,8 +399,26 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
                     x1={forkX} y1={forkY}
                     x2={anchor.x} y2={anchor.y}
                     stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                    strokeDasharray={isAdoption ? adoptionDash : undefined}
                   />
                 );
+                // Adoption tick on twin branch
+                if (isAdoption) {
+                  const mx = (forkX + anchor.x) / 2;
+                  const my = (forkY + anchor.y) / 2;
+                  const dx = anchor.x - forkX;
+                  const dy = anchor.y - forkY;
+                  const len = Math.hypot(dx, dy) || 1;
+                  const nx = -dy / len;
+                  const ny = dx / len;
+                  elements.push(
+                    <line key={`twin-tick-${child.twinGroup}-${ti}`}
+                      x1={mx - nx * tickLen} y1={my - ny * tickLen}
+                      x2={mx + nx * tickLen} y2={my + ny * tickLen}
+                      stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                    />
+                  );
+                }
               });
             } else {
               processed.add(i);
@@ -382,13 +426,24 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
               const dropYTop = combY;
               const dropYBottom = childAnchors[i].y;
               const dropCrossings = findCrossings(dropX, dropYTop, dropYBottom, allHSegments, union.id);
-              // Alternate jog direction based on position relative to union center
               const jogDir = dropX >= unionMidX ? 1 : -1;
               const dropPath = buildAvoidingVerticalPath(dropX, dropYTop, dropYBottom, dropCrossings, jogDir);
               elements.push(
                 <path key={`drop-${i}`} d={dropPath} fill="none"
-                  stroke={stroke} strokeWidth={sw} strokeOpacity={opacity} />
+                  stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                  strokeDasharray={isAdoption ? adoptionDash : undefined} />
               );
+              // Adoption transversal tick at midpoint of drop
+              if (isAdoption) {
+                const midY = (dropYTop + dropYBottom) / 2;
+                elements.push(
+                  <line key={`tick-${i}`}
+                    x1={dropX - tickLen} y1={midY}
+                    x2={dropX + tickLen} y2={midY}
+                    stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                  />
+                );
+              }
             }
           }
           return elements;
