@@ -402,6 +402,55 @@ export function computeAutoLayout(
     }
   }
 
+  // ═══ OVERLAP RESOLUTION — push overlapping cards apart ═══
+  const OVERLAP_MARGIN = 40; // min gap between cards
+  for (let pass = 0; pass < 10; pass++) {
+    let anyOverlap = false;
+    // Group members by generation for efficient overlap checks
+    const genGroups = new Map<number, string[]>();
+    for (const m of members) {
+      const g = generation.get(m.id) ?? 0;
+      if (!genGroups.has(g)) genGroups.set(g, []);
+      genGroups.get(g)!.push(m.id);
+    }
+
+    for (const [, ids] of genGroups) {
+      // Sort by X position
+      const sorted = ids
+        .filter(id => positions.has(id))
+        .sort((a, b) => (positions.get(a)!.x) - (positions.get(b)!.x));
+
+      for (let i = 0; i < sorted.length - 1; i++) {
+        const posA = positions.get(sorted[i])!;
+        const posB = positions.get(sorted[i + 1])!;
+        const rightA = posA.x + CARD_W + OVERLAP_MARGIN;
+        if (posB.x < rightA) {
+          // Overlap detected — push B (and its descendants) right
+          const shift = rightA - posB.x;
+          // Collect all members that should shift (B + partner + descendants)
+          const toShift = [sorted[i + 1]];
+          // Also shift partner if in a union
+          for (const u of unions) {
+            if (u.partner1 === sorted[i + 1] || u.partner2 === sorted[i + 1]) {
+              const partnerId = u.partner1 === sorted[i + 1] ? u.partner2 : u.partner1;
+              const partnerPos = positions.get(partnerId);
+              // Only shift partner if it's to the right (avoid pulling left partner)
+              if (partnerPos && partnerPos.x >= posB.x) {
+                toShift.push(partnerId);
+              }
+            }
+          }
+          for (const id of toShift) {
+            const p = positions.get(id);
+            if (p) p.x += shift;
+          }
+          anyOverlap = true;
+        }
+      }
+    }
+    if (!anyOverlap) break;
+  }
+
   // ═══ Center around origin ═══
   if (positions.size > 0) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
