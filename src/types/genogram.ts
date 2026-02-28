@@ -1,22 +1,15 @@
 export type TwinType = 'monozygotic' | 'dizygotic';
 
-export type GenderIdentity = 'cisgender' | 'transgender' | 'non-binary' | 'other';
-export type SexualOrientation = 'heterosexual' | 'homosexual' | 'bisexual' | 'pansexual' | 'asexual' | 'other';
+export type GenderIdentity = 'cisgender' | 'transgender';
+export type SexualOrientation = 'heterosexual' | 'homosexual' | 'bisexual';
 
 export const GENDER_IDENTITY_OPTIONS: { id: GenderIdentity; label: string }[] = [
-  { id: 'cisgender', label: 'Cisgenre' },
   { id: 'transgender', label: 'Transgenre' },
-  { id: 'non-binary', label: 'Non-binaire' },
-  { id: 'other', label: 'Autre' },
 ];
 
 export const SEXUAL_ORIENTATION_OPTIONS: { id: SexualOrientation; label: string }[] = [
-  { id: 'heterosexual', label: 'Hétérosexuel(le)' },
   { id: 'homosexual', label: 'Homosexuel(le)' },
   { id: 'bisexual', label: 'Bisexuel(le)' },
-  { id: 'pansexual', label: 'Pansexuel(le)' },
-  { id: 'asexual', label: 'Asexuel(le)' },
-  { id: 'other', label: 'Autre' },
 ];
 
 export interface FamilyMember {
