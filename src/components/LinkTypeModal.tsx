@@ -20,7 +20,7 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="bg-card border border-border rounded-2xl shadow-modal p-5 w-[340px] max-h-[80vh] overflow-y-auto"
+        className="bg-card border border-border rounded-xl shadow-modal p-5 w-[340px] max-h-[80vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
