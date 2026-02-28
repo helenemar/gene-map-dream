@@ -557,6 +557,11 @@ const GenogramEditor: React.FC = () => {
     return parentUnions.length > 0;
   }, [unions]);
 
+  /** Check if a member is adopted (child in an adoption union) */
+  const isMemberAdopted = useCallback((memberId: string): boolean => {
+    return unions.some(u => u.isAdoption && u.children.includes(memberId));
+  }, [unions]);
+
   /** Smart placement: compute position for new member based on relationship */
   const computeNewPosition = useCallback((
     sourceId: string,
@@ -1309,6 +1314,7 @@ const GenogramEditor: React.FC = () => {
                 onCancelAnchor={handleCancelAnchor}
                 disabledOptions={getDisabledOptions(member.id)}
                 showParentSplit={shouldShowParentSplit(member.id)}
+                isAdopted={isMemberAdopted(member.id)}
               />
             ))}
             {/* Parent picker popover for multi-union child creation */}
