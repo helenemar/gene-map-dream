@@ -742,14 +742,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     {dynamicPathologies.filter(p => selectedPathologies.includes(p.id)).map(p => (
                       <span
                         key={p.id}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border"
-                        style={{
-                          backgroundColor: `${p.color_hex}20`,
-                          borderColor: `${p.color_hex}50`,
-                          color: p.color_hex,
-                        }}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-border bg-muted/40 text-foreground"
                       >
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color_hex }} />
+                        <div className="w-2.5 h-2.5 rounded-[3px] shrink-0" style={{ backgroundColor: p.color_hex }} />
                         {p.name}
                       </span>
                     ))}
