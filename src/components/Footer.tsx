@@ -60,7 +60,7 @@ const Footer: React.FC = () => {
                 <a href="#" className="text-sm hover:text-primary transition-colors">Mentions légales</a>
               </li>
               <li>
-                <a href="#" className="text-sm hover:text-primary transition-colors">Politique de confidentialité (RGPD)</a>
+                <Link to="/privacy" className="text-sm hover:text-primary transition-colors">Politique de confidentialité (RGPD)</Link>
               </li>
               <li>
                 <a href="#" className="text-sm hover:text-primary transition-colors">Conditions Générales d'Utilisation</a>
