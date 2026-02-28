@@ -12,13 +12,13 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 
 const CARD_W = 220;       // Must match MEMBER_CARD_W (min-width of actual cards)
 const CARD_H = 64;
-const LEVEL_SPACING = 220;
-const BASE_COUPLE_GAP = 60;
-const MIN_BADGE_GAP = 120;
-const BADGE_SAFETY = 36;
-const SIBLING_GAP = 36;
-const BLOCK_GAP = 44;
-const VERTICAL_STAGGER = 20;
+const LEVEL_SPACING = 320;
+const BASE_COUPLE_GAP = 200;
+const MIN_BADGE_GAP = 280;   // Minimum gap when a union has dates/status
+const BADGE_SAFETY = 80;     // 40px breathing room on each side of badge
+const SIBLING_GAP = 100;
+const BLOCK_GAP = 120;
+const VERTICAL_STAGGER = 30; // Cumulative Y-offset per sibling for "escalier" effect
 const MAX_STAGGER = 150; // Cap to avoid colliding with next generation
 
 interface LayoutResult {
@@ -305,24 +305,6 @@ export function computeAutoLayout(
     }
 
     placeCouple(union, coupleLeft, gen);
-
-    // ─── Re-center ALL children block under couple midpoint ───
-    const coupleMidX = coupleLeft + coupleWidth / 2;
-    // Recompute current block center after potential shifts
-    const currentBlockLeft = Math.min(...children.map(cid => positions.get(cid)?.x ?? 0));
-    const currentBlockRight = Math.max(...children.map(cid => (positions.get(cid)?.x ?? 0) + CARD_W));
-    const currentBlockCenter = (currentBlockLeft + currentBlockRight) / 2;
-    const centerShift = coupleMidX - currentBlockCenter;
-    if (Math.abs(centerShift) > 1) {
-      // Only shift children that don't have their own sub-families to avoid cascading issues
-      for (const cid of children) {
-        const childPos = positions.get(cid);
-        if (childPos) {
-          childPos.x += centerShift;
-          updateRightEdge(childGen, childPos.x + CARD_W);
-        }
-      }
-    }
     
     // Recompute block right after potential shifts
     const finalBlockRight = Math.max(...childXPositions.map(c => {
@@ -467,34 +449,6 @@ export function computeAutoLayout(
       }
     }
     if (!anyOverlap) break;
-  }
-
-  // ═══ POST-FIX: Re-center ALL children (+ their subtrees) under parent union ═══
-  for (const u of unions) {
-    if (u.children.length === 0) continue;
-    const p1Pos = positions.get(u.partner1);
-    const p2Pos = positions.get(u.partner2);
-    if (!p1Pos || !p2Pos) continue;
-
-    // Compute union midpoint
-    const unionMidX = (Math.min(p1Pos.x, p2Pos.x) + CARD_W + Math.max(p1Pos.x, p2Pos.x)) / 2;
-
-    // Get positioned children
-    const childPositions = u.children
-      .map(cid => ({ id: cid, pos: positions.get(cid) }))
-      .filter((c): c is { id: string; pos: { x: number; y: number } } => !!c.pos);
-    if (childPositions.length === 0) continue;
-
-    // Compute current block center using ALL children
-    const blockLeft = Math.min(...childPositions.map(c => c.pos.x));
-    const blockRight = Math.max(...childPositions.map(c => c.pos.x + CARD_W));
-    const blockCenter = (blockLeft + blockRight) / 2;
-
-    const shift = unionMidX - blockCenter;
-    if (Math.abs(shift) > 1) {
-      // Shift ALL children and their entire subtrees
-      shiftDescendants(u.children.filter(cid => positions.has(cid)), shift);
-    }
   }
 
   // ═══ Center around origin ═══
