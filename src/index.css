@@ -6,7 +6,8 @@
 
 @layer base {
   :root {
-    --background: 60 100% 98.4%;
+    --background: 0 0% 100%;
+    --page-bg: 60 100% 98.4%;
     --foreground: 224 20% 14%;
 
     --card: 0 0% 100%;
@@ -84,7 +85,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-page-bg text-foreground;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
