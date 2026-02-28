@@ -41,6 +41,8 @@ export interface FamilyMember {
   notes?: string;
   /** Draft member — auto-generated, not yet edited by user */
   isDraft?: boolean;
+  /** Marks this member as an adoptive parent (visual label on draft card) */
+  isAdoptiveParent?: boolean;
 }
 
 export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed' | 'love_affair';
@@ -57,6 +59,8 @@ export interface Union {
   marriageYear?: number;
   divorceYear?: number;
   children: string[]; // member IDs
+  /** If true, children in this union are adopted (dashed filiation line with tick) */
+  isAdoption?: boolean;
 }
 
 /** @deprecated — use Union instead */

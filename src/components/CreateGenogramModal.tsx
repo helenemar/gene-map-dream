@@ -5,6 +5,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,12 +34,14 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
   const [lastName, setLastName] = useState('');
   const [gender, setGender] = useState<Gender>('female');
   const [birthDate, setBirthDate] = useState('');
+  const [isAdopted, setIsAdopted] = useState(false);
 
   const resetForm = () => {
     setFirstName('');
     setLastName('');
     setGender('female');
     setBirthDate('');
+    setIsAdopted(false);
   };
 
   const isValid = firstName.trim().length > 0 && lastName.trim().length > 0 && birthDate.length > 0;
@@ -73,7 +76,7 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
       const fatherMember = {
         id: fatherId,
         firstName: '',
-        lastName: lastName.trim(),
+        lastName: isAdopted ? '' : lastName.trim(),
         birthYear: 0,
         age: 0,
         profession: '',
@@ -82,6 +85,7 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
         y: -200,
         pathologies: [],
         isDraft: true,
+        isAdoptiveParent: isAdopted,
       };
 
       const motherMember = {
@@ -96,6 +100,7 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
         y: -200,
         pathologies: [],
         isDraft: true,
+        isAdoptiveParent: isAdopted,
       };
 
       const parentUnion = {
@@ -104,6 +109,7 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
         partner2: motherId,
         status: 'married' as const,
         children: [patientId],
+        isAdoption: isAdopted,
       };
 
       const genogramName = `${lastName.trim()} – ${firstName.trim()}`;
@@ -198,6 +204,17 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
               value={birthDate}
               onChange={(e) => setBirthDate(e.target.value)}
             />
+          </div>
+
+          <div className="flex items-center gap-2.5 py-1">
+            <Checkbox
+              id="cg-adopted"
+              checked={isAdopted}
+              onCheckedChange={(checked) => setIsAdopted(checked === true)}
+            />
+            <Label htmlFor="cg-adopted" className="text-sm font-normal cursor-pointer">
+              Patient adopté
+            </Label>
           </div>
         </div>
 

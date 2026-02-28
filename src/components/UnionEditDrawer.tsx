@@ -16,6 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface UnionEditDrawerProps {
   union: Union | null;
@@ -125,6 +126,22 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
                 min={1900}
                 max={2100}
               />
+            </div>
+          )}
+
+          {/* Adoption toggle */}
+          {union.children.length > 0 && (
+            <div className="flex items-center gap-2.5 pt-2">
+              <Checkbox
+                id="union-adoption"
+                checked={!!union.isAdoption}
+                onCheckedChange={(checked) =>
+                  onUpdate({ ...union, isAdoption: checked === true })
+                }
+              />
+              <Label htmlFor="union-adoption" className="text-sm font-normal cursor-pointer">
+                Enfant(s) adopté(s)
+              </Label>
             </div>
           )}
         </div>
