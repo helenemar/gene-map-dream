@@ -114,10 +114,10 @@ const Auth: React.FC = () => {
 
         {/* Tab switcher for login/signup */}
         {(tab === 'login' || tab === 'signup') && (
-          <div className="flex gap-1 bg-muted rounded-full p-1 mb-6">
+          <div className="flex gap-1 bg-muted rounded-lg p-1 mb-6">
             <button
               onClick={() => setTab('login')}
-              className={`flex-1 py-2 text-sm font-medium rounded-full transition-colors ${
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
                 tab === 'login'
                   ? 'bg-card text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
@@ -127,7 +127,7 @@ const Auth: React.FC = () => {
             </button>
             <button
               onClick={() => setTab('signup')}
-              className={`flex-1 py-2 text-sm font-medium rounded-full transition-colors ${
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
                 tab === 'signup'
                   ? 'bg-card text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
@@ -151,7 +151,7 @@ const Auth: React.FC = () => {
 
         {/* ─── Login / Signup form ─── */}
         {(tab === 'login' || tab === 'signup') && (
-          <form onSubmit={handleEmailPassword} className="bg-card border border-border rounded-2xl p-6 space-y-4">
+          <form onSubmit={handleEmailPassword} className="bg-card border border-border rounded-xl p-6 space-y-4">
             {tab === 'signup' && (
               <div className="space-y-1.5">
                 <Label htmlFor="fullName">Nom complet</Label>
@@ -200,7 +200,7 @@ const Auth: React.FC = () => {
               />
             </div>
 
-            <Button type="submit" className="w-full rounded-full gap-2" disabled={submitting}>
+            <Button type="submit" className="w-full gap-2" disabled={submitting}>
               <KeyRound className="w-4 h-4" />
               {submitting
                 ? 'Chargement…'
@@ -222,7 +222,7 @@ const Auth: React.FC = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full rounded-full gap-2"
+                  className="w-full gap-2"
                   onClick={async () => {
                     const { error } = await lovable.auth.signInWithOAuth('google', {
                       redirect_uri: window.location.origin,
@@ -241,7 +241,7 @@ const Auth: React.FC = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full rounded-full gap-2"
+                  className="w-full gap-2"
                   onClick={() => setTab('magic-link')}
                 >
                   <Wand2 className="w-4 h-4" />
@@ -254,7 +254,7 @@ const Auth: React.FC = () => {
 
         {/* ─── Magic Link form ─── */}
         {tab === 'magic-link' && (
-          <form onSubmit={handleMagicLink} className="bg-card border border-border rounded-2xl p-6 space-y-4">
+          <form onSubmit={handleMagicLink} className="bg-card border border-border rounded-xl p-6 space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="magic-email">Email</Label>
               <Input
@@ -266,7 +266,7 @@ const Auth: React.FC = () => {
                 required
               />
             </div>
-            <Button type="submit" className="w-full rounded-full gap-2" disabled={submitting}>
+            <Button type="submit" className="w-full gap-2" disabled={submitting}>
               <Mail className="w-4 h-4" />
               {submitting ? 'Envoi en cours…' : 'Envoyer le lien magique'}
             </Button>
@@ -275,7 +275,7 @@ const Auth: React.FC = () => {
 
         {/* ─── Forgot Password form ─── */}
         {tab === 'forgot-password' && (
-          <form onSubmit={handleForgotPassword} className="bg-card border border-border rounded-2xl p-6 space-y-4">
+          <form onSubmit={handleForgotPassword} className="bg-card border border-border rounded-xl p-6 space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="reset-email">Email</Label>
               <Input
@@ -287,7 +287,7 @@ const Auth: React.FC = () => {
                 required
               />
             </div>
-            <Button type="submit" className="w-full rounded-full gap-2" disabled={submitting}>
+            <Button type="submit" className="w-full gap-2" disabled={submitting}>
               <Mail className="w-4 h-4" />
               {submitting ? 'Envoi en cours…' : 'Réinitialiser le mot de passe'}
             </Button>
