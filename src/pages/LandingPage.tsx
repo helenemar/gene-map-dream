@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, Link } from 'react-router-dom';
+import AuthModal from '@/components/AuthModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import gogyIcon from '@/assets/genogy-icon.svg';
@@ -79,7 +80,12 @@ const FAQ_ITEMS = [
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const ctaPath = user ? '/dashboard' : '/auth';
+  const [authModal, setAuthModal] = useState<{ open: boolean; view: 'login' | 'signup' }>({ open: false, view: 'login' });
+
+  const openAuth = (view: 'login' | 'signup') => {
+    if (user) { navigate('/dashboard'); return; }
+    setAuthModal({ open: true, view });
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -97,10 +103,10 @@ const LandingPage: React.FC = () => {
             <span className="text-[15px] font-semibold tracking-tight">Genogy</span>
           </Link>
           <div className="flex items-center gap-2">
-            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-5" onClick={() => navigate('/auth')}>
+            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-5" onClick={() => openAuth('login')}>
               Connexion
             </Button>
-            <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90 rounded-lg px-5" onClick={() => navigate('/auth')}>
+            <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90 rounded-lg px-5" onClick={() => openAuth('signup')}>
               Inscription
             </Button>
           </div>
@@ -141,7 +147,7 @@ const LandingPage: React.FC = () => {
               </p>
 
               <div className="flex flex-wrap gap-4">
-                <Button variant="brand" size="lg" onClick={() => navigate(ctaPath)} className="gap-2 px-8 rounded-full">
+                <Button variant="brand" size="lg" onClick={() => openAuth('signup')} className="gap-2 px-8 rounded-full">
                   Accéder à la version BETA
                 </Button>
                 <Button variant="outline" size="lg" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="border-primary text-primary bg-transparent hover:bg-primary/5 rounded-full px-8">
@@ -350,7 +356,7 @@ const LandingPage: React.FC = () => {
           </p>
           <Button
             size="xl"
-            onClick={() => navigate(ctaPath)}
+            onClick={() => openAuth('signup')}
             className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
           >
             Commencer gratuitement
@@ -361,6 +367,13 @@ const LandingPage: React.FC = () => {
 
       {/* ═══════════ FOOTER ═══════════ */}
       <Footer />
+
+      {/* ═══════════ AUTH MODAL ═══════════ */}
+      <AuthModal
+        open={authModal.open}
+        onClose={() => setAuthModal({ ...authModal, open: false })}
+        defaultView={authModal.view}
+      />
     </div>
   );
 };
