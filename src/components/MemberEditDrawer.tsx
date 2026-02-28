@@ -78,6 +78,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [birthYear, setBirthYear] = useState('');
   const [deathYear, setDeathYear] = useState('');
   const [profession, setProfession] = useState('');
+  const [isRetired, setIsRetired] = useState(false);
   const [gender, setGender] = useState<'male' | 'female' | 'non-binary'>('male');
   const [genderIdentity, setGenderIdentity] = useState<GenderIdentity>('cisgender');
   const [genderIdentityCustom, setGenderIdentityCustom] = useState('');
@@ -107,6 +108,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setDeathYear(member.deathYear ? String(member.deathYear) : '');
       setDeathYearUnsure(!!member.deathYearUnsure);
       setProfession(member.profession);
+      setIsRetired(!!member.isRetired);
       setGender(member.gender);
       // Migrate legacy fields to new model
       setGenderIdentity(member.genderIdentity ?? (member.isTransgender ? 'transgender' : 'cisgender'));
@@ -147,6 +149,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       deathYearUnsure: deathYearUnsure || undefined,
       age: age || 30,
       profession,
+      isRetired: isRetired || undefined,
       gender,
       isGay,
       isBisexual,
@@ -161,7 +164,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       notes: notes || undefined,
       isDraft: false,
     };
-  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, currentYear]);
+  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, currentYear]);
 
   /** Fire live update to canvas */
   useEffect(() => {
@@ -169,7 +172,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes]);
+  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes]);
 
   if (!member) return null;
 
@@ -285,6 +288,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <div className="flex flex-col gap-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Profession</Label>
                   <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} />
+                  <label className="flex items-center gap-2 mt-1 cursor-pointer">
+                    <Checkbox checked={isRetired} onCheckedChange={(v) => setIsRetired(v === true)} />
+                    <span className="text-xs text-muted-foreground">Retraité(e)</span>
+                  </label>
                 </div>
               </div>
 
@@ -636,7 +643,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 {profession && (
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Profession</span>
-                    <span className="text-sm text-foreground">{profession}</span>
+                    <span className="text-sm text-foreground">{profession}{isRetired ? ' (Retraité)' : ''}</span>
                   </div>
                 )}
                 {birthYear && (
