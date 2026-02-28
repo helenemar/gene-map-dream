@@ -97,10 +97,10 @@ const LandingPage: React.FC = () => {
             <span className="text-[15px] font-semibold tracking-tight">Genogy</span>
           </Link>
           <div className="flex items-center gap-2">
-            <Button variant="brand" size="sm" className="rounded-full" onClick={() => navigate('/auth')}>
+            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-5" onClick={() => navigate('/auth')}>
               Connexion
             </Button>
-            <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90 rounded-full" onClick={() => navigate('/auth')}>
+            <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-5" onClick={() => navigate('/auth')}>
               Inscription
             </Button>
           </div>
