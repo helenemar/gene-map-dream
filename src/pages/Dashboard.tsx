@@ -144,14 +144,14 @@ const Dashboard: React.FC = () => {
       {/* ── Main Content ── */}
       <main className="px-8 py-8">
         {/* Hero / CTA Section */}
-        <div className="dot-grid border border-border rounded-2xl px-10 py-9 mb-6">
+        <div className="dot-grid border border-border rounded-xl px-10 py-9 mb-6">
           <h1 className="text-[26px] font-bold text-foreground leading-tight mb-1.5">
             Créer un nouveau génogramme
           </h1>
           <p className="text-[14px] text-muted-foreground mb-7 max-w-lg">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi.
           </p>
-          <Button onClick={handleCreate} className="gap-2 rounded-full px-6 h-11 text-[14px] font-semibold">
+          <Button onClick={handleCreate} className="gap-2 px-6 h-11 text-[14px] font-semibold">
             <Plus className="w-4 h-4" />
             Créer à partir d'un nouveau membre
           </Button>
@@ -160,7 +160,7 @@ const Dashboard: React.FC = () => {
         <CreateGenogramModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
 
         {/* Files Section */}
-        <div className="bg-card border border-border rounded-2xl px-8 py-7">
+        <div className="bg-card border border-border rounded-xl px-8 py-7">
           <div className="flex items-center justify-between gap-4 mb-6">
             <h2 className="text-[16px] font-bold text-foreground">
               Mes génogrammes {genograms ? `(${filteredFiles.length})` : ''}
@@ -172,7 +172,7 @@ const Dashboard: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Rechercher"
-                className="w-full pl-10 pr-4 py-2.5 text-[13px] bg-background border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-ring/30 placeholder:text-muted-foreground/50"
+                className="w-full pl-10 pr-4 py-2.5 text-[13px] bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring/30 placeholder:text-muted-foreground/50"
               />
             </div>
           </div>
@@ -190,7 +190,7 @@ const Dashboard: React.FC = () => {
               ))}
             </div>
           ) : filteredFiles.length > 0 ? (
-            <div className="border border-border rounded-xl overflow-hidden">
+            <div className="border border-border rounded-lg overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent bg-transparent">
@@ -285,21 +285,21 @@ const Dashboard: React.FC = () => {
             </div>
           ) : genograms && genograms.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
+              <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center mb-4">
                 <Plus className="w-7 h-7 text-muted-foreground" />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-1">Aucun génogramme</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Créez votre premier génogramme pour commencer.
               </p>
-              <Button onClick={handleCreate} className="gap-2 rounded-full">
+              <Button onClick={handleCreate} className="gap-2">
                 <Plus className="w-4 h-4" />
                 Créer un génogramme
               </Button>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
+              <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center mb-4">
                 <Search className="w-7 h-7 text-muted-foreground" />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-1">Aucun résultat</h3>

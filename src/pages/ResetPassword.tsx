@@ -56,7 +56,7 @@ const ResetPassword: React.FC = () => {
         <div className="text-center">
           <img src={gogyIcon} alt="Genogy" className="w-12 h-12 mx-auto mb-4" />
           <p className="text-muted-foreground">Lien de réinitialisation invalide ou expiré.</p>
-          <Button onClick={() => navigate('/auth')} className="mt-4 rounded-full">
+          <Button onClick={() => navigate('/auth')} className="mt-4">
             Retour à la connexion
           </Button>
         </div>
@@ -73,7 +73,7 @@ const ResetPassword: React.FC = () => {
           <p className="text-sm text-muted-foreground mt-1">Choisissez un nouveau mot de passe sécurisé</p>
         </div>
 
-        <form onSubmit={handleReset} className="bg-card border border-border rounded-2xl p-6 space-y-4">
+        <form onSubmit={handleReset} className="bg-card border border-border rounded-xl p-6 space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="new-password">Nouveau mot de passe</Label>
             <Input
@@ -98,7 +98,7 @@ const ResetPassword: React.FC = () => {
               minLength={6}
             />
           </div>
-          <Button type="submit" className="w-full rounded-full" disabled={submitting}>
+          <Button type="submit" className="w-full" disabled={submitting}>
             {submitting ? 'Mise à jour…' : 'Mettre à jour le mot de passe'}
           </Button>
         </form>
