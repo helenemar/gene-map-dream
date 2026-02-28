@@ -225,11 +225,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
                 <span className="whitespace-nowrap">
                   {member.birthYearUnsure ? '~' : ''}{member.birthYear}{member.deathYear ? ` - ${member.deathYearUnsure ? '~' : ''}${member.deathYear}` : ' -'}
                 </span>
+              </div>
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span className="whitespace-nowrap">{member.profession}</span>
                 {member.notes && (
                   <FileText className="w-3 h-3 text-primary/60 shrink-0" />
                 )}
               </div>
-              <div className="text-xs text-muted-foreground whitespace-nowrap">{member.profession}</div>
             </>
           )}
         </div>
