@@ -267,8 +267,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               </div>
 
               <div className="flex flex-col gap-1">
-                <Label className={`text-[10px] font-medium uppercase tracking-wider ${gender === 'female' ? 'text-primary' : 'text-muted-foreground'}`}>
-                  Nom de naissance / jeune fille
+                <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Nom de naissance
                 </Label>
                 <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Martin" value={birthName} onChange={(e) => setBirthName(e.target.value)} />
               </div>
