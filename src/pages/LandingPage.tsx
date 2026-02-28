@@ -156,10 +156,17 @@ const LandingPage: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
               className="relative"
+              style={{ perspective: '1200px' }}
             >
-              {/* Two overlapping mockup cards */}
-              <div className="relative">
-                <div className="rounded-xl overflow-hidden border border-border shadow-lg bg-card rotate-[-2deg] translate-y-4 translate-x-4 absolute inset-0 opacity-60" >
+              <div
+                className="relative"
+                style={{ transform: 'rotateY(-12deg) rotateX(4deg)', transformStyle: 'preserve-3d' }}
+              >
+                {/* Back – Dashboard */}
+                <div
+                  className="absolute -top-4 left-8 w-[95%] rounded-xl overflow-hidden bg-card"
+                  style={{ boxShadow: '0 25px 60px -15px hsl(var(--foreground) / 0.12)' }}
+                >
                   <img
                     src={heroDashboard}
                     alt=""
@@ -167,7 +174,11 @@ const LandingPage: React.FC = () => {
                     loading="eager"
                   />
                 </div>
-                <div className="rounded-xl overflow-hidden border border-border shadow-lg bg-card relative z-10">
+                {/* Front – Editor */}
+                <div
+                  className="relative z-10 rounded-xl overflow-hidden bg-card"
+                  style={{ boxShadow: '0 30px 70px -20px hsl(var(--foreground) / 0.18)' }}
+                >
                   <img
                     src={heroEditor}
                     alt="Aperçu de l'éditeur de génogrammes Genogy"
