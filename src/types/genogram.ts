@@ -8,7 +8,7 @@ export interface FamilyMember {
   deathYear?: number;
   age: number;
   profession: string;
-  gender: 'male' | 'female';
+  gender: 'male' | 'female' | 'non-binary';
   isTransgender?: boolean;
   isGay?: boolean;
   isBisexual?: boolean;

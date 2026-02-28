@@ -27,6 +27,7 @@ const App = () => (
             <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/editor" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
             <Route path="/editor/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
+            <Route path="/tree/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
             <Route path="/design-system" element={<DesignSystemPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

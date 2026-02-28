@@ -3,6 +3,7 @@ import gogyIcon from '@/assets/genogy-icon.svg';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown } from 'lucide-react';
 import GenogramThumbnail from '@/components/GenogramThumbnail';
+import CreateGenogramModal from '@/components/CreateGenogramModal';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -32,9 +33,10 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [creating, setCreating] = useState(false);
+
   const [sortKey, setSortKey] = useState<SortKey>('updated_at');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const { data: genograms, isLoading } = useQuery({
     queryKey: ['genograms', user?.id],
@@ -73,22 +75,8 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleCreate = async () => {
-    if (!user || creating) return;
-    setCreating(true);
-    try {
-      const { data, error } = await supabase
-        .from('genograms')
-        .insert({ user_id: user.id, name: 'Sans titre', data: { members: [], unions: [], emotionalLinks: [] } })
-        .select('id')
-        .single();
-      if (error) throw error;
-      navigate(`/editor/${data.id}`);
-    } catch (err: any) {
-      toast.error(err.message || 'Erreur lors de la création');
-    } finally {
-      setCreating(false);
-    }
+  const handleCreate = () => {
+    setCreateModalOpen(true);
   };
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
@@ -157,11 +145,13 @@ const Dashboard: React.FC = () => {
           <p className="text-[14px] text-muted-foreground mb-7 max-w-lg">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut et massa mi.
           </p>
-          <Button onClick={handleCreate} disabled={creating} className="gap-2 rounded-full px-6 h-11 text-[14px] font-semibold">
+          <Button onClick={handleCreate} className="gap-2 rounded-full px-6 h-11 text-[14px] font-semibold">
             <Plus className="w-4 h-4" />
-            {creating ? 'Création…' : 'Créer à partir d\'un nouveau membre'}
+            Créer à partir d'un nouveau membre
           </Button>
         </div>
+
+        <CreateGenogramModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
 
         {/* Files Section */}
         <div className="bg-card border border-border rounded-2xl px-8 py-7">
@@ -296,7 +286,7 @@ const Dashboard: React.FC = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 Créez votre premier génogramme pour commencer.
               </p>
-              <Button onClick={handleCreate} disabled={creating} className="gap-2 rounded-full">
+              <Button onClick={handleCreate} className="gap-2 rounded-full">
                 <Plus className="w-4 h-4" />
                 Créer un génogramme
               </Button>

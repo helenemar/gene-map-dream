@@ -1,7 +1,7 @@
 import React from 'react';
 
 export interface MemberIconProps {
-  gender: 'male' | 'female';
+  gender: 'male' | 'female' | 'non-binary';
   isGay?: boolean;
   isBisexual?: boolean;
   isTransgender?: boolean;
@@ -78,6 +78,8 @@ const MemberIcon: React.FC<MemberIconProps> = ({
         <clipPath id={`clip-${clipId}`}>
           {gender === 'female' ? (
             <circle cx={cx} cy={cy} r={circleR} />
+          ) : gender === 'non-binary' ? (
+            <polygon points={`${cx},${half} ${s - half},${cy} ${cx},${s - half} ${half},${cy}`} />
           ) : (
             <rect x={sqX} y={sqY} width={sqW} height={sqH} />
           )}
@@ -87,6 +89,8 @@ const MemberIcon: React.FC<MemberIconProps> = ({
       {/* Layer 0: White background fill inside shape */}
       {gender === 'female' ? (
         <circle cx={cx} cy={cy} r={circleR} fill="white" />
+      ) : gender === 'non-binary' ? (
+        <polygon points={`${cx},${half} ${s - half},${cy} ${cx},${s - half} ${half},${cy}`} fill="white" />
       ) : (
         <rect x={sqX} y={sqY} width={sqW} height={sqH} fill="white" />
       )}
@@ -110,6 +114,8 @@ const MemberIcon: React.FC<MemberIconProps> = ({
       {/* Layer 2: Outer shape stroke */}
       {gender === 'female' ? (
         <circle cx={cx} cy={cy} r={circleR} stroke={mainStroke} strokeWidth={sw} />
+      ) : gender === 'non-binary' ? (
+        <polygon points={`${cx},${half} ${s - half},${cy} ${cx},${s - half} ${half},${cy}`} stroke={mainStroke} strokeWidth={sw} fill="none" />
       ) : (
         <rect x={sqX} y={sqY} width={sqW} height={sqH} stroke={mainStroke} strokeWidth={sw} />
       )}
