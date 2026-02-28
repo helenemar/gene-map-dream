@@ -24,6 +24,7 @@ export interface FamilyMember {
   deathYearUnsure?: boolean;
   age: number;
   profession: string;
+  isRetired?: boolean;
   gender: 'male' | 'female' | 'non-binary';
   /** @deprecated use genderIdentity */
   isTransgender?: boolean;
