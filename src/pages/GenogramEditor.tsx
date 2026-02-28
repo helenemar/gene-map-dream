@@ -200,7 +200,14 @@ const GenogramEditor: React.FC = () => {
       }
       setFileName(data.name);
       const gData = data.data as any;
-      const loadedMembers: FamilyMember[] = gData?.members || [];
+      // Deduplicate members by ID (guard against data corruption)
+      const rawMembers: FamilyMember[] = gData?.members || [];
+      const seen = new Set<string>();
+      const loadedMembers = rawMembers.filter(m => {
+        if (seen.has(m.id)) return false;
+        seen.add(m.id);
+        return true;
+      });
       if (loadedMembers.length > 0) setMembers(loadedMembers);
       if (gData?.unions) setUnions(gData.unions);
       if (gData?.emotionalLinks) setEmotionalLinks(gData.emotionalLinks);
