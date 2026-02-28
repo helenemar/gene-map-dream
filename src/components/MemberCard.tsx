@@ -101,10 +101,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
   const showDots = !presentationMode && (activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget);
   const dotsFilled = activeState === 'anchor-active';
 
-  // Border & ring logic
-  const borderClasses = isColliding
-    ? 'border-destructive ring-2 ring-destructive/30'
-    : isLinkTarget
+  // Border & ring logic (no collision outline)
+  const borderClasses = isLinkTarget
       ? 'border-primary ring-2 ring-primary/40'
       : isHighlighted
         ? 'border-primary ring-2 ring-primary/30'
@@ -219,7 +217,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
                     </span>
                   )}
                   <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                    {member.age} ans
+                    {isDeceased && member.deathYear ? `${member.deathYear - member.birthYear} ans` : `${member.age} ans`}
                   </span>
                 </div>
               </div>
