@@ -1,5 +1,24 @@
 export type TwinType = 'monozygotic' | 'dizygotic';
 
+export type GenderIdentity = 'cisgender' | 'transgender' | 'non-binary' | 'other';
+export type SexualOrientation = 'heterosexual' | 'homosexual' | 'bisexual' | 'pansexual' | 'asexual' | 'other';
+
+export const GENDER_IDENTITY_OPTIONS: { id: GenderIdentity; label: string }[] = [
+  { id: 'cisgender', label: 'Cisgenre' },
+  { id: 'transgender', label: 'Transgenre' },
+  { id: 'non-binary', label: 'Non-binaire' },
+  { id: 'other', label: 'Autre' },
+];
+
+export const SEXUAL_ORIENTATION_OPTIONS: { id: SexualOrientation; label: string }[] = [
+  { id: 'heterosexual', label: 'Hétérosexuel(le)' },
+  { id: 'homosexual', label: 'Homosexuel(le)' },
+  { id: 'bisexual', label: 'Bisexuel(le)' },
+  { id: 'pansexual', label: 'Pansexuel(le)' },
+  { id: 'asexual', label: 'Asexuel(le)' },
+  { id: 'other', label: 'Autre' },
+];
+
 export interface FamilyMember {
   id: string;
   firstName: string;
@@ -9,17 +28,24 @@ export interface FamilyMember {
   age: number;
   profession: string;
   gender: 'male' | 'female' | 'non-binary';
+  /** @deprecated use genderIdentity */
   isTransgender?: boolean;
+  /** @deprecated use sexualOrientation */
   isGay?: boolean;
+  /** @deprecated use sexualOrientation */
   isBisexual?: boolean;
+  genderIdentity?: GenderIdentity;
+  genderIdentityCustom?: string;
+  sexualOrientation?: SexualOrientation;
+  sexualOrientationCustom?: string;
   x: number;
   y: number;
   pathologies: string[];
   avatar?: string;
-  isPlaceholder?: boolean; // Auto-created empty partner placeholder
-  twinGroup?: string;   // Shared ID among twins (e.g. "twin-1")
-  twinType?: TwinType;  // monozygotic (identical) or dizygotic (fraternal)
-  notes?: string;       // Clinical notes (free-text, supports basic markdown)
+  isPlaceholder?: boolean;
+  twinGroup?: string;
+  twinType?: TwinType;
+  notes?: string;
 }
 
 export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed' | 'love_affair';
