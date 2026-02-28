@@ -4,7 +4,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import gogyIcon from '@/assets/genogy-icon.svg';
-import heroMockup from '@/assets/hero-mockup.png';
+import heroEditor from '@/assets/hero-editor.png';
+import heroDashboard from '@/assets/hero-dashboard.png';
 import abstract160 from '@/assets/abstract-160.svg';
 import abstract122 from '@/assets/abstract-122.svg';
 import abstract206 from '@/assets/abstract-206.svg';
@@ -159,7 +160,7 @@ const LandingPage: React.FC = () => {
               <div className="relative">
                 <div className="rounded-xl overflow-hidden border border-border shadow-lg bg-card rotate-[-2deg] translate-y-4 translate-x-4 absolute inset-0 opacity-60" >
                   <img
-                    src={heroMockup}
+                    src={heroDashboard}
                     alt=""
                     className="w-full h-auto"
                     loading="eager"
@@ -167,7 +168,7 @@ const LandingPage: React.FC = () => {
                 </div>
                 <div className="rounded-xl overflow-hidden border border-border shadow-lg bg-card relative z-10">
                   <img
-                    src={heroMockup}
+                    src={heroEditor}
                     alt="Aperçu de l'éditeur de génogrammes Genogy"
                     className="w-full h-auto"
                     loading="eager"
