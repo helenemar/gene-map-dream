@@ -339,7 +339,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                       const partner = allMembers.find(m => m.id === partnerId);
                       const partnerName = partner ? (partner.isPlaceholder ? 'Parent inconnu' : `${partner.firstName} ${partner.lastName}`) : partnerId;
                       return (
-                        <div key={union.id} className="p-3 rounded-xl bg-accent/20 border border-border/40 flex flex-col gap-2">
+                        <div key={union.id} className="p-3 rounded-xl bg-accent/30 border border-border/60 flex flex-col gap-2">
                           <div className="flex items-center gap-2">
                             {partner && <MemberIcon gender={partner.gender} isDead={!!partner.deathYear} size={24} className="text-foreground shrink-0" />}
                             <span className="text-sm font-medium text-foreground truncate flex-1">{partnerName}</span>
