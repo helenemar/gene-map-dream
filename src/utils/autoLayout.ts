@@ -306,17 +306,20 @@ export function computeAutoLayout(
 
     placeCouple(union, coupleLeft, gen);
 
-    // ─── Re-center single child under couple midpoint ───
-    // When couple is wider than child block, child should be centered under union midpoint
+    // ─── Re-center ALL children block under couple midpoint ───
     const coupleMidX = coupleLeft + coupleWidth / 2;
-    if (children.length === 1) {
-      const childPos = positions.get(children[0]);
-      if (childPos) {
-        const childCenterX = coupleMidX - CARD_W / 2;
-        const childShift = childCenterX - childPos.x;
-        if (Math.abs(childShift) > 1) {
-          childPos.x = childCenterX;
-          updateRightEdge(childGen, childCenterX + CARD_W);
+    // Recompute current block center after potential shifts
+    const currentBlockLeft = Math.min(...children.map(cid => positions.get(cid)?.x ?? 0));
+    const currentBlockRight = Math.max(...children.map(cid => (positions.get(cid)?.x ?? 0) + CARD_W));
+    const currentBlockCenter = (currentBlockLeft + currentBlockRight) / 2;
+    const centerShift = coupleMidX - currentBlockCenter;
+    if (Math.abs(centerShift) > 1) {
+      // Only shift children that don't have their own sub-families to avoid cascading issues
+      for (const cid of children) {
+        const childPos = positions.get(cid);
+        if (childPos) {
+          childPos.x += centerShift;
+          updateRightEdge(childGen, childPos.x + CARD_W);
         }
       }
     }
