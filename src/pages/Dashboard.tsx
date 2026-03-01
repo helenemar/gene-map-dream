@@ -292,9 +292,9 @@ const Dashboard: React.FC = () => {
       </header>
 
       {/* ── Main Content ── */}
-      <main className="px-8 py-8">
+      <main className="px-6 py-5">
         {/* Hero / CTA Section */}
-        <div className="dot-grid bg-background border border-border rounded-xl px-10 py-6 mb-6">
+        <div className="dot-grid bg-background border border-border rounded-xl px-8 py-5 mb-4">
           <h1 className="text-[26px] font-bold text-foreground leading-tight mb-1.5">
             Créer un nouveau génogramme
           </h1>
@@ -310,8 +310,8 @@ const Dashboard: React.FC = () => {
         <CreateGenogramModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
 
         {/* Files Section */}
-        <div className="bg-card border border-border rounded-xl px-8 py-7">
-          <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="bg-card border border-border rounded-xl px-6 py-5">
+          <div className="flex items-center justify-between gap-4 mb-4">
             <h2 className="text-[16px] font-bold text-foreground">
               Mes génogrammes {genograms ? `(${filteredFiles.length})` : ''}
             </h2>
