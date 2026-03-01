@@ -599,6 +599,81 @@ const DesignSystemPage: React.FC = () => {
           </div>
         </SubSection>
 
+        {/* Pregnancy / Miscarriage / Abortion / Stillbirth symbols */}
+        <SubSection title="Symboles périnataux (Grossesse, Fausse couche, Avortement, Mort-né)">
+          <p className="text-sm text-muted-foreground mb-4">
+            Symboles triangulaires et croisés utilisés pour les événements périnataux dans le génogramme.
+          </p>
+          <div className="bg-card rounded-2xl border border-border p-8">
+            <div className="grid grid-cols-5 gap-6">
+              {/* Grossesse — simple triangle */}
+              <div className="flex flex-col items-center gap-3">
+                <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
+                  <polygon points="36,8 66,64 6,64" stroke="currentColor" strokeWidth="2.5" fill="white" strokeLinejoin="miter" />
+                </svg>
+                <div className="text-center">
+                  <span className="text-xs font-semibold text-foreground">Grossesse</span>
+                  <p className="text-[10px] text-muted-foreground">pregnancy</p>
+                </div>
+              </div>
+
+              {/* Fausse couche — triangle + X */}
+              <div className="flex flex-col items-center gap-3">
+                <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
+                  <polygon points="36,8 66,64 6,64" stroke="currentColor" strokeWidth="2.5" fill="white" strokeLinejoin="miter" />
+                  <line x1="20" y1="20" x2="52" y2="52" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="52" y1="20" x2="20" y2="52" stroke="currentColor" strokeWidth="2.5" />
+                </svg>
+                <div className="text-center">
+                  <span className="text-xs font-semibold text-foreground">Fausse couche</span>
+                  <p className="text-[10px] text-muted-foreground">miscarriage</p>
+                </div>
+              </div>
+
+              {/* Avortement — triangle + double X */}
+              <div className="flex flex-col items-center gap-3">
+                <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
+                  <polygon points="36,8 66,64 6,64" stroke="currentColor" strokeWidth="2.5" fill="white" strokeLinejoin="miter" />
+                  <line x1="18" y1="18" x2="54" y2="54" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="54" y1="18" x2="18" y2="54" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="22" y1="14" x2="58" y2="50" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="50" y1="14" x2="14" y2="50" stroke="currentColor" strokeWidth="2.5" />
+                </svg>
+                <div className="text-center">
+                  <span className="text-xs font-semibold text-foreground">Avortement</span>
+                  <p className="text-[10px] text-muted-foreground">abortion</p>
+                </div>
+              </div>
+
+              {/* Mort-né Homme — carré + X */}
+              <div className="flex flex-col items-center gap-3">
+                <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
+                  <rect x="14" y="14" width="44" height="44" stroke="currentColor" strokeWidth="2.5" fill="white" />
+                  <line x1="14" y1="14" x2="58" y2="58" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="58" y1="14" x2="14" y2="58" stroke="currentColor" strokeWidth="2.5" />
+                </svg>
+                <div className="text-center">
+                  <span className="text-xs font-semibold text-foreground">Mort-né (H)</span>
+                  <p className="text-[10px] text-muted-foreground">stillbirth · male</p>
+                </div>
+              </div>
+
+              {/* Mort-né Femme — cercle + X */}
+              <div className="flex flex-col items-center gap-3">
+                <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
+                  <circle cx="36" cy="36" r="22" stroke="currentColor" strokeWidth="2.5" fill="white" />
+                  <line x1="20.44" y1="20.44" x2="51.56" y2="51.56" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="51.56" y1="20.44" x2="20.44" y2="51.56" stroke="currentColor" strokeWidth="2.5" />
+                </svg>
+                <div className="text-center">
+                  <span className="text-xs font-semibold text-foreground">Mort-né (F)</span>
+                  <p className="text-[10px] text-muted-foreground">stillbirth · female</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </SubSection>
+
         {/* Member Card with Icon */}
         <SubSection title="Carte Membre (MemberCard / Node)">
           <p className="text-sm text-muted-foreground mb-4">Composant complet avec MemberIcon + infos. L'icône change selon genre, orientation, identité et statut vital.</p>
