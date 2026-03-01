@@ -160,12 +160,12 @@ const LandingPage: React.FC = () => {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="hidden lg:block absolute -top-4 right-0 w-[58%]"
+            className="hidden lg:block absolute top-1/2 -translate-y-1/2 right-0 w-[58%]"
           >
             <img
               src={heroComposition}
               alt="Captures d'écran du Dashboard et de l'Éditeur de génogrammes Genogy"
-              className="w-[115%] max-w-none h-auto block"
+              className="w-full h-auto block"
               style={{
                 filter: 'drop-shadow(0 20px 40px hsl(var(--foreground) / 0.08)) drop-shadow(0 8px 16px hsl(var(--foreground) / 0.04))',
               }}
