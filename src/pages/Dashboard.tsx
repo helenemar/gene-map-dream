@@ -276,7 +276,7 @@ const Dashboard: React.FC = () => {
       {/* ── Main Content ── */}
       <main className="px-8 py-8">
         {/* Hero / CTA Section */}
-        <div className="dot-grid bg-background border border-border rounded-xl px-10 py-9 mb-6">
+        <div className="dot-grid bg-background border border-border rounded-xl px-10 py-6 mb-6">
           <h1 className="text-[26px] font-bold text-foreground leading-tight mb-1.5">
             Créer un nouveau génogramme
           </h1>
