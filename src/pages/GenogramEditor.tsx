@@ -1035,51 +1035,63 @@ const GenogramEditor: React.FC = () => {
 
   const handleDeleteMember = useCallback((id: string) => {
     recordSnapshot();
-    const affectedUnions = unions.filter(u => u.children.includes(id));
-    const idsToFadeOut: string[] = [];
 
-    for (const union of affectedUnions) {
-      const remainingChildren = union.children.filter(c => c !== id);
-      if (remainingChildren.length === 0) {
-        // Union will have no children — check if either partner is a placeholder
-        const partner1 = members.find(m => m.id === union.partner1);
-        const partner2 = members.find(m => m.id === union.partner2);
-        const placeholderPartner =
-          partner1?.isPlaceholder ? partner1 :
-          partner2?.isPlaceholder ? partner2 : null;
-
-        if (placeholderPartner) {
-          // Cascade: remove placeholder + union
-          idsToFadeOut.push(placeholderPartner.id);
+    // ── Collect all descendants recursively ──
+    const collectDescendants = (memberId: string, visited: Set<string>): void => {
+      if (visited.has(memberId)) return;
+      visited.add(memberId);
+      // Find unions where this member is a partner
+      const parentUnions = unions.filter(u => u.partner1 === memberId || u.partner2 === memberId);
+      for (const union of parentUnions) {
+        for (const childId of union.children) {
+          collectDescendants(childId, visited);
         }
+        // Also cascade the other partner if it's a placeholder
+        const otherPartnerId = union.partner1 === memberId ? union.partner2 : union.partner1;
+        const otherPartner = members.find(m => m.id === otherPartnerId);
+        if (otherPartner?.isPlaceholder && !visited.has(otherPartnerId)) {
+          visited.add(otherPartnerId);
+        }
+      }
+    };
+
+    const toRemoveSet = new Set<string>();
+    collectDescendants(id, toRemoveSet);
+
+    // Also clean up placeholder parents from unions where deleted member was a child
+    const childUnions = unions.filter(u => u.children.includes(id));
+    for (const union of childUnions) {
+      const remainingChildren = union.children.filter(c => !toRemoveSet.has(c));
+      if (remainingChildren.length === 0) {
+        const p1 = members.find(m => m.id === union.partner1);
+        const p2 = members.find(m => m.id === union.partner2);
+        if (p1?.isPlaceholder) toRemoveSet.add(p1.id);
+        if (p2?.isPlaceholder) toRemoveSet.add(p2.id);
       }
     }
 
-    if (idsToFadeOut.length > 0) {
-      // Animate fade-out first, then clean up after animation
-      const allFading = new Set([id, ...idsToFadeOut]);
-      setFadingOutIds(allFading);
-
+    if (toRemoveSet.size > 1) {
+      // Animate fade-out for cascading deletion
+      setFadingOutIds(toRemoveSet);
       setTimeout(() => {
         setFadingOutIds(new Set());
-        const toRemove = allFading;
-        setMembers(prev => prev.filter(m => !toRemove.has(m.id)));
+        setMembers(prev => prev.filter(m => !toRemoveSet.has(m.id)));
         setUnions(prev => prev
-          .map(u => ({ ...u, children: u.children.filter(c => !toRemove.has(c)) }))
-          .filter(u => !toRemove.has(u.partner1) && !toRemove.has(u.partner2))
+          .map(u => ({ ...u, children: u.children.filter(c => !toRemoveSet.has(c)) }))
+          .filter(u => !toRemoveSet.has(u.partner1) && !toRemoveSet.has(u.partner2))
         );
-        setEmotionalLinks(prev => prev.filter(l => !toRemove.has(l.from) && !toRemove.has(l.to)));
+        setEmotionalLinks(prev => prev.filter(l => !toRemoveSet.has(l.from) && !toRemoveSet.has(l.to)));
         setSelectedMember(null);
         setEditingNewMember(null);
       }, 350);
     } else {
-      // Standard delete — no cascade needed
-      setMembers(prev => prev.filter(m => m.id !== id));
+      // Single member delete
+      setMembers(prev => prev.filter(m => !toRemoveSet.has(m.id)));
       setUnions(prev => prev
-        .map(u => ({ ...u, children: u.children.filter(c => c !== id) }))
+        .map(u => ({ ...u, children: u.children.filter(c => !toRemoveSet.has(c)) }))
         .filter(u => u.partner1 !== id && u.partner2 !== id)
       );
-      setEmotionalLinks(prev => prev.filter(l => l.from !== id && l.to !== id));
+      setEmotionalLinks(prev => prev.filter(l => !toRemoveSet.has(l.from) && !toRemoveSet.has(l.to)));
       setSelectedMember(null);
       setEditingNewMember(null);
     }
