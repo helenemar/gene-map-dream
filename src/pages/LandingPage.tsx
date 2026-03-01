@@ -113,9 +113,9 @@ const LandingPage: React.FC = () => {
       </header>
 
       {/* ═══════════ HERO ═══════════ */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-visible">
         <div className="max-w-[1400px] mx-auto px-10 lg:px-20 pt-10 pb-16 lg:pt-12 lg:pb-20">
-          <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-14">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-8">
             {/* Left – copy */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -161,12 +161,12 @@ const LandingPage: React.FC = () => {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="hidden lg:block flex-1 min-w-0"
+              className="hidden lg:block flex-[1.4] min-w-0 lg:-mr-20"
             >
               <img
                 src={heroComposition}
                 alt="Captures d'écran du Dashboard et de l'Éditeur de génogrammes Genogy"
-                className="w-full h-auto block"
+                className="w-[120%] max-w-none h-auto block"
                 style={{
                   filter: 'drop-shadow(0 25px 50px hsl(var(--foreground) / 0.1)) drop-shadow(0 10px 20px hsl(var(--foreground) / 0.06))',
                 }}
