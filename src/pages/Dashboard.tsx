@@ -80,13 +80,13 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'gc4', firstName: 'Léa', lastName: 'Fabre', gender: 'female', x: -100, y: 250, birthYear: 2022, age: 4, profession: '', pathologies: [] },
       ],
       unions: [
-        { partner1: 'gp1', partner2: 'gp2', status: 'widowed', children: ['p1', 'p3'], marriageYear: 1960, notes: 'Couple stable. Henri décédé en 2010.' },
-        { partner1: 'gp3', partner2: 'gp4', status: 'married', children: ['p2', 'p5'], marriageYear: 1963, notes: 'Relation marquée par l\'alcoolisme de Robert et la codépendance de Jeanne.' },
-        { partner1: 'p1', partner2: 'p2', status: 'divorced', children: ['c1', 'c2', 'c3', 'c6'], marriageYear: 1988, divorceYear: 2010, notes: 'Divorce conflictuel. Garde alternée mal vécue par les enfants.' },
-        { partner1: 'p1', partner2: 'p6', status: 'common_law', children: [], notes: 'Union libre depuis 2012. Stabilisatrice pour Philippe.' },
-        { partner1: 'p4', partner2: 'p3', status: 'married', children: ['c4', 'c5'], marriageYear: 1993, isAdoption: true, notes: 'Lucas adopté en 1997. Emma biologique.' },
-        { partner1: 'c1', partner2: 'c1w', status: 'married', children: ['gc1', 'gc2', 'gc3'], marriageYear: 2018, notes: 'Tensions liées à la maladie de Julien. Thérapie de couple en cours.' },
-        { partner1: 'c2', partner2: 'c2h', status: 'married', children: ['gc4'], marriageYear: 2020 },
+        { id: 'u1', partner1: 'gp1', partner2: 'gp2', status: 'widowed', children: ['p1', 'p3'], marriageYear: 1960, notes: 'Couple stable. Henri décédé en 2010.' },
+        { id: 'u2', partner1: 'gp3', partner2: 'gp4', status: 'married', children: ['p2', 'p5'], marriageYear: 1963, notes: 'Relation marquée par l\'alcoolisme de Robert et la codépendance de Jeanne.' },
+        { id: 'u3', partner1: 'p1', partner2: 'p2', status: 'divorced', children: ['c1', 'c2', 'c3', 'c6'], marriageYear: 1988, divorceYear: 2010, notes: 'Divorce conflictuel. Garde alternée mal vécue par les enfants.' },
+        { id: 'u4', partner1: 'p1', partner2: 'p6', status: 'common_law', children: [], notes: 'Union libre depuis 2012. Stabilisatrice pour Philippe.' },
+        { id: 'u5', partner1: 'p4', partner2: 'p3', status: 'married', children: ['c4', 'c5'], marriageYear: 1993, isAdoption: true, notes: 'Lucas adopté en 1997. Emma biologique.' },
+        { id: 'u6', partner1: 'c1', partner2: 'c1w', status: 'married', children: ['gc1', 'gc2', 'gc3'], marriageYear: 2018, notes: 'Tensions liées à la maladie de Julien. Thérapie de couple en cours.' },
+        { id: 'u7', partner1: 'c2', partner2: 'c2h', status: 'married', children: ['gc4'], marriageYear: 2020 },
       ],
       emotionalLinks: [
         { id: 'e1', from: 'p1', to: 'c1', type: 'fusional' },
@@ -110,7 +110,7 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'a2', firstName: 'Marc', lastName: 'Dupont', gender: 'male', x: 200, y: 0, birthYear: 1983, age: 43, profession: '', pathologies: [] },
         { id: 'a3', firstName: 'Clara', lastName: 'Dupont', gender: 'female', x: 100, y: 200, birthYear: 2012, age: 14, profession: '', pathologies: [] },
       ],
-      unions: [{ partner1: 'a2', partner2: 'a1' }],
+      unions: [{ id: 'ua1', partner1: 'a2', partner2: 'a1' }],
     },
   },
   {
@@ -126,8 +126,8 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'b6', firstName: 'Emma', lastName: 'Martin', gender: 'female', x: 200, y: 200, birthYear: 2008, age: 18, profession: '', pathologies: ['psychogenic'] },
       ],
       unions: [
-        { partner1: 'b3', partner2: 'b4' },
-        { partner1: 'b1', partner2: 'b2' },
+        { id: 'ub1', partner1: 'b3', partner2: 'b4' },
+        { id: 'ub2', partner1: 'b1', partner2: 'b2' },
       ],
     },
   },
@@ -140,7 +140,7 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'c2', firstName: 'Antoine', lastName: 'Bernard', gender: 'male', x: -150, y: -200, birthYear: 1965, age: 61, profession: '', pathologies: ['diabetes'] },
         { id: 'c3', firstName: 'Françoise', lastName: 'Morel', gender: 'female', x: 150, y: -200, birthYear: 1968, age: 58, profession: '', pathologies: [] },
       ],
-      unions: [{ partner1: 'c2', partner2: 'c3' }],
+      unions: [{ id: 'uc1', partner1: 'c2', partner2: 'c3' }],
     },
   },
   {
@@ -154,7 +154,7 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'd3', firstName: 'Hugo', lastName: 'Petit', gender: 'male', x: 0, y: 200, birthYear: 2018, age: 8, profession: '', pathologies: [] },
         { id: 'd4', firstName: 'Chloé', lastName: 'Petit', gender: 'female', x: 200, y: 200, birthYear: 2021, age: 5, profession: '', pathologies: [] },
       ],
-      unions: [{ partner1: 'd1', partner2: 'd2' }],
+      unions: [{ id: 'ud1', partner1: 'd1', partner2: 'd2' }],
     },
   },
   {
@@ -169,8 +169,8 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'e4', firstName: 'Monique', lastName: 'Faure', gender: 'female', x: 100, y: -200, birthYear: 1961, age: 65, profession: '', pathologies: [] },
       ],
       unions: [
-        { partner1: 'e3', partner2: 'e4' },
-        { partner1: 'e2', partner2: 'e1' },
+        { id: 'ue1', partner1: 'e3', partner2: 'e4' },
+        { id: 'ue2', partner1: 'e2', partner2: 'e1' },
       ],
     },
   },
@@ -184,7 +184,7 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'f2', firstName: 'Claire', lastName: 'Rousseau', gender: 'female', x: 200, y: 0, birthYear: 1984, age: 42, profession: '', pathologies: ['cancer'] },
         { id: 'f3', firstName: 'Lina', lastName: 'Rousseau', gender: 'female', x: 100, y: 200, birthYear: 2010, age: 16, profession: '', pathologies: [] },
       ],
-      unions: [{ partner1: 'f1', partner2: 'f2' }],
+      unions: [{ id: 'uf1', partner1: 'f1', partner2: 'f2' }],
     },
   },
 ];
