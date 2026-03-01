@@ -114,8 +114,8 @@ const LandingPage: React.FC = () => {
 
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-6 py-20 lg:py-28">
-          <div className="grid lg:grid-cols-[1fr_1.4fr] gap-16 lg:gap-20 items-center">
+        <div className="max-w-[1400px] mx-auto px-6 pt-16 pb-24 lg:pt-20 lg:pb-32">
+          <div className="grid lg:grid-cols-[1fr_1.3fr] gap-12 lg:gap-16 items-center">
             {/* Left – copy */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -123,9 +123,9 @@ const LandingPage: React.FC = () => {
               transition={{ duration: 0.6 }}
             >
               {/* Large logo */}
-              <img src={gogyIcon} alt="" className="w-16 h-16 mb-8" />
+              <img src={gogyIcon} alt="" className="w-20 h-20 mb-10" />
 
-              <h1 className="text-4xl lg:text-[44px] font-extrabold leading-[1.15] tracking-tight mb-6">
+              <h1 className="text-4xl lg:text-5xl font-extrabold leading-[1.12] tracking-tight mb-5">
                 Le meilleur outil en ligne pour{' '}
                 <br className="hidden sm:block" />
                 créer des{' '}
@@ -134,12 +134,12 @@ const LandingPage: React.FC = () => {
                 professionnels
               </h1>
 
-              <p className="text-muted-foreground leading-relaxed mb-2 max-w-lg">
+              <p className="text-muted-foreground text-[16px] leading-relaxed mb-1.5 max-w-lg">
                 Cartographiez les relations familiales et émotionnelles
                 <br className="hidden sm:block" />
                 de vos patients ou clients.
               </p>
-              <p className="text-foreground/70 text-sm leading-relaxed mb-10 max-w-lg">
+              <p className="text-foreground/60 text-sm leading-relaxed mb-10 max-w-lg">
                 Conçu pour les psychologues, travailleurs sociaux, thérapeutes et
                 <br className="hidden sm:block" />
                 professionnels de l'accompagnement.
@@ -160,19 +160,19 @@ const LandingPage: React.FC = () => {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="relative lg:-mr-8"
+              className="relative lg:-mr-16"
             >
               <img
                 src={heroComposition}
                 alt="Captures d'écran du Dashboard et de l'Éditeur de génogrammes Genogy"
-                className="w-full h-auto block drop-shadow-2xl"
+                className="w-full h-auto block"
                 style={{
-                  filter: 'drop-shadow(0 30px 60px hsl(var(--foreground) / 0.12)) drop-shadow(0 12px 24px hsl(var(--foreground) / 0.08))',
+                  filter: 'drop-shadow(0 25px 50px hsl(var(--foreground) / 0.1)) drop-shadow(0 10px 20px hsl(var(--foreground) / 0.06))',
                 }}
                 loading="eager"
               />
               {/* Decorative glow */}
-              <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[130%] bg-primary/5 rounded-full blur-3xl" />
+              <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary/4 rounded-full blur-3xl" />
             </motion.div>
           </div>
         </div>
