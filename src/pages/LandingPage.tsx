@@ -114,14 +114,14 @@ const LandingPage: React.FC = () => {
 
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-10 lg:px-20 pt-10 pb-16 lg:pt-12 lg:pb-20 relative">
-          <div className="relative">
+        <div className="max-w-[1400px] mx-auto px-10 lg:px-20 pt-10 pb-16 lg:pt-12 lg:pb-20">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-14">
             {/* Left – copy */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="relative z-10 max-w-[540px]"
+              className="flex-shrink-0"
             >
               {/* Large logo */}
               <img src={gogyIcon} alt="" className="w-16 h-16 mb-6" />
@@ -156,12 +156,12 @@ const LandingPage: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Right – Mockup Composition (absolute) */}
+            {/* Right – Mockup Composition */}
             <motion.div
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="hidden lg:block absolute bottom-0 right-0 w-[62%] -mr-20 translate-y-[15%]"
+              className="hidden lg:block flex-1 min-w-0"
             >
               <img
                 src={heroComposition}
@@ -172,8 +172,6 @@ const LandingPage: React.FC = () => {
                 }}
                 loading="eager"
               />
-              {/* Decorative glow */}
-              <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary/4 rounded-full blur-3xl" />
             </motion.div>
           </div>
         </div>
