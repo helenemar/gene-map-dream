@@ -617,12 +617,12 @@ const DesignSystemPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Fausse couche — triangle + X */}
+              {/* Fausse couche — triangle + single X */}
               <div className="flex flex-col items-center gap-3">
                 <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
                   <polygon points="36,8 66,64 6,64" stroke="currentColor" strokeWidth="2.5" fill="white" strokeLinejoin="miter" />
-                  <line x1="20" y1="20" x2="52" y2="52" stroke="currentColor" strokeWidth="2.5" />
-                  <line x1="52" y1="20" x2="20" y2="52" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="19" y1="24" x2="53" y2="56" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="53" y1="24" x2="19" y2="56" stroke="currentColor" strokeWidth="2.5" />
                 </svg>
                 <div className="text-center">
                   <span className="text-xs font-semibold text-foreground">Fausse couche</span>
@@ -634,10 +634,10 @@ const DesignSystemPage: React.FC = () => {
               <div className="flex flex-col items-center gap-3">
                 <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
                   <polygon points="36,8 66,64 6,64" stroke="currentColor" strokeWidth="2.5" fill="white" strokeLinejoin="miter" />
-                  <line x1="18" y1="18" x2="54" y2="54" stroke="currentColor" strokeWidth="2.5" />
-                  <line x1="54" y1="18" x2="18" y2="54" stroke="currentColor" strokeWidth="2.5" />
-                  <line x1="22" y1="14" x2="58" y2="50" stroke="currentColor" strokeWidth="2.5" />
-                  <line x1="50" y1="14" x2="14" y2="50" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="17" y1="22" x2="51" y2="56" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="55" y1="22" x2="21" y2="56" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="23" y1="16" x2="57" y2="50" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="49" y1="16" x2="15" y2="50" stroke="currentColor" strokeWidth="2.5" />
                 </svg>
                 <div className="text-center">
                   <span className="text-xs font-semibold text-foreground">Avortement</span>
