@@ -114,8 +114,8 @@ const LandingPage: React.FC = () => {
 
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-6 pt-16 pb-24 lg:pt-20 lg:pb-32">
-          <div className="grid lg:grid-cols-[1fr_1.3fr] gap-12 lg:gap-16 items-center">
+        <div className="max-w-[1400px] mx-auto px-6 pt-10 pb-16 lg:pt-12 lg:pb-20">
+          <div className="grid lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-14 items-center">
             {/* Left – copy */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -123,23 +123,23 @@ const LandingPage: React.FC = () => {
               transition={{ duration: 0.6 }}
             >
               {/* Large logo */}
-              <img src={gogyIcon} alt="" className="w-20 h-20 mb-10" />
+              <img src={gogyIcon} alt="" className="w-16 h-16 mb-6" />
 
-              <h1 className="text-4xl lg:text-5xl font-extrabold leading-[1.12] tracking-tight mb-5">
-                Le meilleur outil en ligne pour{' '}
-                <br className="hidden sm:block" />
+              <h1 className="text-4xl lg:text-[2.75rem] font-extrabold leading-[1.15] tracking-tight mb-4">
+                Le meilleur outil en ligne pour
+                <br />
                 créer des{' '}
                 <span className="text-primary">génogrammes</span>
                 <br />
                 professionnels
               </h1>
 
-              <p className="text-muted-foreground text-[16px] leading-relaxed mb-1.5 max-w-lg">
+              <p className="text-muted-foreground text-[15px] leading-relaxed mb-1 max-w-lg">
                 Cartographiez les relations familiales et émotionnelles
                 <br className="hidden sm:block" />
                 de vos patients ou clients.
               </p>
-              <p className="text-foreground/60 text-sm leading-relaxed mb-10 max-w-lg">
+              <p className="text-foreground/60 text-sm leading-relaxed mb-7 max-w-lg">
                 Conçu pour les psychologues, travailleurs sociaux, thérapeutes et
                 <br className="hidden sm:block" />
                 professionnels de l'accompagnement.
