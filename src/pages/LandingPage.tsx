@@ -114,7 +114,7 @@ const LandingPage: React.FC = () => {
 
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-6 pt-10 pb-16 lg:pt-12 lg:pb-20">
+        <div className="max-w-[1400px] mx-auto px-10 lg:px-20 pt-10 pb-16 lg:pt-12 lg:pb-20">
           <div className="grid lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-14 items-center">
             {/* Left – copy */}
             <motion.div
