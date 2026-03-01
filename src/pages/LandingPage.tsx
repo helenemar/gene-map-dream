@@ -114,64 +114,65 @@ const LandingPage: React.FC = () => {
 
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative overflow-hidden">
-        <div className="max-w-[1440px] mx-auto px-12 lg:px-24 pt-14 pb-20 lg:pt-16 lg:pb-24 relative">
-          {/* Left – copy */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative z-10 max-w-[520px]"
-          >
-            {/* Large logo */}
-            <img src={gogyIcon} alt="" className="w-[64px] h-[64px] mb-6" />
+        <div className="max-w-[1440px] mx-auto px-12 lg:px-24 pt-14 pb-20 lg:pt-16 lg:pb-24">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:gap-8">
+            {/* Left – copy */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="flex-shrink-0 lg:w-[40%]"
+            >
+              <img src={gogyIcon} alt="" className="w-[64px] h-[64px] mb-6" />
 
-            <h1 className="text-[1.6rem] lg:text-[2rem] font-extrabold leading-[1.08] tracking-[-0.01em] mb-4 whitespace-nowrap">
-              Le meilleur outil en ligne pour
-              <br />
-              créer des{' '}
-              <span className="text-primary">génogrammes</span>
-              <br />
-              professionnels
-            </h1>
+              <h1 className="text-[1.6rem] lg:text-[2rem] font-extrabold leading-[1.08] tracking-[-0.01em] mb-4 whitespace-nowrap">
+                Le meilleur outil en ligne pour
+                <br />
+                créer des{' '}
+                <span className="text-primary">génogrammes</span>
+                <br />
+                professionnels
+              </h1>
 
-            <p className="text-muted-foreground text-[14px] leading-[1.5] mb-1 max-w-[420px]">
-              Cartographiez les relations familiales et émotionnelles
-              <br className="hidden sm:block" />
-              de vos patients ou clients.
-            </p>
-            <p className="text-foreground/50 text-[12.5px] leading-[1.5] mb-6 max-w-[420px]">
-              Conçu pour les psychologues, travailleurs sociaux, thérapeutes et
-              <br className="hidden sm:block" />
-              professionnels de l'accompagnement.
-            </p>
+              <p className="text-muted-foreground text-[14px] leading-[1.5] mb-1 max-w-[420px]">
+                Cartographiez les relations familiales et émotionnelles
+                <br className="hidden sm:block" />
+                de vos patients ou clients.
+              </p>
+              <p className="text-foreground/50 text-[12.5px] leading-[1.5] mb-6 max-w-[420px]">
+                Conçu pour les psychologues, travailleurs sociaux, thérapeutes et
+                <br className="hidden sm:block" />
+                professionnels de l'accompagnement.
+              </p>
 
-            <div className="flex items-center gap-4">
-              <Button variant="brand" size="lg" onClick={() => openAuth('signup')} className="gap-2 px-8 rounded-full">
-                Accéder à la version BETA
-              </Button>
-              <Button variant="outline" size="lg" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="border-primary text-primary bg-transparent hover:bg-primary/5 rounded-full px-8">
-                Découvrir l'outil
-              </Button>
-            </div>
-          </motion.div>
+              <div className="flex items-center gap-4">
+                <Button variant="brand" size="lg" onClick={() => openAuth('signup')} className="gap-2 px-8 rounded-full">
+                  Accéder à la version BETA
+                </Button>
+                <Button variant="outline" size="lg" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="border-primary text-primary bg-transparent hover:bg-primary/5 rounded-full px-8">
+                  Découvrir l'outil
+                </Button>
+              </div>
+            </motion.div>
 
-          {/* Right – Mockup Composition (absolute, large) */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="hidden lg:block absolute top-16 right-0 w-[55%]"
-          >
-            <img
-              src={heroComposition}
-              alt="Captures d'écran du Dashboard et de l'Éditeur de génogrammes Genogy"
-              className="w-full h-auto block"
-              style={{
-                filter: 'drop-shadow(0 20px 40px hsl(var(--foreground) / 0.08)) drop-shadow(0 8px 16px hsl(var(--foreground) / 0.04))',
-              }}
-              loading="eager"
-            />
-          </motion.div>
+            {/* Right – Mockup Composition */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="hidden lg:flex lg:flex-1 lg:justify-end lg:-mr-24 lg:items-center"
+            >
+              <img
+                src={heroComposition}
+                alt="Captures d'écran du Dashboard et de l'Éditeur de génogrammes Genogy"
+                className="w-[130%] max-w-none h-auto block"
+                style={{
+                  filter: 'drop-shadow(0 20px 40px hsl(var(--foreground) / 0.08)) drop-shadow(0 8px 16px hsl(var(--foreground) / 0.04))',
+                }}
+                loading="eager"
+              />
+            </motion.div>
+          </div>
         </div>
       </section>
 
