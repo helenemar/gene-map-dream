@@ -94,6 +94,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   const isDeceased = !!member.deathYear;
   const isPlaceholder = !!member.isPlaceholder;
   const isDraft = !!member.isDraft;
+  const isPerinatal = !!member.perinatalType;
   const memberPathologies = dynamicPathologies.filter(p => member.pathologies.includes(p.id));
 
   // Internal anchor-active state for static/DS usage
@@ -184,6 +185,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
             } bg-muted/20 border border-dashed border-muted-foreground/20`}>
               <PencilLine className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} text-muted-foreground/30`} />
             </div>
+          ) : isPerinatal ? (
+            <MemberIcon
+              gender={member.gender}
+              perinatalType={member.perinatalType}
+              size={compact ? 36 : 48}
+              className="text-foreground"
+            />
           ) : (
             <MemberIcon
               gender={member.gender}
@@ -213,6 +221,17 @@ const MemberCard: React.FC<MemberCardProps> = ({
               <span className="text-[11px] text-muted-foreground/30 italic">
                 {member.isAdoptiveParent ? 'À compléter' : 'Cliquer pour éditer'}
               </span>
+            </div>
+          ) : isPerinatal ? (
+            <div className="flex flex-col gap-0.5">
+              <span className="font-medium text-sm text-foreground whitespace-nowrap">
+                {member.perinatalType === 'pregnancy' ? 'Grossesse' :
+                 member.perinatalType === 'miscarriage' ? 'Fausse couche' :
+                 member.perinatalType === 'abortion' ? 'Avortement' : 'Mort-né'}
+              </span>
+              {member.birthYear > 0 && (
+                <span className="text-[11px] text-muted-foreground">{member.birthYear}</span>
+              )}
             </div>
           ) : (
             <>
