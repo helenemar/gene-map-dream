@@ -126,7 +126,7 @@ const LandingPage: React.FC = () => {
               {/* Large logo */}
               <img src={gogyIcon} alt="" className="w-16 h-16 mb-6" />
 
-              <h1 className="text-4xl lg:text-[2.75rem] font-extrabold leading-[1.15] tracking-tight mb-4">
+              <h1 className="text-4xl lg:text-[2.75rem] font-extrabold leading-[1.15] tracking-tight mb-4 whitespace-nowrap">
                 Le meilleur outil en ligne pour
                 <br />
                 créer des{' '}
