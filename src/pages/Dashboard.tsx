@@ -168,22 +168,40 @@ const Dashboard: React.FC = () => {
 
   const genograms = [...(realGenograms || []), ...MOCK_GENOGRAMS];
 
+  // Fake note data for mock genograms
+  const MOCK_NOTE_COUNTS: Record<string, number> = {
+    'mock-1': 3, 'mock-3': 5, 'mock-5': 1, 'mock-6': 2, 'mock-7': 4,
+  };
+  const MOCK_LATEST_NOTE_DATES: Record<string, string> = {
+    'mock-1': '2026-03-01T10:00:00Z', // newer than updated_at → pulsing
+    'mock-3': '2026-02-28T18:00:00Z', // newer than updated_at → pulsing
+    'mock-5': '2025-12-21T09:00:00Z', // newer → pulsing
+    'mock-6': '2026-02-21T07:00:00Z', // newer → pulsing
+    'mock-7': '2025-11-01T10:00:00Z', // older than updated_at → no pulse
+  };
+
   // Fetch note counts and latest note dates for all genograms
   useEffect(() => {
     if (!genograms?.length) return;
-    const ids = genograms.map(g => g.id);
+    const ids = genograms.filter(g => !g.id.startsWith('mock')).map(g => g.id);
+    if (!ids.length) {
+      setNoteCounts(MOCK_NOTE_COUNTS);
+      setLatestNoteDates(MOCK_LATEST_NOTE_DATES);
+      return;
+    }
     supabase
       .from('genogram_notes')
       .select('genogram_id, created_at')
       .in('genogram_id', ids)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
-        if (!data) return;
-        const counts: Record<string, number> = {};
-        const latest: Record<string, string> = {};
-        for (const row of data as { genogram_id: string; created_at: string }[]) {
-          counts[row.genogram_id] = (counts[row.genogram_id] ?? 0) + 1;
-          if (!latest[row.genogram_id]) latest[row.genogram_id] = row.created_at;
+        const counts: Record<string, number> = { ...MOCK_NOTE_COUNTS };
+        const latest: Record<string, string> = { ...MOCK_LATEST_NOTE_DATES };
+        if (data) {
+          for (const row of data as { genogram_id: string; created_at: string }[]) {
+            counts[row.genogram_id] = (counts[row.genogram_id] ?? 0) + 1;
+            if (!latest[row.genogram_id]) latest[row.genogram_id] = row.created_at;
+          }
         }
         setNoteCounts(counts);
         setLatestNoteDates(latest);
