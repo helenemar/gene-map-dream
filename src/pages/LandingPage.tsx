@@ -161,7 +161,7 @@ const LandingPage: React.FC = () => {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="hidden lg:block absolute top-1/2 -translate-y-1/2 right-0 w-[55%] -mr-16"
+              className="hidden lg:block absolute top-1/2 -translate-y-[45%] right-0 w-[58%] -mr-8"
             >
               <img
                 src={heroComposition}
