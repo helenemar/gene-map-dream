@@ -1,4 +1,5 @@
 import React from 'react';
+import type { PerinatalType } from '@/types/genogram';
 
 export interface MemberIconProps {
   gender: 'male' | 'female' | 'non-binary';
@@ -10,6 +11,8 @@ export interface MemberIconProps {
   pathologyColors?: string[];
   size?: number;
   className?: string;
+  /** If set, renders a perinatal triangle symbol instead of the normal shape */
+  perinatalType?: PerinatalType;
 }
 
 /**
@@ -31,7 +34,18 @@ const MemberIcon: React.FC<MemberIconProps> = ({
   pathologyColors = [],
   size = 48,
   className,
+  perinatalType,
 }) => {
+  // Unique ID for clipPath (needed when multiple icons on same page)
+  const clipId = React.useId();
+
+  // ── Perinatal triangle-based symbols ──
+  if (perinatalType) {
+    return (
+      <PerinatalIcon type={perinatalType} gender={gender} size={size} className={className} />
+    );
+  }
+
   const s = size;
   const sw = s * 0.04;
   const half = sw / 2;
@@ -56,9 +70,6 @@ const MemberIcon: React.FC<MemberIconProps> = ({
 
   const mainStroke = 'currentColor';
   const transStroke = 'hsl(var(--muted-foreground) / 0.85)';
-
-  // Unique ID for clipPath (needed when multiple icons on same page)
-  const clipId = React.useId();
 
   // Pathology fill rects — positioned in quadrants within the shape bounds
   const colors = pathologyColors.slice(0, 4);
@@ -222,5 +233,69 @@ function buildFillRects(
       ];
   }
 }
+
+/** Perinatal triangle-based SVG icons */
+const PerinatalIcon: React.FC<{
+  type: PerinatalType;
+  gender: 'male' | 'female' | 'non-binary';
+  size: number;
+  className?: string;
+}> = ({ type, gender, size, className }) => {
+  // Normalized viewBox: triangle from (20,0) to (0,40)/(40,40)
+  // Extra space for cross overflow: viewBox -4 -4 48 48
+  const sw = 2;
+
+  if (type === 'pregnancy') {
+    // Simple triangle
+    return (
+      <svg width={size} height={size} viewBox="-4 -4 48 48" fill="none" className={className}>
+        <polygon points="20,0 40,40 0,40" stroke="currentColor" strokeWidth={sw} fill="white" strokeLinejoin="miter" />
+      </svg>
+    );
+  }
+
+  if (type === 'miscarriage') {
+    // Triangle + X crossing through
+    return (
+      <svg width={size} height={size} viewBox="-4 -4 48 48" fill="none" className={className}>
+        <polygon points="20,0 40,40 0,40" stroke="currentColor" strokeWidth={sw} fill="white" strokeLinejoin="miter" />
+        <line x1={-2} y1={42} x2={42} y2={-2} stroke="currentColor" strokeWidth={sw} />
+        <line x1={42} y1={42} x2={-2} y2={-2} stroke="currentColor" strokeWidth={sw} />
+      </svg>
+    );
+  }
+
+  if (type === 'abortion') {
+    // Triangle + X crossing through + horizontal line
+    return (
+      <svg width={size} height={size} viewBox="-4 -4 48 48" fill="none" className={className}>
+        <polygon points="20,0 40,40 0,40" stroke="currentColor" strokeWidth={sw} fill="white" strokeLinejoin="miter" />
+        <line x1={-2} y1={42} x2={42} y2={-2} stroke="currentColor" strokeWidth={sw} />
+        <line x1={42} y1={42} x2={-2} y2={-2} stroke="currentColor" strokeWidth={sw} />
+        <line x1={-2} y1={20} x2={42} y2={20} stroke="currentColor" strokeWidth={sw} />
+      </svg>
+    );
+  }
+
+  // stillborn — square (male) or circle (female) with X crossing through
+  if (type === 'stillborn') {
+    const s = 40;
+    const shapeSize = 28;
+    const offset = (s - shapeSize) / 2;
+    return (
+      <svg width={size} height={size} viewBox="-4 -4 48 48" fill="none" className={className}>
+        {gender === 'female' ? (
+          <circle cx={s / 2} cy={s / 2} r={shapeSize / 2} stroke="currentColor" strokeWidth={sw} fill="white" />
+        ) : (
+          <rect x={offset} y={offset} width={shapeSize} height={shapeSize} stroke="currentColor" strokeWidth={sw} fill="white" />
+        )}
+        <line x1={-2} y1={-2} x2={42} y2={42} stroke="currentColor" strokeWidth={sw} />
+        <line x1={42} y1={-2} x2={-2} y2={42} stroke="currentColor" strokeWidth={sw} />
+      </svg>
+    );
+  }
+
+  return null;
+};
 
 export default MemberIcon;

@@ -13,7 +13,7 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from '@/components/ui/tooltip';
-import { User, Users, Baby, Heart, CircleSlash, Slash, X, UserPlus, HeartHandshake } from 'lucide-react';
+import { User, Users, Baby, Heart, CircleSlash, Slash, X, UserPlus, HeartHandshake, Triangle } from 'lucide-react';
 
 export type RelationshipChoice =
   | 'parent'
@@ -24,7 +24,11 @@ export type RelationshipChoice =
   | 'spouse_married'
   | 'spouse_divorced'
   | 'spouse_separated'
-  | 'spouse_widowed';
+  | 'spouse_widowed'
+  | 'perinatal_pregnancy'
+  | 'perinatal_miscarriage'
+  | 'perinatal_abortion'
+  | 'perinatal_stillborn';
 
 interface RelOptionDef {
   id: RelationshipChoice;
@@ -41,6 +45,13 @@ const BASE_OPTIONS: RelOptionDef[] = [
   { id: 'spouse_divorced', label: 'Conjoint (Divorce)', icon: <CircleSlash className="w-4 h-4" /> },
   { id: 'spouse_separated', label: 'Conjoint (Séparation)', icon: <Slash className="w-4 h-4" /> },
   { id: 'spouse_widowed', label: 'Veuf(ve)', icon: <X className="w-4 h-4" /> },
+];
+
+const PERINATAL_OPTIONS: RelOptionDef[] = [
+  { id: 'perinatal_pregnancy', label: 'Grossesse', icon: <Triangle className="w-4 h-4" /> },
+  { id: 'perinatal_miscarriage', label: 'Fausse couche', icon: <Triangle className="w-4 h-4" /> },
+  { id: 'perinatal_abortion', label: 'Avortement', icon: <Triangle className="w-4 h-4" /> },
+  { id: 'perinatal_stillborn', label: 'Mort-né', icon: <X className="w-4 h-4" /> },
 ];
 
 const PARENT_SUB_OPTIONS: RelOptionDef[] = [
@@ -117,6 +128,11 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
             </>
           )}
           {BASE_OPTIONS.filter(o => showParentSplit ? o.id !== 'parent' : true).map(renderItem)}
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel className="text-xs text-muted-foreground font-normal px-2 py-1">
+            Événements périnataux
+          </DropdownMenuLabel>
+          {PERINATAL_OPTIONS.map(renderItem)}
         </DropdownMenuContent>
       </DropdownMenu>
     </TooltipProvider>

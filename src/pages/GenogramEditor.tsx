@@ -509,6 +509,7 @@ const GenogramEditor: React.FC = () => {
     sourceId: string;
     open: boolean;
   } | null>(null);
+  const [pendingPerinatalType, setPendingPerinatalType] = useState<import('@/types/genogram').PerinatalType | null>(null);
 
   // (standalone links removed — all children go through unions now)
 
@@ -620,18 +621,30 @@ const GenogramEditor: React.FC = () => {
     const currentYear = new Date().getFullYear();
     const LEVEL_Y = 250;
 
+    const perinatal = pendingPerinatalType;
+    const perinatalLabels: Record<string, string> = {
+      pregnancy: 'Grossesse',
+      miscarriage: 'Fausse couche',
+      abortion: 'Avortement',
+      stillborn: 'Mort-né',
+    };
+
     const newChild: FamilyMember = {
       id: `m-${Date.now()}`,
-      firstName: 'Nouveau',
-      lastName: source?.lastName || '',
-      birthYear: currentYear - 5,
-      age: 5,
+      firstName: perinatal ? (perinatalLabels[perinatal] || 'Nouveau') : 'Nouveau',
+      lastName: perinatal ? '' : (source?.lastName || ''),
+      birthYear: perinatal ? currentYear : currentYear - 5,
+      age: perinatal ? 0 : 5,
       profession: '',
       gender: 'female',
       x: source?.x ?? 200,
       y: (source?.y ?? 200) + LEVEL_Y,
       pathologies: [],
+      ...(perinatal ? { perinatalType: perinatal } : {}),
     };
+
+    // Clear pending perinatal type
+    setPendingPerinatalType(null);
 
     if (targetUnionId) {
       // Add child to an existing union
@@ -724,22 +737,26 @@ const GenogramEditor: React.FC = () => {
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 600);
 
-      // Select and open drawer for new child
+      // Select and open drawer for new child (skip for perinatal)
       setSelectedMember(newChild.id);
-      setEditingNewMember(newChild);
-      setDrawerEditing(true);
-      setNewMemberDrawerOpen(true);
+      if (!perinatal) {
+        setEditingNewMember(newChild);
+        setDrawerEditing(true);
+        setNewMemberDrawerOpen(true);
+      }
       setTimeout(() => centerOnMember(newChild), 100);
       return;
     }
 
-    // Select and open drawer for new child (existing union path)
+    // Select and open drawer for new child (existing union path, skip for perinatal)
     setSelectedMember(newChild.id);
-    setEditingNewMember(newChild);
-    setDrawerEditing(true);
-    setNewMemberDrawerOpen(true);
+    if (!perinatal) {
+      setEditingNewMember(newChild);
+      setDrawerEditing(true);
+      setNewMemberDrawerOpen(true);
+    }
     setTimeout(() => centerOnMember(newChild), 100);
-  }, [members, unions, centerOnMember]);
+  }, [members, unions, centerOnMember, pendingPerinatalType]);
 
   /** Create a child with an existing member as co-parent (creates a new union between them) */
   const executeChildCreationWithExisting = useCallback((sourceId: string, partnerId: string) => {
@@ -787,8 +804,22 @@ const GenogramEditor: React.FC = () => {
   }, [members, centerOnMember]);
 
   const handleCreateRelated = useCallback((sourceId: string, relationship: RelationshipChoice) => {
+    // ── Perinatal events → same flow as child, but with perinatalType ──
+    if (relationship.startsWith('perinatal_')) {
+      const perinatalMap: Record<string, import('@/types/genogram').PerinatalType> = {
+        perinatal_pregnancy: 'pregnancy',
+        perinatal_miscarriage: 'miscarriage',
+        perinatal_abortion: 'abortion',
+        perinatal_stillborn: 'stillborn',
+      };
+      setPendingPerinatalType(perinatalMap[relationship] || null);
+      setParentPickerState({ sourceId, open: true });
+      return;
+    }
+
     // ── Always show parent picker for child creation ──
     if (relationship === 'child') {
+      setPendingPerinatalType(null);
       setParentPickerState({ sourceId, open: true });
       return;
     }
@@ -1379,7 +1410,7 @@ const GenogramEditor: React.FC = () => {
                   members={members}
                   open={parentPickerState.open}
                   onOpenChange={(open) => {
-                    if (!open) setParentPickerState(null);
+                    if (!open) { setParentPickerState(null); setPendingPerinatalType(null); }
                   }}
                   onSelectUnion={(unionId) => {
                     executeChildCreation(parentPickerState.sourceId, unionId);

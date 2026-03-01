@@ -1,5 +1,8 @@
 export type TwinType = 'monozygotic' | 'dizygotic';
 
+/** Perinatal member types — rendered as triangle-based symbols */
+export type PerinatalType = 'pregnancy' | 'miscarriage' | 'abortion' | 'stillborn';
+
 export type GenderIdentity = 'cisgender' | 'transgender';
 export type SexualOrientation = 'heterosexual' | 'homosexual' | 'bisexual';
 
@@ -48,6 +51,8 @@ export interface FamilyMember {
   isDraft?: boolean;
   /** Marks this member as an adoptive parent (visual label on draft card) */
   isAdoptiveParent?: boolean;
+  /** Perinatal type — overrides normal rendering with triangle-based symbols */
+  perinatalType?: PerinatalType;
 }
 
 export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed' | 'love_affair';
