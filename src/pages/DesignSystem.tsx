@@ -617,12 +617,11 @@ const DesignSystemPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Fausse couche — triangle + single X */}
+              {/* Fausse couche — triangle + X qui dépasse */}
               <div className="flex flex-col items-center gap-3">
-                <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
-                  <polygon points="36,8 66,64 6,64" stroke="currentColor" strokeWidth="2.5" fill="white" strokeLinejoin="miter" />
-                  <line x1="19" y1="24" x2="53" y2="56" stroke="currentColor" strokeWidth="2.5" />
-                  <line x1="53" y1="24" x2="19" y2="56" stroke="currentColor" strokeWidth="2.5" />
+                <svg width="72" height="72" viewBox="0 0 40 40" fill="none" className="text-foreground">
+                  <path d="M0.808594 39.5L20 1.11816L39.1914 39.5L0.808594 39.5Z" stroke="currentColor" />
+                  <path d="M2 39L39 1M38 39L1 1" stroke="currentColor" />
                 </svg>
                 <div className="text-center">
                   <span className="text-xs font-semibold text-foreground">Fausse couche</span>
