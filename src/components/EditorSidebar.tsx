@@ -117,13 +117,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-3">
             <div className="space-y-0.5">
-              {[...members].sort((a, b) => {
-                // Perinatal members go to the bottom
-                const aPeri = a.perinatalType ? 1 : 0;
-                const bPeri = b.perinatalType ? 1 : 0;
-                if (aPeri !== bPeri) return aPeri - bPeri;
-                return a.firstName.localeCompare(b.firstName, 'fr');
-              }).map(m => (
+              {[...members].sort((a, b) => a.firstName.localeCompare(b.firstName, 'fr')).map(m => (
                 <div
                   key={m.id}
                   className="flex items-center justify-between group py-1.5 text-sm text-foreground/80 hover:text-foreground transition-colors rounded-md hover:bg-accent/30 px-1.5 -mx-1.5"

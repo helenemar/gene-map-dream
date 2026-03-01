@@ -39,58 +39,43 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
     created_at: '2025-11-12T09:30:00Z', updated_at: '2026-02-28T14:22:00Z',
     data: {
       members: [
-        // Gen 0 — Arrière-grand-père paternel
-        { id: 'agp1', firstName: 'Marcel', lastName: 'Lefèvre', gender: 'male', x: -100, y: -660, birthYear: 1908, deathYear: 1944, age: 36, profession: 'Résistant', pathologies: [], notes: 'Mort en déportation. Secret de famille révélé tardivement (2005). Trauma transgénérationnel identifié.' },
-        // Gen 1 — Grands-parents paternels
-        { id: 'gp1', firstName: 'Henri', lastName: 'Lefèvre', gender: 'male', x: -300, y: -440, birthYear: 1935, deathYear: 2010, age: 75, profession: 'Ouvrier métallurgiste', pathologies: ['cardiovascular', 'diabetes'], notes: 'Infarctus du myocarde à 68 ans. Diabète de type 2 diagnostiqué à 55 ans. Alcoolisme chronique non traité.' },
-        { id: 'gp2', firstName: 'Madeleine', lastName: 'Roux', birthName: 'Roux', gender: 'female', x: -60, y: -440, birthYear: 1938, age: 88, profession: 'Couturière', pathologies: ['cancer'], notes: 'Cancer du sein à 72 ans (rémission). Deuil compliqué après décès du mari.' },
-        // Gen 1 — Grands-parents maternels
-        { id: 'gp3', firstName: 'Robert', lastName: 'Girard', gender: 'male', x: 400, y: -440, birthYear: 1940, deathYear: 2018, age: 78, profession: 'Instituteur', pathologies: ['addiction', 'depression'], notes: 'Dépression récurrente. Tentative de suicide en 1985. Alcoolodépendance sévère.' },
-        { id: 'gp4', firstName: 'Jeanne', lastName: 'Blanc', birthName: 'Blanc', gender: 'female', x: 640, y: -440, birthYear: 1942, age: 84, profession: 'Secrétaire médicale', isRetired: true, pathologies: ['neurodegeneration'], notes: 'Maladie d\'Alzheimer diagnostiquée en 2019. Placée en EHPAD en 2021.' },
-        // Gen 2 — Parents + oncles/tantes
-        { id: 'p4', firstName: 'Marc', lastName: 'Dupont', gender: 'male', x: -620, y: -220, birthYear: 1966, age: 60, profession: 'Chauffeur routier', pathologies: ['cardiovascular'], notes: 'Hypertension artérielle. Peu présent au domicile.' },
-        { id: 'p3', firstName: 'Sylvie', lastName: 'Dupont', birthName: 'Lefèvre', gender: 'female', x: -380, y: -220, birthYear: 1968, age: 58, profession: 'Assistante sociale', pathologies: ['psychogenic'], notes: 'Troubles somatoformes chroniques (lombalgies, migraines). Rôle de médiatrice familiale.' },
-        { id: 'p1', firstName: 'Philippe', lastName: 'Lefèvre', gender: 'male', x: -100, y: -220, birthYear: 1962, age: 64, profession: 'Comptable', isRetired: true, pathologies: ['addiction', 'depression'], notes: 'Alcoolisme actif 1990-2010, sevré depuis. Dépression réactionnelle post-divorce. Suivi psychiatrique.' },
-        { id: 'p2', firstName: 'Nathalie', lastName: 'Girard', birthName: 'Girard', gender: 'female', x: 140, y: -220, birthYear: 1965, age: 61, profession: 'Infirmière', pathologies: ['depression'], notes: 'Burnout professionnel en 2008. Épisode dépressif majeur 2015. Parentification dans famille d\'origine.' },
-        { id: 'p5', firstName: 'Alain', lastName: 'Girard', gender: 'male', x: 520, y: -220, birthYear: 1970, deathYear: 2022, age: 52, profession: 'Musicien', pathologies: ['bipolar', 'addiction'], notes: 'Trouble bipolaire type I. Polytoxicomanie. Décès par overdose — probable suicide. Figure d\'identification pour Julien.' },
-        // Gen 2 — Seconde compagne du père (same Y as parents)
-        { id: 'p6', firstName: 'Véronique', lastName: 'Morel', gender: 'female', x: -100, y: -120, birthYear: 1970, age: 56, profession: 'Pharmacienne', pathologies: [], notes: 'Relation avec Philippe depuis 2012. Bonne entente avec les enfants.' },
-        // Gen 3 — Patient + fratrie + cousins (y: 0)
-        { id: 'c5', firstName: 'Emma', lastName: 'Dupont', gender: 'female', x: -680, y: 0, birthYear: 1998, age: 28, profession: 'Étudiante en psychologie', pathologies: ['psychogenic'], notes: 'Crises d\'angoisse récurrentes. En thérapie.' },
-        { id: 'c4', firstName: 'Lucas', lastName: 'Dupont', gender: 'male', x: -460, y: 0, birthYear: 1995, age: 31, profession: 'Électricien', pathologies: [], notes: 'Adopté à l\'âge de 2 ans (origine Colombie). Recherche de ses origines en cours.' },
-        { id: 'c3', firstName: 'Clara', lastName: 'Lefèvre', gender: 'female', x: -240, y: 0, birthYear: 1993, age: 33, profession: 'Avocate', pathologies: ['psychogenic'], twinGroup: 'tw1', twinType: 'dizygotic', notes: 'Troubles alimentaires (anorexie) à l\'adolescence. Perfectionnisme. Coupure émotionnelle avec la famille.', sexualOrientation: 'homosexual' },
-        { id: 'c2', firstName: 'Camille', lastName: 'Lefèvre', gender: 'female', x: 0, y: 0, birthYear: 1993, age: 33, profession: 'Éducatrice spécialisée', pathologies: ['depression'], twinGroup: 'tw1', twinType: 'dizygotic', notes: 'Dépression post-partum en 2022. Relation conflictuelle avec sa jumelle Clara.' },
-        { id: 'c1', firstName: 'Julien', lastName: 'Lefèvre', gender: 'male', x: 240, y: 0, birthYear: 1990, age: 36, profession: 'Développeur web', pathologies: ['bipolar', 'addiction'], notes: 'Patient index. Trouble bipolaire type II diagnostiqué à 28 ans. Cannabis quotidien depuis l\'adolescence. Angoisse d\'abandon. Identification à l\'oncle Alain. Suivi psychothérapique en cours.', genderIdentity: 'cisgender', sexualOrientation: 'heterosexual' },
-        { id: 'c1w', firstName: 'Marie', lastName: 'Perret', gender: 'female', x: 480, y: 0, birthYear: 1992, age: 34, profession: 'Sage-femme', pathologies: [], notes: 'Grossesse actuelle (3e). Tensions conjugales liées aux épisodes maniaques de Julien.' },
-        { id: 'c6', firstName: '', lastName: '', gender: 'female', x: 160, y: 0, birthYear: 1996, age: 0, profession: '', pathologies: [], perinatalType: 'miscarriage', notes: 'Fausse couche au 5e mois. Deuil périnatal non élaboré par la mère.' },
-        // Gen 3 — Conjoint de Camille (same Y as Gen 3)
-        { id: 'c2h', firstName: 'Antoine', lastName: 'Fabre', gender: 'male', x: -230, y: 100, birthYear: 1991, age: 35, profession: 'Pompier', pathologies: [], notes: 'Peu impliqué dans la dynamique familiale élargie.' },
-        // Gen 4 — Enfants de Julien (y: 220)
-        { id: 'gc1', firstName: 'Théo', lastName: 'Lefèvre', gender: 'male', x: 280, y: 220, birthYear: 2020, age: 6, profession: '', pathologies: [], notes: 'Troubles du sommeil. Forte proximité avec la grand-mère Madeleine.' },
-        { id: 'gc2', firstName: 'Rose', lastName: 'Lefèvre', gender: 'female', x: 500, y: 220, birthYear: 2023, age: 3, profession: '', pathologies: [] },
-        { id: 'gc3', firstName: '', lastName: '', gender: 'female', x: 700, y: 220, birthYear: 2026, age: 0, profession: '', pathologies: [], perinatalType: 'pregnancy', notes: 'Grossesse en cours (7 mois). Source d\'anxiété pour les deux parents.' },
-        // Gen 4 — Enfant de Camille
-        { id: 'gc4', firstName: 'Léa', lastName: 'Fabre', gender: 'female', x: -120, y: 320, birthYear: 2022, age: 4, profession: '', pathologies: [] },
+        // Gen 0 — Grands-parents paternels
+        { id: 'gp1', firstName: 'Henri', lastName: 'Lefèvre', gender: 'male', x: -200, y: -400, birthYear: 1935, deathYear: 2010, age: 75, profession: '', pathologies: ['cardiovascular', 'diabetes'] },
+        { id: 'gp2', firstName: 'Madeleine', lastName: 'Roux', gender: 'female', x: 0, y: -400, birthYear: 1938, age: 88, profession: '', pathologies: ['cancer'] },
+        // Gen 0 — Grands-parents maternels
+        { id: 'gp3', firstName: 'Robert', lastName: 'Girard', gender: 'male', x: 400, y: -400, birthYear: 1940, deathYear: 2018, age: 78, profession: '', pathologies: ['addiction'] },
+        { id: 'gp4', firstName: 'Jeanne', lastName: 'Blanc', gender: 'female', x: 600, y: -400, birthYear: 1942, age: 84, profession: '', pathologies: ['neurodegeneration'] },
+        // Gen 1 — Parents + oncles/tantes
+        { id: 'p1', firstName: 'Philippe', lastName: 'Lefèvre', gender: 'male', x: -100, y: -200, birthYear: 1962, age: 64, profession: '', pathologies: ['addiction'] },
+        { id: 'p2', firstName: 'Nathalie', lastName: 'Girard', gender: 'female', x: 100, y: -200, birthYear: 1965, age: 61, profession: '', pathologies: ['depression'] },
+        { id: 'p3', firstName: 'Sylvie', lastName: 'Lefèvre', gender: 'female', x: -350, y: -200, birthYear: 1968, age: 58, profession: '', pathologies: [] },
+        { id: 'p4', firstName: 'Marc', lastName: 'Dupont', gender: 'male', x: -500, y: -200, birthYear: 1966, age: 60, profession: '', pathologies: ['cardiovascular'] },
+        { id: 'p5', firstName: 'Alain', lastName: 'Girard', gender: 'male', x: 500, y: -200, birthYear: 1970, deathYear: 2022, age: 52, profession: '', pathologies: ['bipolar'] },
+        // Gen 2 — Patient + fratrie + cousins
+        { id: 'c1', firstName: 'Julien', lastName: 'Lefèvre', gender: 'male', x: 0, y: 0, birthYear: 1990, age: 36, profession: '', pathologies: ['bipolar'] },
+        { id: 'c1w', firstName: 'Marie', lastName: 'Perret', gender: 'female', x: 200, y: 0, birthYear: 1992, age: 34, profession: '', pathologies: [] },
+        { id: 'c2', firstName: 'Camille', lastName: 'Lefèvre', gender: 'female', x: -100, y: 0, birthYear: 1993, age: 33, profession: '', pathologies: ['depression'], twinGroup: 'tw1', twinType: 'dizygotic' },
+        { id: 'c3', firstName: 'Clara', lastName: 'Lefèvre', gender: 'female', x: -250, y: 0, birthYear: 1993, age: 33, profession: '', pathologies: ['psychogenic'], twinGroup: 'tw1', twinType: 'dizygotic' },
+        { id: 'c4', firstName: 'Lucas', lastName: 'Dupont', gender: 'male', x: -450, y: 0, birthYear: 1995, age: 31, profession: '', pathologies: [] },
+        { id: 'c5', firstName: 'Emma', lastName: 'Dupont', gender: 'female', x: -600, y: 0, birthYear: 1998, age: 28, profession: '', pathologies: ['psychogenic'] },
+        // Gen 2 — Fausse couche
+        { id: 'c6', firstName: 'FC', lastName: '', gender: 'female', x: 350, y: 0, birthYear: 1996, age: 0, profession: '', pathologies: [], perinatalType: 'miscarriage' },
+        // Gen 3 — Petits-enfants
+        { id: 'gc1', firstName: 'Théo', lastName: 'Lefèvre', gender: 'male', x: 50, y: 200, birthYear: 2020, age: 6, profession: '', pathologies: [] },
+        { id: 'gc2', firstName: 'Rose', lastName: 'Lefèvre', gender: 'female', x: 200, y: 200, birthYear: 2023, age: 3, profession: '', pathologies: [] },
+        { id: 'gc3', firstName: '', lastName: '', gender: 'female', x: 350, y: 200, birthYear: 2026, age: 0, profession: '', pathologies: [], perinatalType: 'pregnancy' },
       ],
       unions: [
-        { id: 'u1', partner1: 'gp1', partner2: 'gp2', status: 'widowed', children: ['p1', 'p3'], marriageYear: 1960, notes: 'Couple stable. Henri décédé en 2010.' },
-        { id: 'u2', partner1: 'gp3', partner2: 'gp4', status: 'married', children: ['p2', 'p5'], marriageYear: 1963, notes: 'Relation marquée par l\'alcoolisme de Robert et la codépendance de Jeanne.' },
-        { id: 'u3', partner1: 'p1', partner2: 'p2', status: 'divorced', children: ['c1', 'c2', 'c3', 'c6'], marriageYear: 1988, divorceYear: 2010, notes: 'Divorce conflictuel. Garde alternée mal vécue par les enfants.' },
-        { id: 'u4', partner1: 'p1', partner2: 'p6', status: 'common_law', children: [], notes: 'Union libre depuis 2012. Stabilisatrice pour Philippe.' },
-        { id: 'u5', partner1: 'p4', partner2: 'p3', status: 'married', children: ['c4', 'c5'], marriageYear: 1993, isAdoption: true, notes: 'Lucas adopté en 1997. Emma biologique.' },
-        { id: 'u6', partner1: 'c1', partner2: 'c1w', status: 'married', children: ['gc1', 'gc2', 'gc3'], marriageYear: 2018, notes: 'Tensions liées à la maladie de Julien. Thérapie de couple en cours.' },
-        { id: 'u7', partner1: 'c2', partner2: 'c2h', status: 'married', children: ['gc4'], marriageYear: 2020 },
+        { partner1: 'gp1', partner2: 'gp2', status: 'widowed', children: ['p1', 'p3'] },
+        { partner1: 'gp3', partner2: 'gp4', status: 'married', children: ['p2', 'p5'] },
+        { partner1: 'p1', partner2: 'p2', status: 'divorced', children: ['c1', 'c2', 'c3', 'c6'] },
+        { partner1: 'p4', partner2: 'p3', status: 'married', children: ['c4', 'c5'] },
+        { partner1: 'c1', partner2: 'c1w', status: 'married', children: ['gc1', 'gc2', 'gc3'] },
       ],
       emotionalLinks: [
         { id: 'e1', from: 'p1', to: 'c1', type: 'fusional' },
         { id: 'e2', from: 'c2', to: 'c3', type: 'conflictual' },
         { id: 'e3', from: 'gp2', to: 'gc1', type: 'fusional' },
-        { id: 'e4', from: 'p1', to: 'p2', type: 'conflictual' },
-        { id: 'e5', from: 'c3', to: 'p2', type: 'cutoff' },
-        { id: 'e6', from: 'c1', to: 'p5', type: 'fusional' },
-        { id: 'e7', from: 'gp3', to: 'p5', type: 'ambivalent' },
-        { id: 'e8', from: 'p3', to: 'p1', type: 'controlling' },
-        { id: 'e9', from: 'gp3', to: 'p2', type: 'violence' },
       ],
     },
   },
@@ -103,7 +88,7 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'a2', firstName: 'Marc', lastName: 'Dupont', gender: 'male', x: 200, y: 0, birthYear: 1983, age: 43, profession: '', pathologies: [] },
         { id: 'a3', firstName: 'Clara', lastName: 'Dupont', gender: 'female', x: 100, y: 200, birthYear: 2012, age: 14, profession: '', pathologies: [] },
       ],
-      unions: [{ id: 'ua1', partner1: 'a2', partner2: 'a1' }],
+      unions: [{ partner1: 'a2', partner2: 'a1' }],
     },
   },
   {
@@ -119,8 +104,8 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'b6', firstName: 'Emma', lastName: 'Martin', gender: 'female', x: 200, y: 200, birthYear: 2008, age: 18, profession: '', pathologies: ['psychogenic'] },
       ],
       unions: [
-        { id: 'ub1', partner1: 'b3', partner2: 'b4' },
-        { id: 'ub2', partner1: 'b1', partner2: 'b2' },
+        { partner1: 'b3', partner2: 'b4' },
+        { partner1: 'b1', partner2: 'b2' },
       ],
     },
   },
@@ -133,7 +118,7 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'c2', firstName: 'Antoine', lastName: 'Bernard', gender: 'male', x: -150, y: -200, birthYear: 1965, age: 61, profession: '', pathologies: ['diabetes'] },
         { id: 'c3', firstName: 'Françoise', lastName: 'Morel', gender: 'female', x: 150, y: -200, birthYear: 1968, age: 58, profession: '', pathologies: [] },
       ],
-      unions: [{ id: 'uc1', partner1: 'c2', partner2: 'c3' }],
+      unions: [{ partner1: 'c2', partner2: 'c3' }],
     },
   },
   {
@@ -147,7 +132,7 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'd3', firstName: 'Hugo', lastName: 'Petit', gender: 'male', x: 0, y: 200, birthYear: 2018, age: 8, profession: '', pathologies: [] },
         { id: 'd4', firstName: 'Chloé', lastName: 'Petit', gender: 'female', x: 200, y: 200, birthYear: 2021, age: 5, profession: '', pathologies: [] },
       ],
-      unions: [{ id: 'ud1', partner1: 'd1', partner2: 'd2' }],
+      unions: [{ partner1: 'd1', partner2: 'd2' }],
     },
   },
   {
@@ -162,8 +147,8 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'e4', firstName: 'Monique', lastName: 'Faure', gender: 'female', x: 100, y: -200, birthYear: 1961, age: 65, profession: '', pathologies: [] },
       ],
       unions: [
-        { id: 'ue1', partner1: 'e3', partner2: 'e4' },
-        { id: 'ue2', partner1: 'e2', partner2: 'e1' },
+        { partner1: 'e3', partner2: 'e4' },
+        { partner1: 'e2', partner2: 'e1' },
       ],
     },
   },
@@ -177,7 +162,7 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'f2', firstName: 'Claire', lastName: 'Rousseau', gender: 'female', x: 200, y: 0, birthYear: 1984, age: 42, profession: '', pathologies: ['cancer'] },
         { id: 'f3', firstName: 'Lina', lastName: 'Rousseau', gender: 'female', x: 100, y: 200, birthYear: 2010, age: 16, profession: '', pathologies: [] },
       ],
-      unions: [{ id: 'uf1', partner1: 'f1', partner2: 'f2' }],
+      unions: [{ partner1: 'f1', partner2: 'f2' }],
     },
   },
 ];
@@ -209,19 +194,19 @@ const Dashboard: React.FC = () => {
     enabled: !!user,
   });
 
-  const genograms = useMemo(() => [...(realGenograms || []), ...MOCK_GENOGRAMS], [realGenograms]);
+  const genograms = [...(realGenograms || []), ...MOCK_GENOGRAMS];
 
   // Fake note data for mock genograms
-  const MOCK_NOTE_COUNTS: Record<string, number> = useMemo(() => ({
+  const MOCK_NOTE_COUNTS: Record<string, number> = {
     'mock-1': 3, 'mock-3': 5, 'mock-5': 1, 'mock-6': 2, 'mock-7': 4,
-  }), []);
-  const MOCK_LATEST_NOTE_DATES: Record<string, string> = useMemo(() => ({
-    'mock-1': '2026-03-01T10:00:00Z',
-    'mock-3': '2026-02-28T18:00:00Z',
-    'mock-5': '2025-12-21T09:00:00Z',
-    'mock-6': '2026-02-21T07:00:00Z',
-    'mock-7': '2025-11-01T10:00:00Z',
-  }), []);
+  };
+  const MOCK_LATEST_NOTE_DATES: Record<string, string> = {
+    'mock-1': '2026-03-01T10:00:00Z', // newer than updated_at → pulsing
+    'mock-3': '2026-02-28T18:00:00Z', // newer than updated_at → pulsing
+    'mock-5': '2025-12-21T09:00:00Z', // newer → pulsing
+    'mock-6': '2026-02-21T07:00:00Z', // newer → pulsing
+    'mock-7': '2025-11-01T10:00:00Z', // older than updated_at → no pulse
+  };
 
   // Fetch note counts and latest note dates for all genograms
   useEffect(() => {
@@ -249,7 +234,7 @@ const Dashboard: React.FC = () => {
         setNoteCounts(counts);
         setLatestNoteDates(latest);
       });
-  }, [genograms, MOCK_NOTE_COUNTS, MOCK_LATEST_NOTE_DATES]);
+  }, [genograms]);
 
   const filteredFiles = useMemo(() => {
     if (!genograms) return [];
@@ -418,7 +403,7 @@ const Dashboard: React.FC = () => {
                   {filteredFiles.map((file) => (
                     <TableRow
                       key={file.id}
-                      onClick={() => navigate(`/editor/${file.id}`, file.id.startsWith('mock-') ? { state: { mockData: file } } : undefined)}
+                      onClick={() => navigate(`/editor/${file.id}`)}
                       className="cursor-pointer group h-[60px]"
                     >
                       <TableCell className="pl-6">
@@ -489,7 +474,7 @@ const Dashboard: React.FC = () => {
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-40">
-                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/editor/${file.id}`, file.id.startsWith('mock-') ? { state: { mockData: file } } : undefined); }}>
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/editor/${file.id}`); }}>
                                 Ouvrir
                               </DropdownMenuItem>
                               <DropdownMenuItem

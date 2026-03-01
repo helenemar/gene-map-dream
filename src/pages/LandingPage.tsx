@@ -5,7 +5,8 @@ import AuthModal from '@/components/AuthModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import gogyIcon from '@/assets/genogy-icon.svg';
-import heroMockup from '@/assets/hero-mockup-new.png';
+import heroEditor from '@/assets/hero-editor.png';
+import heroDashboard from '@/assets/hero-dashboard.png';
 import aboutIllustration from '@/assets/about-illustration.png';
 import abstract160 from '@/assets/abstract-160.svg';
 import abstract122 from '@/assets/abstract-122.svg';
@@ -160,20 +161,51 @@ const LandingPage: React.FC = () => {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="relative lg:-mr-8 flex items-center justify-center"
+              className="relative lg:-mr-8"
+              style={{ perspective: '1400px' }}
             >
-              <div className="relative">
-                <img
-                  src={heroMockup}
-                  alt="Aperçu du dashboard et de l'éditeur de génogrammes Genogy"
-                  className="w-full h-auto block relative z-10"
-                  loading="eager"
-                />
-                {/* Shadow layer for 3D depth */}
+              <div
+                className="relative"
+                style={{
+                  transform: 'rotateY(-10deg) rotateX(3deg)',
+                  transformStyle: 'preserve-3d',
+                }}
+              >
+                {/* Back layer – Dashboard */}
                 <div
-                  className="absolute inset-0 -z-10 translate-x-4 translate-y-6 rounded-3xl blur-2xl opacity-20 bg-foreground"
-                />
+                  className="absolute top-6 left-12 w-[92%] rounded-xl overflow-hidden"
+                  style={{
+                    boxShadow: '0 20px 50px -12px hsl(var(--foreground) / 0.08), 0 8px 20px -8px hsl(var(--foreground) / 0.05)',
+                    transform: 'translateZ(-30px)',
+                  }}
+                >
+                  <img
+                    src={heroDashboard}
+                    alt="Dashboard Genogy"
+                    className="w-full h-auto block"
+                    loading="eager"
+                  />
+                </div>
+
+                {/* Front layer – Editor */}
+                <div
+                  className="relative z-10 rounded-xl overflow-hidden"
+                  style={{
+                    boxShadow: '0 30px 80px -20px hsl(var(--foreground) / 0.15), 0 12px 30px -10px hsl(var(--foreground) / 0.08)',
+                    transform: 'translateZ(20px)',
+                  }}
+                >
+                  <img
+                    src={heroEditor}
+                    alt="Éditeur de génogrammes Genogy – vue complexe multi-générationnelle"
+                    className="w-full h-auto block"
+                    loading="eager"
+                  />
+                </div>
               </div>
+
+              {/* Decorative glow */}
+              <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[130%] bg-primary/5 rounded-full blur-3xl" />
             </motion.div>
           </div>
         </div>
