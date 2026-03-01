@@ -645,19 +645,12 @@ const DesignSystemPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Mort-né Homme — petit carré + X clippé */}
+              {/* Mort-né Homme — petit carré + X qui dépasse */}
               <div className="flex flex-col items-center gap-3">
                 <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
-                  <defs>
-                    <clipPath id="clip-sq-still">
-                      <rect x="18" y="18" width="36" height="36" />
-                    </clipPath>
-                  </defs>
-                  <rect x="18" y="18" width="36" height="36" stroke="currentColor" strokeWidth="2.5" fill="white" />
-                  <g clipPath="url(#clip-sq-still)">
-                    <line x1="18" y1="18" x2="54" y2="54" stroke="currentColor" strokeWidth="2.5" />
-                    <line x1="54" y1="18" x2="18" y2="54" stroke="currentColor" strokeWidth="2.5" />
-                  </g>
+                  <rect x="20" y="20" width="32" height="32" stroke="currentColor" strokeWidth="2.5" fill="white" />
+                  <line x1="14" y1="14" x2="58" y2="58" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="58" y1="14" x2="14" y2="58" stroke="currentColor" strokeWidth="2.5" />
                 </svg>
                 <div className="text-center">
                   <span className="text-xs font-semibold text-foreground">Mort-né (H)</span>
@@ -665,19 +658,12 @@ const DesignSystemPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Mort-né Femme — cercle + X clippé */}
+              {/* Mort-né Femme — petit cercle + X qui dépasse */}
               <div className="flex flex-col items-center gap-3">
                 <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
-                  <defs>
-                    <clipPath id="clip-circ-still">
-                      <circle cx="36" cy="36" r="20" />
-                    </clipPath>
-                  </defs>
-                  <circle cx="36" cy="36" r="20" stroke="currentColor" strokeWidth="2.5" fill="white" />
-                  <g clipPath="url(#clip-circ-still)">
-                    <line x1="22" y1="22" x2="50" y2="50" stroke="currentColor" strokeWidth="2.5" />
-                    <line x1="50" y1="22" x2="22" y2="50" stroke="currentColor" strokeWidth="2.5" />
-                  </g>
+                  <circle cx="36" cy="36" r="16" stroke="currentColor" strokeWidth="2.5" fill="white" />
+                  <line x1="14" y1="14" x2="58" y2="58" stroke="currentColor" strokeWidth="2.5" />
+                  <line x1="58" y1="14" x2="14" y2="58" stroke="currentColor" strokeWidth="2.5" />
                 </svg>
                 <div className="text-center">
                   <span className="text-xs font-semibold text-foreground">Mort-né (F)</span>
