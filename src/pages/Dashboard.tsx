@@ -403,7 +403,7 @@ const Dashboard: React.FC = () => {
                   {filteredFiles.map((file) => (
                     <TableRow
                       key={file.id}
-                      onClick={() => navigate(`/editor/${file.id}`)}
+                      onClick={() => navigate(`/editor/${file.id}`, file.id.startsWith('mock-') ? { state: { mockData: file } } : undefined)}
                       className="cursor-pointer group h-[60px]"
                     >
                       <TableCell className="pl-6">
@@ -474,7 +474,7 @@ const Dashboard: React.FC = () => {
                               </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-40">
-                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/editor/${file.id}`); }}>
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/editor/${file.id}`, file.id.startsWith('mock-') ? { state: { mockData: file } } : undefined); }}>
                                 Ouvrir
                               </DropdownMenuItem>
                               <DropdownMenuItem

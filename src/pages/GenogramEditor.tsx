@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import DossierNotesModal, { useGenogramNoteCount } from '@/components/DossierNotesModal';
 import EditorHeader from '@/components/EditorHeader';
 import EditorSidebar from '@/components/EditorSidebar';
@@ -176,6 +176,7 @@ const GenogramEditor: React.FC = () => {
   const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const canvasRef = useRef<HTMLDivElement>(null);
 
   // ─── Notes du dossier ───
@@ -188,6 +189,38 @@ const GenogramEditor: React.FC = () => {
   // ─── Load genogram from DB ───
   useEffect(() => {
     if (!genogramId || !user) return;
+
+    // Handle mock genograms passed via navigation state
+    const mockData = (location.state as any)?.mockData;
+    if (mockData && genogramId.startsWith('mock-')) {
+      setFileName(mockData.name);
+      const gData = mockData.data as any;
+      const rawMembers: FamilyMember[] = gData?.members || [];
+      const seen = new Set<string>();
+      const loadedMembers = rawMembers.filter(m => {
+        if (seen.has(m.id)) return false;
+        seen.add(m.id);
+        return true;
+      });
+      if (loadedMembers.length > 0) setMembers(loadedMembers);
+      if (gData?.unions) setUnions(gData.unions);
+      if (gData?.emotionalLinks) setEmotionalLinks(gData.emotionalLinks);
+      setDbLoaded(true);
+      if (loadedMembers.length > 0) {
+        requestAnimationFrame(() => {
+          const canvas = canvasRef.current;
+          if (!canvas) return;
+          const rect = canvas.getBoundingClientRect();
+          const m = loadedMembers[0];
+          setPan({
+            x: rect.width / 2 - (m.x + CARD_W / 2),
+            y: rect.height / 2 - (m.y + CARD_H / 2),
+          });
+        });
+      }
+      return;
+    }
+
     const load = async () => {
       const { data, error } = await supabase
         .from('genograms')
@@ -202,7 +235,6 @@ const GenogramEditor: React.FC = () => {
       }
       setFileName(data.name);
       const gData = data.data as any;
-      // Deduplicate members by ID (guard against data corruption)
       const rawMembers: FamilyMember[] = gData?.members || [];
       const seen = new Set<string>();
       const loadedMembers = rawMembers.filter(m => {
