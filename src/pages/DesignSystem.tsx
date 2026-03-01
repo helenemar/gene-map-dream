@@ -630,14 +630,12 @@ const DesignSystemPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Avortement — triangle + double X */}
+              {/* Avortement — triangle + X qui dépasse + ligne horizontale */}
               <div className="flex flex-col items-center gap-3">
-                <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
-                  <polygon points="36,8 66,64 6,64" stroke="currentColor" strokeWidth="2.5" fill="white" strokeLinejoin="miter" />
-                  <line x1="17" y1="22" x2="51" y2="56" stroke="currentColor" strokeWidth="2.5" />
-                  <line x1="55" y1="22" x2="21" y2="56" stroke="currentColor" strokeWidth="2.5" />
-                  <line x1="23" y1="16" x2="57" y2="50" stroke="currentColor" strokeWidth="2.5" />
-                  <line x1="49" y1="16" x2="15" y2="50" stroke="currentColor" strokeWidth="2.5" />
+                <svg width="72" height="72" viewBox="0 0 40 40" fill="none" className="text-foreground">
+                  <path d="M0.808594 39.5L20 1.11816L39.1914 39.5L0.808594 39.5Z" stroke="currentColor" />
+                  <path d="M2 39L39 1M38 39L1 1" stroke="currentColor" />
+                  <path d="M1.01001 19.99L39.01 19.99" stroke="currentColor" />
                 </svg>
                 <div className="text-center">
                   <span className="text-xs font-semibold text-foreground">Avortement</span>
