@@ -109,7 +109,7 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
   },
   {
     id: 'mock-6', name: 'Garnier – Émilie', user_id: 'mock-other-1',
-    created_at: '2026-01-18T13:00:00Z', updated_at: '2026-02-20T08:30:00Z',
+    created_at: '2026-01-18T13:00:00Z', updated_at: '2026-02-28T18:00:00Z',
     _mockCreator: { name: 'Léonie Nguyen', initials: 'LN', color: 'hsl(160 55% 42%)' },
     data: {
       members: [
