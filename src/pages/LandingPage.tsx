@@ -115,13 +115,12 @@ const LandingPage: React.FC = () => {
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative overflow-hidden">
         <div className="max-w-[1440px] mx-auto px-12 lg:px-24 pt-14 pb-20 lg:pt-16 lg:pb-24">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:gap-8">
+          <div className="grid lg:grid-cols-2 gap-10 items-center">
             {/* Left – copy */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="flex-shrink-0 lg:w-[40%]"
             >
               <img src={gogyIcon} alt="" className="w-[64px] h-[64px] mb-6" />
 
@@ -160,12 +159,12 @@ const LandingPage: React.FC = () => {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="hidden lg:flex lg:flex-1 lg:justify-end lg:-mr-24 lg:items-center"
+              className="hidden lg:block"
             >
               <img
                 src={heroComposition}
                 alt="Captures d'écran du Dashboard et de l'Éditeur de génogrammes Genogy"
-                className="w-[130%] max-w-none h-auto block"
+                className="w-full h-auto"
                 style={{
                   filter: 'drop-shadow(0 20px 40px hsl(var(--foreground) / 0.08)) drop-shadow(0 8px 16px hsl(var(--foreground) / 0.04))',
                 }}
