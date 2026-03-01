@@ -87,7 +87,7 @@ const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[#FFFFF5] text-foreground">
       <Helmet>
         <title>Genogy — Créez vos génogrammes professionnels en ligne</title>
         <meta name="description" content="Genogy est l'outil en ligne le plus simple pour créer des génogrammes professionnels. Cartographiez les relations familiales et émotionnelles de vos patients en quelques clics." />
