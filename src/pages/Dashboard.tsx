@@ -194,19 +194,19 @@ const Dashboard: React.FC = () => {
     enabled: !!user,
   });
 
-  const genograms = [...(realGenograms || []), ...MOCK_GENOGRAMS];
+  const genograms = useMemo(() => [...(realGenograms || []), ...MOCK_GENOGRAMS], [realGenograms]);
 
   // Fake note data for mock genograms
-  const MOCK_NOTE_COUNTS: Record<string, number> = {
+  const MOCK_NOTE_COUNTS: Record<string, number> = useMemo(() => ({
     'mock-1': 3, 'mock-3': 5, 'mock-5': 1, 'mock-6': 2, 'mock-7': 4,
-  };
-  const MOCK_LATEST_NOTE_DATES: Record<string, string> = {
-    'mock-1': '2026-03-01T10:00:00Z', // newer than updated_at → pulsing
-    'mock-3': '2026-02-28T18:00:00Z', // newer than updated_at → pulsing
-    'mock-5': '2025-12-21T09:00:00Z', // newer → pulsing
-    'mock-6': '2026-02-21T07:00:00Z', // newer → pulsing
-    'mock-7': '2025-11-01T10:00:00Z', // older than updated_at → no pulse
-  };
+  }), []);
+  const MOCK_LATEST_NOTE_DATES: Record<string, string> = useMemo(() => ({
+    'mock-1': '2026-03-01T10:00:00Z',
+    'mock-3': '2026-02-28T18:00:00Z',
+    'mock-5': '2025-12-21T09:00:00Z',
+    'mock-6': '2026-02-21T07:00:00Z',
+    'mock-7': '2025-11-01T10:00:00Z',
+  }), []);
 
   // Fetch note counts and latest note dates for all genograms
   useEffect(() => {
@@ -234,7 +234,7 @@ const Dashboard: React.FC = () => {
         setNoteCounts(counts);
         setLatestNoteDates(latest);
       });
-  }, [genograms]);
+  }, [genograms, MOCK_NOTE_COUNTS, MOCK_LATEST_NOTE_DATES]);
 
   const filteredFiles = useMemo(() => {
     if (!genograms) return [];
