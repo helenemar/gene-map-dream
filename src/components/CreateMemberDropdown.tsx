@@ -51,11 +51,18 @@ const BASE_OPTIONS: RelOptionDef[] = [
   { id: 'spouse_widowed', label: 'Veuf(ve)', icon: <X className="w-4 h-4" /> },
 ];
 
+// Inline SVG perinatal icons matching clinical symbology
+const PerinatalSvg = ({ children }: { children: React.ReactNode }) => (
+  <svg width="16" height="16" viewBox="-4 -4 48 48" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4">
+    {children}
+  </svg>
+);
+
 const PERINATAL_OPTIONS: RelOptionDef[] = [
-  { id: 'perinatal_pregnancy', label: 'Grossesse', icon: <Triangle className="w-4 h-4" /> },
-  { id: 'perinatal_miscarriage', label: 'Fausse couche', icon: <Triangle className="w-4 h-4" /> },
-  { id: 'perinatal_abortion', label: 'Avortement', icon: <Triangle className="w-4 h-4" /> },
-  { id: 'perinatal_stillborn', label: 'Mort-né', icon: <X className="w-4 h-4" /> },
+  { id: 'perinatal_pregnancy', label: 'Grossesse', icon: <PerinatalSvg><polygon points="20,0 40,40 0,40" fill="white" strokeLinejoin="miter" /></PerinatalSvg> },
+  { id: 'perinatal_miscarriage', label: 'Fausse couche', icon: <PerinatalSvg><polygon points="20,0 40,40 0,40" fill="white" strokeLinejoin="miter" /><line x1="-2" y1="42" x2="42" y2="-2" /><line x1="42" y1="42" x2="-2" y2="-2" /></PerinatalSvg> },
+  { id: 'perinatal_abortion', label: 'Avortement', icon: <PerinatalSvg><polygon points="20,0 40,40 0,40" fill="white" strokeLinejoin="miter" /><line x1="-2" y1="42" x2="42" y2="-2" /><line x1="42" y1="42" x2="-2" y2="-2" /><line x1="-2" y1="20" x2="42" y2="20" /></PerinatalSvg> },
+  { id: 'perinatal_stillborn', label: 'Mort-né', icon: <PerinatalSvg><rect x="6" y="6" width="28" height="28" fill="white" /><line x1="-2" y1="-2" x2="42" y2="42" /><line x1="42" y1="-2" x2="-2" y2="42" /></PerinatalSvg> },
 ];
 
 const PARENT_SUB_OPTIONS: RelOptionDef[] = [
