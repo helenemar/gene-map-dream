@@ -114,13 +114,14 @@ const LandingPage: React.FC = () => {
 
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-10 lg:px-20 pt-10 pb-16 lg:pt-12 lg:pb-20">
-          <div className="grid lg:grid-cols-[1fr_1.3fr] gap-10 lg:gap-14 items-center">
+        <div className="max-w-[1400px] mx-auto px-10 lg:px-20 pt-10 pb-16 lg:pt-12 lg:pb-20 relative">
+          <div className="relative">
             {/* Left – copy */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
+              className="relative z-10 max-w-[540px]"
             >
               {/* Large logo */}
               <img src={gogyIcon} alt="" className="w-16 h-16 mb-6" />
@@ -155,12 +156,12 @@ const LandingPage: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Right – Mockup Composition */}
+            {/* Right – Mockup Composition (absolute) */}
             <motion.div
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="relative lg:-mr-16"
+              className="hidden lg:block absolute top-1/2 -translate-y-1/2 right-0 w-[55%] -mr-16"
             >
               <img
                 src={heroComposition}
