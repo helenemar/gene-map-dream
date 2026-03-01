@@ -133,7 +133,7 @@ const Dashboard: React.FC = () => {
     enabled: !!user,
   });
 
-  const genograms = realGenograms && realGenograms.length > 0 ? realGenograms : MOCK_GENOGRAMS;
+  const genograms = [...(realGenograms || []), ...MOCK_GENOGRAMS];
 
   // Fetch note counts and latest note dates for all genograms
   useEffect(() => {
