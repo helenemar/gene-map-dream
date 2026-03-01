@@ -39,45 +39,38 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
     created_at: '2025-11-12T09:30:00Z', updated_at: '2026-02-28T14:22:00Z',
     data: {
       members: [
-        // Gen 0 — Grands-parents paternels
-        { id: 'gp1', firstName: 'Henri', lastName: 'Lefèvre', gender: 'male', x: -200, y: -400, birthYear: 1935, deathYear: 2010, age: 75, profession: 'Ouvrier métallurgiste', pathologies: ['cardiovascular', 'diabetes'], notes: 'Infarctus du myocarde à 68 ans. Diabète de type 2 diagnostiqué à 55 ans. Alcoolisme chronique non traité.' },
-        { id: 'gp2', firstName: 'Madeleine', lastName: 'Roux', birthName: 'Roux', gender: 'female', x: 0, y: -400, birthYear: 1938, age: 88, profession: 'Couturière', pathologies: ['cancer'], notes: 'Cancer du sein à 72 ans (rémission). Deuil compliqué après décès du mari.' },
-        // Gen 0 — Grands-parents maternels
-        { id: 'gp3', firstName: 'Robert', lastName: 'Girard', gender: 'male', x: 400, y: -400, birthYear: 1940, deathYear: 2018, age: 78, profession: 'Instituteur', pathologies: ['addiction', 'depression'], notes: 'Dépression récurrente. Tentative de suicide en 1985. Alcoolodépendance sévère.' },
-        { id: 'gp4', firstName: 'Jeanne', lastName: 'Blanc', birthName: 'Blanc', gender: 'female', x: 600, y: -400, birthYear: 1942, age: 84, profession: 'Secrétaire médicale', isRetired: true, pathologies: ['neurodegeneration'], notes: 'Maladie d\'Alzheimer diagnostiquée en 2019. Placée en EHPAD en 2021.' },
-        // Gen 0 — Arrière-grand-père paternel (figure significative)
-        { id: 'agp1', firstName: 'Marcel', lastName: 'Lefèvre', gender: 'male', x: -100, y: -600, birthYear: 1908, deathYear: 1944, age: 36, profession: 'Résistant', pathologies: [], notes: 'Mort en déportation. Secret de famille révélé tardivement (2005). Trauma transgénérationnel identifié.' },
-        // Gen 1 — Parents
-        { id: 'p1', firstName: 'Philippe', lastName: 'Lefèvre', gender: 'male', x: -100, y: -200, birthYear: 1962, age: 64, profession: 'Comptable', isRetired: true, pathologies: ['addiction', 'depression'], notes: 'Alcoolisme actif 1990-2010, sevré depuis. Dépression réactionnelle post-divorce. Suivi psychiatrique.' },
-        { id: 'p2', firstName: 'Nathalie', lastName: 'Girard', birthName: 'Girard', gender: 'female', x: 100, y: -200, birthYear: 1965, age: 61, profession: 'Infirmière', pathologies: ['depression'], notes: 'Burnout professionnel en 2008. Épisode dépressif majeur 2015. Parentification dans famille d\'origine.' },
-        // Gen 1 — Tante paternelle + conjoint
-        { id: 'p3', firstName: 'Sylvie', lastName: 'Dupont', birthName: 'Lefèvre', gender: 'female', x: -350, y: -200, birthYear: 1968, age: 58, profession: 'Assistante sociale', pathologies: ['psychogenic'], notes: 'Troubles somatoformes chroniques (lombalgies, migraines). Rôle de médiatrice familiale.' },
-        { id: 'p4', firstName: 'Marc', lastName: 'Dupont', gender: 'male', x: -500, y: -200, birthYear: 1966, age: 60, profession: 'Chauffeur routier', pathologies: ['cardiovascular'], notes: 'Hypertension artérielle. Peu présent au domicile.' },
-        // Gen 1 — Oncle maternel (décédé)
-        { id: 'p5', firstName: 'Alain', lastName: 'Girard', gender: 'male', x: 500, y: -200, birthYear: 1970, deathYear: 2022, age: 52, profession: 'Musicien', pathologies: ['bipolar', 'addiction'], notes: 'Trouble bipolaire type I. Polytoxicomanie. Décès par overdose — probable suicide. Figure d\'identification pour Julien.' },
-        // Gen 1 — Seconde compagne du père
-        { id: 'p6', firstName: 'Véronique', lastName: 'Morel', gender: 'female', x: -100, y: -100, birthYear: 1970, age: 56, profession: 'Pharmacienne', pathologies: [], notes: 'Relation avec Philippe depuis 2012. Bonne entente avec les enfants.' },
-        // Gen 2 — Patient index
-        { id: 'c1', firstName: 'Julien', lastName: 'Lefèvre', gender: 'male', x: 0, y: 0, birthYear: 1990, age: 36, profession: 'Développeur web', pathologies: ['bipolar', 'addiction'], notes: 'Patient index. Trouble bipolaire type II diagnostiqué à 28 ans. Cannabis quotidien depuis l\'adolescence. Angoisse d\'abandon. Identification à l\'oncle Alain. Suivi psychothérapique en cours.', genderIdentity: 'cisgender', sexualOrientation: 'heterosexual' },
-        // Gen 2 — Conjointe de Julien
-        { id: 'c1w', firstName: 'Marie', lastName: 'Perret', gender: 'female', x: 200, y: 0, birthYear: 1992, age: 34, profession: 'Sage-femme', pathologies: [], notes: 'Grossesse actuelle (3e). Tensions conjugales liées aux épisodes maniaques de Julien.' },
-        // Gen 2 — Jumelles
-        { id: 'c2', firstName: 'Camille', lastName: 'Lefèvre', gender: 'female', x: -100, y: 0, birthYear: 1993, age: 33, profession: 'Éducatrice spécialisée', pathologies: ['depression'], twinGroup: 'tw1', twinType: 'dizygotic', notes: 'Dépression post-partum en 2022. Relation conflictuelle avec sa jumelle Clara.' },
-        { id: 'c3', firstName: 'Clara', lastName: 'Lefèvre', gender: 'female', x: -250, y: 0, birthYear: 1993, age: 33, profession: 'Avocate', pathologies: ['psychogenic'], twinGroup: 'tw1', twinType: 'dizygotic', notes: 'Troubles alimentaires (anorexie) à l\'adolescence. Perfectionnisme. Coupure émotionnelle avec la famille.', sexualOrientation: 'homosexual' },
-        // Gen 2 — Cousins
-        { id: 'c4', firstName: 'Lucas', lastName: 'Dupont', gender: 'male', x: -450, y: 0, birthYear: 1995, age: 31, profession: 'Électricien', pathologies: [], notes: 'Adopté à l\'âge de 2 ans (origine Colombie). Recherche de ses origines en cours.' },
-        { id: 'c5', firstName: 'Emma', lastName: 'Dupont', gender: 'female', x: -600, y: 0, birthYear: 1998, age: 28, profession: 'Étudiante en psychologie', pathologies: ['psychogenic'], notes: 'Crises d\'angoisse récurrentes. En thérapie.' },
-        // Gen 2 — Fausse couche (entre Julien et Camille)
-        { id: 'c6', firstName: '', lastName: '', gender: 'female', x: 350, y: 0, birthYear: 1996, age: 0, profession: '', pathologies: [], perinatalType: 'miscarriage', notes: 'Fausse couche au 5e mois. Deuil périnatal non élaboré par la mère.' },
-        // Gen 3 — Enfants de Julien
-        { id: 'gc1', firstName: 'Théo', lastName: 'Lefèvre', gender: 'male', x: 50, y: 200, birthYear: 2020, age: 6, profession: '', pathologies: [], notes: 'Troubles du sommeil. Forte proximité avec la grand-mère Madeleine.' },
-        { id: 'gc2', firstName: 'Rose', lastName: 'Lefèvre', gender: 'female', x: 200, y: 200, birthYear: 2023, age: 3, profession: '', pathologies: [] },
-        // Gen 3 — Grossesse en cours
-        { id: 'gc3', firstName: '', lastName: '', gender: 'female', x: 350, y: 200, birthYear: 2026, age: 0, profession: '', pathologies: [], perinatalType: 'pregnancy', notes: 'Grossesse en cours (7 mois). Source d\'anxiété pour les deux parents.' },
-        // Gen 2 — Conjoint de Camille
-        { id: 'c2h', firstName: 'Antoine', lastName: 'Fabre', gender: 'male', x: -100, y: 100, birthYear: 1991, age: 35, profession: 'Pompier', pathologies: [], notes: 'Peu impliqué dans la dynamique familiale élargie.' },
-        // Gen 3 — Enfant de Camille
-        { id: 'gc4', firstName: 'Léa', lastName: 'Fabre', gender: 'female', x: -100, y: 250, birthYear: 2022, age: 4, profession: '', pathologies: [] },
+        // Gen 0 — Arrière-grand-père paternel
+        { id: 'agp1', firstName: 'Marcel', lastName: 'Lefèvre', gender: 'male', x: -100, y: -660, birthYear: 1908, deathYear: 1944, age: 36, profession: 'Résistant', pathologies: [], notes: 'Mort en déportation. Secret de famille révélé tardivement (2005). Trauma transgénérationnel identifié.' },
+        // Gen 1 — Grands-parents paternels
+        { id: 'gp1', firstName: 'Henri', lastName: 'Lefèvre', gender: 'male', x: -300, y: -440, birthYear: 1935, deathYear: 2010, age: 75, profession: 'Ouvrier métallurgiste', pathologies: ['cardiovascular', 'diabetes'], notes: 'Infarctus du myocarde à 68 ans. Diabète de type 2 diagnostiqué à 55 ans. Alcoolisme chronique non traité.' },
+        { id: 'gp2', firstName: 'Madeleine', lastName: 'Roux', birthName: 'Roux', gender: 'female', x: -60, y: -440, birthYear: 1938, age: 88, profession: 'Couturière', pathologies: ['cancer'], notes: 'Cancer du sein à 72 ans (rémission). Deuil compliqué après décès du mari.' },
+        // Gen 1 — Grands-parents maternels
+        { id: 'gp3', firstName: 'Robert', lastName: 'Girard', gender: 'male', x: 400, y: -440, birthYear: 1940, deathYear: 2018, age: 78, profession: 'Instituteur', pathologies: ['addiction', 'depression'], notes: 'Dépression récurrente. Tentative de suicide en 1985. Alcoolodépendance sévère.' },
+        { id: 'gp4', firstName: 'Jeanne', lastName: 'Blanc', birthName: 'Blanc', gender: 'female', x: 640, y: -440, birthYear: 1942, age: 84, profession: 'Secrétaire médicale', isRetired: true, pathologies: ['neurodegeneration'], notes: 'Maladie d\'Alzheimer diagnostiquée en 2019. Placée en EHPAD en 2021.' },
+        // Gen 2 — Parents + oncles/tantes
+        { id: 'p4', firstName: 'Marc', lastName: 'Dupont', gender: 'male', x: -620, y: -220, birthYear: 1966, age: 60, profession: 'Chauffeur routier', pathologies: ['cardiovascular'], notes: 'Hypertension artérielle. Peu présent au domicile.' },
+        { id: 'p3', firstName: 'Sylvie', lastName: 'Dupont', birthName: 'Lefèvre', gender: 'female', x: -380, y: -220, birthYear: 1968, age: 58, profession: 'Assistante sociale', pathologies: ['psychogenic'], notes: 'Troubles somatoformes chroniques (lombalgies, migraines). Rôle de médiatrice familiale.' },
+        { id: 'p1', firstName: 'Philippe', lastName: 'Lefèvre', gender: 'male', x: -100, y: -220, birthYear: 1962, age: 64, profession: 'Comptable', isRetired: true, pathologies: ['addiction', 'depression'], notes: 'Alcoolisme actif 1990-2010, sevré depuis. Dépression réactionnelle post-divorce. Suivi psychiatrique.' },
+        { id: 'p2', firstName: 'Nathalie', lastName: 'Girard', birthName: 'Girard', gender: 'female', x: 140, y: -220, birthYear: 1965, age: 61, profession: 'Infirmière', pathologies: ['depression'], notes: 'Burnout professionnel en 2008. Épisode dépressif majeur 2015. Parentification dans famille d\'origine.' },
+        { id: 'p5', firstName: 'Alain', lastName: 'Girard', gender: 'male', x: 520, y: -220, birthYear: 1970, deathYear: 2022, age: 52, profession: 'Musicien', pathologies: ['bipolar', 'addiction'], notes: 'Trouble bipolaire type I. Polytoxicomanie. Décès par overdose — probable suicide. Figure d\'identification pour Julien.' },
+        // Gen 2 — Seconde compagne du père (same Y as parents)
+        { id: 'p6', firstName: 'Véronique', lastName: 'Morel', gender: 'female', x: -100, y: -120, birthYear: 1970, age: 56, profession: 'Pharmacienne', pathologies: [], notes: 'Relation avec Philippe depuis 2012. Bonne entente avec les enfants.' },
+        // Gen 3 — Patient + fratrie + cousins (y: 0)
+        { id: 'c5', firstName: 'Emma', lastName: 'Dupont', gender: 'female', x: -680, y: 0, birthYear: 1998, age: 28, profession: 'Étudiante en psychologie', pathologies: ['psychogenic'], notes: 'Crises d\'angoisse récurrentes. En thérapie.' },
+        { id: 'c4', firstName: 'Lucas', lastName: 'Dupont', gender: 'male', x: -460, y: 0, birthYear: 1995, age: 31, profession: 'Électricien', pathologies: [], notes: 'Adopté à l\'âge de 2 ans (origine Colombie). Recherche de ses origines en cours.' },
+        { id: 'c3', firstName: 'Clara', lastName: 'Lefèvre', gender: 'female', x: -240, y: 0, birthYear: 1993, age: 33, profession: 'Avocate', pathologies: ['psychogenic'], twinGroup: 'tw1', twinType: 'dizygotic', notes: 'Troubles alimentaires (anorexie) à l\'adolescence. Perfectionnisme. Coupure émotionnelle avec la famille.', sexualOrientation: 'homosexual' },
+        { id: 'c2', firstName: 'Camille', lastName: 'Lefèvre', gender: 'female', x: 0, y: 0, birthYear: 1993, age: 33, profession: 'Éducatrice spécialisée', pathologies: ['depression'], twinGroup: 'tw1', twinType: 'dizygotic', notes: 'Dépression post-partum en 2022. Relation conflictuelle avec sa jumelle Clara.' },
+        { id: 'c1', firstName: 'Julien', lastName: 'Lefèvre', gender: 'male', x: 240, y: 0, birthYear: 1990, age: 36, profession: 'Développeur web', pathologies: ['bipolar', 'addiction'], notes: 'Patient index. Trouble bipolaire type II diagnostiqué à 28 ans. Cannabis quotidien depuis l\'adolescence. Angoisse d\'abandon. Identification à l\'oncle Alain. Suivi psychothérapique en cours.', genderIdentity: 'cisgender', sexualOrientation: 'heterosexual' },
+        { id: 'c1w', firstName: 'Marie', lastName: 'Perret', gender: 'female', x: 480, y: 0, birthYear: 1992, age: 34, profession: 'Sage-femme', pathologies: [], notes: 'Grossesse actuelle (3e). Tensions conjugales liées aux épisodes maniaques de Julien.' },
+        { id: 'c6', firstName: '', lastName: '', gender: 'female', x: 160, y: 0, birthYear: 1996, age: 0, profession: '', pathologies: [], perinatalType: 'miscarriage', notes: 'Fausse couche au 5e mois. Deuil périnatal non élaboré par la mère.' },
+        // Gen 3 — Conjoint de Camille (same Y as Gen 3)
+        { id: 'c2h', firstName: 'Antoine', lastName: 'Fabre', gender: 'male', x: -230, y: 100, birthYear: 1991, age: 35, profession: 'Pompier', pathologies: [], notes: 'Peu impliqué dans la dynamique familiale élargie.' },
+        // Gen 4 — Enfants de Julien (y: 220)
+        { id: 'gc1', firstName: 'Théo', lastName: 'Lefèvre', gender: 'male', x: 280, y: 220, birthYear: 2020, age: 6, profession: '', pathologies: [], notes: 'Troubles du sommeil. Forte proximité avec la grand-mère Madeleine.' },
+        { id: 'gc2', firstName: 'Rose', lastName: 'Lefèvre', gender: 'female', x: 500, y: 220, birthYear: 2023, age: 3, profession: '', pathologies: [] },
+        { id: 'gc3', firstName: '', lastName: '', gender: 'female', x: 700, y: 220, birthYear: 2026, age: 0, profession: '', pathologies: [], perinatalType: 'pregnancy', notes: 'Grossesse en cours (7 mois). Source d\'anxiété pour les deux parents.' },
+        // Gen 4 — Enfant de Camille
+        { id: 'gc4', firstName: 'Léa', lastName: 'Fabre', gender: 'female', x: -120, y: 320, birthYear: 2022, age: 4, profession: '', pathologies: [] },
       ],
       unions: [
         { id: 'u1', partner1: 'gp1', partner2: 'gp2', status: 'widowed', children: ['p1', 'p3'], marriageYear: 1960, notes: 'Couple stable. Henri décédé en 2010.' },
