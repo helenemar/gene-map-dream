@@ -6,6 +6,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
 import {
   Tooltip,
@@ -128,11 +132,17 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
             </>
           )}
           {BASE_OPTIONS.filter(o => showParentSplit ? o.id !== 'parent' : true).map(renderItem)}
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel className="text-xs text-muted-foreground font-normal px-2 py-1">
-            Événements périnataux
-          </DropdownMenuLabel>
-          {PERINATAL_OPTIONS.map(renderItem)}
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger className="flex items-center gap-2.5 py-2 cursor-pointer">
+              <span className="text-muted-foreground"><Triangle className="w-4 h-4" /></span>
+              <span className="text-sm font-medium">Événements périnataux</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                {PERINATAL_OPTIONS.map(renderItem)}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
         </DropdownMenuContent>
       </DropdownMenu>
     </TooltipProvider>
