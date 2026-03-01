@@ -30,6 +30,81 @@ interface GenogramRow {
 type SortKey = 'name' | 'updated_at' | 'created_at';
 type SortDir = 'asc' | 'desc';
 
+const MOCK_GENOGRAMS: GenogramRow[] = [
+  {
+    id: 'mock-1', name: 'Lefèvre – Julien', user_id: 'mock',
+    created_at: '2025-11-12T09:30:00Z', updated_at: '2026-02-28T14:22:00Z',
+    data: {
+      members: [
+        { id: 'm1', firstName: 'Julien', lastName: 'Lefèvre', gender: 'male', x: 0, y: 0, birthYear: 1990, age: 36, profession: '', pathologies: ['depression'] },
+        { id: 'm2', firstName: 'Marie', lastName: 'Lefèvre', gender: 'female', x: 200, y: 0, birthYear: 1992, age: 34, profession: '', pathologies: [] },
+        { id: 'm3', firstName: 'Henri', lastName: 'Lefèvre', gender: 'male', x: -100, y: -200, birthYear: 1960, age: 66, profession: '', pathologies: ['cardiovascular'], deathYear: 2022 },
+        { id: 'm4', firstName: 'Suzanne', lastName: 'Roux', gender: 'female', x: 100, y: -200, birthYear: 1963, age: 63, profession: '', pathologies: [] },
+        { id: 'm5', firstName: 'Léo', lastName: 'Lefèvre', gender: 'male', x: 50, y: 200, birthYear: 2020, age: 6, profession: '', pathologies: [] },
+      ],
+      unions: [
+        { partner1: 'm3', partner2: 'm4' },
+        { partner1: 'm1', partner2: 'm2' },
+      ],
+    },
+  },
+  {
+    id: 'mock-2', name: 'Dupont – Sophie', user_id: 'mock',
+    created_at: '2026-01-05T11:00:00Z', updated_at: '2026-02-25T10:45:00Z',
+    data: {
+      members: [
+        { id: 'a1', firstName: 'Sophie', lastName: 'Dupont', gender: 'female', x: 0, y: 0, birthYear: 1985, age: 41, profession: '', pathologies: ['cancer'] },
+        { id: 'a2', firstName: 'Marc', lastName: 'Dupont', gender: 'male', x: 200, y: 0, birthYear: 1983, age: 43, profession: '', pathologies: [] },
+        { id: 'a3', firstName: 'Clara', lastName: 'Dupont', gender: 'female', x: 100, y: 200, birthYear: 2012, age: 14, profession: '', pathologies: [] },
+      ],
+      unions: [{ partner1: 'a2', partner2: 'a1' }],
+    },
+  },
+  {
+    id: 'mock-3', name: 'Martin – Lucas', user_id: 'mock',
+    created_at: '2025-09-20T08:15:00Z', updated_at: '2026-01-10T16:30:00Z',
+    data: {
+      members: [
+        { id: 'b1', firstName: 'Lucas', lastName: 'Martin', gender: 'male', x: 0, y: 0, birthYear: 1978, age: 48, profession: '', pathologies: ['addiction', 'bipolar'] },
+        { id: 'b2', firstName: 'Isabelle', lastName: 'Martin', gender: 'female', x: 200, y: 0, birthYear: 1980, age: 46, profession: '', pathologies: ['depression'] },
+        { id: 'b3', firstName: 'Pierre', lastName: 'Martin', gender: 'male', x: -100, y: -200, birthYear: 1950, age: 76, profession: '', pathologies: [] },
+        { id: 'b4', firstName: 'Jeanne', lastName: 'Blanc', gender: 'female', x: 100, y: -200, birthYear: 1952, age: 74, profession: '', pathologies: ['neurodegeneration'] },
+        { id: 'b5', firstName: 'Théo', lastName: 'Martin', gender: 'male', x: 0, y: 200, birthYear: 2005, age: 21, profession: '', pathologies: [] },
+        { id: 'b6', firstName: 'Emma', lastName: 'Martin', gender: 'female', x: 200, y: 200, birthYear: 2008, age: 18, profession: '', pathologies: ['psychogenic'] },
+      ],
+      unions: [
+        { partner1: 'b3', partner2: 'b4' },
+        { partner1: 'b1', partner2: 'b2' },
+      ],
+    },
+  },
+  {
+    id: 'mock-4', name: 'Bernard – Camille', user_id: 'mock',
+    created_at: '2026-02-01T14:00:00Z', updated_at: '2026-02-27T09:10:00Z',
+    data: {
+      members: [
+        { id: 'c1', firstName: 'Camille', lastName: 'Bernard', gender: 'female', x: 0, y: 0, birthYear: 1995, age: 31, profession: '', pathologies: [] },
+        { id: 'c2', firstName: 'Antoine', lastName: 'Bernard', gender: 'male', x: -150, y: -200, birthYear: 1965, age: 61, profession: '', pathologies: ['diabetes'] },
+        { id: 'c3', firstName: 'Françoise', lastName: 'Morel', gender: 'female', x: 150, y: -200, birthYear: 1968, age: 58, profession: '', pathologies: [] },
+      ],
+      unions: [{ partner1: 'c2', partner2: 'c3' }],
+    },
+  },
+  {
+    id: 'mock-5', name: 'Petit – Alexandre', user_id: 'mock',
+    created_at: '2025-06-15T10:30:00Z', updated_at: '2025-12-20T11:00:00Z',
+    data: {
+      members: [
+        { id: 'd1', firstName: 'Alexandre', lastName: 'Petit', gender: 'male', x: 0, y: 0, birthYear: 1988, age: 38, profession: '', pathologies: ['cardiovascular'] },
+        { id: 'd2', firstName: 'Laura', lastName: 'Petit', gender: 'female', x: 200, y: 0, birthYear: 1990, age: 36, profession: '', pathologies: [] },
+        { id: 'd3', firstName: 'Hugo', lastName: 'Petit', gender: 'male', x: 0, y: 200, birthYear: 2018, age: 8, profession: '', pathologies: [] },
+        { id: 'd4', firstName: 'Chloé', lastName: 'Petit', gender: 'female', x: 200, y: 200, birthYear: 2021, age: 5, profession: '', pathologies: [] },
+      ],
+      unions: [{ partner1: 'd1', partner2: 'd2' }],
+    },
+  },
+];
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -43,7 +118,7 @@ const Dashboard: React.FC = () => {
   const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
   const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
 
-  const { data: genograms, isLoading } = useQuery({
+  const { data: realGenograms, isLoading } = useQuery({
     queryKey: ['genograms', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -55,6 +130,8 @@ const Dashboard: React.FC = () => {
     },
     enabled: !!user,
   });
+
+  const genograms = realGenograms && realGenograms.length > 0 ? realGenograms : MOCK_GENOGRAMS;
 
   // Fetch note counts and latest note dates for all genograms
   useEffect(() => {
