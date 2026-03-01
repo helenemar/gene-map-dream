@@ -128,7 +128,7 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
     <TooltipProvider delayDuration={200}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-        <DropdownMenuContent align="center" sideOffset={4} className="w-56">
+        <DropdownMenuContent align="center" sideOffset={4} collisionPadding={16} className="w-56">
           {showParentSplit && (
             <>
               <DropdownMenuLabel className="text-xs text-muted-foreground font-normal px-2 py-1">
@@ -145,7 +145,7 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
               <span className="text-sm font-medium">Événements périnataux</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
-              <DropdownMenuSubContent>
+              <DropdownMenuSubContent collisionPadding={16}>
                 {PERINATAL_OPTIONS.map(renderItem)}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
