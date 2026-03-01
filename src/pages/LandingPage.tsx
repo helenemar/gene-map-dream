@@ -113,7 +113,7 @@ const LandingPage: React.FC = () => {
       </header>
 
       {/* ═══════════ HERO ═══════════ */}
-      <section className="relative overflow-hidden min-h-[680px]">
+      <section className="relative overflow-hidden">
         <div className="max-w-[1440px] mx-auto px-12 lg:px-24 pt-14 pb-20 lg:pt-16 lg:pb-24 relative">
           {/* Left – copy */}
           <motion.div
@@ -160,7 +160,7 @@ const LandingPage: React.FC = () => {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="hidden lg:block absolute top-1/2 -translate-y-1/2 right-0 w-[58%]"
+            className="hidden lg:block absolute top-16 right-0 w-[55%]"
           >
             <img
               src={heroComposition}
