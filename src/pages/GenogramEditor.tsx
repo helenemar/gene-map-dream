@@ -510,6 +510,7 @@ const GenogramEditor: React.FC = () => {
     open: boolean;
   } | null>(null);
   const [pendingPerinatalType, setPendingPerinatalType] = useState<import('@/types/genogram').PerinatalType | null>(null);
+  const [pendingStillbornGender, setPendingStillbornGender] = useState<'male' | 'female' | null>(null);
 
   // (standalone links removed — all children go through unions now)
 
@@ -636,7 +637,7 @@ const GenogramEditor: React.FC = () => {
       birthYear: perinatal ? currentYear : currentYear - 5,
       age: perinatal ? 0 : 5,
       profession: '',
-      gender: 'female',
+      gender: pendingStillbornGender || 'female',
       x: source?.x ?? 200,
       y: (source?.y ?? 200) + LEVEL_Y,
       pathologies: [],
@@ -645,6 +646,7 @@ const GenogramEditor: React.FC = () => {
 
     // Clear pending perinatal type
     setPendingPerinatalType(null);
+    setPendingStillbornGender(null);
 
     if (targetUnionId) {
       // Add child to an existing union
@@ -756,7 +758,7 @@ const GenogramEditor: React.FC = () => {
       setNewMemberDrawerOpen(true);
     }
     setTimeout(() => centerOnMember(newChild), 100);
-  }, [members, unions, centerOnMember, pendingPerinatalType]);
+  }, [members, unions, centerOnMember, pendingPerinatalType, pendingStillbornGender]);
 
   /** Create a child with an existing member as co-parent (creates a new union between them) */
   const executeChildCreationWithExisting = useCallback((sourceId: string, partnerId: string) => {
@@ -811,8 +813,13 @@ const GenogramEditor: React.FC = () => {
         perinatal_miscarriage: 'miscarriage',
         perinatal_abortion: 'abortion',
         perinatal_stillborn: 'stillborn',
+        perinatal_stillborn_male: 'stillborn',
+        perinatal_stillborn_female: 'stillborn',
       };
       setPendingPerinatalType(perinatalMap[relationship] || null);
+      if (relationship === 'perinatal_stillborn_male') setPendingStillbornGender('male');
+      else if (relationship === 'perinatal_stillborn_female') setPendingStillbornGender('female');
+      else setPendingStillbornGender(null);
       setParentPickerState({ sourceId, open: true });
       return;
     }
@@ -1410,7 +1417,7 @@ const GenogramEditor: React.FC = () => {
                   members={members}
                   open={parentPickerState.open}
                   onOpenChange={(open) => {
-                    if (!open) { setParentPickerState(null); setPendingPerinatalType(null); }
+                    if (!open) { setParentPickerState(null); setPendingPerinatalType(null); setPendingStillbornGender(null); }
                   }}
                   onSelectUnion={(unionId) => {
                     executeChildCreation(parentPickerState.sourceId, unionId);
