@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText } from 'lucide-react';
 import GenogramThumbnail from '@/components/GenogramThumbnail';
 import CreateGenogramModal from '@/components/CreateGenogramModal';
+import BetaShareModal from '@/components/BetaShareModal';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -114,6 +115,7 @@ const Dashboard: React.FC = () => {
   const [sortKey, setSortKey] = useState<SortKey>('updated_at');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [betaModalOpen, setBetaModalOpen] = useState(false);
   const [notesModal, setNotesModal] = useState<{ open: boolean; genogramId: string; genogramName: string }>({ open: false, genogramId: '', genogramName: '' });
   const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
   const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
@@ -216,7 +218,7 @@ const Dashboard: React.FC = () => {
           <span className="text-[15px] font-semibold text-foreground tracking-tight">Genogy</span>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="beta" size="sm" className="h-9 px-4 text-xs font-bold">
+          <Button variant="beta" size="sm" className="h-9 px-4 text-xs font-bold" onClick={() => setBetaModalOpen(true)}>
             <Atom className="w-3.5 h-3.5" />
             BETA Test
           </Button>
@@ -432,6 +434,8 @@ const Dashboard: React.FC = () => {
             </div>
           )}
         </div>
+
+        <BetaShareModal open={betaModalOpen} onOpenChange={setBetaModalOpen} />
 
         <DossierNotesModal
           open={notesModal.open}
