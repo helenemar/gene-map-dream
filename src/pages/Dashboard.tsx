@@ -26,6 +26,8 @@ interface GenogramRow {
   updated_at: string;
   user_id: string;
   data: any;
+  /** Mock-only fields for fake creators */
+  _mockCreator?: { name: string; initials: string; color: string };
 }
 
 type SortKey = 'name' | 'updated_at' | 'created_at';
@@ -94,6 +96,7 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
   {
     id: 'mock-5', name: 'Petit – Alexandre', user_id: 'mock',
     created_at: '2025-06-15T10:30:00Z', updated_at: '2025-12-20T11:00:00Z',
+    _mockCreator: { name: 'Nathalie Berteau', initials: 'NB', color: 'hsl(280 60% 55%)' },
     data: {
       members: [
         { id: 'd1', firstName: 'Alexandre', lastName: 'Petit', gender: 'male', x: 0, y: 0, birthYear: 1988, age: 38, profession: '', pathologies: ['cardiovascular'] },
@@ -102,6 +105,36 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'd4', firstName: 'Chloé', lastName: 'Petit', gender: 'female', x: 200, y: 200, birthYear: 2021, age: 5, profession: '', pathologies: [] },
       ],
       unions: [{ partner1: 'd1', partner2: 'd2' }],
+    },
+  },
+  {
+    id: 'mock-6', name: 'Garnier – Émilie', user_id: 'mock-other-1',
+    created_at: '2026-01-18T13:00:00Z', updated_at: '2026-02-20T08:30:00Z',
+    _mockCreator: { name: 'Léonie Nguyen', initials: 'LN', color: 'hsl(160 55% 42%)' },
+    data: {
+      members: [
+        { id: 'e1', firstName: 'Émilie', lastName: 'Garnier', gender: 'female', x: 0, y: 0, birthYear: 1993, age: 33, profession: '', pathologies: ['depression'] },
+        { id: 'e2', firstName: 'Thomas', lastName: 'Garnier', gender: 'male', x: 200, y: 0, birthYear: 1991, age: 35, profession: '', pathologies: [] },
+        { id: 'e3', firstName: 'Robert', lastName: 'Garnier', gender: 'male', x: -100, y: -200, birthYear: 1958, age: 68, profession: '', pathologies: ['cardiovascular'] },
+        { id: 'e4', firstName: 'Monique', lastName: 'Faure', gender: 'female', x: 100, y: -200, birthYear: 1961, age: 65, profession: '', pathologies: [] },
+      ],
+      unions: [
+        { partner1: 'e3', partner2: 'e4' },
+        { partner1: 'e2', partner2: 'e1' },
+      ],
+    },
+  },
+  {
+    id: 'mock-7', name: 'Rousseau – Victor', user_id: 'mock-other-2',
+    created_at: '2025-12-02T16:45:00Z', updated_at: '2026-02-15T12:00:00Z',
+    _mockCreator: { name: 'Alice Vanmerche', initials: 'AV', color: 'hsl(20 75% 55%)' },
+    data: {
+      members: [
+        { id: 'f1', firstName: 'Victor', lastName: 'Rousseau', gender: 'male', x: 0, y: 0, birthYear: 1982, age: 44, profession: '', pathologies: ['addiction'] },
+        { id: 'f2', firstName: 'Claire', lastName: 'Rousseau', gender: 'female', x: 200, y: 0, birthYear: 1984, age: 42, profession: '', pathologies: ['cancer'] },
+        { id: 'f3', firstName: 'Lina', lastName: 'Rousseau', gender: 'female', x: 100, y: 200, birthYear: 2010, age: 16, profession: '', pathologies: [] },
+      ],
+      unions: [{ partner1: 'f1', partner2: 'f2' }],
     },
   },
 ];
@@ -342,15 +375,26 @@ const Dashboard: React.FC = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center shrink-0">
-                            <span className="text-primary-foreground text-[10px] font-bold">{userInitials}</span>
-                          </div>
-                          <span className="text-[13px] text-foreground">
-                            {displayName.split('@')[0]}{' '}
-                            <span className="text-muted-foreground">(moi)</span>
-                          </span>
-                        </div>
+                        {(() => {
+                          const mock = file._mockCreator;
+                          const creatorName = mock ? mock.name : displayName.split('@')[0];
+                          const creatorInitials = mock ? mock.initials : userInitials;
+                          const isMe = !mock;
+                          return (
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+                                style={{ backgroundColor: mock ? mock.color : 'hsl(var(--primary))' }}
+                              >
+                                <span className="text-white text-[10px] font-bold">{creatorInitials}</span>
+                              </div>
+                              <span className="text-[13px] text-foreground">
+                                {creatorName}{' '}
+                                {isMe && <span className="text-muted-foreground">(moi)</span>}
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell className="text-right">
                         <span className="text-[13px] text-foreground">{formatDate(file.updated_at)}</span>
