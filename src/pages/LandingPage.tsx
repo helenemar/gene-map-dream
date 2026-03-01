@@ -123,9 +123,9 @@ const LandingPage: React.FC = () => {
             className="relative z-10 max-w-[520px]"
           >
             {/* Large logo */}
-            <img src={gogyIcon} alt="" className="w-[72px] h-[72px] mb-8" />
+            <img src={gogyIcon} alt="" className="w-[64px] h-[64px] mb-6" />
 
-            <h1 className="text-[1.75rem] lg:text-[2.15rem] font-extrabold leading-[1.12] tracking-[-0.01em] mb-5 whitespace-nowrap">
+            <h1 className="text-[1.6rem] lg:text-[2rem] font-extrabold leading-[1.08] tracking-[-0.01em] mb-4 whitespace-nowrap">
               Le meilleur outil en ligne pour
               <br />
               créer des{' '}
@@ -134,12 +134,12 @@ const LandingPage: React.FC = () => {
               professionnels
             </h1>
 
-            <p className="text-muted-foreground text-[15px] leading-[1.6] mb-1.5 max-w-[420px]">
+            <p className="text-muted-foreground text-[14px] leading-[1.5] mb-1 max-w-[420px]">
               Cartographiez les relations familiales et émotionnelles
               <br className="hidden sm:block" />
               de vos patients ou clients.
             </p>
-            <p className="text-foreground/50 text-[13px] leading-[1.6] mb-8 max-w-[420px]">
+            <p className="text-foreground/50 text-[12.5px] leading-[1.5] mb-6 max-w-[420px]">
               Conçu pour les psychologues, travailleurs sociaux, thérapeutes et
               <br className="hidden sm:block" />
               professionnels de l'accompagnement.
@@ -160,7 +160,7 @@ const LandingPage: React.FC = () => {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="hidden lg:block absolute top-8 right-0 w-[58%]"
+            className="hidden lg:block absolute -top-4 right-0 w-[58%]"
           >
             <img
               src={heroComposition}
