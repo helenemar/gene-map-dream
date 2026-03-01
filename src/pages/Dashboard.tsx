@@ -39,15 +39,43 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
     created_at: '2025-11-12T09:30:00Z', updated_at: '2026-02-28T14:22:00Z',
     data: {
       members: [
-        { id: 'm1', firstName: 'Julien', lastName: 'Lefèvre', gender: 'male', x: 0, y: 0, birthYear: 1990, age: 36, profession: '', pathologies: ['depression'] },
-        { id: 'm2', firstName: 'Marie', lastName: 'Lefèvre', gender: 'female', x: 200, y: 0, birthYear: 1992, age: 34, profession: '', pathologies: [] },
-        { id: 'm3', firstName: 'Henri', lastName: 'Lefèvre', gender: 'male', x: -100, y: -200, birthYear: 1960, age: 66, profession: '', pathologies: ['cardiovascular'], deathYear: 2022 },
-        { id: 'm4', firstName: 'Suzanne', lastName: 'Roux', gender: 'female', x: 100, y: -200, birthYear: 1963, age: 63, profession: '', pathologies: [] },
-        { id: 'm5', firstName: 'Léo', lastName: 'Lefèvre', gender: 'male', x: 50, y: 200, birthYear: 2020, age: 6, profession: '', pathologies: [] },
+        // Gen 0 — Grands-parents paternels
+        { id: 'gp1', firstName: 'Henri', lastName: 'Lefèvre', gender: 'male', x: -200, y: -400, birthYear: 1935, deathYear: 2010, age: 75, profession: '', pathologies: ['cardiovascular', 'diabetes'] },
+        { id: 'gp2', firstName: 'Madeleine', lastName: 'Roux', gender: 'female', x: 0, y: -400, birthYear: 1938, age: 88, profession: '', pathologies: ['cancer'] },
+        // Gen 0 — Grands-parents maternels
+        { id: 'gp3', firstName: 'Robert', lastName: 'Girard', gender: 'male', x: 400, y: -400, birthYear: 1940, deathYear: 2018, age: 78, profession: '', pathologies: ['addiction'] },
+        { id: 'gp4', firstName: 'Jeanne', lastName: 'Blanc', gender: 'female', x: 600, y: -400, birthYear: 1942, age: 84, profession: '', pathologies: ['neurodegeneration'] },
+        // Gen 1 — Parents + oncles/tantes
+        { id: 'p1', firstName: 'Philippe', lastName: 'Lefèvre', gender: 'male', x: -100, y: -200, birthYear: 1962, age: 64, profession: '', pathologies: ['addiction'] },
+        { id: 'p2', firstName: 'Nathalie', lastName: 'Girard', gender: 'female', x: 100, y: -200, birthYear: 1965, age: 61, profession: '', pathologies: ['depression'] },
+        { id: 'p3', firstName: 'Sylvie', lastName: 'Lefèvre', gender: 'female', x: -350, y: -200, birthYear: 1968, age: 58, profession: '', pathologies: [] },
+        { id: 'p4', firstName: 'Marc', lastName: 'Dupont', gender: 'male', x: -500, y: -200, birthYear: 1966, age: 60, profession: '', pathologies: ['cardiovascular'] },
+        { id: 'p5', firstName: 'Alain', lastName: 'Girard', gender: 'male', x: 500, y: -200, birthYear: 1970, deathYear: 2022, age: 52, profession: '', pathologies: ['bipolar'] },
+        // Gen 2 — Patient + fratrie + cousins
+        { id: 'c1', firstName: 'Julien', lastName: 'Lefèvre', gender: 'male', x: 0, y: 0, birthYear: 1990, age: 36, profession: '', pathologies: ['bipolar'] },
+        { id: 'c1w', firstName: 'Marie', lastName: 'Perret', gender: 'female', x: 200, y: 0, birthYear: 1992, age: 34, profession: '', pathologies: [] },
+        { id: 'c2', firstName: 'Camille', lastName: 'Lefèvre', gender: 'female', x: -100, y: 0, birthYear: 1993, age: 33, profession: '', pathologies: ['depression'], twinGroup: 'tw1', twinType: 'dizygotic' },
+        { id: 'c3', firstName: 'Clara', lastName: 'Lefèvre', gender: 'female', x: -250, y: 0, birthYear: 1993, age: 33, profession: '', pathologies: ['psychogenic'], twinGroup: 'tw1', twinType: 'dizygotic' },
+        { id: 'c4', firstName: 'Lucas', lastName: 'Dupont', gender: 'male', x: -450, y: 0, birthYear: 1995, age: 31, profession: '', pathologies: [] },
+        { id: 'c5', firstName: 'Emma', lastName: 'Dupont', gender: 'female', x: -600, y: 0, birthYear: 1998, age: 28, profession: '', pathologies: ['psychogenic'] },
+        // Gen 2 — Fausse couche
+        { id: 'c6', firstName: 'FC', lastName: '', gender: 'female', x: 350, y: 0, birthYear: 1996, age: 0, profession: '', pathologies: [], perinatalType: 'miscarriage' },
+        // Gen 3 — Petits-enfants
+        { id: 'gc1', firstName: 'Théo', lastName: 'Lefèvre', gender: 'male', x: 50, y: 200, birthYear: 2020, age: 6, profession: '', pathologies: [] },
+        { id: 'gc2', firstName: 'Rose', lastName: 'Lefèvre', gender: 'female', x: 200, y: 200, birthYear: 2023, age: 3, profession: '', pathologies: [] },
+        { id: 'gc3', firstName: '', lastName: '', gender: 'female', x: 350, y: 200, birthYear: 2026, age: 0, profession: '', pathologies: [], perinatalType: 'pregnancy' },
       ],
       unions: [
-        { partner1: 'm3', partner2: 'm4' },
-        { partner1: 'm1', partner2: 'm2' },
+        { partner1: 'gp1', partner2: 'gp2', status: 'widowed', children: ['p1', 'p3'] },
+        { partner1: 'gp3', partner2: 'gp4', status: 'married', children: ['p2', 'p5'] },
+        { partner1: 'p1', partner2: 'p2', status: 'divorced', children: ['c1', 'c2', 'c3', 'c6'] },
+        { partner1: 'p4', partner2: 'p3', status: 'married', children: ['c4', 'c5'] },
+        { partner1: 'c1', partner2: 'c1w', status: 'married', children: ['gc1', 'gc2', 'gc3'] },
+      ],
+      emotionalLinks: [
+        { id: 'e1', from: 'p1', to: 'c1', type: 'fusional' },
+        { id: 'e2', from: 'c2', to: 'c3', type: 'conflictual' },
+        { id: 'e3', from: 'gp2', to: 'gc1', type: 'fusional' },
       ],
     },
   },
