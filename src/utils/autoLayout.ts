@@ -1,16 +1,15 @@
 /**
- * Reingold-Tilford–inspired Hierarchical Tree Layout (v3)
+ * Couple-First Chronology Layout Engine
  *
  * Guarantees:
  *   1. Strict Y per generation: gen × LEVEL_SPACING
- *   2. Each family branch occupies a contiguous horizontal corridor
- *      sized by total descendant count (bottom-up)
- *   3. Parents are centred exactly above their children
- *   4. Siblings are distributed symmetrically around the parent union midpoint
- *   5. Minimum BRANCH_GAP (400 px) between distinct family branches
- *   6. Collision resolution pushes entire branches apart
- *   7. Cross-family unions (partners from different branches) are handled
- *      so each partner stays under their own parents
+ *   2. Couple = inseparable block (max coupleGap between partners)
+ *   3. Spouse (in-law) placed OUTSIDE the sibling line
+ *   4. Siblings ordered by birth year (eldest left, youngest right)
+ *   5. Dynamic spacing: couple blocks push subsequent siblings
+ *   6. Collision resolution keeps couples atomic
+ *   7. Cross-family unions compact branches together
+ *   8. No link may cross a member card
  */
 
 import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
@@ -407,19 +406,32 @@ export function computeAutoLayout(
             const stepOffset = totalLeaves > 1 ? leafIndex * SIBLING_STEP_Y : 0;
             const childY = baseChildY + stepOffset;
 
-            // Check if this leaf has a childless union → place as couple
+            // Check if this leaf has a childless union → place as couple block
             const childlessU = getChildlessUnions(slot.memberId);
             if (childlessU.length > 0) {
               const u = childlessU[0];
               const gap = coupleGap(u);
               const cw = coupleWidth(u);
               const coupleLeft = slotCenter - cw / 2;
-              const m1 = memberMap.get(u.partner1);
-              const [leftId, rightId] = m1 && m1.gender === 'male'
-                ? [u.partner1, u.partner2]
-                : [u.partner2, u.partner1];
-              if (!positions.has(leftId)) positions.set(leftId, { x: coupleLeft, y: childY });
-              if (!positions.has(rightId)) positions.set(rightId, { x: coupleLeft + CARD_W + gap, y: childY });
+
+              // Couple-First: lineage member stays on inner side (closest to siblings),
+              // spouse (in-law) goes on OUTER side (away from sibling line)
+              const isLastSlot = slots.indexOf(slot) === slots.length - 1;
+              const isFirstSlot = slots.indexOf(slot) === 0;
+
+              // Determine lineage member vs spouse
+              const lineageMember = slot.memberId;
+              const spouseId = u.partner1 === lineageMember ? u.partner2 : u.partner1;
+
+              if (isFirstSlot && !isLastSlot) {
+                // Leftmost sibling: spouse goes LEFT (outer), lineage member stays RIGHT (inner)
+                if (!positions.has(spouseId)) positions.set(spouseId, { x: coupleLeft, y: childY });
+                if (!positions.has(lineageMember)) positions.set(lineageMember, { x: coupleLeft + CARD_W + gap, y: childY });
+              } else {
+                // Rightmost or middle: lineage member LEFT (inner), spouse RIGHT (outer)
+                if (!positions.has(lineageMember)) positions.set(lineageMember, { x: coupleLeft, y: childY });
+                if (!positions.has(spouseId)) positions.set(spouseId, { x: coupleLeft + CARD_W + gap, y: childY });
+              }
             } else {
               if (!positions.has(slot.memberId)) {
                 positions.set(slot.memberId, { x: slotCenter - CARD_W / 2, y: childY });
@@ -687,7 +699,11 @@ export function computeAutoLayout(
   return { positions };
 }
 
-/** Shift a member and all descendants by dx (partners are NOT cascaded — handled by re-compaction) */
+/**
+ * Shift a member, their coupled partner(s), and all descendants by dx.
+ * Partners are shifted together (couple = atomic block) but we do NOT
+ * cascade through the partner's OTHER unions to avoid spreading branches.
+ */
 function shiftMemberAndDescendants(
   startId: string,
   dx: number,
@@ -698,20 +714,30 @@ function shiftMemberAndDescendants(
   _parentUnionOf?: Map<string, string>,
 ) {
   const visited = new Set<string>();
-  const stack = [startId];
+  // cascadeUnions: true = process this member's unions; false = just shift position (partner pulled along)
+  const stack: { id: string; cascadeUnions: boolean }[] = [{ id: startId, cascadeUnions: true }];
 
   while (stack.length > 0) {
-    const id = stack.pop()!;
+    const { id, cascadeUnions } = stack.pop()!;
     if (visited.has(id) || !memberMap.has(id)) continue;
     visited.add(id);
     const pos = positions.get(id);
     if (pos) pos.x += dx;
+
+    if (!cascadeUnions) continue; // Partner was pulled along — don't cascade their other unions
+
     for (const uid of (partnerUnions.get(id) || [])) {
       const u = unionMap.get(uid);
       if (!u) continue;
-      // Only cascade to children, NOT to partners
-      // Partners will be re-snapped by the re-compaction step (11b)
-      for (const cid of u.children) stack.push(cid);
+      const pid = u.partner1 === id ? u.partner2 : u.partner1;
+      // Pull partner along (couple = inseparable block) but don't cascade their other unions
+      if (!visited.has(pid)) {
+        stack.push({ id: pid, cascadeUnions: false });
+      }
+      // Always cascade to children
+      for (const cid of u.children) {
+        stack.push({ id: cid, cascadeUnions: true });
+      }
     }
   }
 }
