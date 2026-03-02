@@ -381,6 +381,20 @@ export function computeAutoLayout(
     }
   }
 
+  // ═══ 6b. PLACE UNPOSITIONED PARTNERS NEXT TO THEIR SPOUSE ═══
+  // Partners who have no parent union (in-laws) would otherwise become orphans far away
+  for (const u of unions) {
+    const p1Pos = positions.get(u.partner1);
+    const p2Pos = positions.get(u.partner2);
+    if (p1Pos && !p2Pos) {
+      const gap = coupleGap(u);
+      positions.set(u.partner2, { x: p1Pos.x + CARD_W + gap, y: p1Pos.y });
+    } else if (!p1Pos && p2Pos) {
+      const gap = coupleGap(u);
+      positions.set(u.partner1, { x: p2Pos.x - CARD_W - gap, y: p2Pos.y });
+    }
+  }
+
   // ═══ 7. PLACE ORPHAN MEMBERS ═══
   for (const m of members) {
     if (!positions.has(m.id)) {
