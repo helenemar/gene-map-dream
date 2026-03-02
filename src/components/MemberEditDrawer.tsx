@@ -273,25 +273,41 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Martin" value={birthName} onChange={(e) => setBirthName(e.target.value)} />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1">
-                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Genre</Label>
-                  <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female' | 'non-binary')}>
-                    <SelectTrigger className="h-8 text-sm border-border/50 bg-card"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Homme</SelectItem>
-                      <SelectItem value="female">Femme</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <div className="flex flex-col gap-1">
+                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Genre</Label>
+                <div className="flex h-8 rounded-lg border border-border/50 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setGender('female')}
+                    className={`flex-1 text-sm font-medium transition-colors ${
+                      gender === 'female'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-card text-muted-foreground hover:bg-accent'
+                    }`}
+                  >
+                    Femme
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGender('male')}
+                    className={`flex-1 text-sm font-medium transition-colors border-l border-border/50 ${
+                      gender === 'male'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-card text-muted-foreground hover:bg-accent'
+                    }`}
+                  >
+                    Homme
+                  </button>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Profession</Label>
-                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} />
-                  <label className="flex items-center gap-2 mt-1 cursor-pointer">
-                    <Checkbox checked={isRetired} onCheckedChange={(v) => setIsRetired(v === true)} />
-                    <span className="text-xs text-muted-foreground">Retraité(e)</span>
-                  </label>
-                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Profession</Label>
+                <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} />
+                <label className="flex items-center gap-2 mt-1 cursor-pointer">
+                  <Checkbox checked={isRetired} onCheckedChange={(v) => setIsRetired(v === true)} />
+                  <span className="text-xs text-muted-foreground">Retraité(e)</span>
+                </label>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
