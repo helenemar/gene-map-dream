@@ -147,7 +147,7 @@ export function computeAutoLayout(
   }
 
   const builtUnions = new Set<string>();
-  const crossFamilyUnions: Union[] = [];
+  
 
   function buildNode(union: Union): TreeNode {
     builtUnions.add(union.id);
@@ -157,49 +157,16 @@ export function computeAutoLayout(
       .filter(cid => memberMap.has(cid))
       .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
 
-    // Identify which children have cross-family unions so we can reorder them
-    const crossFamilyChildIds = new Set<string>();
-    for (const cid of sortedChildren) {
-      const childParentingUnions = getParentingUnions(cid).filter(u => !builtUnions.has(u.id));
-      for (const cu of childParentingUnions) {
-        const otherPartner = cu.partner1 === cid ? cu.partner2 : cu.partner1;
-        const otherParentUnionId = parentUnionOf.get(otherPartner);
-        if (otherParentUnionId && otherParentUnionId !== union.id) {
-          crossFamilyChildIds.add(cid);
-        }
-      }
-    }
-
-    // Reorder: non-cross-family children first (by age), then cross-family children last (rightmost)
-    // This places cross-family children at the edge closest to the other branch
-    const reorderedChildren = [
-      ...sortedChildren.filter(cid => !crossFamilyChildIds.has(cid)),
-      ...sortedChildren.filter(cid => crossFamilyChildIds.has(cid)),
-    ];
-
     const childNodes: TreeNode[] = [];
     const leafMembers: string[] = [];
 
-    for (const cid of reorderedChildren) {
+    for (const cid of sortedChildren) {
       const childParentingUnions = getParentingUnions(cid).filter(u => !builtUnions.has(u.id));
 
-      // Separate cross-family from same-branch
-      const sameBranch: Union[] = [];
-      for (const cu of childParentingUnions) {
-        const otherPartner = cu.partner1 === cid ? cu.partner2 : cu.partner1;
-        const otherParentUnionId = parentUnionOf.get(otherPartner);
-        const isCrossFamily = otherParentUnionId && otherParentUnionId !== union.id;
-
-        if (isCrossFamily) {
-          builtUnions.add(cu.id);
-          crossFamilyUnions.push(cu);
-        } else {
-          sameBranch.push(cu);
-        }
-      }
-
-      if (sameBranch.length > 0) {
-        for (const cu of sameBranch) {
+      // Build ALL parenting unions as subtrees (including cross-family ones)
+      // The cross-family partner will be placed next to their spouse naturally
+      if (childParentingUnions.length > 0) {
+        for (const cu of childParentingUnions) {
           childNodes.push(buildNode(cu));
         }
       } else {
@@ -212,7 +179,7 @@ export function computeAutoLayout(
       union,
       leafMembers,
       children: childNodes,
-      orderedChildIds: reorderedChildren,
+      orderedChildIds: sortedChildren,
       width: 0,
       absX: 0,
       gen,
@@ -365,71 +332,7 @@ export function computeAutoLayout(
     forestCursor += root.width + BRANCH_GAP;
   }
 
-  // ═══ 6. POSITION CROSS-FAMILY UNION CHILDREN ═══
-  // Place children next to the rightmost parent to avoid crossing other branches
-  for (const cu of crossFamilyUnions) {
-    const p1Pos = positions.get(cu.partner1);
-    const p2Pos = positions.get(cu.partner2);
-    if (!p1Pos || !p2Pos) continue;
-
-    // Place children under the space between the two parents,
-    // but anchored next to the rightmost of the left-parent or leftmost of the right-parent
-    // to avoid landing on top of other branches
-    const leftParentX = Math.min(p1Pos.x, p2Pos.x);
-    const rightParentX = Math.max(p1Pos.x, p2Pos.x);
-    // Anchor children just right of the left parent's card
-    const anchorX = leftParentX + CARD_W + coupleGap(cu) / 2;
-
-    const parentGen = Math.max(generation.get(cu.partner1) ?? 0, generation.get(cu.partner2) ?? 0);
-    const childY = (parentGen + 1) * LEVEL_SPACING;
-
-    const children = cu.children
-      .filter(cid => memberMap.has(cid) && !positions.has(cid))
-      .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
-
-    if (children.length === 0) continue;
-
-    const totalW = children.length * CARD_W + (children.length - 1) * SIBLING_GAP;
-    let cursor = anchorX - totalW / 2;
-    for (let ci = 0; ci < children.length; ci++) {
-      const cid = children[ci];
-      const stepOffset = children.length > 1 ? ci * SIBLING_STEP_Y : 0;
-      positions.set(cid, { x: cursor, y: childY + stepOffset });
-      cursor += CARD_W + SIBLING_GAP;
-
-      // Also position any sub-unions of cross-family children
-      const childUnions = getParentingUnions(cid);
-      for (const childU of childUnions) {
-        if (!builtUnions.has(childU.id)) {
-          builtUnions.add(childU.id);
-          const otherPartner = childU.partner1 === cid ? childU.partner2 : childU.partner1;
-          if (!positions.has(otherPartner)) {
-            const cidPos = positions.get(cid)!;
-            const gap = coupleGap(childU);
-            positions.set(otherPartner, { x: cidPos.x + CARD_W + gap, y: cidPos.y });
-          }
-          // Position grandchildren
-          const gcY = childY + LEVEL_SPACING;
-          const gcList = childU.children
-            .filter(gc => memberMap.has(gc) && !positions.has(gc))
-            .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
-          if (gcList.length > 0) {
-            const cidPos = positions.get(cid)!;
-            const opPos = positions.get(otherPartner)!;
-            const gcMidX = (cidPos.x + CARD_W / 2 + opPos.x + CARD_W / 2) / 2;
-            const gcTotalW = gcList.length * CARD_W + (gcList.length - 1) * SIBLING_GAP;
-            let gcCursor = gcMidX - gcTotalW / 2;
-            for (let gi = 0; gi < gcList.length; gi++) {
-              const gc = gcList[gi];
-              const gcStep = gcList.length > 1 ? gi * SIBLING_STEP_Y : 0;
-              positions.set(gc, { x: gcCursor, y: gcY + gcStep });
-              gcCursor += CARD_W + SIBLING_GAP;
-            }
-          }
-        }
-      }
-    }
-  }
+  // ═══ 6. (Cross-family unions are now built as regular subtrees, no special positioning needed) ═══
 
   // ═══ 7. PLACE ORPHAN MEMBERS ═══
   for (const m of members) {
