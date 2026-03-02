@@ -626,6 +626,51 @@ export function computeAutoLayout(
     if (!anyOverlap) break;
   }
 
+  // ═══ 11b. RE-COMPACT COUPLES ═══
+  // After collision resolution, partners (especially in-laws) may have drifted apart.
+  // Re-snap them to proper couple gap distance.
+  for (const u of unions) {
+    const p1 = positions.get(u.partner1);
+    const p2 = positions.get(u.partner2);
+    if (!p1 || !p2) continue;
+    const gap = coupleGap(u);
+    const [leftId, rightId] = p1.x <= p2.x ? [u.partner1, u.partner2] : [u.partner2, u.partner1];
+    const leftPos = positions.get(leftId)!;
+    const rightPos = positions.get(rightId)!;
+    const desiredX = leftPos.x + CARD_W + gap;
+    if (rightPos.x > desiredX + 5) {
+      // Pull the right partner back to the left
+      rightPos.x = desiredX;
+    }
+  }
+
+  // ═══ 11c. FINAL COLLISION PASS (post-compaction) ═══
+  for (let pass = 0; pass < 10; pass++) {
+    let anyOverlap = false;
+    const genGroups = new Map<number, string[]>();
+    for (const m of members) {
+      const g = generation.get(m.id) ?? 0;
+      if (!genGroups.has(g)) genGroups.set(g, []);
+      genGroups.get(g)!.push(m.id);
+    }
+    for (const [, ids] of genGroups) {
+      const sorted = ids
+        .filter(id => positions.has(id))
+        .sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
+      for (let i = 0; i < sorted.length - 1; i++) {
+        const posA = positions.get(sorted[i])!;
+        const posB = positions.get(sorted[i + 1])!;
+        const minRight = posA.x + CARD_W + MIN_CARD_GAP;
+        if (posB.x < minRight) {
+          const shift = minRight - posB.x;
+          shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap, parentUnionOf);
+          anyOverlap = true;
+        }
+      }
+    }
+    if (!anyOverlap) break;
+  }
+
   // ═══ 12. CENTER AROUND ORIGIN ═══
   if (positions.size > 0) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -665,10 +710,8 @@ function shiftMemberAndDescendants(
       const u = unionMap.get(uid);
       if (!u) continue;
       const pid = u.partner1 === id ? u.partner2 : u.partner1;
-      const partnerPos = positions.get(pid);
-      if (partnerPos && pos && partnerPos.x >= pos.x - dx) {
-        stack.push(pid);
-      }
+      // Always shift partner together (couples are atomic units)
+      if (!visited.has(pid)) stack.push(pid);
       for (const cid of u.children) stack.push(cid);
     }
   }
