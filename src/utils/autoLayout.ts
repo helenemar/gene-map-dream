@@ -38,6 +38,8 @@ interface TreeNode {
   /** Member IDs that are leaf children (no sub-tree) */
   leafMembers: string[];
   children: TreeNode[];
+  /** Ordered child IDs (accounts for cross-family reordering) */
+  orderedChildIds: string[];
   width: number;
   absX: number;
   gen: number;
@@ -210,6 +212,7 @@ export function computeAutoLayout(
       union,
       leafMembers,
       children: childNodes,
+      orderedChildIds: reorderedChildren,
       width: 0,
       absX: 0,
       gen,
@@ -292,12 +295,9 @@ export function computeAutoLayout(
     const allSlots: { type: 'leaf'; memberId: string; width: number }[]
       | { type: 'subtree'; node: TreeNode; width: number }[] = [];
 
-    // Interleave leaves and subtrees in birth-year order
-    // Rebuild combined order from the original sorted children
+    // Use the pre-computed ordered child IDs (accounts for cross-family reordering)
     if (node.union) {
-      const sortedChildren = [...node.union.children]
-        .filter(cid => memberMap.has(cid))
-        .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
+      const orderedChildren = node.orderedChildIds.filter(cid => memberMap.has(cid));
 
       const leafSet = new Set(node.leafMembers);
       // Map subtree nodes to their "owning child" — the child from this union
@@ -307,7 +307,7 @@ export function computeAutoLayout(
       type Slot = { type: 'leaf'; memberId: string; w: number } | { type: 'subtree'; node: TreeNode; w: number };
       const slots: Slot[] = [];
 
-      for (const cid of sortedChildren) {
+      for (const cid of orderedChildren) {
         if (leafSet.has(cid)) {
           slots.push({ type: 'leaf', memberId: cid, w: CARD_W });
         } else {
