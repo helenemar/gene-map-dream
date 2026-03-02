@@ -23,6 +23,7 @@ const BASE_COUPLE_GAP = 200;
 const MIN_BADGE_GAP = 280;
 const BADGE_SAFETY = 80;
 const SIBLING_GAP = 80;          // gap between sibling sub-trees
+const SIBLING_STEP_Y = 30;       // vertical staircase offset between siblings (oldest→youngest)
 const BRANCH_GAP = 400;          // gap between distinct family branches
 const MIN_CARD_GAP = 60;         // absolute minimum between any two cards
 
@@ -311,16 +312,23 @@ export function computeAutoLayout(
           + (slots.length - 1) * SIBLING_GAP;
         let cursor = centerX - totalW / 2;
 
+        // Count only leaf siblings for staircase (subtrees keep their own gen Y)
+        let leafIndex = 0;
+        const totalLeaves = slots.filter(s => s.type === 'leaf').length;
+
         for (const slot of slots) {
           const slotCenter = cursor + slot.w / 2;
 
           if (slot.type === 'subtree') {
             positionNode(slot.node, slotCenter);
           } else {
-            const childY = (node.gen + 1) * LEVEL_SPACING;
+            const baseChildY = (node.gen + 1) * LEVEL_SPACING;
+            // Staircase: each leaf sibling steps down slightly (oldest=0, youngest=max)
+            const stepOffset = totalLeaves > 1 ? leafIndex * SIBLING_STEP_Y : 0;
             if (!positions.has(slot.memberId)) {
-              positions.set(slot.memberId, { x: slotCenter - CARD_W / 2, y: childY });
+              positions.set(slot.memberId, { x: slotCenter - CARD_W / 2, y: baseChildY + stepOffset });
             }
+            leafIndex++;
           }
 
           cursor += slot.w + SIBLING_GAP;
@@ -363,8 +371,10 @@ export function computeAutoLayout(
 
     const totalW = children.length * CARD_W + (children.length - 1) * SIBLING_GAP;
     let cursor = anchorX - totalW / 2;
-    for (const cid of children) {
-      positions.set(cid, { x: cursor, y: childY });
+    for (let ci = 0; ci < children.length; ci++) {
+      const cid = children[ci];
+      const stepOffset = children.length > 1 ? ci * SIBLING_STEP_Y : 0;
+      positions.set(cid, { x: cursor, y: childY + stepOffset });
       cursor += CARD_W + SIBLING_GAP;
 
       // Also position any sub-unions of cross-family children
@@ -389,8 +399,10 @@ export function computeAutoLayout(
             const gcMidX = (cidPos.x + CARD_W / 2 + opPos.x + CARD_W / 2) / 2;
             const gcTotalW = gcList.length * CARD_W + (gcList.length - 1) * SIBLING_GAP;
             let gcCursor = gcMidX - gcTotalW / 2;
-            for (const gc of gcList) {
-              positions.set(gc, { x: gcCursor, y: gcY });
+            for (let gi = 0; gi < gcList.length; gi++) {
+              const gc = gcList[gi];
+              const gcStep = gcList.length > 1 ? gi * SIBLING_STEP_Y : 0;
+              positions.set(gc, { x: gcCursor, y: gcY + gcStep });
               gcCursor += CARD_W + SIBLING_GAP;
             }
           }
