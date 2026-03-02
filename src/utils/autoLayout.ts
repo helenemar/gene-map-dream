@@ -143,10 +143,13 @@ export function computeAutoLayout(
   }
 
   const builtUnions = new Set<string>();
+  const crossFamilyUnions: Union[] = [];
 
   /**
    * Build a tree node for a union. Each child that itself has a parenting union
-   * becomes a sub-tree. This naturally partitions the genogram into non-overlapping branches.
+   * becomes a sub-tree — UNLESS the other partner comes from a different family
+   * branch (cross-family union). In that case, both partners stay as leaves
+   * under their respective parents and the union's children are positioned later.
    */
   function buildNode(union: Union): TreeNode {
     builtUnions.add(union.id);
@@ -159,11 +162,26 @@ export function computeAutoLayout(
 
     const childNodes: TreeNode[] = [];
     for (const cid of sortedChildren) {
-      // Does this child have their own parenting union?
       const childParentingUnions = getParentingUnions(cid).filter(u => !builtUnions.has(u.id));
-      if (childParentingUnions.length > 0) {
-        // Build sub-tree for each parenting union of this child
-        for (const cu of childParentingUnions) {
+
+      // Separate cross-family unions from same-branch unions
+      const sameBranch: Union[] = [];
+      for (const cu of childParentingUnions) {
+        const otherPartner = cu.partner1 === cid ? cu.partner2 : cu.partner1;
+        const otherParentUnionId = parentUnionOf.get(otherPartner);
+        const isCrossFamily = otherParentUnionId && otherParentUnionId !== union.id;
+
+        if (isCrossFamily) {
+          // Mark as built so the other branch doesn't claim it either
+          builtUnions.add(cu.id);
+          crossFamilyUnions.push(cu);
+        } else {
+          sameBranch.push(cu);
+        }
+      }
+
+      if (sameBranch.length > 0) {
+        for (const cu of sameBranch) {
           childNodes.push(buildNode(cu));
         }
       } else {
@@ -184,7 +202,7 @@ export function computeAutoLayout(
       id: union.id,
       union,
       children: childNodes,
-      width: 0,  // computed in sizing pass
+      width: 0,
       relX: 0,
       absX: 0,
       gen,
@@ -308,6 +326,31 @@ export function computeAutoLayout(
     const cx = forestCursor + root.width / 2;
     positionNode(root, cx);
     forestCursor += root.width + BRANCH_GAP;
+  }
+
+  // ═══ POSITION CROSS-FAMILY UNION CHILDREN ═══
+  // These unions join two branches — position their children between both partners
+  for (const cu of crossFamilyUnions) {
+    const p1Pos = positions.get(cu.partner1);
+    const p2Pos = positions.get(cu.partner2);
+    if (!p1Pos || !p2Pos) continue;
+
+    const midX = (p1Pos.x + CARD_W / 2 + p2Pos.x + CARD_W / 2) / 2;
+    const parentGen = Math.max(generation.get(cu.partner1) ?? 0, generation.get(cu.partner2) ?? 0);
+    const childY = (parentGen + 1) * LEVEL_SPACING;
+
+    const children = cu.children
+      .filter(cid => memberMap.has(cid) && !positions.has(cid))
+      .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
+
+    if (children.length === 0) continue;
+
+    const totalW = children.length * CARD_W + (children.length - 1) * SIBLING_GAP;
+    let cursor = midX - totalW / 2;
+    for (const cid of children) {
+      positions.set(cid, { x: cursor, y: childY });
+      cursor += CARD_W + SIBLING_GAP;
+    }
   }
 
   // ═══ PLACE ORPHAN MEMBERS ═══
