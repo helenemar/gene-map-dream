@@ -289,7 +289,13 @@ export function computeAutoLayout(
     // ─── Children block span ───
     const blockLeft = Math.min(...childXPositions.map(c => c.left));
     const blockRight = Math.max(...childXPositions.map(c => c.right));
-    const blockCenter = (blockLeft + blockRight) / 2;
+
+    // Center parents above child CARD centers (not their full sub-family extents)
+    const childCardCenters = childXPositions.map(c => {
+      const pos = positions.get(c.id);
+      return pos ? pos.x + CARD_W / 2 : (c.left + c.right) / 2;
+    });
+    const blockCenter = (Math.min(...childCardCenters) + Math.max(...childCardCenters)) / 2;
 
     const gap = coupleGap(union);
     const coupleWidth = CARD_W * 2 + gap;
