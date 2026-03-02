@@ -457,11 +457,11 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
               const dropX = childAnchors[i].x;
               const dropYTop = combY;
               const dropYBottom = childAnchors[i].y;
-              const dropCrossings = findCrossings(dropX, dropYTop, dropYBottom, allHSegments, union.id);
-              const jogDir = dropX >= unionMidX ? 1 : -1;
-              const dropPath = buildAvoidingVerticalPath(dropX, dropYTop, dropYBottom, dropCrossings, jogDir);
+              // Always draw a straight vertical line – no crossing avoidance jogs
               elements.push(
-                <path key={`drop-${i}`} d={dropPath} fill="none"
+                <line key={`drop-${i}`}
+                  x1={dropX} y1={dropYTop}
+                  x2={dropX} y2={dropYBottom}
                   stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
                   strokeDasharray={isAdoption ? adoptionDash : undefined} />
               );
