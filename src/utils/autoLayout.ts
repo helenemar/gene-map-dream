@@ -1,32 +1,48 @@
 /**
- * Reingold-Tilford–inspired Hierarchical Tree Layout
+ * Reingold-Tilford–inspired Hierarchical Tree Layout (v3)
  *
  * Guarantees:
- *   1. Strict Y per generation: gen × LEVEL_SPACING (no stagger)
+ *   1. Strict Y per generation: gen × LEVEL_SPACING
  *   2. Each family branch occupies a contiguous horizontal corridor
+ *      sized by total descendant count (bottom-up)
  *   3. Parents are centred exactly above their children
  *   4. Siblings are distributed symmetrically around the parent union midpoint
- *   5. Minimum 40 px gap between any two cards (collision resolution)
- *   6. Lines never cross family branches
+ *   5. Minimum BRANCH_GAP (400 px) between distinct family branches
+ *   6. Collision resolution pushes entire branches apart
+ *   7. Cross-family unions (partners from different branches) are handled
+ *      so each partner stays under their own parents
  */
 
 import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 
+// ═══ CONSTANTS ═══
 const CARD_W = 220;
 const CARD_H = 64;
 const LEVEL_SPACING = 250;
 const BASE_COUPLE_GAP = 200;
 const MIN_BADGE_GAP = 280;
 const BADGE_SAFETY = 80;
-const SIBLING_GAP = 60;         // gap between sibling sub-trees
-const BRANCH_GAP = 80;          // gap between distinct family branches
-const MIN_CARD_GAP = 40;        // absolute minimum between any two cards
+const SIBLING_GAP = 80;          // gap between sibling sub-trees
+const BRANCH_GAP = 400;          // gap between distinct family branches
+const MIN_CARD_GAP = 60;         // absolute minimum between any two cards
 
+// ═══ TYPES ═══
 interface LayoutResult {
   positions: Map<string, { x: number; y: number }>;
 }
 
-/** Dynamic couple gap based on badge width */
+interface TreeNode {
+  id: string;
+  union: Union | null;
+  /** Member IDs that are leaf children (no sub-tree) */
+  leafMembers: string[];
+  children: TreeNode[];
+  width: number;
+  absX: number;
+  gen: number;
+}
+
+// ═══ HELPERS ═══
 function coupleGap(union: Union): number {
   let labelLen = 0;
   if (union.marriageYear) labelLen += `R: ${union.marriageYear}`.length;
@@ -39,25 +55,13 @@ function coupleGap(union: Union): number {
   return hasIcon ? Math.max(BASE_COUPLE_GAP, 160) : BASE_COUPLE_GAP;
 }
 
-// ═══════════════════════════════════════════════════════════
-// Internal tree node used during layout
-// ═══════════════════════════════════════════════════════════
-interface TreeNode {
-  /** Union id (or synthetic id for singletons) */
-  id: string;
-  union: Union | null;
-  /** Ordered children tree nodes */
-  children: TreeNode[];
-  /** Computed subtree width (bottom-up) */
-  width: number;
-  /** Relative X offset of this node's center within its parent's coordinate frame */
-  relX: number;
-  /** Absolute X of the couple/center after layout */
-  absX: number;
-  /** Generation level */
-  gen: number;
+function coupleWidth(union: Union): number {
+  return CARD_W * 2 + coupleGap(union);
 }
 
+// ═══════════════════════════════════════════════════════════
+// MAIN LAYOUT FUNCTION
+// ═══════════════════════════════════════════════════════════
 export function computeAutoLayout(
   members: FamilyMember[],
   unions: Union[],
@@ -69,9 +73,9 @@ export function computeAutoLayout(
   const unionMap = new Map(unions.map(u => [u.id, u]));
   const positions = new Map<string, { x: number; y: number }>();
 
-  // ═══ INDEX ═══
+  // ═══ 1. INDEX RELATIONSHIPS ═══
   const allChildIds = new Set<string>();
-  const parentUnionOf = new Map<string, string>(); // childId → unionId
+  const parentUnionOf = new Map<string, string>();   // childId → unionId
   const partnerUnions = new Map<string, string[]>(); // memberId → unionIds
 
   for (const u of unions) {
@@ -85,13 +89,12 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ GENERATION ASSIGNMENT ═══
+  // ═══ 2. GENERATION ASSIGNMENT ═══
   const generation = new Map<string, number>();
 
   function assignGen(id: string, gen: number) {
     if (generation.has(id)) return;
     generation.set(id, gen);
-    // Propagate to partners (same gen) and children (gen + 1)
     for (const uid of (partnerUnions.get(id) || [])) {
       const u = unionMap.get(uid)!;
       const pid = u.partner1 === id ? u.partner2 : u.partner1;
@@ -102,16 +105,15 @@ export function computeAutoLayout(
     }
   }
 
-  // Start from roots (members who are not children of any union)
+  // Roots = members who are not children of any union
   for (const m of members) {
     if (!allChildIds.has(m.id)) assignGen(m.id, 0);
   }
-  // Handle orphans
   for (const m of members) {
     if (!generation.has(m.id)) assignGen(m.id, 0);
   }
 
-  // Fix-up: ensure children are always parent_gen + 1, partners same gen
+  // Fix-up: force children > parent gen, partners same gen
   for (let iter = 0; iter < 20; iter++) {
     let changed = false;
     for (const u of unions) {
@@ -134,8 +136,7 @@ export function computeAutoLayout(
     if (!changed) break;
   }
 
-  // ═══ BUILD TREE ═══
-  // Find "parenting unions" for a member (unions where they are a parent with children)
+  // ═══ 3. BUILD TREE ═══
   function getParentingUnions(memberId: string): Union[] {
     return (partnerUnions.get(memberId) || [])
       .map(uid => unionMap.get(uid)!)
@@ -145,26 +146,21 @@ export function computeAutoLayout(
   const builtUnions = new Set<string>();
   const crossFamilyUnions: Union[] = [];
 
-  /**
-   * Build a tree node for a union. Each child that itself has a parenting union
-   * becomes a sub-tree — UNLESS the other partner comes from a different family
-   * branch (cross-family union). In that case, both partners stay as leaves
-   * under their respective parents and the union's children are positioned later.
-   */
   function buildNode(union: Union): TreeNode {
     builtUnions.add(union.id);
     const gen = Math.max(generation.get(union.partner1) ?? 0, generation.get(union.partner2) ?? 0);
 
-    // Sort children by birth year (oldest left)
     const sortedChildren = [...union.children]
       .filter(cid => memberMap.has(cid))
       .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
 
     const childNodes: TreeNode[] = [];
+    const leafMembers: string[] = [];
+
     for (const cid of sortedChildren) {
       const childParentingUnions = getParentingUnions(cid).filter(u => !builtUnions.has(u.id));
 
-      // Separate cross-family unions from same-branch unions
+      // Separate cross-family from same-branch
       const sameBranch: Union[] = [];
       for (const cu of childParentingUnions) {
         const otherPartner = cu.partner1 === cid ? cu.partner2 : cu.partner1;
@@ -172,7 +168,6 @@ export function computeAutoLayout(
         const isCrossFamily = otherParentUnionId && otherParentUnionId !== union.id;
 
         if (isCrossFamily) {
-          // Mark as built so the other branch doesn't claim it either
           builtUnions.add(cu.id);
           crossFamilyUnions.push(cu);
         } else {
@@ -185,142 +180,156 @@ export function computeAutoLayout(
           childNodes.push(buildNode(cu));
         }
       } else {
-        // Leaf child — create a minimal node
-        childNodes.push({
-          id: `leaf-${cid}`,
-          union: null,
-          children: [],
-          width: CARD_W,
-          relX: 0,
-          absX: 0,
-          gen: generation.get(cid) ?? gen + 1,
-        });
+        leafMembers.push(cid);
       }
     }
 
     return {
       id: union.id,
       union,
+      leafMembers,
       children: childNodes,
       width: 0,
-      relX: 0,
       absX: 0,
       gen,
     };
   }
 
-  // Build forest from root unions (gen 0)
-  const rootUnions = unions.filter(u => {
-    const g = Math.max(generation.get(u.partner1) ?? 0, generation.get(u.partner2) ?? 0);
-    return g === 0 && !builtUnions.has(u.id);
-  });
+  // Build forest from root unions (gen 0 first, then remaining)
+  const rootUnions = unions
+    .filter(u => {
+      const g = Math.max(generation.get(u.partner1) ?? 0, generation.get(u.partner2) ?? 0);
+      return g === 0;
+    })
+    .filter(u => !builtUnions.has(u.id));
 
   const forest: TreeNode[] = [];
   for (const ru of rootUnions) {
     if (!builtUnions.has(ru.id)) forest.push(buildNode(ru));
   }
-  // Remaining un-built unions
   for (const u of unions) {
     if (!builtUnions.has(u.id)) forest.push(buildNode(u));
   }
 
-  // ═══ BOTTOM-UP SIZING ═══
+  // ═══ 4. BOTTOM-UP SIZING ═══
   function computeWidth(node: TreeNode): number {
-    if (node.children.length === 0) {
-      // Leaf: either a couple (2 cards + gap) or a single card
-      if (node.union) {
-        node.width = CARD_W * 2 + coupleGap(node.union);
-      } else {
-        node.width = CARD_W;
-      }
+    const cw = node.union ? coupleWidth(node.union) : CARD_W;
+
+    if (node.children.length === 0 && node.leafMembers.length === 0) {
+      node.width = cw;
       return node.width;
     }
 
-    // Width = sum of children widths + gaps between them
-    let childrenTotalW = 0;
+    // Leaves each take CARD_W
+    const leafTotalW = node.leafMembers.length > 0
+      ? node.leafMembers.length * CARD_W + (node.leafMembers.length - 1) * SIBLING_GAP
+      : 0;
+
+    // Recursive children
+    let subTreeTotalW = 0;
     for (let i = 0; i < node.children.length; i++) {
-      if (i > 0) childrenTotalW += SIBLING_GAP;
-      childrenTotalW += computeWidth(node.children[i]);
+      if (i > 0) subTreeTotalW += SIBLING_GAP;
+      subTreeTotalW += computeWidth(node.children[i]);
     }
 
-    // The couple itself also has a minimum width
-    const coupleW = node.union ? CARD_W * 2 + coupleGap(node.union) : CARD_W;
-    node.width = Math.max(childrenTotalW, coupleW);
+    // Total children width = leaves + subtrees + gap between them
+    let childrenW = 0;
+    if (leafTotalW > 0 && subTreeTotalW > 0) {
+      childrenW = leafTotalW + SIBLING_GAP + subTreeTotalW;
+    } else {
+      childrenW = leafTotalW + subTreeTotalW;
+    }
+
+    node.width = Math.max(childrenW, cw);
     return node.width;
   }
 
   for (const root of forest) computeWidth(root);
 
-  // ═══ TOP-DOWN POSITIONING ═══
+  // ═══ 5. TOP-DOWN POSITIONING ═══
   function positionNode(node: TreeNode, centerX: number) {
     node.absX = centerX;
+    const y = node.gen * LEVEL_SPACING;
 
+    // Place the couple
     if (node.union) {
       const u = node.union;
       const gap = coupleGap(u);
-      const coupleW = CARD_W * 2 + gap;
-      const coupleLeft = centerX - coupleW / 2;
-      const y = node.gen * LEVEL_SPACING;
+      const cw = coupleWidth(u);
+      const coupleLeft = centerX - cw / 2;
 
-      // Male left, female right
       const m1 = memberMap.get(u.partner1);
       const [maleId, femaleId] = m1 && m1.gender === 'male'
         ? [u.partner1, u.partner2]
         : [u.partner2, u.partner1];
 
-      if (!positions.has(maleId)) {
-        positions.set(maleId, { x: coupleLeft, y });
-      }
-      if (!positions.has(femaleId)) {
-        positions.set(femaleId, { x: coupleLeft + CARD_W + gap, y });
-      }
+      if (!positions.has(maleId)) positions.set(maleId, { x: coupleLeft, y });
+      if (!positions.has(femaleId)) positions.set(femaleId, { x: coupleLeft + CARD_W + gap, y });
+    }
 
-      // Place children that are in this union but DON'T have their own sub-tree
-      // (they are leaf nodes). We need to map leaf nodes back to their member IDs.
-      const sortedChildren = [...u.children]
+    // Compute total children strip width
+    const allSlots: { type: 'leaf'; memberId: string; width: number }[]
+      | { type: 'subtree'; node: TreeNode; width: number }[] = [];
+
+    // Interleave leaves and subtrees in birth-year order
+    // Rebuild combined order from the original sorted children
+    if (node.union) {
+      const sortedChildren = [...node.union.children]
         .filter(cid => memberMap.has(cid))
         .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
 
-      // Distribute child sub-trees within this node's width
-      if (node.children.length > 0) {
-        const totalChildrenW = node.children.reduce((s, c) => s + c.width, 0)
-          + (node.children.length - 1) * SIBLING_GAP;
-        let cursor = centerX - totalChildrenW / 2;
+      const leafSet = new Set(node.leafMembers);
+      // Map subtree nodes to their "owning child" — the child from this union
+      // that initiated the subtree
+      const subtreeQueue = [...node.children];
 
-        let childMemberIdx = 0;
-        for (const childNode of node.children) {
-          const childCenterX = cursor + childNode.width / 2;
+      type Slot = { type: 'leaf'; memberId: string; w: number } | { type: 'subtree'; node: TreeNode; w: number };
+      const slots: Slot[] = [];
 
-          if (childNode.union) {
-            // Sub-family: position recursively
-            positionNode(childNode, childCenterX);
-          } else {
-            // Leaf child — place the member card
-            if (childMemberIdx < sortedChildren.length) {
-              // Find the right member for this leaf
-              let memberId = sortedChildren[childMemberIdx];
-              // Skip members that already have positions (placed by sub-tree)
-              while (positions.has(memberId) && childMemberIdx < sortedChildren.length - 1) {
-                childMemberIdx++;
-                memberId = sortedChildren[childMemberIdx];
-              }
-              const childY = (node.gen + 1) * LEVEL_SPACING;
-              if (!positions.has(memberId)) {
-                positions.set(memberId, { x: childCenterX - CARD_W / 2, y: childY });
-              }
-            }
-            childMemberIdx++;
+      for (const cid of sortedChildren) {
+        if (leafSet.has(cid)) {
+          slots.push({ type: 'leaf', memberId: cid, w: CARD_W });
+        } else {
+          // Find the subtree node for this child
+          const stIdx = subtreeQueue.findIndex(sn => {
+            if (!sn.union) return false;
+            return sn.union.partner1 === cid || sn.union.partner2 === cid;
+          });
+          if (stIdx >= 0) {
+            const sn = subtreeQueue.splice(stIdx, 1)[0];
+            slots.push({ type: 'subtree', node: sn, w: sn.width });
           }
-
-          cursor += childNode.width + SIBLING_GAP;
         }
       }
-    } else {
-      // Single member node (no union) — should not happen at root level
+      // Any remaining subtrees (shouldn't happen but safety)
+      for (const sn of subtreeQueue) {
+        slots.push({ type: 'subtree', node: sn, w: sn.width });
+      }
+
+      if (slots.length > 0) {
+        const totalW = slots.reduce((s, sl) => s + sl.w, 0)
+          + (slots.length - 1) * SIBLING_GAP;
+        let cursor = centerX - totalW / 2;
+
+        for (const slot of slots) {
+          const slotCenter = cursor + slot.w / 2;
+
+          if (slot.type === 'subtree') {
+            positionNode(slot.node, slotCenter);
+          } else {
+            const childY = (node.gen + 1) * LEVEL_SPACING;
+            if (!positions.has(slot.memberId)) {
+              positions.set(slot.memberId, { x: slotCenter - CARD_W / 2, y: childY });
+            }
+          }
+
+          cursor += slot.w + SIBLING_GAP;
+        }
+      }
     }
   }
 
-  // Position forest roots side by side
+  // Position forest roots side by side with BRANCH_GAP
   let forestCursor = 0;
   for (const root of forest) {
     const cx = forestCursor + root.width / 2;
@@ -328,8 +337,7 @@ export function computeAutoLayout(
     forestCursor += root.width + BRANCH_GAP;
   }
 
-  // ═══ POSITION CROSS-FAMILY UNION CHILDREN ═══
-  // These unions join two branches — position their children between both partners
+  // ═══ 6. POSITION CROSS-FAMILY UNION CHILDREN ═══
   for (const cu of crossFamilyUnions) {
     const p1Pos = positions.get(cu.partner1);
     const p2Pos = positions.get(cu.partner2);
@@ -350,10 +358,40 @@ export function computeAutoLayout(
     for (const cid of children) {
       positions.set(cid, { x: cursor, y: childY });
       cursor += CARD_W + SIBLING_GAP;
+
+      // Also position any sub-unions of cross-family children
+      const childUnions = getParentingUnions(cid);
+      for (const childU of childUnions) {
+        if (!builtUnions.has(childU.id)) {
+          builtUnions.add(childU.id);
+          const otherPartner = childU.partner1 === cid ? childU.partner2 : childU.partner1;
+          if (!positions.has(otherPartner)) {
+            const cidPos = positions.get(cid)!;
+            const gap = coupleGap(childU);
+            positions.set(otherPartner, { x: cidPos.x + CARD_W + gap, y: cidPos.y });
+          }
+          // Position grandchildren
+          const gcY = childY + LEVEL_SPACING;
+          const gcList = childU.children
+            .filter(gc => memberMap.has(gc) && !positions.has(gc))
+            .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
+          if (gcList.length > 0) {
+            const cidPos = positions.get(cid)!;
+            const opPos = positions.get(otherPartner)!;
+            const gcMidX = (cidPos.x + CARD_W / 2 + opPos.x + CARD_W / 2) / 2;
+            const gcTotalW = gcList.length * CARD_W + (gcList.length - 1) * SIBLING_GAP;
+            let gcCursor = gcMidX - gcTotalW / 2;
+            for (const gc of gcList) {
+              positions.set(gc, { x: gcCursor, y: gcY });
+              gcCursor += CARD_W + SIBLING_GAP;
+            }
+          }
+        }
+      }
     }
   }
 
-  // ═══ PLACE ORPHAN MEMBERS ═══
+  // ═══ 7. PLACE ORPHAN MEMBERS ═══
   for (const m of members) {
     if (!positions.has(m.id)) {
       const gen = generation.get(m.id) ?? 0;
@@ -362,9 +400,8 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ COLLISION RESOLUTION ═══
-  // Group by generation, sort by X, push apart if overlapping
-  for (let pass = 0; pass < 15; pass++) {
+  // ═══ 8. COLLISION RESOLUTION ═══
+  for (let pass = 0; pass < 20; pass++) {
     let anyOverlap = false;
     const genGroups = new Map<number, string[]>();
     for (const m of members) {
@@ -384,7 +421,6 @@ export function computeAutoLayout(
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
           const shift = minRight - posB.x;
-          // Shift B and all its descendants
           shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap);
           anyOverlap = true;
         }
@@ -393,7 +429,39 @@ export function computeAutoLayout(
     if (!anyOverlap) break;
   }
 
-  // ═══ ENSURE PARTNERS SHARE SAME Y ═══
+  // ═══ 9. RE-CENTER PARENTS ABOVE CHILDREN ═══
+  // After collision resolution, nudge parent couples so they stay centered
+  for (let pass = 0; pass < 5; pass++) {
+    let anyShift = false;
+    for (const u of unions) {
+      if (u.children.length === 0) continue;
+      const childPositions = u.children
+        .map(cid => positions.get(cid))
+        .filter((p): p is { x: number; y: number } => !!p);
+      if (childPositions.length === 0) continue;
+
+      const childMinX = Math.min(...childPositions.map(p => p.x));
+      const childMaxX = Math.max(...childPositions.map(p => p.x + CARD_W));
+      const childCenterX = (childMinX + childMaxX) / 2;
+
+      const p1 = positions.get(u.partner1);
+      const p2 = positions.get(u.partner2);
+      if (!p1 || !p2) continue;
+
+      const gap = coupleGap(u);
+      const currentCoupleCenter = (Math.min(p1.x, p2.x) + Math.max(p1.x, p2.x) + CARD_W) / 2;
+      const dx = childCenterX - currentCoupleCenter;
+
+      if (Math.abs(dx) > 5) {
+        p1.x += dx;
+        p2.x += dx;
+        anyShift = true;
+      }
+    }
+    if (!anyShift) break;
+  }
+
+  // ═══ 10. ENSURE PARTNERS SHARE SAME Y ═══
   for (const u of unions) {
     const p1 = positions.get(u.partner1);
     const p2 = positions.get(u.partner2);
@@ -404,7 +472,34 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ CENTER AROUND ORIGIN ═══
+  // ═══ 11. FINAL COLLISION PASS ═══
+  for (let pass = 0; pass < 10; pass++) {
+    let anyOverlap = false;
+    const genGroups = new Map<number, string[]>();
+    for (const m of members) {
+      const g = generation.get(m.id) ?? 0;
+      if (!genGroups.has(g)) genGroups.set(g, []);
+      genGroups.get(g)!.push(m.id);
+    }
+    for (const [, ids] of genGroups) {
+      const sorted = ids
+        .filter(id => positions.has(id))
+        .sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
+      for (let i = 0; i < sorted.length - 1; i++) {
+        const posA = positions.get(sorted[i])!;
+        const posB = positions.get(sorted[i + 1])!;
+        const minRight = posA.x + CARD_W + MIN_CARD_GAP;
+        if (posB.x < minRight) {
+          const shift = minRight - posB.x;
+          shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap);
+          anyOverlap = true;
+        }
+      }
+    }
+    if (!anyOverlap) break;
+  }
+
+  // ═══ 12. CENTER AROUND ORIGIN ═══
   if (positions.size > 0) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const pos of positions.values()) {
@@ -442,7 +537,6 @@ function shiftMemberAndDescendants(
       if (!u) continue;
       const pid = u.partner1 === id ? u.partner2 : u.partner1;
       const partnerPos = positions.get(pid);
-      // Only shift partner if they are to the right or at same position
       if (partnerPos && pos && partnerPos.x >= pos.x - dx) {
         stack.push(pid);
       }
