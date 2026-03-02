@@ -457,35 +457,14 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
               const dropX = childAnchors[i].x;
               const dropYTop = combY;
               const dropYBottom = childAnchors[i].y;
-
-              // Find unions where this child is a partner – exclude those from crossing detection
-              const childId = childMembers[i].id;
-              const childUnionIds = new Set<string>([union.id]);
-              for (const otherUnion of unions) {
-                if (otherUnion.partner1 === childId || otherUnion.partner2 === childId) {
-                  childUnionIds.add(otherUnion.id);
-                }
-              }
-              const relevantSegments = allHSegments.filter(s => !childUnionIds.has(s.unionId));
-              const dropCrossings = findCrossings(dropX, dropYTop, dropYBottom, relevantSegments, '');
-              const jogDir = dropX >= unionMidX ? 1 : -1;
-
-              if (dropCrossings.length > 0) {
-                const dropPath = buildAvoidingVerticalPath(dropX, dropYTop, dropYBottom, dropCrossings, jogDir);
-                elements.push(
-                  <path key={`drop-${i}`} d={dropPath} fill="none"
-                    stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-                    strokeDasharray={isAdoption ? adoptionDash : undefined} />
-                );
-              } else {
-                elements.push(
-                  <line key={`drop-${i}`}
-                    x1={dropX} y1={dropYTop}
-                    x2={dropX} y2={dropYBottom}
-                    stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-                    strokeDasharray={isAdoption ? adoptionDash : undefined} />
-                );
-              }
+              // Always straight vertical drops
+              elements.push(
+                <line key={`drop-${i}`}
+                  x1={dropX} y1={dropYTop}
+                  x2={dropX} y2={dropYBottom}
+                  stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                  strokeDasharray={isAdoption ? adoptionDash : undefined} />
+              );
               // Adoption transversal tick at midpoint of drop
               if (isAdoption) {
                 const midY = (dropYTop + dropYBottom) / 2;
