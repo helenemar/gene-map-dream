@@ -338,12 +338,20 @@ export function computeAutoLayout(
   }
 
   // ═══ 6. POSITION CROSS-FAMILY UNION CHILDREN ═══
+  // Place children next to the rightmost parent to avoid crossing other branches
   for (const cu of crossFamilyUnions) {
     const p1Pos = positions.get(cu.partner1);
     const p2Pos = positions.get(cu.partner2);
     if (!p1Pos || !p2Pos) continue;
 
-    const midX = (p1Pos.x + CARD_W / 2 + p2Pos.x + CARD_W / 2) / 2;
+    // Place children under the space between the two parents,
+    // but anchored next to the rightmost of the left-parent or leftmost of the right-parent
+    // to avoid landing on top of other branches
+    const leftParentX = Math.min(p1Pos.x, p2Pos.x);
+    const rightParentX = Math.max(p1Pos.x, p2Pos.x);
+    // Anchor children just right of the left parent's card
+    const anchorX = leftParentX + CARD_W + coupleGap(cu) / 2;
+
     const parentGen = Math.max(generation.get(cu.partner1) ?? 0, generation.get(cu.partner2) ?? 0);
     const childY = (parentGen + 1) * LEVEL_SPACING;
 
@@ -354,7 +362,7 @@ export function computeAutoLayout(
     if (children.length === 0) continue;
 
     const totalW = children.length * CARD_W + (children.length - 1) * SIBLING_GAP;
-    let cursor = midX - totalW / 2;
+    let cursor = anchorX - totalW / 2;
     for (const cid of children) {
       positions.set(cid, { x: cursor, y: childY });
       cursor += CARD_W + SIBLING_GAP;
