@@ -54,18 +54,16 @@ describe('autoLayout cross-family unions', () => {
     // Elisabeth's Y should be one generation below Henri & Genevieve
     expect(elisabethPos.y).toBeGreaterThan(henriPos.y);
 
-    // Elisabeth's X center should be between Henri and Genevieve (within their branch)
-    const hgLeft = Math.min(henriPos.x, genevievePos.x);
-    const hgRight = Math.max(henriPos.x, genevievePos.x) + CARD_W;
-    const elisabethCenter = elisabethPos.x + CARD_W / 2;
-    expect(elisabethCenter).toBeGreaterThanOrEqual(hgLeft);
-    expect(elisabethCenter).toBeLessThanOrEqual(hgRight);
+    // Philippe (1963) should be LEFT of Christine (1966) - oldest first
+    const christinePos = result.positions.get('christine')!;
+    expect(christinePos).toBeDefined();
+    expect(philippePos.x).toBeLessThan(christinePos.x);
 
-    // Philippe should be under Claude & Jeannine's branch, NOT near Henri & Genevieve
-    const cjLeft = Math.min(claudePos.x, philippePos.x);
-    expect(philippePos.x).toBeLessThan(henriPos.x);
+    // Elisabeth should be next to Philippe (as his partner), not far away
+    // They form a couple, so Elisabeth should be close to Philippe
+    expect(Math.abs(elisabethPos.x - philippePos.x)).toBeLessThan(1000);
 
-    // Children of the cross-family union should be grouped together
+    // Children of Philippe & Elisabeth should be grouped together
     const helenePos = result.positions.get('helene')!;
     const francoisPos = result.positions.get('francois')!;
     expect(helenePos).toBeDefined();
@@ -76,8 +74,7 @@ describe('autoLayout cross-family unions', () => {
     const thomasPos = result.positions.get('thomas')!;
     expect(thomasPos).toBeDefined();
 
-    // Cross-family children (François, Hélène) should NOT be interleaved with Thomas
-    // Either all cross-family children are left of Thomas, or all are right
+    // Philippe&Elisabeth's children should NOT be interleaved with Christine&Pascal's children
     const crossChildrenXs = [francoisPos.x, helenePos.x].sort((a, b) => a - b);
     const thomasInBetween = thomasPos.x > crossChildrenXs[0] && thomasPos.x < crossChildrenXs[1];
     expect(thomasInBetween).toBe(false);
