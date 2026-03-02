@@ -1190,7 +1190,7 @@ const GenogramEditor: React.FC = () => {
       setIsAnimating(false);
       handleFitToScreen();
     }, 900); // Match spring animation duration
-  }, [members, emotionalLinks, handleFitToScreen]);
+  }, [members, unions, emotionalLinks, handleFitToScreen]);
 
   // ─── Auto-layout on member count change (skip initial load) ───
   const prevMemberCountRef = React.useRef<number | null>(null);
