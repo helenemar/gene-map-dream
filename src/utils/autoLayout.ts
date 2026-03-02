@@ -421,7 +421,7 @@ export function computeAutoLayout(
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
           const shift = minRight - posB.x;
-          shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap);
+          shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap, parentUnionOf);
           anyOverlap = true;
         }
       }
@@ -491,7 +491,7 @@ export function computeAutoLayout(
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
           const shift = minRight - posB.x;
-          shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap);
+          shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap, parentUnionOf);
           anyOverlap = true;
         }
       }
@@ -515,7 +515,7 @@ export function computeAutoLayout(
   return { positions };
 }
 
-/** Shift a member and all their partners + descendants by dx */
+/** Shift a member, their siblings, partners, and all descendants by dx */
 function shiftMemberAndDescendants(
   startId: string,
   dx: number,
@@ -523,9 +523,29 @@ function shiftMemberAndDescendants(
   partnerUnions: Map<string, string[]>,
   unionMap: Map<string, Union>,
   memberMap: Map<string, FamilyMember>,
+  parentUnionOf?: Map<string, string>,
 ) {
   const visited = new Set<string>();
   const stack = [startId];
+
+  // Also include all siblings (children of the same parent union)
+  if (parentUnionOf) {
+    const parentUId = parentUnionOf.get(startId);
+    if (parentUId) {
+      const parentU = unionMap.get(parentUId);
+      if (parentU) {
+        for (const sibId of parentU.children) {
+          const sibPos = positions.get(sibId);
+          const startPos = positions.get(startId);
+          // Only shift siblings that are at or to the right of the shifted member
+          if (sibPos && startPos && sibId !== startId && sibPos.x >= startPos.x) {
+            stack.push(sibId);
+          }
+        }
+      }
+    }
+  }
+
   while (stack.length > 0) {
     const id = stack.pop()!;
     if (visited.has(id) || !memberMap.has(id)) continue;

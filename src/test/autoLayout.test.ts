@@ -65,10 +65,22 @@ describe('autoLayout cross-family unions', () => {
     const cjLeft = Math.min(claudePos.x, philippePos.x);
     expect(philippePos.x).toBeLessThan(henriPos.x);
 
-    // Children of the cross-family union should be between both parents
+    // Children of the cross-family union should be grouped together
     const helenePos = result.positions.get('helene')!;
+    const francoisPos = result.positions.get('francois')!;
     expect(helenePos).toBeDefined();
+    expect(francoisPos).toBeDefined();
     expect(helenePos.y).toBeGreaterThan(elisabethPos.y);
+
+    // Thomas & Matthieu (Christine & Pascal's children) should be grouped separately
+    const thomasPos = result.positions.get('thomas')!;
+    expect(thomasPos).toBeDefined();
+
+    // Cross-family children (François, Hélène) should NOT be interleaved with Thomas
+    // Either all cross-family children are left of Thomas, or all are right
+    const crossChildrenXs = [francoisPos.x, helenePos.x].sort((a, b) => a - b);
+    const thomasInBetween = thomasPos.x > crossChildrenXs[0] && thomasPos.x < crossChildrenXs[1];
+    expect(thomasInBetween).toBe(false);
   });
 
   it('aligns all members of the same generation on the same Y', () => {
