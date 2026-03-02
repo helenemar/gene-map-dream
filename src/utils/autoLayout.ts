@@ -222,6 +222,68 @@ export function computeAutoLayout(
     if (!builtUnions.has(u.id)) forest.push(buildNode(u));
   }
 
+  // Track which members belong to which root tree (for branch compaction)
+  const rootMembers = new Map<number, Set<string>>();
+  function collectRootMembers(node: TreeNode, rootIdx: number) {
+    if (!rootMembers.has(rootIdx)) rootMembers.set(rootIdx, new Set());
+    const s = rootMembers.get(rootIdx)!;
+    if (node.union) { s.add(node.union.partner1); s.add(node.union.partner2); }
+    for (const lid of node.leafMembers) s.add(lid);
+    // Also collect childless union partners
+    for (const lid of node.leafMembers) {
+      for (const cu of getChildlessUnions(lid)) {
+        const otherId = cu.partner1 === lid ? cu.partner2 : cu.partner1;
+        s.add(otherId);
+      }
+    }
+    for (const child of node.children) collectRootMembers(child, rootIdx);
+  }
+  forest.forEach((root, idx) => collectRootMembers(root, idx));
+
+  // ═══ 3b. REORDER CHILDREN FOR CROSS-FAMILY ADJACENCY ═══
+  // Move cross-family partners to the edges closest to each other's branch
+  function findParentNode(nodes: TreeNode[], childId: string): TreeNode | null {
+    for (const node of nodes) {
+      if (node.union && node.union.children.includes(childId)) return node;
+      const found = findParentNode(node.children, childId);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  for (const cu of crossFamilyUnions) {
+    let p1RootIdx = -1, p2RootIdx = -1;
+    for (const [idx, members] of rootMembers) {
+      if (members.has(cu.partner1)) p1RootIdx = idx;
+      if (members.has(cu.partner2)) p2RootIdx = idx;
+    }
+    if (p1RootIdx < 0 || p2RootIdx < 0 || p1RootIdx === p2RootIdx) continue;
+
+    const [leftRootIdx, rightRootIdx] = p1RootIdx < p2RootIdx ? [p1RootIdx, p2RootIdx] : [p2RootIdx, p1RootIdx];
+    const leftPartner = rootMembers.get(leftRootIdx)!.has(cu.partner1) ? cu.partner1 : cu.partner2;
+    const rightPartner = leftPartner === cu.partner1 ? cu.partner2 : cu.partner1;
+
+    // Move leftPartner to RIGHT edge of their parent's orderedChildIds
+    const leftParentNode = findParentNode(forest, leftPartner);
+    if (leftParentNode) {
+      const idx = leftParentNode.orderedChildIds.indexOf(leftPartner);
+      if (idx >= 0 && idx < leftParentNode.orderedChildIds.length - 1) {
+        leftParentNode.orderedChildIds.splice(idx, 1);
+        leftParentNode.orderedChildIds.push(leftPartner);
+      }
+    }
+
+    // Move rightPartner to LEFT edge of their parent's orderedChildIds
+    const rightParentNode = findParentNode(forest, rightPartner);
+    if (rightParentNode) {
+      const idx = rightParentNode.orderedChildIds.indexOf(rightPartner);
+      if (idx > 0) {
+        rightParentNode.orderedChildIds.splice(idx, 1);
+        rightParentNode.orderedChildIds.unshift(rightPartner);
+      }
+    }
+  }
+
   // ═══ 4. BOTTOM-UP SIZING ═══
   function computeWidth(node: TreeNode): number {
     const cw = node.union ? coupleWidth(node.union) : CARD_W;
@@ -380,18 +442,48 @@ export function computeAutoLayout(
     forestCursor += root.width + BRANCH_GAP;
   }
 
-  // ═══ 6. POSITION CROSS-FAMILY UNION CHILDREN ═══
-  // Place children under the LEFT parent (the one from the first-built branch)
-  // to keep them grouped with that branch and avoid interleaving with cousins
+  // ═══ 5b. COMPACT CROSS-FAMILY COUPLES ═══
+  // Pull branches connected by cross-family unions together so partners are adjacent
   for (const cu of crossFamilyUnions) {
     const p1Pos = positions.get(cu.partner1);
     const p2Pos = positions.get(cu.partner2);
     if (!p1Pos || !p2Pos) continue;
 
-    // Use the leftmost parent as anchor — children go under them
-    const leftParent = p1Pos.x <= p2Pos.x ? cu.partner1 : cu.partner2;
-    const leftParentPos = positions.get(leftParent)!;
-    const anchorX = leftParentPos.x + CARD_W / 2;
+    const [leftId, rightId] = p1Pos.x <= p2Pos.x
+      ? [cu.partner1, cu.partner2]
+      : [cu.partner2, cu.partner1];
+
+    const leftPos = positions.get(leftId)!;
+    const rightPos = positions.get(rightId)!;
+
+    const gap = coupleGap(cu);
+    const desiredRightX = leftPos.x + CARD_W + gap;
+    const dx = desiredRightX - rightPos.x;
+    if (dx >= -5) continue; // Already close enough
+
+    // Find roots of each partner
+    let rightRootIdx = -1, leftRootIdx = -1;
+    for (const [idx, members] of rootMembers) {
+      if (members.has(rightId)) rightRootIdx = idx;
+      if (members.has(leftId)) leftRootIdx = idx;
+    }
+    if (rightRootIdx < 0 || leftRootIdx < 0 || rightRootIdx === leftRootIdx) continue;
+
+    // Shift entire right root tree leftward
+    for (const mid of rootMembers.get(rightRootIdx)!) {
+      const pos = positions.get(mid);
+      if (pos) pos.x += dx;
+    }
+  }
+
+  // ═══ 6. POSITION CROSS-FAMILY UNION CHILDREN ═══
+  for (const cu of crossFamilyUnions) {
+    const p1Pos = positions.get(cu.partner1);
+    const p2Pos = positions.get(cu.partner2);
+    if (!p1Pos || !p2Pos) continue;
+
+    // Use midpoint between the (now adjacent) parents
+    const midX = (Math.min(p1Pos.x, p2Pos.x) + Math.max(p1Pos.x, p2Pos.x) + CARD_W) / 2;
 
     const parentGen = Math.max(generation.get(cu.partner1) ?? 0, generation.get(cu.partner2) ?? 0);
     const childY = (parentGen + 1) * LEVEL_SPACING;
@@ -403,7 +495,7 @@ export function computeAutoLayout(
     if (children.length === 0) continue;
 
     const totalW = children.length * CARD_W + (children.length - 1) * SIBLING_GAP;
-    let cursor = anchorX - totalW / 2;
+    let cursor = midX - totalW / 2;
     for (let ci = 0; ci < children.length; ci++) {
       const cid = children[ci];
       const stepOffset = children.length > 1 ? ci * SIBLING_STEP_Y : 0;
@@ -550,7 +642,7 @@ export function computeAutoLayout(
   return { positions };
 }
 
-/** Shift a member, their siblings, partners, and all descendants by dx */
+/** Shift a member, their partners, and all descendants by dx (no sibling cascade) */
 function shiftMemberAndDescendants(
   startId: string,
   dx: number,
@@ -558,28 +650,10 @@ function shiftMemberAndDescendants(
   partnerUnions: Map<string, string[]>,
   unionMap: Map<string, Union>,
   memberMap: Map<string, FamilyMember>,
-  parentUnionOf?: Map<string, string>,
+  _parentUnionOf?: Map<string, string>,
 ) {
   const visited = new Set<string>();
   const stack = [startId];
-
-  // Also include all siblings (children of the same parent union)
-  if (parentUnionOf) {
-    const parentUId = parentUnionOf.get(startId);
-    if (parentUId) {
-      const parentU = unionMap.get(parentUId);
-      if (parentU) {
-        for (const sibId of parentU.children) {
-          const sibPos = positions.get(sibId);
-          const startPos = positions.get(startId);
-          // Only shift siblings that are at or to the right of the shifted member
-          if (sibPos && startPos && sibId !== startId && sibPos.x >= startPos.x) {
-            stack.push(sibId);
-          }
-        }
-      }
-    }
-  }
 
   while (stack.length > 0) {
     const id = stack.pop()!;
