@@ -147,7 +147,7 @@ export function computeAutoLayout(
   }
 
   const builtUnions = new Set<string>();
-  
+  const crossFamilyUnions: Union[] = [];
 
   function buildNode(union: Union): TreeNode {
     builtUnions.add(union.id);
@@ -163,10 +163,23 @@ export function computeAutoLayout(
     for (const cid of sortedChildren) {
       const childParentingUnions = getParentingUnions(cid).filter(u => !builtUnions.has(u.id));
 
-      // Build ALL parenting unions as subtrees (including cross-family ones)
-      // The cross-family partner will be placed next to their spouse naturally
-      if (childParentingUnions.length > 0) {
-        for (const cu of childParentingUnions) {
+      // Separate cross-family from same-branch
+      const sameBranch: Union[] = [];
+      for (const cu of childParentingUnions) {
+        const otherPartner = cu.partner1 === cid ? cu.partner2 : cu.partner1;
+        const otherParentUnionId = parentUnionOf.get(otherPartner);
+        const isCrossFamily = otherParentUnionId && otherParentUnionId !== union.id;
+
+        if (isCrossFamily) {
+          builtUnions.add(cu.id);
+          crossFamilyUnions.push(cu);
+        } else {
+          sameBranch.push(cu);
+        }
+      }
+
+      if (sameBranch.length > 0) {
+        for (const cu of sameBranch) {
           childNodes.push(buildNode(cu));
         }
       } else {
@@ -332,7 +345,41 @@ export function computeAutoLayout(
     forestCursor += root.width + BRANCH_GAP;
   }
 
-  // ═══ 6. (Cross-family unions are now built as regular subtrees, no special positioning needed) ═══
+  // ═══ 6. POSITION CROSS-FAMILY UNION CHILDREN ═══
+  // Place children under the cross-family child (the one from THIS branch), not at midpoint
+  for (const cu of crossFamilyUnions) {
+    const p1Pos = positions.get(cu.partner1);
+    const p2Pos = positions.get(cu.partner2);
+    if (!p1Pos || !p2Pos) continue;
+
+    // Find which partner is the cross-family child (the one whose parent union is different)
+    // Place children under that partner's position to avoid crossing
+    const p1ParentU = parentUnionOf.get(cu.partner1);
+    const p2ParentU = parentUnionOf.get(cu.partner2);
+
+    // Anchor children under the midpoint of the couple (both partners are already positioned)
+    const coupleMinX = Math.min(p1Pos.x, p2Pos.x);
+    const coupleMaxX = Math.max(p1Pos.x, p2Pos.x) + CARD_W;
+    const coupleCenterX = (coupleMinX + coupleMaxX) / 2;
+
+    const parentGen = Math.max(generation.get(cu.partner1) ?? 0, generation.get(cu.partner2) ?? 0);
+    const childY = (parentGen + 1) * LEVEL_SPACING;
+
+    const children = cu.children
+      .filter(cid => memberMap.has(cid) && !positions.has(cid))
+      .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
+
+    if (children.length === 0) continue;
+
+    const totalW = children.length * CARD_W + (children.length - 1) * SIBLING_GAP;
+    let cursor = coupleCenterX - totalW / 2;
+    for (let ci = 0; ci < children.length; ci++) {
+      const cid = children[ci];
+      const stepOffset = children.length > 1 ? ci * SIBLING_STEP_Y : 0;
+      positions.set(cid, { x: cursor, y: childY + stepOffset });
+      cursor += CARD_W + SIBLING_GAP;
+    }
+  }
 
   // ═══ 7. PLACE ORPHAN MEMBERS ═══
   for (const m of members) {

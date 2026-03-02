@@ -59,9 +59,12 @@ describe('autoLayout cross-family unions', () => {
     expect(christinePos).toBeDefined();
     expect(philippePos.x).toBeLessThan(christinePos.x);
 
-    // Elisabeth should be next to Philippe (as his partner), not far away
-    // They form a couple, so Elisabeth should be close to Philippe
-    expect(Math.abs(elisabethPos.x - philippePos.x)).toBeLessThan(1000);
+    // Elisabeth stays under Henri & Genevieve's branch (cross-family union)
+    const hgLeft = Math.min(henriPos.x, genevievePos.x);
+    const hgRight = Math.max(henriPos.x, genevievePos.x) + CARD_W;
+    const elisabethCenter = elisabethPos.x + CARD_W / 2;
+    expect(elisabethCenter).toBeGreaterThanOrEqual(hgLeft);
+    expect(elisabethCenter).toBeLessThanOrEqual(hgRight);
 
     // Children of Philippe & Elisabeth should be grouped together
     const helenePos = result.positions.get('helene')!;
