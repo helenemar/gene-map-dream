@@ -710,8 +710,11 @@ function shiftMemberAndDescendants(
       const u = unionMap.get(uid);
       if (!u) continue;
       const pid = u.partner1 === id ? u.partner2 : u.partner1;
-      // Always shift partner together (couples are atomic units)
-      if (!visited.has(pid)) stack.push(pid);
+      const partnerPos = positions.get(pid);
+      // Only shift partners to the right (avoid cascading entire branches left)
+      if (partnerPos && pos && partnerPos.x >= pos.x - dx) {
+        stack.push(pid);
+      }
       for (const cid of u.children) stack.push(cid);
     }
   }
