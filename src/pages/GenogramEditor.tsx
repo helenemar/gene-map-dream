@@ -39,8 +39,9 @@ const MARGIN = 5;
 const MIN_ZOOM = 0.15;
 const MAX_ZOOM = 3;
 const ZOOM_SENSITIVITY = 0.002;
-const DOT_SPACING = 24;
-const SNAP_GRID = 20;
+const DOT_SPACING = 20;
+const SNAP_GRID_X = 20;
+const SNAP_GRID_Y = 50;
 const STORAGE_KEY = 'genogy-member-positions';
 
 type Side = 'top' | 'bottom' | 'left' | 'right';
@@ -152,7 +153,8 @@ const GenogramEditor: React.FC = () => {
   const [editingUnionId, setEditingUnionId] = useState<string | null>(null);
   const [fileName, setFileName] = useState('Sans titre');
   const [isAnimating, setIsAnimating] = useState(false);
-  const [snapToGrid, setSnapToGrid] = useState(false);
+  const [snapToGrid, setSnapToGrid] = useState(true);
+  const [smartGuides, setSmartGuides] = useState<{ type: 'horizontal' | 'vertical'; pos: number; from: number; to: number }[]>([]);
   const [highlightedUnionStatus, setHighlightedUnionStatus] = useState<UnionStatus | null>(null);
   const [soloEmotionalType, setSoloEmotionalType] = useState<EmotionalLinkType | null>(null);
   const [zoom, setZoom] = useState(1);
@@ -414,16 +416,39 @@ const GenogramEditor: React.FC = () => {
       let newX = dragInfo.memberX + dx;
       let newY = dragInfo.memberY + dy;
       if (snapToGrid) {
-        newX = Math.round(newX / SNAP_GRID) * SNAP_GRID;
-        newY = Math.round(newY / SNAP_GRID) * SNAP_GRID;
+        newX = Math.round(newX / SNAP_GRID_X) * SNAP_GRID_X;
+        newY = Math.round(newY / SNAP_GRID_Y) * SNAP_GRID_Y;
       }
+      // Smart guides: detect alignment with other members on same generation
+      const GUIDE_THRESHOLD = 8;
+      const guides: typeof smartGuides = [];
+      for (const other of members) {
+        if (other.id === dragInfo.id) continue;
+        // Horizontal alignment (same Y → same generation row)
+        if (Math.abs(other.y - newY) < GUIDE_THRESHOLD) {
+          newY = other.y;
+          const minX = Math.min(newX + CARD_W / 2, other.x + CARD_W / 2);
+          const maxX = Math.max(newX + CARD_W / 2, other.x + CARD_W / 2);
+          guides.push({ type: 'horizontal', pos: other.y + CARD_H / 2, from: minX, to: maxX });
+        }
+        // Vertical alignment (same X center)
+        const otherCx = other.x + CARD_W / 2;
+        const newCx = newX + CARD_W / 2;
+        if (Math.abs(otherCx - newCx) < GUIDE_THRESHOLD) {
+          newX = other.x;
+          const minY = Math.min(newY + CARD_H / 2, other.y + CARD_H / 2);
+          const maxY = Math.max(newY + CARD_H / 2, other.y + CARD_H / 2);
+          guides.push({ type: 'vertical', pos: otherCx, from: minY, to: maxY });
+        }
+      }
+      setSmartGuides(guides);
       setMembers(prev => prev.map(m =>
         m.id === dragInfo.id ? { ...m, x: newX, y: newY } : m
       ));
     } else if (isPanning) {
       setPan(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }));
     }
-  }, [dragInfo, linkDrag, isPanning, zoom, pan, snapToGrid]);
+  }, [dragInfo, linkDrag, isPanning, zoom, pan, snapToGrid, members]);
 
   const handleMouseUp = useCallback((e: React.MouseEvent) => {
     // Link drag release — use snapped target or find card under cursor
@@ -458,10 +483,11 @@ const GenogramEditor: React.FC = () => {
     if (dragInfo && snapToGrid) {
       setMembers(prev => prev.map(m =>
         m.id === dragInfo.id
-          ? { ...m, x: Math.round(m.x / SNAP_GRID) * SNAP_GRID, y: Math.round(m.y / SNAP_GRID) * SNAP_GRID }
+          ? { ...m, x: Math.round(m.x / SNAP_GRID_X) * SNAP_GRID_X, y: Math.round(m.y / SNAP_GRID_Y) * SNAP_GRID_Y }
           : m
       ));
     }
+    setSmartGuides([]);
     setDragInfo(null);
     setIsPanning(false);
   }, [dragInfo, linkDrag, snapToGrid, members, pan, zoom]);
@@ -1295,6 +1321,20 @@ const GenogramEditor: React.FC = () => {
               willChange: 'transform',
             }}
           >
+            {/* Smart alignment guides */}
+            {smartGuides.length > 0 && (
+              <svg className="absolute pointer-events-none" style={{ zIndex: 100, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
+                {smartGuides.map((guide, i) =>
+                  guide.type === 'horizontal' ? (
+                    <line key={`guide-${i}`} x1={guide.from} y1={guide.pos} x2={guide.to} y2={guide.pos}
+                      stroke="hsl(var(--primary))" strokeWidth={1} strokeDasharray="4 3" opacity={0.7} />
+                  ) : (
+                    <line key={`guide-${i}`} x1={guide.pos} y1={guide.from} x2={guide.pos} y2={guide.to}
+                      stroke="hsl(var(--primary))" strokeWidth={1} strokeDasharray="4 3" opacity={0.7} />
+                  )
+                )}
+              </svg>
+            )}
             <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} searchMatchedUnionIds={search.matchedUnionIds} isSearchActive={search.isActive} highlightedUnionStatus={highlightedUnionStatus} />
             {/* All children go through unions now */}
             <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: presentationMode ? 1 : (search.isActive && search.matchedEmotionalLinkIds.size === 0) ? 0.1 : 1, transition: 'opacity 0.3s' }}>
