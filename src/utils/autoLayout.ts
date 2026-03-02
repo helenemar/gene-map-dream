@@ -21,9 +21,9 @@ const LEVEL_SPACING = 250;
 const BASE_COUPLE_GAP = 120;
 const MIN_BADGE_GAP = 180;
 const BADGE_SAFETY = 40;
-const SIBLING_GAP = 40;          // gap between sibling sub-trees
+const SIBLING_GAP = 300;         // fixed 300px gap between cards
 const SIBLING_STEP_Y = 30;       // vertical staircase offset between siblings (oldest→youngest)
-const BRANCH_GAP = 120;          // gap between distinct family branches
+const BRANCH_GAP = 600;          // 600px gutter between distinct family branches
 const MIN_CARD_GAP = 20;         // absolute minimum between any two cards
 
 // ═══ TYPES ═══
@@ -161,7 +161,17 @@ export function computeAutoLayout(
 
     const sortedChildren = [...union.children]
       .filter(cid => memberMap.has(cid))
-      .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
+      .sort((a, b) => {
+        const ma = memberMap.get(a)!;
+        const mb = memberMap.get(b)!;
+        const ya = ma.birthYear ?? 0;
+        const yb = mb.birthYear ?? 0;
+        if (!ma.birthYear) console.warn(`[AutoLayout] Date manquante pour le tri : ${ma.firstName || a}`);
+        if (!mb.birthYear) console.warn(`[AutoLayout] Date manquante pour le tri : ${mb.firstName || b}`);
+        if (ya !== yb) return ya - yb;
+        // Fallback: ID lexicographic order
+        return a.localeCompare(b);
+      });
 
     const childNodes: TreeNode[] = [];
     const leafMembers: string[] = [];
@@ -423,15 +433,9 @@ export function computeAutoLayout(
               const lineageMember = slot.memberId;
               const spouseId = u.partner1 === lineageMember ? u.partner2 : u.partner1;
 
-              if (isFirstSlot && !isLastSlot) {
-                // Leftmost sibling: spouse goes LEFT (outer), lineage member stays RIGHT (inner)
-                if (!positions.has(spouseId)) positions.set(spouseId, { x: coupleLeft, y: childY });
-                if (!positions.has(lineageMember)) positions.set(lineageMember, { x: coupleLeft + CARD_W + gap, y: childY });
-              } else {
-                // Rightmost or middle: lineage member LEFT (inner), spouse RIGHT (outer)
-                if (!positions.has(lineageMember)) positions.set(lineageMember, { x: coupleLeft, y: childY });
-                if (!positions.has(spouseId)) positions.set(spouseId, { x: coupleLeft + CARD_W + gap, y: childY });
-              }
+              // RULE: Spouse (in-law) always placed LEFT of lineage member
+              if (!positions.has(spouseId)) positions.set(spouseId, { x: coupleLeft, y: childY });
+              if (!positions.has(lineageMember)) positions.set(lineageMember, { x: coupleLeft + CARD_W + gap, y: childY });
             } else {
               if (!positions.has(slot.memberId)) {
                 positions.set(slot.memberId, { x: slotCenter - CARD_W / 2, y: childY });
@@ -502,7 +506,13 @@ export function computeAutoLayout(
 
     const children = cu.children
       .filter(cid => memberMap.has(cid) && !positions.has(cid))
-      .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
+      .sort((a, b) => {
+        const ma = memberMap.get(a)!;
+        const mb = memberMap.get(b)!;
+        if (!ma.birthYear) console.warn(`[AutoLayout] Date manquante pour le tri : ${ma.firstName || a}`);
+        if (!mb.birthYear) console.warn(`[AutoLayout] Date manquante pour le tri : ${mb.firstName || b}`);
+        return (ma.birthYear ?? 0) - (mb.birthYear ?? 0) || a.localeCompare(b);
+      });
 
     if (children.length === 0) continue;
 
