@@ -155,10 +155,30 @@ export function computeAutoLayout(
       .filter(cid => memberMap.has(cid))
       .sort((a, b) => (memberMap.get(a)!.birthYear ?? 0) - (memberMap.get(b)!.birthYear ?? 0));
 
+    // Identify which children have cross-family unions so we can reorder them
+    const crossFamilyChildIds = new Set<string>();
+    for (const cid of sortedChildren) {
+      const childParentingUnions = getParentingUnions(cid).filter(u => !builtUnions.has(u.id));
+      for (const cu of childParentingUnions) {
+        const otherPartner = cu.partner1 === cid ? cu.partner2 : cu.partner1;
+        const otherParentUnionId = parentUnionOf.get(otherPartner);
+        if (otherParentUnionId && otherParentUnionId !== union.id) {
+          crossFamilyChildIds.add(cid);
+        }
+      }
+    }
+
+    // Reorder: non-cross-family children first (by age), then cross-family children last (rightmost)
+    // This places cross-family children at the edge closest to the other branch
+    const reorderedChildren = [
+      ...sortedChildren.filter(cid => !crossFamilyChildIds.has(cid)),
+      ...sortedChildren.filter(cid => crossFamilyChildIds.has(cid)),
+    ];
+
     const childNodes: TreeNode[] = [];
     const leafMembers: string[] = [];
 
-    for (const cid of sortedChildren) {
+    for (const cid of reorderedChildren) {
       const childParentingUnions = getParentingUnions(cid).filter(u => !builtUnions.has(u.id));
 
       // Separate cross-family from same-branch
