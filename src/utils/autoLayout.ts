@@ -19,13 +19,13 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 const CARD_W = 220;
 const CARD_H = 64;
 const LEVEL_SPACING = 250;
-const BASE_COUPLE_GAP = 200;
-const MIN_BADGE_GAP = 280;
-const BADGE_SAFETY = 80;
-const SIBLING_GAP = 80;          // gap between sibling sub-trees
+const BASE_COUPLE_GAP = 120;
+const MIN_BADGE_GAP = 180;
+const BADGE_SAFETY = 40;
+const SIBLING_GAP = 40;          // gap between sibling sub-trees
 const SIBLING_STEP_Y = 30;       // vertical staircase offset between siblings (oldest→youngest)
-const BRANCH_GAP = 400;          // gap between distinct family branches
-const MIN_CARD_GAP = 60;         // absolute minimum between any two cards
+const BRANCH_GAP = 120;          // gap between distinct family branches
+const MIN_CARD_GAP = 20;         // absolute minimum between any two cards
 
 // ═══ TYPES ═══
 interface LayoutResult {
@@ -687,7 +687,7 @@ export function computeAutoLayout(
   return { positions };
 }
 
-/** Shift a member, their partners, and all descendants by dx (no sibling cascade) */
+/** Shift a member and all descendants by dx (partners are NOT cascaded — handled by re-compaction) */
 function shiftMemberAndDescendants(
   startId: string,
   dx: number,
@@ -709,12 +709,8 @@ function shiftMemberAndDescendants(
     for (const uid of (partnerUnions.get(id) || [])) {
       const u = unionMap.get(uid);
       if (!u) continue;
-      const pid = u.partner1 === id ? u.partner2 : u.partner1;
-      const partnerPos = positions.get(pid);
-      // Only shift partners to the right (avoid cascading entire branches left)
-      if (partnerPos && pos && partnerPos.x >= pos.x - dx) {
-        stack.push(pid);
-      }
+      // Only cascade to children, NOT to partners
+      // Partners will be re-snapped by the re-compaction step (11b)
       for (const cid of u.children) stack.push(cid);
     }
   }
