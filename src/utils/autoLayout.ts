@@ -547,13 +547,40 @@ export function computeAutoLayout(
 
     if (children.length === 0) continue;
 
-    const totalW = children.length * CARD_W + (children.length - 1) * SIBLING_GAP;
+    // Calculate total width accounting for couple blocks
+    let totalW = 0;
+    const childSlots: { id: string; w: number; hasUnion: boolean; union?: Union }[] = [];
+    for (const cid of children) {
+      // Check if this child has a union (childless or with children)
+      const childUnions = (partnerUnions.get(cid) || [])
+        .map(uid => unionMap.get(uid)!)
+        .filter(u => u && !crossFamilyUnions.includes(u));
+      if (childUnions.length > 0) {
+        const u = childUnions[0];
+        childSlots.push({ id: cid, w: coupleWidth(u), hasUnion: true, union: u });
+      } else {
+        childSlots.push({ id: cid, w: CARD_W, hasUnion: false });
+      }
+    }
+    totalW = childSlots.reduce((s, sl) => s + sl.w, 0) + (childSlots.length - 1) * SIBLING_GAP;
+
     let cursor = midX - totalW / 2;
-    for (let ci = 0; ci < children.length; ci++) {
-      const cid = children[ci];
-      const stepOffset = children.length > 1 ? ci * SIBLING_STEP_Y : 0;
-      positions.set(cid, { x: cursor, y: childY + stepOffset });
-      cursor += CARD_W + SIBLING_GAP;
+    for (let ci = 0; ci < childSlots.length; ci++) {
+      const slot = childSlots[ci];
+      const stepOffset = childSlots.length > 1 ? ci * SIBLING_STEP_Y : 0;
+      const childYPos = childY + stepOffset;
+
+      if (slot.hasUnion && slot.union) {
+        const u = slot.union;
+        const gap = coupleGap(u);
+        const spouseId = u.partner1 === slot.id ? u.partner2 : u.partner1;
+        // Spouse LEFT, lineage member RIGHT
+        if (!positions.has(spouseId)) positions.set(spouseId, { x: cursor, y: childYPos });
+        if (!positions.has(slot.id)) positions.set(slot.id, { x: cursor + CARD_W + gap, y: childYPos });
+      } else {
+        if (!positions.has(slot.id)) positions.set(slot.id, { x: cursor, y: childYPos });
+      }
+      cursor += slot.w + SIBLING_GAP;
     }
   }
 
