@@ -243,6 +243,16 @@ export function computeAutoLayout(
         builtUnions.add(u.id); // mark as handled
         continue;
       }
+      // Skip childless unions where either partner is already placed by a built tree
+      // (they'll be handled inline by getChildlessUnions during positioning)
+      if (u.children.length === 0) {
+        const p1ParentBuilt = parentUnionOf.has(u.partner1) && builtUnions.has(parentUnionOf.get(u.partner1)!);
+        const p2ParentBuilt = parentUnionOf.has(u.partner2) && builtUnions.has(parentUnionOf.get(u.partner2)!);
+        if (p1ParentBuilt || p2ParentBuilt) {
+          builtUnions.add(u.id);
+          continue;
+        }
+      }
       forest.push(buildNode(u));
     }
   }
@@ -622,6 +632,8 @@ export function computeAutoLayout(
   }
 
   // ═══ 8. COLLISION RESOLUTION ═══
+  // Use simple per-member shifts (no cascade) to avoid feedback loops
+  // when cross-family couples interleave with other branch siblings.
   for (let pass = 0; pass < 20; pass++) {
     let anyOverlap = false;
     const genGroups = new Map<number, string[]>();
@@ -642,7 +654,8 @@ export function computeAutoLayout(
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
           const shift = minRight - posB.x;
-          shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap, parentUnionOf);
+          // Simple shift — just move this member, no cascade
+          posB.x += shift;
           anyOverlap = true;
         }
       }
@@ -652,10 +665,13 @@ export function computeAutoLayout(
 
   // ═══ 9. RE-CENTER PARENTS ABOVE CHILDREN ═══
   // After collision resolution, nudge parent couples so they stay centered
+  const crossFamilyUnionIds = new Set(crossFamilyUnions.map(cu => cu.id));
   for (let pass = 0; pass < 5; pass++) {
     let anyShift = false;
     for (const u of unions) {
       if (u.children.length === 0) continue;
+      // Skip cross-family unions — their children are placed between parents, not parents above children
+      if (crossFamilyUnionIds.has(u.id)) continue;
       const childPositions = u.children
         .map(cid => positions.get(cid))
         .filter((p): p is { x: number; y: number } => !!p);
@@ -711,8 +727,7 @@ export function computeAutoLayout(
         const posB = positions.get(sorted[i + 1])!;
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
-          const shift = minRight - posB.x;
-          shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap, parentUnionOf);
+          posB.x = minRight;
           anyOverlap = true;
         }
       }
@@ -756,8 +771,7 @@ export function computeAutoLayout(
         const posB = positions.get(sorted[i + 1])!;
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
-          const shift = minRight - posB.x;
-          shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap, parentUnionOf);
+          posB.x = minRight;
           anyOverlap = true;
         }
       }
