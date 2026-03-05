@@ -775,16 +775,6 @@ export function computeAutoLayout(
     if (!anyOverlap) break;
   }
 
-  // ═══ DEBUG: Log positions before centering ═══
-  console.log('[AutoLayout] === POSITIONS BEFORE CENTERING ===');
-  for (const [id, pos] of positions) {
-    const m = memberMap.get(id);
-    const gen = generation.get(id) ?? '?';
-    console.log(`  ${m?.firstName ?? id} (gen ${gen}): x=${Math.round(pos.x)}, y=${Math.round(pos.y)}`);
-  }
-  console.log('[AutoLayout] === CROSS-FAMILY UNIONS ===', crossFamilyUnions.map(cu => `${memberMap.get(cu.partner1)?.firstName}-${memberMap.get(cu.partner2)?.firstName}`));
-  console.log('[AutoLayout] === FOREST SIZE ===', forest.length);
-
   // ═══ 12. CENTER AROUND ORIGIN ═══
   if (positions.size > 0) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
