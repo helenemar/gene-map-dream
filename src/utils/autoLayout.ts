@@ -348,13 +348,29 @@ export function computeAutoLayout(
       const cw = coupleWidth(u);
       const coupleLeft = centerX - cw / 2;
 
-      const m1 = memberMap.get(u.partner1);
-      const [maleId, femaleId] = m1 && m1.gender === 'male'
-        ? [u.partner1, u.partner2]
-        : [u.partner2, u.partner1];
+      // Determine lineage member (has a parent union) vs spouse (in-law)
+      const p1IsLineage = parentUnionOf.has(u.partner1);
+      const p2IsLineage = parentUnionOf.has(u.partner2);
 
-      if (!positions.has(maleId)) positions.set(maleId, { x: coupleLeft, y });
-      if (!positions.has(femaleId)) positions.set(femaleId, { x: coupleLeft + CARD_W + gap, y });
+      let leftId: string, rightId: string;
+      if (p1IsLineage && !p2IsLineage) {
+        // p2 is spouse → spouse LEFT, lineage RIGHT
+        leftId = u.partner2;
+        rightId = u.partner1;
+      } else if (p2IsLineage && !p1IsLineage) {
+        // p1 is spouse → spouse LEFT, lineage RIGHT
+        leftId = u.partner1;
+        rightId = u.partner2;
+      } else {
+        // Both lineage or both in-law: fallback to male left
+        const m1 = memberMap.get(u.partner1);
+        [leftId, rightId] = m1 && m1.gender === 'male'
+          ? [u.partner1, u.partner2]
+          : [u.partner2, u.partner1];
+      }
+
+      if (!positions.has(leftId)) positions.set(leftId, { x: coupleLeft, y });
+      if (!positions.has(rightId)) positions.set(rightId, { x: coupleLeft + CARD_W + gap, y });
     }
 
     // Compute total children strip width
