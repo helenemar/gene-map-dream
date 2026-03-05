@@ -631,19 +631,19 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ 8. COLLISION RESOLUTION ═══
-  // Use simple per-member shifts (no cascade) to avoid feedback loops
-  // when cross-family couples interleave with other branch siblings.
-  for (let pass = 0; pass < 20; pass++) {
+  // ═══ HELPER: Group-aware collision resolution ═══
+  // When pushing member B right, also push all siblings from the same parent union
+  // (and their spouses) to keep sibling groups contiguous.
+  function groupAwareCollisionPass(): boolean {
     let anyOverlap = false;
-    const genGroups = new Map<number, string[]>();
+    const genGroupsLocal = new Map<number, string[]>();
     for (const m of members) {
       const g = generation.get(m.id) ?? 0;
-      if (!genGroups.has(g)) genGroups.set(g, []);
-      genGroups.get(g)!.push(m.id);
+      if (!genGroupsLocal.has(g)) genGroupsLocal.set(g, []);
+      genGroupsLocal.get(g)!.push(m.id);
     }
 
-    for (const [, ids] of genGroups) {
+    for (const [, ids] of genGroupsLocal) {
       const sorted = ids
         .filter(id => positions.has(id))
         .sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
@@ -654,13 +654,51 @@ export function computeAutoLayout(
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
           const shift = minRight - posB.x;
-          // Simple shift — just move this member, no cascade
-          posB.x += shift;
+          const bId = sorted[i + 1];
+
+          // Collect B's sibling block (same parent union, X >= posB.x)
+          const toShift = new Set<string>();
+          toShift.add(bId);
+
+          const bParentUid = parentUnionOf.get(bId);
+          if (bParentUid) {
+            const bParentUnion = unionMap.get(bParentUid);
+            if (bParentUnion) {
+              for (const sibId of bParentUnion.children) {
+                const sibPos = positions.get(sibId);
+                if (sibPos && sibPos.x >= posB.x - 1) {
+                  toShift.add(sibId);
+                }
+              }
+            }
+          }
+
+          // Also shift spouses of shifted members
+          const withSpouses = new Set(toShift);
+          for (const mid of toShift) {
+            for (const uid of (partnerUnions.get(mid) || [])) {
+              const pu = unionMap.get(uid);
+              if (!pu) continue;
+              const spouseId = pu.partner1 === mid ? pu.partner2 : pu.partner1;
+              withSpouses.add(spouseId);
+            }
+          }
+
+          for (const mid of withSpouses) {
+            const pos = positions.get(mid);
+            if (pos) pos.x += shift;
+          }
+
           anyOverlap = true;
         }
       }
     }
-    if (!anyOverlap) break;
+    return anyOverlap;
+  }
+
+  // ═══ 8. COLLISION RESOLUTION (group-aware) ═══
+  for (let pass = 0; pass < 20; pass++) {
+    if (!groupAwareCollisionPass()) break;
   }
 
   // ═══ 9. RE-CENTER PARENTS ABOVE CHILDREN ═══
@@ -709,30 +747,9 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ 11. FINAL COLLISION PASS ═══
+  // ═══ 11. FINAL COLLISION PASS (group-aware) ═══
   for (let pass = 0; pass < 10; pass++) {
-    let anyOverlap = false;
-    const genGroups = new Map<number, string[]>();
-    for (const m of members) {
-      const g = generation.get(m.id) ?? 0;
-      if (!genGroups.has(g)) genGroups.set(g, []);
-      genGroups.get(g)!.push(m.id);
-    }
-    for (const [, ids] of genGroups) {
-      const sorted = ids
-        .filter(id => positions.has(id))
-        .sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
-      for (let i = 0; i < sorted.length - 1; i++) {
-        const posA = positions.get(sorted[i])!;
-        const posB = positions.get(sorted[i + 1])!;
-        const minRight = posA.x + CARD_W + MIN_CARD_GAP;
-        if (posB.x < minRight) {
-          posB.x = minRight;
-          anyOverlap = true;
-        }
-      }
-    }
-    if (!anyOverlap) break;
+    if (!groupAwareCollisionPass()) break;
   }
 
   // ═══ 11b. RE-COMPACT COUPLES ═══
@@ -753,30 +770,9 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ 11c. FINAL COLLISION PASS (post-compaction) ═══
+  // ═══ 11c. FINAL COLLISION PASS (post-compaction, group-aware) ═══
   for (let pass = 0; pass < 10; pass++) {
-    let anyOverlap = false;
-    const genGroups = new Map<number, string[]>();
-    for (const m of members) {
-      const g = generation.get(m.id) ?? 0;
-      if (!genGroups.has(g)) genGroups.set(g, []);
-      genGroups.get(g)!.push(m.id);
-    }
-    for (const [, ids] of genGroups) {
-      const sorted = ids
-        .filter(id => positions.has(id))
-        .sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
-      for (let i = 0; i < sorted.length - 1; i++) {
-        const posA = positions.get(sorted[i])!;
-        const posB = positions.get(sorted[i + 1])!;
-        const minRight = posA.x + CARD_W + MIN_CARD_GAP;
-        if (posB.x < minRight) {
-          posB.x = minRight;
-          anyOverlap = true;
-        }
-      }
-    }
-    if (!anyOverlap) break;
+    if (!groupAwareCollisionPass()) break;
   }
 
   // ═══ 12. CENTER AROUND ORIGIN ═══
