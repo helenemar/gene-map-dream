@@ -662,10 +662,13 @@ export function computeAutoLayout(
 
   // ═══ 9. RE-CENTER PARENTS ABOVE CHILDREN ═══
   // After collision resolution, nudge parent couples so they stay centered
+  const crossFamilyUnionIds = new Set(crossFamilyUnions.map(cu => cu.id));
   for (let pass = 0; pass < 5; pass++) {
     let anyShift = false;
     for (const u of unions) {
       if (u.children.length === 0) continue;
+      // Skip cross-family unions — their children are placed between parents, not parents above children
+      if (crossFamilyUnionIds.has(u.id)) continue;
       const childPositions = u.children
         .map(cid => positions.get(cid))
         .filter((p): p is { x: number; y: number } => !!p);
