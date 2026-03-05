@@ -747,30 +747,9 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ 11. FINAL COLLISION PASS ═══
+  // ═══ 11. FINAL COLLISION PASS (group-aware) ═══
   for (let pass = 0; pass < 10; pass++) {
-    let anyOverlap = false;
-    const genGroups = new Map<number, string[]>();
-    for (const m of members) {
-      const g = generation.get(m.id) ?? 0;
-      if (!genGroups.has(g)) genGroups.set(g, []);
-      genGroups.get(g)!.push(m.id);
-    }
-    for (const [, ids] of genGroups) {
-      const sorted = ids
-        .filter(id => positions.has(id))
-        .sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
-      for (let i = 0; i < sorted.length - 1; i++) {
-        const posA = positions.get(sorted[i])!;
-        const posB = positions.get(sorted[i + 1])!;
-        const minRight = posA.x + CARD_W + MIN_CARD_GAP;
-        if (posB.x < minRight) {
-          posB.x = minRight;
-          anyOverlap = true;
-        }
-      }
-    }
-    if (!anyOverlap) break;
+    if (!groupAwareCollisionPass()) break;
   }
 
   // ═══ 11b. RE-COMPACT COUPLES ═══
@@ -791,30 +770,9 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ 11c. FINAL COLLISION PASS (post-compaction) ═══
+  // ═══ 11c. FINAL COLLISION PASS (post-compaction, group-aware) ═══
   for (let pass = 0; pass < 10; pass++) {
-    let anyOverlap = false;
-    const genGroups = new Map<number, string[]>();
-    for (const m of members) {
-      const g = generation.get(m.id) ?? 0;
-      if (!genGroups.has(g)) genGroups.set(g, []);
-      genGroups.get(g)!.push(m.id);
-    }
-    for (const [, ids] of genGroups) {
-      const sorted = ids
-        .filter(id => positions.has(id))
-        .sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
-      for (let i = 0; i < sorted.length - 1; i++) {
-        const posA = positions.get(sorted[i])!;
-        const posB = positions.get(sorted[i + 1])!;
-        const minRight = posA.x + CARD_W + MIN_CARD_GAP;
-        if (posB.x < minRight) {
-          posB.x = minRight;
-          anyOverlap = true;
-        }
-      }
-    }
-    if (!anyOverlap) break;
+    if (!groupAwareCollisionPass()) break;
   }
 
   // ═══ 12. CENTER AROUND ORIGIN ═══
