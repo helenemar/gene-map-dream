@@ -775,6 +775,15 @@ export function computeAutoLayout(
     if (!anyOverlap) break;
   }
 
+  // ═══ DEBUG ═══
+  console.log('[AL] forest=' + forest.length + ' CF=' + crossFamilyUnions.length);
+  const posArr: string[] = [];
+  for (const [id, pos] of positions) {
+    const m = memberMap.get(id);
+    posArr.push(`${m?.firstName}(g${generation.get(id)}):${Math.round(pos.x)},${Math.round(pos.y)}`);
+  }
+  console.log('[AL]', posArr.join(' | '));
+
   // ═══ 12. CENTER AROUND ORIGIN ═══
   if (positions.size > 0) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
