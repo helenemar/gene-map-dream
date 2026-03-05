@@ -631,10 +631,8 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ HELPER: Group-aware collision resolution ═══
-  // When pushing member B right, also push all siblings from the same parent union
-  // (and their spouses) to keep sibling groups contiguous.
-  function groupAwareCollisionPass(): boolean {
+  // ═══ HELPER: Simple collision resolution pass ═══
+  function simpleCollisionPass(): boolean {
     let anyOverlap = false;
     const genGroupsLocal = new Map<number, string[]>();
     for (const m of members) {
@@ -642,53 +640,16 @@ export function computeAutoLayout(
       if (!genGroupsLocal.has(g)) genGroupsLocal.set(g, []);
       genGroupsLocal.get(g)!.push(m.id);
     }
-
     for (const [, ids] of genGroupsLocal) {
       const sorted = ids
         .filter(id => positions.has(id))
         .sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
-
       for (let i = 0; i < sorted.length - 1; i++) {
         const posA = positions.get(sorted[i])!;
         const posB = positions.get(sorted[i + 1])!;
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
-          const shift = minRight - posB.x;
-          const bId = sorted[i + 1];
-
-          // Collect B's sibling block (same parent union, X >= posB.x)
-          const toShift = new Set<string>();
-          toShift.add(bId);
-
-          const bParentUid = parentUnionOf.get(bId);
-          if (bParentUid) {
-            const bParentUnion = unionMap.get(bParentUid);
-            if (bParentUnion) {
-              for (const sibId of bParentUnion.children) {
-                const sibPos = positions.get(sibId);
-                if (sibPos && sibPos.x >= posB.x - 1) {
-                  toShift.add(sibId);
-                }
-              }
-            }
-          }
-
-          // Also shift spouses of shifted members
-          const withSpouses = new Set(toShift);
-          for (const mid of toShift) {
-            for (const uid of (partnerUnions.get(mid) || [])) {
-              const pu = unionMap.get(uid);
-              if (!pu) continue;
-              const spouseId = pu.partner1 === mid ? pu.partner2 : pu.partner1;
-              withSpouses.add(spouseId);
-            }
-          }
-
-          for (const mid of withSpouses) {
-            const pos = positions.get(mid);
-            if (pos) pos.x += shift;
-          }
-
+          posB.x = minRight;
           anyOverlap = true;
         }
       }
@@ -696,19 +657,17 @@ export function computeAutoLayout(
     return anyOverlap;
   }
 
-  // ═══ 8. COLLISION RESOLUTION (group-aware) ═══
+  // ═══ 8. COLLISION RESOLUTION ═══
   for (let pass = 0; pass < 20; pass++) {
-    if (!groupAwareCollisionPass()) break;
+    if (!simpleCollisionPass()) break;
   }
 
   // ═══ 9. RE-CENTER PARENTS ABOVE CHILDREN ═══
-  // After collision resolution, nudge parent couples so they stay centered
   const crossFamilyUnionIds = new Set(crossFamilyUnions.map(cu => cu.id));
   for (let pass = 0; pass < 5; pass++) {
     let anyShift = false;
     for (const u of unions) {
       if (u.children.length === 0) continue;
-      // Skip cross-family unions — their children are placed between parents, not parents above children
       if (crossFamilyUnionIds.has(u.id)) continue;
       const childPositions = u.children
         .map(cid => positions.get(cid))
@@ -747,14 +706,12 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ 11. FINAL COLLISION PASS (group-aware) ═══
+  // ═══ 11. COLLISION PASS ═══
   for (let pass = 0; pass < 10; pass++) {
-    if (!groupAwareCollisionPass()) break;
+    if (!simpleCollisionPass()) break;
   }
 
   // ═══ 11b. RE-COMPACT COUPLES ═══
-  // After collision resolution, partners (especially in-laws) may have drifted apart.
-  // Re-snap them to proper couple gap distance.
   for (const u of unions) {
     const p1 = positions.get(u.partner1);
     const p2 = positions.get(u.partner2);
@@ -765,14 +722,90 @@ export function computeAutoLayout(
     const rightPos = positions.get(rightId)!;
     const desiredX = leftPos.x + CARD_W + gap;
     if (rightPos.x > desiredX + 5) {
-      // Pull the right partner back to the left
       rightPos.x = desiredX;
     }
   }
 
-  // ═══ 11c. FINAL COLLISION PASS (post-compaction, group-aware) ═══
+  // ═══ 11c. COLLISION PASS (post-compaction) ═══
   for (let pass = 0; pass < 10; pass++) {
-    if (!groupAwareCollisionPass()) break;
+    if (!simpleCollisionPass()) break;
+  }
+
+  // ═══ 11d. DEINTERLEAVE SIBLING GROUPS ═══
+  // After collision resolution, siblings from the same union may have been
+  // scattered by non-siblings inserted between them. Pull them back together.
+  for (const u of unions) {
+    const childIds = u.children.filter(cid => positions.has(cid));
+    if (childIds.length < 2) continue;
+
+    // Sort children by current X
+    childIds.sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
+
+    const firstChildX = positions.get(childIds[0])!.x;
+    const lastChildX = positions.get(childIds[childIds.length - 1])!.x;
+    const childGen = generation.get(childIds[0]) ?? 0;
+
+    // Check if any non-sibling is between first and last child
+    const childSet = new Set(childIds);
+    // Also include spouses of children as "allowed" members
+    const allowedSet = new Set(childIds);
+    for (const cid of childIds) {
+      for (const uid of (partnerUnions.get(cid) || [])) {
+        const pu = unionMap.get(uid);
+        if (!pu) continue;
+        const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+        allowedSet.add(spouseId);
+      }
+    }
+
+    let hasInterlopers = false;
+    for (const [mid, pos] of positions) {
+      if ((generation.get(mid) ?? 0) === childGen &&
+          pos.x > firstChildX && pos.x < lastChildX &&
+          !allowedSet.has(mid)) {
+        hasInterlopers = true;
+        break;
+      }
+    }
+    if (!hasInterlopers) continue;
+
+    // Re-pack children tightly starting from firstChildX
+    let cursor = firstChildX;
+    for (let i = 0; i < childIds.length; i++) {
+      const cid = childIds[i];
+      const pos = positions.get(cid)!;
+      const oldX = pos.x;
+      const dx = cursor - oldX;
+
+      // Move child
+      pos.x = cursor;
+
+      // Move spouse(s) by same delta
+      for (const uid of (partnerUnions.get(cid) || [])) {
+        const pu = unionMap.get(uid);
+        if (!pu) continue;
+        const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+        const spousePos = positions.get(spouseId);
+        if (spousePos) spousePos.x += dx;
+      }
+
+      // Calculate width of this child block (including spouse)
+      let blockWidth = CARD_W;
+      for (const uid of (partnerUnions.get(cid) || [])) {
+        const pu = unionMap.get(uid);
+        if (pu) {
+          blockWidth = coupleWidth(pu);
+          break;
+        }
+      }
+
+      cursor += blockWidth + SIBLING_GAP;
+    }
+  }
+
+  // ═══ 11e. FINAL COLLISION PASS (post-deinterleave) ═══
+  for (let pass = 0; pass < 10; pass++) {
+    if (!simpleCollisionPass()) break;
   }
 
   // ═══ 12. CENTER AROUND ORIGIN ═══
