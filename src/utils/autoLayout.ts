@@ -632,6 +632,8 @@ export function computeAutoLayout(
   }
 
   // ═══ 8. COLLISION RESOLUTION ═══
+  // Use simple per-member shifts (no cascade) to avoid feedback loops
+  // when cross-family couples interleave with other branch siblings.
   for (let pass = 0; pass < 20; pass++) {
     let anyOverlap = false;
     const genGroups = new Map<number, string[]>();
@@ -652,7 +654,8 @@ export function computeAutoLayout(
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
           const shift = minRight - posB.x;
-          shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap, parentUnionOf);
+          // Simple shift — just move this member, no cascade
+          posB.x += shift;
           anyOverlap = true;
         }
       }
