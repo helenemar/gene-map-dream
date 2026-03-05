@@ -21,9 +21,9 @@ const LEVEL_SPACING = 250;
 const BASE_COUPLE_GAP = 120;
 const MIN_BADGE_GAP = 180;
 const BADGE_SAFETY = 40;
-const SIBLING_GAP = 300;         // fixed 300px gap between cards
+const SIBLING_GAP = 60;          // compact gap between sibling cards
 const SIBLING_STEP_Y = 30;       // vertical staircase offset between siblings (oldest→youngest)
-const BRANCH_GAP = 600;          // 600px gutter between distinct family branches
+const BRANCH_GAP = 160;          // gutter between distinct family branches
 const MIN_CARD_GAP = 20;         // absolute minimum between any two cards
 
 // ═══ TYPES ═══
