@@ -727,7 +727,7 @@ export function computeAutoLayout(
         const posB = positions.get(sorted[i + 1])!;
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
-          posB.x += shift;
+          posB.x = minRight;
           anyOverlap = true;
         }
       }
@@ -771,7 +771,7 @@ export function computeAutoLayout(
         const posB = positions.get(sorted[i + 1])!;
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
-          posB.x += shift;
+          posB.x = minRight;
           anyOverlap = true;
         }
       }
