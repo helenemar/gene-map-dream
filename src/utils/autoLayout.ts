@@ -727,8 +727,7 @@ export function computeAutoLayout(
         const posB = positions.get(sorted[i + 1])!;
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
-          const shift = minRight - posB.x;
-          shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap, parentUnionOf);
+          posB.x += shift;
           anyOverlap = true;
         }
       }
@@ -772,23 +771,13 @@ export function computeAutoLayout(
         const posB = positions.get(sorted[i + 1])!;
         const minRight = posA.x + CARD_W + MIN_CARD_GAP;
         if (posB.x < minRight) {
-          const shift = minRight - posB.x;
-          shiftMemberAndDescendants(sorted[i + 1], shift, positions, partnerUnions, unionMap, memberMap, parentUnionOf);
+          posB.x += shift;
           anyOverlap = true;
         }
       }
     }
     if (!anyOverlap) break;
   }
-
-  // ═══ DEBUG ═══
-  console.log('[AL] forest=' + forest.length + ' CF=' + crossFamilyUnions.length);
-  const posArr: string[] = [];
-  for (const [id, pos] of positions) {
-    const m = memberMap.get(id);
-    posArr.push(`${m?.firstName}(g${generation.get(id)}):${Math.round(pos.x)},${Math.round(pos.y)}`);
-  }
-  console.log('[AL]', posArr.join(' | '));
 
   // ═══ 12. CENTER AROUND ORIGIN ═══
   if (positions.size > 0) {
