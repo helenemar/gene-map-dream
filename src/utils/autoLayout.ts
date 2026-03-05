@@ -243,6 +243,16 @@ export function computeAutoLayout(
         builtUnions.add(u.id); // mark as handled
         continue;
       }
+      // Skip childless unions where either partner is already placed by a built tree
+      // (they'll be handled inline by getChildlessUnions during positioning)
+      if (u.children.length === 0) {
+        const p1ParentBuilt = parentUnionOf.has(u.partner1) && builtUnions.has(parentUnionOf.get(u.partner1)!);
+        const p2ParentBuilt = parentUnionOf.has(u.partner2) && builtUnions.has(parentUnionOf.get(u.partner2)!);
+        if (p1ParentBuilt || p2ParentBuilt) {
+          builtUnions.add(u.id);
+          continue;
+        }
+      }
       forest.push(buildNode(u));
     }
   }
