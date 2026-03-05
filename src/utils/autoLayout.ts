@@ -738,15 +738,20 @@ export function computeAutoLayout(
     const childIds = u.children.filter(cid => positions.has(cid));
     if (childIds.length < 2) continue;
 
-    // Sort children by current X
-    childIds.sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
+    // Sort children by BIRTH YEAR (not current X) to maintain correct order
+    childIds.sort((a, b) => {
+      const ma = memberMap.get(a);
+      const mb = memberMap.get(b);
+      const ya = ma?.birthYear ?? 0;
+      const yb = mb?.birthYear ?? 0;
+      if (ya !== yb) return ya - yb;
+      return a.localeCompare(b);
+    });
 
-    const firstChildX = positions.get(childIds[0])!.x;
-    const lastChildX = positions.get(childIds[childIds.length - 1])!.x;
+    const firstChildX = Math.min(...childIds.map(cid => positions.get(cid)!.x));
+    const lastChildX = Math.max(...childIds.map(cid => positions.get(cid)!.x));
     const childGen = generation.get(childIds[0]) ?? 0;
 
-    // Check if any non-sibling is between first and last child
-    const childSet = new Set(childIds);
     // Also include spouses of children as "allowed" members
     const allowedSet = new Set(childIds);
     for (const cid of childIds) {
@@ -800,6 +805,80 @@ export function computeAutoLayout(
       }
 
       cursor += blockWidth + SIBLING_GAP;
+    }
+  }
+
+  // ═══ 11d2. ENFORCE BRANCH GAP BETWEEN CHILDREN OF DIFFERENT UNIONS ═══
+  // Ensure children of different parent unions at the same generation have
+  // at least BRANCH_GAP separation, preventing branches from merging visually.
+  {
+    // Group unions by child generation
+    const unionsByChildGen = new Map<number, Union[]>();
+    for (const u of unions) {
+      if (u.children.length === 0) continue;
+      const childGen = Math.max(...u.children.map(cid => generation.get(cid) ?? 0));
+      if (!unionsByChildGen.has(childGen)) unionsByChildGen.set(childGen, []);
+      unionsByChildGen.get(childGen)!.push(u);
+    }
+
+    for (const [, genUnions] of unionsByChildGen) {
+      if (genUnions.length < 2) continue;
+
+      // For each union, compute the bounding box of its children + their spouses
+      const blocks: { union: Union; minX: number; maxX: number }[] = [];
+      for (const u of genUnions) {
+        const childIds = u.children.filter(cid => positions.has(cid));
+        if (childIds.length === 0) continue;
+        let minX = Infinity, maxX = -Infinity;
+        for (const cid of childIds) {
+          const pos = positions.get(cid)!;
+          minX = Math.min(minX, pos.x);
+          maxX = Math.max(maxX, pos.x + CARD_W);
+          // Include spouse positions
+          for (const uid of (partnerUnions.get(cid) || [])) {
+            const pu = unionMap.get(uid);
+            if (!pu) continue;
+            const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+            const spousePos = positions.get(spouseId);
+            if (spousePos) {
+              minX = Math.min(minX, spousePos.x);
+              maxX = Math.max(maxX, spousePos.x + CARD_W);
+            }
+          }
+        }
+        blocks.push({ union: u, minX, maxX });
+      }
+
+      // Sort blocks by minX
+      blocks.sort((a, b) => a.minX - b.minX);
+
+      // Enforce BRANCH_GAP between consecutive blocks
+      for (let i = 0; i < blocks.length - 1; i++) {
+        const leftBlock = blocks[i];
+        const rightBlock = blocks[i + 1];
+        const gap = rightBlock.minX - leftBlock.maxX;
+        if (gap < BRANCH_GAP) {
+          const shift = BRANCH_GAP - gap;
+          // Shift the right block and all subsequent blocks
+          for (let j = i + 1; j < blocks.length; j++) {
+            const bUnion = blocks[j].union;
+            for (const cid of bUnion.children) {
+              const pos = positions.get(cid);
+              if (pos) pos.x += shift;
+              // Also shift spouses
+              for (const uid of (partnerUnions.get(cid) || [])) {
+                const pu = unionMap.get(uid);
+                if (!pu) continue;
+                const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+                const spousePos = positions.get(spouseId);
+                if (spousePos) spousePos.x += shift;
+              }
+            }
+            blocks[j].minX += shift;
+            blocks[j].maxX += shift;
+          }
+        }
+      }
     }
   }
 
