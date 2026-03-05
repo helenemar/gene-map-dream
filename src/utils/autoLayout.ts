@@ -18,7 +18,7 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 const CARD_W = 220;
 const CARD_H = 64;
 const LEVEL_SPACING = 250;
-const BASE_COUPLE_GAP = 120;
+const BASE_COUPLE_GAP = 40;
 const MIN_BADGE_GAP = 180;
 const BADGE_SAFETY = 40;
 const SIBLING_GAP = 60;          // compact gap between sibling cards
@@ -533,10 +533,23 @@ export function computeAutoLayout(
     const p2Pos = positions.get(u.partner2);
     if (p1Pos && !p2Pos) {
       const gap = coupleGap(u);
-      positions.set(u.partner2, { x: p1Pos.x + CARD_W + gap, y: p1Pos.y });
+      // Determine who is lineage (has a parent union) vs spouse (in-law)
+      const p1IsLineage = parentUnionOf.has(u.partner1);
+      if (p1IsLineage) {
+        // p2 is spouse → place LEFT of lineage member p1
+        positions.set(u.partner2, { x: p1Pos.x - CARD_W - gap, y: p1Pos.y });
+      } else {
+        positions.set(u.partner2, { x: p1Pos.x + CARD_W + gap, y: p1Pos.y });
+      }
     } else if (!p1Pos && p2Pos) {
       const gap = coupleGap(u);
-      positions.set(u.partner1, { x: p2Pos.x - CARD_W - gap, y: p2Pos.y });
+      const p2IsLineage = parentUnionOf.has(u.partner2);
+      if (p2IsLineage) {
+        // p1 is spouse → place LEFT of lineage member p2
+        positions.set(u.partner1, { x: p2Pos.x - CARD_W - gap, y: p2Pos.y });
+      } else {
+        positions.set(u.partner1, { x: p2Pos.x - CARD_W - gap, y: p2Pos.y });
+      }
     }
   }
 
