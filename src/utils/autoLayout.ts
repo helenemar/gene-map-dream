@@ -887,6 +887,42 @@ export function computeAutoLayout(
     if (!simpleCollisionPass()) break;
   }
 
+  // ═══ 11f. RE-CENTER PARENTS ABOVE CHILDREN (post-deinterleave) ═══
+  for (let pass = 0; pass < 5; pass++) {
+    let anyShift = false;
+    for (const u of unions) {
+      if (u.children.length === 0) continue;
+      if (crossFamilyUnionIds.has(u.id)) continue;
+      const childPositions = u.children
+        .map(cid => positions.get(cid))
+        .filter((p): p is { x: number; y: number } => !!p);
+      if (childPositions.length === 0) continue;
+
+      const childMinX = Math.min(...childPositions.map(p => p.x));
+      const childMaxX = Math.max(...childPositions.map(p => p.x + CARD_W));
+      const childCenterX = (childMinX + childMaxX) / 2;
+
+      const p1 = positions.get(u.partner1);
+      const p2 = positions.get(u.partner2);
+      if (!p1 || !p2) continue;
+
+      const currentCoupleCenter = (Math.min(p1.x, p2.x) + Math.max(p1.x, p2.x) + CARD_W) / 2;
+      const dx = childCenterX - currentCoupleCenter;
+
+      if (Math.abs(dx) > 5) {
+        p1.x += dx;
+        p2.x += dx;
+        anyShift = true;
+      }
+    }
+    if (!anyShift) break;
+  }
+
+  // ═══ 11g. FINAL COLLISION PASS ═══
+  for (let pass = 0; pass < 10; pass++) {
+    if (!simpleCollisionPass()) break;
+  }
+
   // ═══ 12. CENTER AROUND ORIGIN ═══
   if (positions.size > 0) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
