@@ -223,12 +223,27 @@ export function computeAutoLayout(
     })
     .filter(u => !builtUnions.has(u.id));
 
+  // Collect cross-family children so their unions don't become separate roots
+  const crossFamilyChildIds = new Set<string>();
+  for (const cu of crossFamilyUnions) {
+    for (const cid of cu.children) crossFamilyChildIds.add(cid);
+  }
+
   const forest: TreeNode[] = [];
   for (const ru of rootUnions) {
     if (!builtUnions.has(ru.id)) forest.push(buildNode(ru));
   }
   for (const u of unions) {
-    if (!builtUnions.has(u.id)) forest.push(buildNode(u));
+    if (!builtUnions.has(u.id)) {
+      // Skip unions where a partner is a cross-family child — they'll be placed in step 6
+      const p1IsCFChild = crossFamilyChildIds.has(u.partner1);
+      const p2IsCFChild = crossFamilyChildIds.has(u.partner2);
+      if (p1IsCFChild || p2IsCFChild) {
+        builtUnions.add(u.id); // mark as handled
+        continue;
+      }
+      forest.push(buildNode(u));
+    }
   }
 
   // Track which members belong to which root tree (for branch compaction)
