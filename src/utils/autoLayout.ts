@@ -931,6 +931,29 @@ export function computeAutoLayout(
     if (!simpleCollisionPass()) break;
   }
 
+  // ═══ 11h. FINAL RE-COMPACT ALL COUPLES (especially childless) ═══
+  // After all collision passes, couples may have been pushed apart.
+  // Pull them back together, prioritising childless couples which have no
+  // children anchor to justify separation.
+  for (const u of unions) {
+    const p1 = positions.get(u.partner1);
+    const p2 = positions.get(u.partner2);
+    if (!p1 || !p2) continue;
+    const gap = coupleGap(u);
+    const [leftId, rightId] = p1.x <= p2.x ? [u.partner1, u.partner2] : [u.partner2, u.partner1];
+    const leftPos = positions.get(leftId)!;
+    const rightPos = positions.get(rightId)!;
+    const desiredX = leftPos.x + CARD_W + gap;
+    if (rightPos.x > desiredX + 2) {
+      rightPos.x = desiredX;
+    }
+  }
+
+  // Final collision pass after re-compaction
+  for (let pass = 0; pass < 10; pass++) {
+    if (!simpleCollisionPass()) break;
+  }
+
   // ═══ 12. CENTER AROUND ORIGIN ═══
   if (positions.size > 0) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
