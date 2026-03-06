@@ -714,6 +714,8 @@ export function computeAutoLayout(
   }
 
   // ═══ HELPER: Re-center each couple above its children ═══
+  // IMPORTANT: Only use direct children positions for centering, NOT their spouses.
+  // Spouses (in-laws) should be next to their partner but must not affect parent centering.
   function reCenterParents(): boolean {
     let anyShift = false;
     for (const u of unions) {
@@ -724,21 +726,9 @@ export function computeAutoLayout(
         .filter((p): p is { x: number; y: number } => !!p);
       if (childPositions.length === 0) continue;
 
-      // Include spouses of children in the bounding box
-      let childMinX = Math.min(...childPositions.map(p => p.x));
-      let childMaxX = Math.max(...childPositions.map(p => p.x + CARD_W));
-      for (const cid of u.children) {
-        for (const uid of (partnerUnions.get(cid) || [])) {
-          const pu = unionMap.get(uid);
-          if (!pu) continue;
-          const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
-          const sp = positions.get(spouseId);
-          if (sp) {
-            childMinX = Math.min(childMinX, sp.x);
-            childMaxX = Math.max(childMaxX, sp.x + CARD_W);
-          }
-        }
-      }
+      // Center only on direct children (not their spouses)
+      const childMinX = Math.min(...childPositions.map(p => p.x));
+      const childMaxX = Math.max(...childPositions.map(p => p.x + CARD_W));
       const childCenterX = (childMinX + childMaxX) / 2;
 
       const p1 = positions.get(u.partner1);
