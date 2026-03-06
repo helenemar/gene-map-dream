@@ -1104,7 +1104,10 @@ export function computeAutoLayout(
       const oldX = pos.x;
       const dx = cursor - oldX;
 
-      pos.x = cursor;
+      if (Math.abs(dx) > 1) {
+        // Shift the child AND their entire subtree (partner + descendants)
+        shiftMemberAndDescendants(cid, dx, positions, partnerUnions, unionMap, memberMap);
+      }
 
       for (const uid of (partnerUnions.get(cid) || [])) {
         const pu = unionMap.get(uid);
