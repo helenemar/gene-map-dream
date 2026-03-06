@@ -1287,12 +1287,27 @@ export function computeAutoLayout(
     // Sort by minX (leftmost first)
     rootBounds.sort((a, b) => a.minX - b.minX);
 
-    // Push overlapping branches apart
+    // Build set of root index pairs connected by cross-family unions (should stay compact)
+    const connectedRootPairs = new Set<string>();
+    for (const cu of crossFamilyUnions) {
+      let p1Root = -1, p2Root = -1;
+      for (const rb of rootBounds) {
+        if (rb.memberIds.has(cu.partner1)) p1Root = rb.rootIdx;
+        if (rb.memberIds.has(cu.partner2)) p2Root = rb.rootIdx;
+      }
+      if (p1Root >= 0 && p2Root >= 0 && p1Root !== p2Root) {
+        connectedRootPairs.add(`${Math.min(p1Root, p2Root)}-${Math.max(p1Root, p2Root)}`);
+      }
+    }
+
+    // Push overlapping branches apart (skip cross-family connected pairs)
     for (let i = 0; i < rootBounds.length - 1; i++) {
+      const pairKey = `${Math.min(rootBounds[i].rootIdx, rootBounds[i + 1].rootIdx)}-${Math.max(rootBounds[i].rootIdx, rootBounds[i + 1].rootIdx)}`;
+      if (connectedRootPairs.has(pairKey)) continue; // Already compacted by cross-family logic
+
       const gap = rootBounds[i + 1].minX - rootBounds[i].maxX;
       if (gap < BRANCH_GAP) {
         const shift = BRANCH_GAP - gap;
-        // Shift the right branch and all subsequent branches
         for (let j = i + 1; j < rootBounds.length; j++) {
           for (const mid of rootBounds[j].memberIds) {
             const pos = positions.get(mid);
