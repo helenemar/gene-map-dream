@@ -757,6 +757,63 @@ export function computeAutoLayout(
     return anyShift;
   }
 
+  // ═══ HELPER: Center single children below their parents ═══
+  // For unions with only 1 child (no siblings), move the child + spouse
+  // to be centered directly below the parent couple midpoint.
+  function centerSingleChildren(): boolean {
+    let anyShift = false;
+    for (const u of unions) {
+      if (u.children.length !== 1) continue;
+      if (crossFamilyUnionIds.has(u.id)) continue;
+      
+      const cid = u.children[0];
+      const childPos = positions.get(cid);
+      if (!childPos) continue;
+
+      const p1 = positions.get(u.partner1);
+      const p2 = positions.get(u.partner2);
+      if (!p1 || !p2) continue;
+
+      const parentMidX = (Math.min(p1.x, p2.x) + Math.max(p1.x, p2.x) + CARD_W) / 2;
+
+      // Calculate the child block center (child + spouse if any)
+      let blockMinX = childPos.x;
+      let blockMaxX = childPos.x + CARD_W;
+      const childSpouseIds: string[] = [];
+      for (const uid of (partnerUnions.get(cid) || [])) {
+        const pu = unionMap.get(uid);
+        if (!pu) continue;
+        const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+        const sp = positions.get(spouseId);
+        if (sp) {
+          blockMinX = Math.min(blockMinX, sp.x);
+          blockMaxX = Math.max(blockMaxX, sp.x + CARD_W);
+          childSpouseIds.push(spouseId);
+        }
+      }
+      const blockCenterX = (blockMinX + blockMaxX) / 2;
+      const dx = parentMidX - blockCenterX;
+
+      if (Math.abs(dx) > 3) {
+        childPos.x += dx;
+        for (const sid of childSpouseIds) {
+          const sp = positions.get(sid);
+          if (sp) sp.x += dx;
+        }
+        // Also shift descendants of this child
+        for (const uid of (partnerUnions.get(cid) || [])) {
+          const pu = unionMap.get(uid);
+          if (!pu) continue;
+          for (const gcid of pu.children) {
+            shiftMemberAndDescendants(gcid, dx, positions, partnerUnions, unionMap, memberMap);
+          }
+        }
+        anyShift = true;
+      }
+    }
+    return anyShift;
+  }
+
   // ═══ HELPER: Sort children at each generation by parent X order ═══
   // This prevents crossings by ensuring children follow the same left-to-right
   // order as their parents.
@@ -1120,6 +1177,11 @@ export function computeAutoLayout(
     if (!reCenterParents()) break;
   }
 
+  // Center single children below their parents
+  for (let pass = 0; pass < 3; pass++) {
+    if (!centerSingleChildren()) break;
+  }
+
   // Final collision + compact
   for (let pass = 0; pass < 5; pass++) {
     if (!simpleCollisionPass()) break;
@@ -1128,6 +1190,17 @@ export function computeAutoLayout(
   for (let pass = 0; pass < 5; pass++) {
     if (!simpleCollisionPass()) break;
   }
+
+  // One more re-center pass after collision to ensure alignment
+  for (let pass = 0; pass < 3; pass++) {
+    const a = reCenterParents();
+    const b = centerSingleChildren();
+    if (!a && !b) break;
+  }
+  for (let pass = 0; pass < 5; pass++) {
+    if (!simpleCollisionPass()) break;
+  }
+  compactCouples();
 
   // ═══ 11i. INJECT LOCKED POSITIONS & ADAPT PARTNERS ═══
   // Strategy: run normal centering first, then compute offset between where
