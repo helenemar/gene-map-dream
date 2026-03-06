@@ -1048,6 +1048,10 @@ const GenogramEditor: React.FC = () => {
     setTimeout(() => centerOnMember(newMember), 100);
   }, [members, unions, computeNewPosition, centerOnMember, recordSnapshot]);
 
+  const handleToggleLock = useCallback((id: string) => {
+    setMembers(prev => prev.map(m => m.id === id ? { ...m, locked: !m.locked } : m));
+  }, []);
+
   const [drawerEditing, setDrawerEditing] = useState(true);
 
   const handleEdit = useCallback((id: string) => {
@@ -1468,6 +1472,7 @@ const GenogramEditor: React.FC = () => {
                 onDragStart={handleDragStart}
                 onCreateRelated={handleCreateRelated}
                 onEdit={handleEdit}
+                onToggleLock={handleToggleLock}
                 onView={handleView}
                 onHover={setHoveredMember}
                 onLinkDragStart={handleLinkDragStart}
