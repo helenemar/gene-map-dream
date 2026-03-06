@@ -18,7 +18,7 @@ import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 const CARD_W = 220;
 const CARD_H = 64;
 const LEVEL_SPACING = 250;
-const BASE_COUPLE_GAP = 40;
+const BASE_COUPLE_GAP = 20;
 const MIN_BADGE_GAP = 180;
 const BADGE_SAFETY = 40;
 const SIBLING_GAP = 35;          // compact gap between sibling cards
