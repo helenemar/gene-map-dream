@@ -957,25 +957,31 @@ export function computeAutoLayout(
   }
 
   // ═══ 11i. INJECT LOCKED POSITIONS & ADAPT PARTNERS ═══
-  // Locked members keep their absolute position. Partners and nearby members adapt.
+  // Locked members keep their absolute position. We shift the ENTIRE layout
+  // to best align with locked members, then fix up partners and collisions.
   if (lockedPositions && lockedPositions.size > 0) {
-    // First, compute the centering offset the normal layout would apply,
-    // so we can translate locked (absolute) coords into the same coordinate space.
-    // We'll apply locked positions AFTER centering, so we need to do centering first,
-    // then override locked, then re-resolve.
-
-    // Temporary center pass to align coordinate spaces
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    for (const pos of positions.values()) {
-      minX = Math.min(minX, pos.x);
-      minY = Math.min(minY, pos.y);
-      maxX = Math.max(maxX, pos.x + CARD_W);
-      maxY = Math.max(maxY, pos.y + CARD_H);
+    // Compute the average offset between layout positions and locked positions
+    // This aligns the coordinate systems so non-locked members stay near locked ones
+    let totalDx = 0, totalDy = 0, count = 0;
+    for (const [id, lockedPos] of lockedPositions) {
+      const pos = positions.get(id);
+      if (pos) {
+        totalDx += lockedPos.x - pos.x;
+        totalDy += lockedPos.y - pos.y;
+        count++;
+      }
     }
-    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
-    for (const pos of positions.values()) { pos.x -= cx; pos.y -= cy; }
+    if (count > 0) {
+      const avgDx = totalDx / count;
+      const avgDy = totalDy / count;
+      // Shift ALL positions by the average offset to align coordinate spaces
+      for (const pos of positions.values()) {
+        pos.x += avgDx;
+        pos.y += avgDy;
+      }
+    }
 
-    // Now override locked members with their absolute positions
+    // Now override locked members with their exact positions
     const lockedIds = new Set<string>();
     for (const [id, lockedPos] of lockedPositions) {
       const pos = positions.get(id);
