@@ -864,7 +864,70 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ 11d2. (removed — was enforcing excessive branch gaps) ═══
+  // ═══ 11d2. ENSURE CHILDREN OF DIFFERENT UNIONS DON'T INTERLEAVE ═══
+  // Only fix actual overlaps — don't force extra gaps
+  {
+    const unionsByChildGen = new Map<number, Union[]>();
+    for (const u of unions) {
+      if (u.children.length === 0) continue;
+      const childGen = Math.max(...u.children.map(cid => generation.get(cid) ?? 0));
+      if (!unionsByChildGen.has(childGen)) unionsByChildGen.set(childGen, []);
+      unionsByChildGen.get(childGen)!.push(u);
+    }
+
+    for (const [, genUnions] of unionsByChildGen) {
+      if (genUnions.length < 2) continue;
+
+      const blocks: { union: Union; minX: number; maxX: number; childIds: string[] }[] = [];
+      for (const u of genUnions) {
+        const childIds = u.children.filter(cid => positions.has(cid));
+        if (childIds.length === 0) continue;
+        let minX = Infinity, maxX = -Infinity;
+        for (const cid of childIds) {
+          const pos = positions.get(cid)!;
+          minX = Math.min(minX, pos.x);
+          maxX = Math.max(maxX, pos.x + CARD_W);
+          // Include spouse in bounding box
+          for (const uid of (partnerUnions.get(cid) || [])) {
+            const pu = unionMap.get(uid);
+            if (!pu) continue;
+            const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+            const spousePos = positions.get(spouseId);
+            if (spousePos) {
+              minX = Math.min(minX, spousePos.x);
+              maxX = Math.max(maxX, spousePos.x + CARD_W);
+            }
+          }
+        }
+        blocks.push({ union: u, minX, maxX, childIds });
+      }
+
+      blocks.sort((a, b) => a.minX - b.minX);
+
+      // Only fix overlaps (gap < MIN_CARD_GAP)
+      for (let i = 0; i < blocks.length - 1; i++) {
+        const currentGap = blocks[i + 1].minX - blocks[i].maxX;
+        if (currentGap < MIN_CARD_GAP) {
+          const shift = MIN_CARD_GAP - currentGap;
+          for (let j = i + 1; j < blocks.length; j++) {
+            for (const cid of blocks[j].childIds) {
+              const pos = positions.get(cid);
+              if (pos) pos.x += shift;
+              for (const uid of (partnerUnions.get(cid) || [])) {
+                const pu = unionMap.get(uid);
+                if (!pu) continue;
+                const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+                const spousePos = positions.get(spouseId);
+                if (spousePos) spousePos.x += shift;
+              }
+            }
+            blocks[j].minX += shift;
+            blocks[j].maxX += shift;
+          }
+        }
+      }
+    }
+  }
 
   // ═══ 11e. FINAL COLLISION PASS (post-deinterleave) ═══
   for (let pass = 0; pass < 10; pass++) {
