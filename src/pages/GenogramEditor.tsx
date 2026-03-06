@@ -41,7 +41,9 @@ const MAX_ZOOM = 3;
 const ZOOM_SENSITIVITY = 0.002;
 const DOT_SPACING = 20;
 const SNAP_GRID_X = 20;
-const SNAP_GRID_Y = 50;
+const SNAP_GRID_Y = 20;  // Fine grid for smooth dragging
+const LEVEL_SPACING_SNAP = 250; // Must match autoLayout LEVEL_SPACING
+const SNAP_LEVEL_THRESHOLD = 40; // Snap to generation Y row when within this distance
 const STORAGE_KEY = 'genogy-member-positions';
 
 type Side = 'top' | 'bottom' | 'left' | 'right';
