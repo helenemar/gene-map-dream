@@ -1177,6 +1177,11 @@ export function computeAutoLayout(
     if (!reCenterParents()) break;
   }
 
+  // Center single children below their parents
+  for (let pass = 0; pass < 3; pass++) {
+    if (!centerSingleChildren()) break;
+  }
+
   // Final collision + compact
   for (let pass = 0; pass < 5; pass++) {
     if (!simpleCollisionPass()) break;
@@ -1185,6 +1190,17 @@ export function computeAutoLayout(
   for (let pass = 0; pass < 5; pass++) {
     if (!simpleCollisionPass()) break;
   }
+
+  // One more re-center pass after collision to ensure alignment
+  for (let pass = 0; pass < 3; pass++) {
+    const a = reCenterParents();
+    const b = centerSingleChildren();
+    if (!a && !b) break;
+  }
+  for (let pass = 0; pass < 5; pass++) {
+    if (!simpleCollisionPass()) break;
+  }
+  compactCouples();
 
   // ═══ 11i. INJECT LOCKED POSITIONS & ADAPT PARTNERS ═══
   // Strategy: run normal centering first, then compute offset between where
