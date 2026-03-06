@@ -794,17 +794,17 @@ export function computeAutoLayout(
         if (spousePos) spousePos.x += dx;
       }
 
-      // Calculate width of this child block (including spouse)
-      let blockWidth = CARD_W;
+      // Calculate actual right edge of this child's block (child + spouse if to the right)
+      let rightEdge = pos.x + CARD_W;
       for (const uid of (partnerUnions.get(cid) || [])) {
         const pu = unionMap.get(uid);
-        if (pu) {
-          blockWidth = coupleWidth(pu);
-          break;
-        }
+        if (!pu) continue;
+        const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+        const spousePos = positions.get(spouseId);
+        if (spousePos) rightEdge = Math.max(rightEdge, spousePos.x + CARD_W);
       }
 
-      cursor += blockWidth + SIBLING_GAP;
+      cursor = rightEdge + SIBLING_GAP;
     }
   }
 
