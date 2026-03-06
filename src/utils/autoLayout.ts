@@ -713,14 +713,8 @@ export function computeAutoLayout(
     return anyOverlap;
   }
 
-  // ═══ 8. COLLISION RESOLUTION ═══
-  for (let pass = 0; pass < 20; pass++) {
-    if (!simpleCollisionPass()) break;
-  }
-
-  // ═══ 9. RE-CENTER PARENTS ABOVE CHILDREN ═══
-  const crossFamilyUnionIds = new Set(crossFamilyUnions.map(cu => cu.id));
-  for (let pass = 0; pass < 5; pass++) {
+  // ═══ HELPER: Re-center each couple above its children ═══
+  function reCenterParents(): boolean {
     let anyShift = false;
     for (const u of unions) {
       if (u.children.length === 0) continue;
@@ -730,28 +724,66 @@ export function computeAutoLayout(
         .filter((p): p is { x: number; y: number } => !!p);
       if (childPositions.length === 0) continue;
 
-      const childMinX = Math.min(...childPositions.map(p => p.x));
-      const childMaxX = Math.max(...childPositions.map(p => p.x + CARD_W));
+      // Include spouses of children in the bounding box
+      let childMinX = Math.min(...childPositions.map(p => p.x));
+      let childMaxX = Math.max(...childPositions.map(p => p.x + CARD_W));
+      for (const cid of u.children) {
+        for (const uid of (partnerUnions.get(cid) || [])) {
+          const pu = unionMap.get(uid);
+          if (!pu) continue;
+          const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+          const sp = positions.get(spouseId);
+          if (sp) {
+            childMinX = Math.min(childMinX, sp.x);
+            childMaxX = Math.max(childMaxX, sp.x + CARD_W);
+          }
+        }
+      }
       const childCenterX = (childMinX + childMaxX) / 2;
 
       const p1 = positions.get(u.partner1);
       const p2 = positions.get(u.partner2);
       if (!p1 || !p2) continue;
 
-      const gap = coupleGap(u);
       const currentCoupleCenter = (Math.min(p1.x, p2.x) + Math.max(p1.x, p2.x) + CARD_W) / 2;
       const dx = childCenterX - currentCoupleCenter;
 
-      if (Math.abs(dx) > 5) {
+      if (Math.abs(dx) > 3) {
         p1.x += dx;
         p2.x += dx;
         anyShift = true;
       }
     }
-    if (!anyShift) break;
+    return anyShift;
   }
 
-  // ═══ 10. ENSURE PARTNERS SHARE SAME Y ═══
+  // ═══ HELPER: Compact couples back together ═══
+  function compactCouples() {
+    for (const u of unions) {
+      const p1 = positions.get(u.partner1);
+      const p2 = positions.get(u.partner2);
+      if (!p1 || !p2) continue;
+      const gap = coupleGap(u);
+      const [leftId, rightId] = p1.x <= p2.x ? [u.partner1, u.partner2] : [u.partner2, u.partner1];
+      const leftPos = positions.get(leftId)!;
+      const rightPos = positions.get(rightId)!;
+      const desiredX = leftPos.x + CARD_W + gap;
+      if (rightPos.x > desiredX + 2) {
+        rightPos.x = desiredX;
+      }
+    }
+  }
+
+  // ═══ 8. INTEGRATED POST-PROCESSING ═══
+  // Run collision + re-center + compact in an integrated loop to avoid oscillation
+  const crossFamilyUnionIds = new Set(crossFamilyUnions.map(cu => cu.id));
+
+  // Phase 1: Initial collision resolution
+  for (let pass = 0; pass < 10; pass++) {
+    if (!simpleCollisionPass()) break;
+  }
+
+  // Phase 2: Ensure partners same Y
   for (const u of unions) {
     const p1 = positions.get(u.partner1);
     const p2 = positions.get(u.partner2);
@@ -762,38 +794,11 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ 11. COLLISION PASS ═══
-  for (let pass = 0; pass < 10; pass++) {
-    if (!simpleCollisionPass()) break;
-  }
-
-  // ═══ 11b. RE-COMPACT COUPLES ═══
-  for (const u of unions) {
-    const p1 = positions.get(u.partner1);
-    const p2 = positions.get(u.partner2);
-    if (!p1 || !p2) continue;
-    const gap = coupleGap(u);
-    const [leftId, rightId] = p1.x <= p2.x ? [u.partner1, u.partner2] : [u.partner2, u.partner1];
-    const leftPos = positions.get(leftId)!;
-    const rightPos = positions.get(rightId)!;
-    const desiredX = leftPos.x + CARD_W + gap;
-    if (rightPos.x > desiredX + 5) {
-      rightPos.x = desiredX;
-    }
-  }
-
-  // ═══ 11c. COLLISION PASS (post-compaction) ═══
-  for (let pass = 0; pass < 10; pass++) {
-    if (!simpleCollisionPass()) break;
-  }
-
-  // ═══ 11d. ENFORCE SIBLING ORDER + DEINTERLEAVE ═══
-  // Ensure siblings are in birth-year order AND tightly packed (no interlopers).
+  // Phase 3: Deinterleave siblings (enforce birth-year order within same union)
   for (const u of unions) {
     const childIds = u.children.filter(cid => positions.has(cid));
     if (childIds.length < 2) continue;
 
-    // Sort children by BIRTH YEAR
     childIds.sort((a, b) => {
       const ma = memberMap.get(a);
       const mb = memberMap.get(b);
@@ -803,7 +808,6 @@ export function computeAutoLayout(
       return a.localeCompare(b);
     });
 
-    // Check if X order matches birth-year order
     const currentXOrder = [...childIds].sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
     const isOutOfOrder = childIds.some((cid, i) => cid !== currentXOrder[i]);
 
@@ -833,7 +837,6 @@ export function computeAutoLayout(
 
     if (!hasInterlopers && !isOutOfOrder) continue;
 
-    // Re-pack children in birth-year order starting from firstChildX
     let cursor = firstChildX;
     for (let i = 0; i < childIds.length; i++) {
       const cid = childIds[i];
@@ -864,8 +867,7 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ 11d2. ENSURE CHILDREN OF DIFFERENT UNIONS DON'T INTERLEAVE ═══
-  // Only fix actual overlaps — don't force extra gaps
+  // Phase 4: Branch separation (prevent children of different unions from overlapping)
   {
     const unionsByChildGen = new Map<number, Union[]>();
     for (const u of unions) {
@@ -887,7 +889,6 @@ export function computeAutoLayout(
           const pos = positions.get(cid)!;
           minX = Math.min(minX, pos.x);
           maxX = Math.max(maxX, pos.x + CARD_W);
-          // Include spouse in bounding box
           for (const uid of (partnerUnions.get(cid) || [])) {
             const pu = unionMap.get(uid);
             if (!pu) continue;
@@ -904,7 +905,6 @@ export function computeAutoLayout(
 
       blocks.sort((a, b) => a.minX - b.minX);
 
-      // Only fix overlaps (gap < MIN_CARD_GAP)
       for (let i = 0; i < blocks.length - 1; i++) {
         const currentGap = blocks[i + 1].minX - blocks[i].maxX;
         if (currentGap < MIN_CARD_GAP) {
@@ -929,67 +929,36 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ 11e. FINAL COLLISION PASS (post-deinterleave) ═══
-  for (let pass = 0; pass < 10; pass++) {
-    if (!simpleCollisionPass()) break;
-  }
-
-  // ═══ 11f. RE-CENTER PARENTS ABOVE CHILDREN (post-deinterleave) ═══
+  // Phase 5: Sequential passes (proven to give best results at 40% zoom)
+  // Re-center parents above children
   for (let pass = 0; pass < 5; pass++) {
-    let anyShift = false;
-    for (const u of unions) {
-      if (u.children.length === 0) continue;
-      if (crossFamilyUnionIds.has(u.id)) continue;
-      const childPositions = u.children
-        .map(cid => positions.get(cid))
-        .filter((p): p is { x: number; y: number } => !!p);
-      if (childPositions.length === 0) continue;
-
-      const childMinX = Math.min(...childPositions.map(p => p.x));
-      const childMaxX = Math.max(...childPositions.map(p => p.x + CARD_W));
-      const childCenterX = (childMinX + childMaxX) / 2;
-
-      const p1 = positions.get(u.partner1);
-      const p2 = positions.get(u.partner2);
-      if (!p1 || !p2) continue;
-
-      const currentCoupleCenter = (Math.min(p1.x, p2.x) + Math.max(p1.x, p2.x) + CARD_W) / 2;
-      const dx = childCenterX - currentCoupleCenter;
-
-      if (Math.abs(dx) > 5) {
-        p1.x += dx;
-        p2.x += dx;
-        anyShift = true;
-      }
-    }
-    if (!anyShift) break;
+    if (!reCenterParents()) break;
   }
 
-  // ═══ 11g. FINAL COLLISION PASS ═══
+  // Collision resolution
   for (let pass = 0; pass < 10; pass++) {
     if (!simpleCollisionPass()) break;
   }
 
-  // ═══ 11h. FINAL RE-COMPACT ALL COUPLES (especially childless) ═══
-  // After all collision passes, couples may have been pushed apart.
-  // Pull them back together, prioritising childless couples which have no
-  // children anchor to justify separation.
-  for (const u of unions) {
-    const p1 = positions.get(u.partner1);
-    const p2 = positions.get(u.partner2);
-    if (!p1 || !p2) continue;
-    const gap = coupleGap(u);
-    const [leftId, rightId] = p1.x <= p2.x ? [u.partner1, u.partner2] : [u.partner2, u.partner1];
-    const leftPos = positions.get(leftId)!;
-    const rightPos = positions.get(rightId)!;
-    const desiredX = leftPos.x + CARD_W + gap;
-    if (rightPos.x > desiredX + 2) {
-      rightPos.x = desiredX;
-    }
+  // Compact couples
+  compactCouples();
+
+  // Final collision
+  for (let pass = 0; pass < 10; pass++) {
+    if (!simpleCollisionPass()) break;
   }
 
-  // Final collision pass after re-compaction
-  for (let pass = 0; pass < 10; pass++) {
+  // Final re-center
+  for (let pass = 0; pass < 3; pass++) {
+    if (!reCenterParents()) break;
+  }
+
+  // Final collision + compact
+  for (let pass = 0; pass < 5; pass++) {
+    if (!simpleCollisionPass()) break;
+  }
+  compactCouples();
+  for (let pass = 0; pass < 5; pass++) {
     if (!simpleCollisionPass()) break;
   }
 
