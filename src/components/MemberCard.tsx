@@ -4,7 +4,7 @@ import { FamilyMember } from '@/types/genogram';
 import type { DynamicPathology } from '@/hooks/usePathologies';
 import MemberIcon from '@/components/MemberIcon';
 import CreateMemberDropdown, { RelationshipChoice, DisabledOptions } from '@/components/CreateMemberDropdown';
-import { Plus, PencilLine, Link, X, Eye, UserPlus, FileText, HeartHandshake, HelpCircle } from 'lucide-react';
+import { Plus, PencilLine, Link, X, Eye, UserPlus, FileText, HeartHandshake, HelpCircle, Lock, Unlock } from 'lucide-react';
 
 
 /**
@@ -45,6 +45,7 @@ interface MemberCardProps {
   onDragStart?: (id: string, e: React.MouseEvent) => void;
   onCreateRelated?: (id: string, relationship: RelationshipChoice) => void;
   onEdit?: (id: string) => void;
+  onToggleLock?: (id: string) => void;
   disabledOptions?: DisabledOptions;
   /** Dynamic pathologies from DB for color resolution */
   dynamicPathologies?: DynamicPathology[];
@@ -82,6 +83,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onDragStart,
   onCreateRelated,
   onEdit,
+  onToggleLock,
   onView,
   onHover,
   onLinkDragStart,

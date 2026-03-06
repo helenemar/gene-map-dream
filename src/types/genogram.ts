@@ -53,6 +53,8 @@ export interface FamilyMember {
   isAdoptiveParent?: boolean;
   /** Perinatal type — overrides normal rendering with triangle-based symbols */
   perinatalType?: PerinatalType;
+  /** When true, auto-layout (Réorganiser) will not move this member */
+  locked?: boolean;
 }
 
 export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed' | 'love_affair';

@@ -1203,6 +1203,8 @@ const GenogramEditor: React.FC = () => {
     recordSnapshot();
     setIsAnimating(true);
     setMembers(prev => prev.map(m => {
+      // Skip locked members — keep their manual position
+      if (m.locked) return m;
       const pos = result.positions.get(m.id);
       return pos ? { ...m, x: pos.x, y: pos.y } : m;
     }));
