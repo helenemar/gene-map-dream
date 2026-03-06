@@ -757,59 +757,164 @@ export function computeAutoLayout(
     return anyShift;
   }
 
-  // ═══ HELPER: Re-center cross-family children below their parents ═══
-  function reCenterCrossFamilyChildren(): boolean {
-    let anyShift = false;
-    for (const cu of crossFamilyUnions) {
-      if (cu.children.length === 0) continue;
-      const p1 = positions.get(cu.partner1);
-      const p2 = positions.get(cu.partner2);
-      if (!p1 || !p2) continue;
+  // ═══ HELPER: Sort children at each generation by parent X order ═══
+  // This prevents crossings by ensuring children follow the same left-to-right
+  // order as their parents.
+  function sortChildrenByParentOrder() {
+    // Find all generations
+    const allGens = new Set<number>();
+    for (const [, g] of generation) allGens.add(g);
+    const sortedGens = [...allGens].sort((a, b) => a - b);
 
-      // Midpoint of parents
-      const parentMidX = (Math.min(p1.x, p2.x) + Math.max(p1.x, p2.x) + CARD_W) / 2;
+    for (const gen of sortedGens) {
+      if (gen === 0) continue; // Root generation has no parents to sort by
 
-      // Current children bounding box
-      const childPositions = cu.children
-        .map(cid => positions.get(cid))
-        .filter((p): p is { x: number; y: number } => !!p);
-      if (childPositions.length === 0) continue;
+      // Collect all unions that have children at this generation
+      const unionsAtGen: Union[] = [];
+      for (const u of unions) {
+        if (u.children.length === 0) continue;
+        const childGen = Math.max(...u.children.map(cid => generation.get(cid) ?? 0));
+        if (childGen === gen) unionsAtGen.push(u);
+      }
+      if (unionsAtGen.length === 0) continue;
 
-      let childMinX = Math.min(...childPositions.map(p => p.x));
-      let childMaxX = Math.max(...childPositions.map(p => p.x + CARD_W));
-      // Include spouses of children
-      for (const cid of cu.children) {
-        for (const uid of (partnerUnions.get(cid) || [])) {
-          const pu = unionMap.get(uid);
-          if (!pu) continue;
-          const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
-          const sp = positions.get(spouseId);
-          if (sp) {
-            childMinX = Math.min(childMinX, sp.x);
-            childMaxX = Math.max(childMaxX, sp.x + CARD_W);
+      // Sort unions by the X midpoint of their parent couple
+      unionsAtGen.sort((a, b) => {
+        const a1 = positions.get(a.partner1);
+        const a2 = positions.get(a.partner2);
+        const b1 = positions.get(b.partner1);
+        const b2 = positions.get(b.partner2);
+        const aMid = a1 && a2 ? (Math.min(a1.x, a2.x) + Math.max(a1.x, a2.x) + CARD_W) / 2 : 0;
+        const bMid = b1 && b2 ? (Math.min(b1.x, b2.x) + Math.max(b1.x, b2.x) + CARD_W) / 2 : 0;
+        return aMid - bMid;
+      });
+
+      // Build ordered blocks: each union's children (sorted by birth year) + their spouses
+      type Block = { unionId: string; memberIds: string[]; width: number };
+      const blocks: Block[] = [];
+
+      for (const u of unionsAtGen) {
+        const children = u.children
+          .filter(cid => positions.has(cid))
+          .sort((a, b) => {
+            const ma = memberMap.get(a);
+            const mb = memberMap.get(b);
+            return (ma?.birthYear ?? 0) - (mb?.birthYear ?? 0) || a.localeCompare(b);
+          });
+        if (children.length === 0) continue;
+
+        // Collect all member IDs in this block (children + their spouses)
+        const blockMemberIds: string[] = [];
+        let blockWidth = 0;
+        for (let ci = 0; ci < children.length; ci++) {
+          const cid = children[ci];
+          // Check if child has a couple (childless or with children)
+          const childUnions = (partnerUnions.get(cid) || [])
+            .map(uid => unionMap.get(uid)!)
+            .filter(pu => pu && pu.id !== u.id); // exclude the parent union
+          
+          if (childUnions.length > 0) {
+            const cu = childUnions[0];
+            const spouseId = cu.partner1 === cid ? cu.partner2 : cu.partner1;
+            blockMemberIds.push(cid, spouseId);
+            blockWidth += coupleWidth(cu);
+          } else {
+            blockMemberIds.push(cid);
+            blockWidth += CARD_W;
           }
+          if (ci < children.length - 1) blockWidth += SIBLING_GAP;
+        }
+        blocks.push({ unionId: u.id, memberIds: blockMemberIds, width: blockWidth });
+      }
+
+      if (blocks.length === 0) continue;
+
+      // Find the leftmost position among all members at this generation
+      let globalMinX = Infinity;
+      for (const block of blocks) {
+        for (const mid of block.memberIds) {
+          const p = positions.get(mid);
+          if (p) globalMinX = Math.min(globalMinX, p.x);
         }
       }
-      const childCenterX = (childMinX + childMaxX) / 2;
-      const dx = parentMidX - childCenterX;
+      if (!isFinite(globalMinX)) globalMinX = 0;
 
-      if (Math.abs(dx) > 3) {
-        // Shift all children and their spouses
-        for (const cid of cu.children) {
-          const pos = positions.get(cid);
-          if (pos) pos.x += dx;
-          for (const uid of (partnerUnions.get(cid) || [])) {
-            const pu = unionMap.get(uid);
-            if (!pu) continue;
-            const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
-            const sp = positions.get(spouseId);
-            if (sp) sp.x += dx;
-          }
+      // Now lay out blocks left-to-right, centered under their parent couple
+      // First pass: compute ideal center for each block (parent midpoint)
+      const blockCenters: number[] = blocks.map(block => {
+        const u = unionMap.get(block.unionId)!;
+        const p1 = positions.get(u.partner1);
+        const p2 = positions.get(u.partner2);
+        if (p1 && p2) {
+          return (Math.min(p1.x, p2.x) + Math.max(p1.x, p2.x) + CARD_W) / 2;
         }
-        anyShift = true;
+        return 0;
+      });
+
+      // Second pass: ensure no overlap between blocks
+      // Start from ideal positions, then push right if needed
+      const blockStarts: number[] = blockCenters.map((center, i) => center - blocks[i].width / 2);
+      
+      for (let i = 1; i < blocks.length; i++) {
+        const prevEnd = blockStarts[i - 1] + blocks[i - 1].width;
+        const minStart = prevEnd + MIN_CARD_GAP;
+        if (blockStarts[i] < minStart) {
+          blockStarts[i] = minStart;
+        }
+      }
+
+      // Position members within each block
+      for (let bi = 0; bi < blocks.length; bi++) {
+        const block = blocks[bi];
+        const u = unionMap.get(block.unionId)!;
+        const children = u.children
+          .filter(cid => positions.has(cid))
+          .sort((a, b) => {
+            const ma = memberMap.get(a);
+            const mb = memberMap.get(b);
+            return (ma?.birthYear ?? 0) - (mb?.birthYear ?? 0) || a.localeCompare(b);
+          });
+
+        let cursor = blockStarts[bi];
+        const totalLeaves = children.length;
+        let leafIdx = 0;
+
+        for (const cid of children) {
+          const baseY = gen * LEVEL_SPACING;
+          const stepOffset = totalLeaves > 1 ? leafIdx * SIBLING_STEP_Y : 0;
+          const childY = baseY + stepOffset;
+
+          const childUnions = (partnerUnions.get(cid) || [])
+            .map(uid => unionMap.get(uid)!)
+            .filter(pu => pu && pu.id !== u.id);
+
+          if (childUnions.length > 0) {
+            const cu = childUnions[0];
+            const spouseId = cu.partner1 === cid ? cu.partner2 : cu.partner1;
+            const gap = coupleGap(cu);
+            const cw = coupleWidth(cu);
+
+            // Determine lineage vs spouse positioning
+            const isLastChild = leafIdx === totalLeaves - 1;
+            const isFirstChild = leafIdx === 0;
+            const lineageMember = cid;
+
+            if (isLastChild && !isFirstChild) {
+              positions.set(lineageMember, { x: cursor, y: childY });
+              positions.set(spouseId, { x: cursor + CARD_W + gap, y: childY });
+            } else {
+              positions.set(spouseId, { x: cursor, y: childY });
+              positions.set(lineageMember, { x: cursor + CARD_W + gap, y: childY });
+            }
+            cursor += cw + SIBLING_GAP;
+          } else {
+            positions.set(cid, { x: cursor, y: childY });
+            cursor += CARD_W + SIBLING_GAP;
+          }
+          leafIdx++;
+        }
       }
     }
-    return anyShift;
   }
 
   // ═══ HELPER: Compact couples back together ═══
@@ -984,17 +1089,20 @@ export function computeAutoLayout(
     }
   }
 
-  // Phase 5: Sequential passes (proven to give best results at 40% zoom)
+  // Phase 5: Sort children by parent order (prevents crossings)
+  sortChildrenByParentOrder();
+
+  // Collision resolution
+  for (let pass = 0; pass < 10; pass++) {
+    if (!simpleCollisionPass()) break;
+  }
+
   // Re-center parents above children
   for (let pass = 0; pass < 5; pass++) {
     if (!reCenterParents()) break;
   }
-  // Re-center cross-family children below their parents
-  for (let pass = 0; pass < 5; pass++) {
-    if (!reCenterCrossFamilyChildren()) break;
-  }
 
-  // Collision resolution
+  // Collision resolution again
   for (let pass = 0; pass < 10; pass++) {
     if (!simpleCollisionPass()) break;
   }
@@ -1007,11 +1115,9 @@ export function computeAutoLayout(
     if (!simpleCollisionPass()) break;
   }
 
-  // Final re-center (both regular and cross-family)
+  // Final re-center
   for (let pass = 0; pass < 3; pass++) {
-    const a = reCenterParents();
-    const b = reCenterCrossFamilyChildren();
-    if (!a && !b) break;
+    if (!reCenterParents()) break;
   }
 
   // Final collision + compact
