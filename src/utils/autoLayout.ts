@@ -731,14 +731,13 @@ export function computeAutoLayout(
     if (!simpleCollisionPass()) break;
   }
 
-  // ═══ 11d. DEINTERLEAVE SIBLING GROUPS ═══
-  // After collision resolution, siblings from the same union may have been
-  // scattered by non-siblings inserted between them. Pull them back together.
+  // ═══ 11d. ENFORCE SIBLING ORDER + DEINTERLEAVE ═══
+  // Ensure siblings are in birth-year order AND tightly packed (no interlopers).
   for (const u of unions) {
     const childIds = u.children.filter(cid => positions.has(cid));
     if (childIds.length < 2) continue;
 
-    // Sort children by BIRTH YEAR (not current X) to maintain correct order
+    // Sort children by BIRTH YEAR
     childIds.sort((a, b) => {
       const ma = memberMap.get(a);
       const mb = memberMap.get(b);
@@ -748,11 +747,14 @@ export function computeAutoLayout(
       return a.localeCompare(b);
     });
 
+    // Check if X order matches birth-year order
+    const currentXOrder = [...childIds].sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
+    const isOutOfOrder = childIds.some((cid, i) => cid !== currentXOrder[i]);
+
     const firstChildX = Math.min(...childIds.map(cid => positions.get(cid)!.x));
     const lastChildX = Math.max(...childIds.map(cid => positions.get(cid)!.x));
     const childGen = generation.get(childIds[0]) ?? 0;
 
-    // Also include spouses of children as "allowed" members
     const allowedSet = new Set(childIds);
     for (const cid of childIds) {
       for (const uid of (partnerUnions.get(cid) || [])) {
@@ -772,9 +774,10 @@ export function computeAutoLayout(
         break;
       }
     }
-    if (!hasInterlopers) continue;
 
-    // Re-pack children tightly starting from firstChildX
+    if (!hasInterlopers && !isOutOfOrder) continue;
+
+    // Re-pack children in birth-year order starting from firstChildX
     let cursor = firstChildX;
     for (let i = 0; i < childIds.length; i++) {
       const cid = childIds[i];
@@ -782,10 +785,8 @@ export function computeAutoLayout(
       const oldX = pos.x;
       const dx = cursor - oldX;
 
-      // Move child
       pos.x = cursor;
 
-      // Move spouse(s) by same delta
       for (const uid of (partnerUnions.get(cid) || [])) {
         const pu = unionMap.get(uid);
         if (!pu) continue;
@@ -794,7 +795,6 @@ export function computeAutoLayout(
         if (spousePos) spousePos.x += dx;
       }
 
-      // Calculate actual right edge of this child's block (child + spouse if to the right)
       let rightEdge = pos.x + CARD_W;
       for (const uid of (partnerUnions.get(cid) || [])) {
         const pu = unionMap.get(uid);
