@@ -170,6 +170,18 @@ export function computeAutoLayout(
           }
         }
       }
+      // Pull parents DOWN to child_gen - 1 if they're too far above
+      // This ensures cross-family grandparents align on the same row
+      if (u.children.length > 0) {
+        const minChildGen = Math.min(...u.children.map(cid => generation.get(cid) ?? 0));
+        const expectedParentGen = minChildGen - 1;
+        const currentPg = Math.max(generation.get(u.partner1) ?? 0, generation.get(u.partner2) ?? 0);
+        if (currentPg < expectedParentGen) {
+          generation.set(u.partner1, expectedParentGen);
+          generation.set(u.partner2, expectedParentGen);
+          changed = true;
+        }
+      }
     }
     if (!changed) break;
   }
