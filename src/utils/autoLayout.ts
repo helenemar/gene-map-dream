@@ -68,6 +68,8 @@ export function computeAutoLayout(
   members: FamilyMember[],
   unions: Union[],
   _emotionalLinks: EmotionalLink[],
+  /** Locked positions: members whose position must not change. The engine adapts around them. */
+  lockedPositions?: Map<string, { x: number; y: number }>,
 ): LayoutResult {
   if (members.length === 0) return { positions: new Map() };
 
