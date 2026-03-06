@@ -757,6 +757,61 @@ export function computeAutoLayout(
     return anyShift;
   }
 
+  // ═══ HELPER: Re-center cross-family children below their parents ═══
+  function reCenterCrossFamilyChildren(): boolean {
+    let anyShift = false;
+    for (const cu of crossFamilyUnions) {
+      if (cu.children.length === 0) continue;
+      const p1 = positions.get(cu.partner1);
+      const p2 = positions.get(cu.partner2);
+      if (!p1 || !p2) continue;
+
+      // Midpoint of parents
+      const parentMidX = (Math.min(p1.x, p2.x) + Math.max(p1.x, p2.x) + CARD_W) / 2;
+
+      // Current children bounding box
+      const childPositions = cu.children
+        .map(cid => positions.get(cid))
+        .filter((p): p is { x: number; y: number } => !!p);
+      if (childPositions.length === 0) continue;
+
+      let childMinX = Math.min(...childPositions.map(p => p.x));
+      let childMaxX = Math.max(...childPositions.map(p => p.x + CARD_W));
+      // Include spouses of children
+      for (const cid of cu.children) {
+        for (const uid of (partnerUnions.get(cid) || [])) {
+          const pu = unionMap.get(uid);
+          if (!pu) continue;
+          const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+          const sp = positions.get(spouseId);
+          if (sp) {
+            childMinX = Math.min(childMinX, sp.x);
+            childMaxX = Math.max(childMaxX, sp.x + CARD_W);
+          }
+        }
+      }
+      const childCenterX = (childMinX + childMaxX) / 2;
+      const dx = parentMidX - childCenterX;
+
+      if (Math.abs(dx) > 3) {
+        // Shift all children and their spouses
+        for (const cid of cu.children) {
+          const pos = positions.get(cid);
+          if (pos) pos.x += dx;
+          for (const uid of (partnerUnions.get(cid) || [])) {
+            const pu = unionMap.get(uid);
+            if (!pu) continue;
+            const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+            const sp = positions.get(spouseId);
+            if (sp) sp.x += dx;
+          }
+        }
+        anyShift = true;
+      }
+    }
+    return anyShift;
+  }
+
   // ═══ HELPER: Compact couples back together ═══
   function compactCouples() {
     for (const u of unions) {
@@ -934,6 +989,10 @@ export function computeAutoLayout(
   for (let pass = 0; pass < 5; pass++) {
     if (!reCenterParents()) break;
   }
+  // Re-center cross-family children below their parents
+  for (let pass = 0; pass < 5; pass++) {
+    if (!reCenterCrossFamilyChildren()) break;
+  }
 
   // Collision resolution
   for (let pass = 0; pass < 10; pass++) {
@@ -948,9 +1007,11 @@ export function computeAutoLayout(
     if (!simpleCollisionPass()) break;
   }
 
-  // Final re-center
+  // Final re-center (both regular and cross-family)
   for (let pass = 0; pass < 3; pass++) {
-    if (!reCenterParents()) break;
+    const a = reCenterParents();
+    const b = reCenterCrossFamilyChildren();
+    if (!a && !b) break;
   }
 
   // Final collision + compact
