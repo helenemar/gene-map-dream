@@ -1221,18 +1221,22 @@ const GenogramEditor: React.FC = () => {
     }, 900); // Match spring animation duration
   }, [members, unions, emotionalLinks, handleFitToScreen]);
 
-  // ─── Auto-layout on member count change (skip initial load) ───
+  // ─── Auto-layout on member/union count change (including initial load) ───
   const prevMemberCountRef = React.useRef<number | null>(null);
+  const prevUnionCountRef = React.useRef<number | null>(null);
+  const initialLayoutDoneRef = React.useRef(false);
   useEffect(() => {
-    if (prevMemberCountRef.current === null) {
-      prevMemberCountRef.current = members.length;
-      return;
-    }
-    if (members.length > prevMemberCountRef.current) {
+    const membersChanged = prevMemberCountRef.current !== null && members.length > prevMemberCountRef.current;
+    const unionsChanged = prevUnionCountRef.current !== null && unions.length > prevUnionCountRef.current;
+    const isInitialLoad = !initialLayoutDoneRef.current && members.length > 0;
+
+    if (membersChanged || unionsChanged || isInitialLoad) {
       handleAutoLayout();
+      initialLayoutDoneRef.current = true;
     }
     prevMemberCountRef.current = members.length;
-  }, [members.length, handleAutoLayout]);
+    prevUnionCountRef.current = unions.length;
+  }, [members.length, unions.length, handleAutoLayout]);
 
   // ─── Button zoom (centered on viewport center) ───
   const handleZoomIn = useCallback(() => {
