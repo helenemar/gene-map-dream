@@ -1109,21 +1109,28 @@ export function computeAutoLayout(
         shiftMemberAndDescendants(cid, dx, positions, partnerUnions, unionMap, memberMap);
       }
 
-      for (const uid of (partnerUnions.get(cid) || [])) {
-        const pu = unionMap.get(uid);
-        if (!pu) continue;
-        const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
-        const spousePos = positions.get(spouseId);
-        if (spousePos) spousePos.x += dx;
-      }
-
+      // Compute the rightmost edge of this child's entire branch
       let rightEdge = pos.x + CARD_W;
+      // Include spouse
       for (const uid of (partnerUnions.get(cid) || [])) {
         const pu = unionMap.get(uid);
         if (!pu) continue;
         const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
         const spousePos = positions.get(spouseId);
         if (spousePos) rightEdge = Math.max(rightEdge, spousePos.x + CARD_W);
+        // Include descendants
+        for (const gcid of pu.children) {
+          const gcPos = positions.get(gcid);
+          if (gcPos) rightEdge = Math.max(rightEdge, gcPos.x + CARD_W);
+          // Include grandchild spouses
+          for (const guid of (partnerUnions.get(gcid) || [])) {
+            const gpu = unionMap.get(guid);
+            if (!gpu) continue;
+            const gsid = gpu.partner1 === gcid ? gpu.partner2 : gpu.partner1;
+            const gsPos = positions.get(gsid);
+            if (gsPos) rightEdge = Math.max(rightEdge, gsPos.x + CARD_W);
+          }
+        }
       }
 
       cursor = rightEdge + SIBLING_GAP;
