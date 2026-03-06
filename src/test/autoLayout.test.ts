@@ -98,3 +98,66 @@ describe('autoLayout cross-family unions', () => {
     expect(claudeY).toBe(henriY); // Same generation
   });
 });
+
+describe('autoLayout spouse placement (left/right rule)', () => {
+  // 3 siblings: Alice (eldest), Bob (middle), Charlie (youngest)
+  // Each has a spouse. Rule: spouse on OUTER side of sibling line.
+  // Eldest & middle → spouse LEFT, lineage RIGHT
+  // Youngest (last) → lineage LEFT, spouse RIGHT
+
+  function buildThreeSiblingFamily() {
+    const members: FamilyMember[] = [
+      makeMember('dad', 'Dad', 'male', 1950),
+      makeMember('mom', 'Mom', 'female', 1952),
+      // Siblings sorted by birth year
+      makeMember('alice', 'Alice', 'female', 1975),   // eldest
+      makeMember('alice-h', 'AliceH', 'male', 1974),  // Alice's spouse
+      makeMember('bob', 'Bob', 'male', 1978),          // middle
+      makeMember('bob-w', 'BobW', 'female', 1979),    // Bob's spouse
+      makeMember('charlie', 'Charlie', 'male', 1982),  // youngest (last)
+      makeMember('charlie-w', 'CharlieW', 'female', 1983), // Charlie's spouse
+    ];
+
+    const unions: Union[] = [
+      { id: 'u-parents', partner1: 'dad', partner2: 'mom', status: 'married', children: ['alice', 'bob', 'charlie'] },
+      { id: 'u-alice', partner1: 'alice', partner2: 'alice-h', status: 'married', children: [] },
+      { id: 'u-bob', partner1: 'bob', partner2: 'bob-w', status: 'married', children: [] },
+      { id: 'u-charlie', partner1: 'charlie', partner2: 'charlie-w', status: 'married', children: [] },
+    ];
+
+    return computeAutoLayout(members, unions, []);
+  }
+
+  it('places eldest spouse to the LEFT of the lineage member', () => {
+    const result = buildThreeSiblingFamily();
+    const aliceX = result.positions.get('alice')!.x;
+    const aliceHX = result.positions.get('alice-h')!.x;
+    // Spouse LEFT, lineage RIGHT
+    expect(aliceHX).toBeLessThan(aliceX);
+  });
+
+  it('places middle child spouse to the LEFT of the lineage member', () => {
+    const result = buildThreeSiblingFamily();
+    const bobX = result.positions.get('bob')!.x;
+    const bobWX = result.positions.get('bob-w')!.x;
+    // Spouse LEFT, lineage RIGHT
+    expect(bobWX).toBeLessThan(bobX);
+  });
+
+  it('places youngest (last) spouse to the RIGHT of the lineage member', () => {
+    const result = buildThreeSiblingFamily();
+    const charlieX = result.positions.get('charlie')!.x;
+    const charlieWX = result.positions.get('charlie-w')!.x;
+    // Lineage LEFT, spouse RIGHT
+    expect(charlieWX).toBeGreaterThan(charlieX);
+  });
+
+  it('maintains sibling order left-to-right by birth year', () => {
+    const result = buildThreeSiblingFamily();
+    const aliceX = result.positions.get('alice')!.x;
+    const bobX = result.positions.get('bob')!.x;
+    const charlieX = result.positions.get('charlie')!.x;
+    expect(aliceX).toBeLessThan(bobX);
+    expect(bobX).toBeLessThan(charlieX);
+  });
+});
