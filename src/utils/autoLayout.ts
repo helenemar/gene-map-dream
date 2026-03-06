@@ -117,10 +117,13 @@ export function computeAutoLayout(
     if (!generation.has(m.id)) assignGen(m.id, 0);
   }
 
-  // Fix-up: force children > parent gen, partners same gen
-  for (let iter = 0; iter < 20; iter++) {
+  // Fix-up: force children = parent + 1, partners same gen
+  // Two-phase: first push children down, then pull parents up to ensure
+  // cross-family grandparents align on the same generation row.
+  for (let iter = 0; iter < 30; iter++) {
     let changed = false;
     for (const u of unions) {
+      // Partners must share the same generation
       const g1 = generation.get(u.partner1) ?? 0;
       const g2 = generation.get(u.partner2) ?? 0;
       if (g1 !== g2) {
@@ -129,10 +132,23 @@ export function computeAutoLayout(
         generation.set(u.partner2, t);
         changed = true;
       }
+      // Children must be exactly parent + 1 (push DOWN if too low)
       const pg = Math.max(generation.get(u.partner1) ?? 0, generation.get(u.partner2) ?? 0);
       for (const cid of u.children) {
         if ((generation.get(cid) ?? 0) <= pg) {
           generation.set(cid, pg + 1);
+          changed = true;
+        }
+      }
+      // Parents must be exactly child - 1 (pull UP if too low)
+      // This ensures cross-family grandparents align
+      if (u.children.length > 0) {
+        const minChildGen = Math.min(...u.children.map(cid => generation.get(cid) ?? 0));
+        const expectedParentGen = minChildGen - 1;
+        const currentParentGen = Math.max(generation.get(u.partner1) ?? 0, generation.get(u.partner2) ?? 0);
+        if (currentParentGen < expectedParentGen) {
+          generation.set(u.partner1, expectedParentGen);
+          generation.set(u.partner2, expectedParentGen);
           changed = true;
         }
       }
