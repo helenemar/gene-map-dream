@@ -419,7 +419,25 @@ const GenogramEditor: React.FC = () => {
       let newY = dragInfo.memberY + dy;
       if (snapToGrid) {
         newX = Math.round(newX / SNAP_GRID_X) * SNAP_GRID_X;
-        newY = Math.round(newY / SNAP_GRID_Y) * SNAP_GRID_Y;
+        // Snap Y to nearest occupied generation row (other members' Y positions)
+        // This keeps manually-dragged cards aligned with auto-layout rows
+        const occupiedYs = new Set<number>();
+        for (const other of members) {
+          if (other.id !== dragInfo.id) occupiedYs.add(other.y);
+        }
+        let bestSnapY = Math.round(newY / SNAP_GRID_Y) * SNAP_GRID_Y;
+        let bestDist = SNAP_LEVEL_THRESHOLD + 1;
+        for (const oy of occupiedYs) {
+          const dist = Math.abs(newY - oy);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestSnapY = oy;
+          }
+        }
+        if (bestDist > SNAP_LEVEL_THRESHOLD) {
+          bestSnapY = Math.round(newY / SNAP_GRID_Y) * SNAP_GRID_Y;
+        }
+        newY = bestSnapY;
       }
       // Smart guides: detect alignment with other members on same generation
       const GUIDE_THRESHOLD = 8;
