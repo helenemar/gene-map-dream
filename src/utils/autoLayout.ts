@@ -956,6 +956,135 @@ export function computeAutoLayout(
     if (!simpleCollisionPass()) break;
   }
 
+  // ═══ 11i. INJECT LOCKED POSITIONS & ADAPT PARTNERS ═══
+  // Locked members keep their absolute position. Partners and nearby members adapt.
+  if (lockedPositions && lockedPositions.size > 0) {
+    // First, compute the centering offset the normal layout would apply,
+    // so we can translate locked (absolute) coords into the same coordinate space.
+    // We'll apply locked positions AFTER centering, so we need to do centering first,
+    // then override locked, then re-resolve.
+
+    // Temporary center pass to align coordinate spaces
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const pos of positions.values()) {
+      minX = Math.min(minX, pos.x);
+      minY = Math.min(minY, pos.y);
+      maxX = Math.max(maxX, pos.x + CARD_W);
+      maxY = Math.max(maxY, pos.y + CARD_H);
+    }
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    for (const pos of positions.values()) { pos.x -= cx; pos.y -= cy; }
+
+    // Now override locked members with their absolute positions
+    const lockedIds = new Set<string>();
+    for (const [id, lockedPos] of lockedPositions) {
+      const pos = positions.get(id);
+      if (pos) {
+        pos.x = lockedPos.x;
+        pos.y = lockedPos.y;
+        lockedIds.add(id);
+      }
+    }
+
+    // Adapt partners of locked members: pull/push them to maintain couple gap
+    for (const u of unions) {
+      const p1Locked = lockedIds.has(u.partner1);
+      const p2Locked = lockedIds.has(u.partner2);
+      if (!p1Locked && !p2Locked) continue;
+      const p1 = positions.get(u.partner1);
+      const p2 = positions.get(u.partner2);
+      if (!p1 || !p2) continue;
+      const gap = coupleGap(u);
+
+      if (p1Locked && !p2Locked) {
+        // Adapt p2 to be adjacent to p1
+        // Determine which side p2 should be on (use layout's original relative position)
+        const p2ShouldBeLeft = p2.x < p1.x;
+        if (p2ShouldBeLeft) {
+          p2.x = p1.x - CARD_W - gap;
+        } else {
+          p2.x = p1.x + CARD_W + gap;
+        }
+        p2.y = p1.y;
+      } else if (p2Locked && !p1Locked) {
+        const p1ShouldBeLeft = p1.x < p2.x;
+        if (p1ShouldBeLeft) {
+          p1.x = p2.x - CARD_W - gap;
+        } else {
+          p1.x = p2.x + CARD_W + gap;
+        }
+        p1.y = p2.y;
+      }
+      // If both locked, don't touch either
+    }
+
+    // Collision resolution respecting locked positions
+    function lockedCollisionPass(): boolean {
+      let anyOverlap = false;
+      const genGroupsLocal = new Map<number, string[]>();
+      for (const m of members) {
+        const g = generation.get(m.id) ?? 0;
+        if (!genGroupsLocal.has(g)) genGroupsLocal.set(g, []);
+        genGroupsLocal.get(g)!.push(m.id);
+      }
+      for (const [, ids] of genGroupsLocal) {
+        const sorted = ids
+          .filter(id => positions.has(id))
+          .sort((a, b) => positions.get(a)!.x - positions.get(b)!.x);
+        for (let i = 0; i < sorted.length - 1; i++) {
+          const posA = positions.get(sorted[i])!;
+          const posB = positions.get(sorted[i + 1])!;
+          const minRight = posA.x + CARD_W + MIN_CARD_GAP;
+          if (posB.x < minRight) {
+            if (lockedIds.has(sorted[i + 1])) {
+              // Can't move the right one — push left one leftward
+              if (!lockedIds.has(sorted[i])) {
+                posA.x = posB.x - CARD_W - MIN_CARD_GAP;
+                anyOverlap = true;
+              }
+            } else {
+              posB.x = minRight;
+              anyOverlap = true;
+            }
+          }
+        }
+      }
+      return anyOverlap;
+    }
+
+    for (let pass = 0; pass < 20; pass++) {
+      if (!lockedCollisionPass()) break;
+    }
+
+    // Re-compact couples (non-locked partners)
+    for (const u of unions) {
+      const p1 = positions.get(u.partner1);
+      const p2 = positions.get(u.partner2);
+      if (!p1 || !p2) continue;
+      if (lockedIds.has(u.partner1) && lockedIds.has(u.partner2)) continue;
+      const gap = coupleGap(u);
+      const [leftId, rightId] = p1.x <= p2.x ? [u.partner1, u.partner2] : [u.partner2, u.partner1];
+      const leftPos = positions.get(leftId)!;
+      const rightPos = positions.get(rightId)!;
+      const desiredX = leftPos.x + CARD_W + gap;
+      if (lockedIds.has(rightId)) {
+        // Right is locked — pull left closer
+        if (!lockedIds.has(leftId) && leftPos.x < rightPos.x - CARD_W - gap - 2) {
+          leftPos.x = rightPos.x - CARD_W - gap;
+        }
+      } else if (rightPos.x > desiredX + 2) {
+        rightPos.x = desiredX;
+      }
+    }
+
+    // Final collision pass
+    for (let pass = 0; pass < 20; pass++) {
+      if (!lockedCollisionPass()) break;
+    }
+
+    return { positions };
+  }
+
   // ═══ 12. CENTER AROUND ORIGIN ═══
   if (positions.size > 0) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
