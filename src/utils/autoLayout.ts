@@ -140,6 +140,16 @@ export function computeAutoLayout(
           changed = true;
         }
       }
+      // All children of the same union must share the same generation
+      if (u.children.length > 1) {
+        const maxChildGen = Math.max(...u.children.map(cid => generation.get(cid) ?? 0));
+        for (const cid of u.children) {
+          if ((generation.get(cid) ?? 0) < maxChildGen) {
+            generation.set(cid, maxChildGen);
+            changed = true;
+          }
+        }
+      }
       // Parents must be exactly child - 1 (pull UP if too low)
       // This ensures cross-family grandparents align
       if (u.children.length > 0) {
