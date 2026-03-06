@@ -94,32 +94,52 @@ export function computeAutoLayout(
   }
 
   // ═══ 2. GENERATION ASSIGNMENT ═══
+  // Strategy: BFS from roots (members with no parent union), then fix-up
+  // to ensure cross-family grandparents align on the same row.
   const generation = new Map<string, number>();
 
-  function assignGen(id: string, gen: number) {
-    if (generation.has(id)) return;
-    generation.set(id, gen);
-    for (const uid of (partnerUnions.get(id) || [])) {
-      const u = unionMap.get(uid)!;
-      const pid = u.partner1 === id ? u.partner2 : u.partner1;
-      if (!generation.has(pid)) assignGen(pid, gen);
-      for (const cid of u.children) {
-        if (!generation.has(cid)) assignGen(cid, gen + 1);
+  // Phase 1: BFS from each root, assigning increasing generations downward.
+  // Use a queue to handle partners and children breadth-first.
+  function assignGen(startId: string, startGen: number) {
+    const queue: { id: string; gen: number }[] = [{ id: startId, gen: startGen }];
+    while (queue.length > 0) {
+      const { id, gen } = queue.shift()!;
+      if (generation.has(id)) {
+        // Already assigned — push down if needed
+        if (generation.get(id)! < gen) {
+          generation.set(id, gen);
+        } else {
+          continue;
+        }
+      } else {
+        generation.set(id, gen);
+      }
+      for (const uid of (partnerUnions.get(id) || [])) {
+        const u = unionMap.get(uid)!;
+        const pid = u.partner1 === id ? u.partner2 : u.partner1;
+        // Partner at same gen
+        if (!generation.has(pid) || generation.get(pid)! < gen) {
+          queue.push({ id: pid, gen });
+        }
+        // Children at gen + 1
+        for (const cid of u.children) {
+          if (!generation.has(cid) || generation.get(cid)! < gen + 1) {
+            queue.push({ id: cid, gen: gen + 1 });
+          }
+        }
       }
     }
   }
 
-  // Roots = members who are not children of any union
+  // Start BFS from roots (not children of any union)
   for (const m of members) {
-    if (!allChildIds.has(m.id)) assignGen(m.id, 0);
+    if (!allChildIds.has(m.id) && !generation.has(m.id)) assignGen(m.id, 0);
   }
   for (const m of members) {
     if (!generation.has(m.id)) assignGen(m.id, 0);
   }
 
-  // Fix-up: force children = parent + 1, partners same gen
-  // Two-phase: first push children down, then pull parents up to ensure
-  // cross-family grandparents align on the same generation row.
+  // Phase 2: Fix-up — ensure constraints converge
   for (let iter = 0; iter < 30; iter++) {
     let changed = false;
     for (const u of unions) {
@@ -132,7 +152,7 @@ export function computeAutoLayout(
         generation.set(u.partner2, t);
         changed = true;
       }
-      // Children must be exactly parent + 1 (push DOWN if too low)
+      // Children must be > parent gen
       const pg = Math.max(generation.get(u.partner1) ?? 0, generation.get(u.partner2) ?? 0);
       for (const cid of u.children) {
         if ((generation.get(cid) ?? 0) <= pg) {
@@ -140,7 +160,7 @@ export function computeAutoLayout(
           changed = true;
         }
       }
-      // All children of the same union must share the same generation
+      // All siblings must share the same generation (max)
       if (u.children.length > 1) {
         const maxChildGen = Math.max(...u.children.map(cid => generation.get(cid) ?? 0));
         for (const cid of u.children) {
@@ -148,18 +168,6 @@ export function computeAutoLayout(
             generation.set(cid, maxChildGen);
             changed = true;
           }
-        }
-      }
-      // Parents must be exactly child - 1 (pull UP if too low)
-      // This ensures cross-family grandparents align
-      if (u.children.length > 0) {
-        const minChildGen = Math.min(...u.children.map(cid => generation.get(cid) ?? 0));
-        const expectedParentGen = minChildGen - 1;
-        const currentParentGen = Math.max(generation.get(u.partner1) ?? 0, generation.get(u.partner2) ?? 0);
-        if (currentParentGen < expectedParentGen) {
-          generation.set(u.partner1, expectedParentGen);
-          generation.set(u.partner2, expectedParentGen);
-          changed = true;
         }
       }
     }
