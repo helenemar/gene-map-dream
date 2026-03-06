@@ -864,7 +864,70 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ 11d2. (removed — was enforcing excessive branch gaps) ═══
+  // ═══ 11d2. ENSURE CHILDREN OF DIFFERENT UNIONS DON'T INTERLEAVE ═══
+  // Lighter version: just ensure non-overlapping bounding boxes with SIBLING_GAP
+  {
+    const unionsByChildGen = new Map<number, Union[]>();
+    for (const u of unions) {
+      if (u.children.length === 0) continue;
+      const childGen = Math.max(...u.children.map(cid => generation.get(cid) ?? 0));
+      if (!unionsByChildGen.has(childGen)) unionsByChildGen.set(childGen, []);
+      unionsByChildGen.get(childGen)!.push(u);
+    }
+
+    for (const [, genUnions] of unionsByChildGen) {
+      if (genUnions.length < 2) continue;
+
+      // Compute bounding box per union (children + their spouses)
+      const blocks: { union: Union; minX: number; maxX: number; memberIds: string[] }[] = [];
+      for (const u of genUnions) {
+        const childIds = u.children.filter(cid => positions.has(cid));
+        if (childIds.length === 0) continue;
+        let minX = Infinity, maxX = -Infinity;
+        const allIds: string[] = [];
+        for (const cid of childIds) {
+          const pos = positions.get(cid)!;
+          minX = Math.min(minX, pos.x);
+          maxX = Math.max(maxX, pos.x + CARD_W);
+          allIds.push(cid);
+          for (const uid of (partnerUnions.get(cid) || [])) {
+            const pu = unionMap.get(uid);
+            if (!pu) continue;
+            const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+            const spousePos = positions.get(spouseId);
+            if (spousePos) {
+              minX = Math.min(minX, spousePos.x);
+              maxX = Math.max(maxX, spousePos.x + CARD_W);
+              allIds.push(spouseId);
+            }
+          }
+        }
+        blocks.push({ union: u, minX, maxX, memberIds: allIds });
+      }
+
+      blocks.sort((a, b) => a.minX - b.minX);
+
+      // Check for overlapping blocks and shift apart
+      for (let i = 0; i < blocks.length - 1; i++) {
+        const leftBlock = blocks[i];
+        const rightBlock = blocks[i + 1];
+        const requiredGap = SIBLING_GAP;
+        const currentGap = rightBlock.minX - leftBlock.maxX;
+        if (currentGap < requiredGap) {
+          const shift = requiredGap - currentGap;
+          // Shift right block and all subsequent blocks
+          for (let j = i + 1; j < blocks.length; j++) {
+            for (const mid of blocks[j].memberIds) {
+              const pos = positions.get(mid);
+              if (pos) pos.x += shift;
+            }
+            blocks[j].minX += shift;
+            blocks[j].maxX += shift;
+          }
+        }
+      }
+    }
+  }
 
   // ═══ 11e. FINAL COLLISION PASS (post-deinterleave) ═══
   for (let pass = 0; pass < 10; pass++) {
