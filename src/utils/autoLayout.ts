@@ -323,6 +323,26 @@ export function computeAutoLayout(
   }
   forest.forEach((root, idx) => collectRootMembers(root, idx));
 
+  // Also add cross-family children to their parent root trees
+  for (const cu of crossFamilyUnions) {
+    let p1Root = -1, p2Root = -1;
+    for (const [idx, mset] of rootMembers) {
+      if (mset.has(cu.partner1)) p1Root = idx;
+      if (mset.has(cu.partner2)) p2Root = idx;
+    }
+    for (const cid of cu.children) {
+      if (p1Root >= 0) rootMembers.get(p1Root)!.add(cid);
+      if (p2Root >= 0) rootMembers.get(p2Root)!.add(cid);
+      for (const uid of (partnerUnions.get(cid) || [])) {
+        const pu = unionMap.get(uid);
+        if (!pu) continue;
+        const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+        if (p1Root >= 0) rootMembers.get(p1Root)!.add(spouseId);
+        if (p2Root >= 0) rootMembers.get(p2Root)!.add(spouseId);
+      }
+    }
+  }
+
   // ═══ 3b. REORDER CHILDREN FOR CROSS-FAMILY ADJACENCY ═══
   // Move cross-family partners to the edges closest to each other's branch
   function findParentNode(nodes: TreeNode[], childId: string): TreeNode | null {
