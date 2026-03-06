@@ -23,7 +23,7 @@ const MIN_BADGE_GAP = 180;
 const BADGE_SAFETY = 40;
 const SIBLING_GAP = 60;          // compact gap between sibling cards
 const SIBLING_STEP_Y = 30;       // vertical staircase offset between siblings (oldest→youngest)
-const BRANCH_GAP = 160;          // gutter between distinct family branches
+const BRANCH_GAP = 80;           // gutter between distinct family branches
 const MIN_CARD_GAP = 20;         // absolute minimum between any two cards
 
 // ═══ TYPES ═══
@@ -94,32 +94,52 @@ export function computeAutoLayout(
   }
 
   // ═══ 2. GENERATION ASSIGNMENT ═══
+  // Strategy: BFS from roots (members with no parent union), then fix-up
+  // to ensure cross-family grandparents align on the same row.
   const generation = new Map<string, number>();
 
-  function assignGen(id: string, gen: number) {
-    if (generation.has(id)) return;
-    generation.set(id, gen);
-    for (const uid of (partnerUnions.get(id) || [])) {
-      const u = unionMap.get(uid)!;
-      const pid = u.partner1 === id ? u.partner2 : u.partner1;
-      if (!generation.has(pid)) assignGen(pid, gen);
-      for (const cid of u.children) {
-        if (!generation.has(cid)) assignGen(cid, gen + 1);
+  // Phase 1: BFS from each root, assigning increasing generations downward.
+  // Use a queue to handle partners and children breadth-first.
+  function assignGen(startId: string, startGen: number) {
+    const queue: { id: string; gen: number }[] = [{ id: startId, gen: startGen }];
+    while (queue.length > 0) {
+      const { id, gen } = queue.shift()!;
+      if (generation.has(id)) {
+        // Already assigned — push down if needed
+        if (generation.get(id)! < gen) {
+          generation.set(id, gen);
+        } else {
+          continue;
+        }
+      } else {
+        generation.set(id, gen);
+      }
+      for (const uid of (partnerUnions.get(id) || [])) {
+        const u = unionMap.get(uid)!;
+        const pid = u.partner1 === id ? u.partner2 : u.partner1;
+        // Partner at same gen
+        if (!generation.has(pid) || generation.get(pid)! < gen) {
+          queue.push({ id: pid, gen });
+        }
+        // Children at gen + 1
+        for (const cid of u.children) {
+          if (!generation.has(cid) || generation.get(cid)! < gen + 1) {
+            queue.push({ id: cid, gen: gen + 1 });
+          }
+        }
       }
     }
   }
 
-  // Roots = members who are not children of any union
+  // Start BFS from roots (not children of any union)
   for (const m of members) {
-    if (!allChildIds.has(m.id)) assignGen(m.id, 0);
+    if (!allChildIds.has(m.id) && !generation.has(m.id)) assignGen(m.id, 0);
   }
   for (const m of members) {
     if (!generation.has(m.id)) assignGen(m.id, 0);
   }
 
-  // Fix-up: force children = parent + 1, partners same gen
-  // Two-phase: first push children down, then pull parents up to ensure
-  // cross-family grandparents align on the same generation row.
+  // Phase 2: Fix-up — ensure constraints converge
   for (let iter = 0; iter < 30; iter++) {
     let changed = false;
     for (const u of unions) {
@@ -132,7 +152,7 @@ export function computeAutoLayout(
         generation.set(u.partner2, t);
         changed = true;
       }
-      // Children must be exactly parent + 1 (push DOWN if too low)
+      // Children must be > parent gen
       const pg = Math.max(generation.get(u.partner1) ?? 0, generation.get(u.partner2) ?? 0);
       for (const cid of u.children) {
         if ((generation.get(cid) ?? 0) <= pg) {
@@ -140,7 +160,7 @@ export function computeAutoLayout(
           changed = true;
         }
       }
-      // All children of the same union must share the same generation
+      // All siblings must share the same generation (max)
       if (u.children.length > 1) {
         const maxChildGen = Math.max(...u.children.map(cid => generation.get(cid) ?? 0));
         for (const cid of u.children) {
@@ -150,13 +170,13 @@ export function computeAutoLayout(
           }
         }
       }
-      // Parents must be exactly child - 1 (pull UP if too low)
-      // This ensures cross-family grandparents align
+      // Pull parents DOWN to child_gen - 1 if they're too far above
+      // This ensures cross-family grandparents align on the same row
       if (u.children.length > 0) {
         const minChildGen = Math.min(...u.children.map(cid => generation.get(cid) ?? 0));
         const expectedParentGen = minChildGen - 1;
-        const currentParentGen = Math.max(generation.get(u.partner1) ?? 0, generation.get(u.partner2) ?? 0);
-        if (currentParentGen < expectedParentGen) {
+        const currentPg = Math.max(generation.get(u.partner1) ?? 0, generation.get(u.partner2) ?? 0);
+        if (currentPg < expectedParentGen) {
           generation.set(u.partner1, expectedParentGen);
           generation.set(u.partner2, expectedParentGen);
           changed = true;
@@ -844,79 +864,7 @@ export function computeAutoLayout(
     }
   }
 
-  // ═══ 11d2. ENFORCE BRANCH GAP BETWEEN CHILDREN OF DIFFERENT UNIONS ═══
-  // Ensure children of different parent unions at the same generation have
-  // at least BRANCH_GAP separation, preventing branches from merging visually.
-  {
-    // Group unions by child generation
-    const unionsByChildGen = new Map<number, Union[]>();
-    for (const u of unions) {
-      if (u.children.length === 0) continue;
-      const childGen = Math.max(...u.children.map(cid => generation.get(cid) ?? 0));
-      if (!unionsByChildGen.has(childGen)) unionsByChildGen.set(childGen, []);
-      unionsByChildGen.get(childGen)!.push(u);
-    }
-
-    for (const [, genUnions] of unionsByChildGen) {
-      if (genUnions.length < 2) continue;
-
-      // For each union, compute the bounding box of its children + their spouses
-      const blocks: { union: Union; minX: number; maxX: number }[] = [];
-      for (const u of genUnions) {
-        const childIds = u.children.filter(cid => positions.has(cid));
-        if (childIds.length === 0) continue;
-        let minX = Infinity, maxX = -Infinity;
-        for (const cid of childIds) {
-          const pos = positions.get(cid)!;
-          minX = Math.min(minX, pos.x);
-          maxX = Math.max(maxX, pos.x + CARD_W);
-          // Include spouse positions
-          for (const uid of (partnerUnions.get(cid) || [])) {
-            const pu = unionMap.get(uid);
-            if (!pu) continue;
-            const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
-            const spousePos = positions.get(spouseId);
-            if (spousePos) {
-              minX = Math.min(minX, spousePos.x);
-              maxX = Math.max(maxX, spousePos.x + CARD_W);
-            }
-          }
-        }
-        blocks.push({ union: u, minX, maxX });
-      }
-
-      // Sort blocks by minX
-      blocks.sort((a, b) => a.minX - b.minX);
-
-      // Enforce BRANCH_GAP between consecutive blocks
-      for (let i = 0; i < blocks.length - 1; i++) {
-        const leftBlock = blocks[i];
-        const rightBlock = blocks[i + 1];
-        const gap = rightBlock.minX - leftBlock.maxX;
-        if (gap < BRANCH_GAP) {
-          const shift = BRANCH_GAP - gap;
-          // Shift the right block and all subsequent blocks
-          for (let j = i + 1; j < blocks.length; j++) {
-            const bUnion = blocks[j].union;
-            for (const cid of bUnion.children) {
-              const pos = positions.get(cid);
-              if (pos) pos.x += shift;
-              // Also shift spouses
-              for (const uid of (partnerUnions.get(cid) || [])) {
-                const pu = unionMap.get(uid);
-                if (!pu) continue;
-                const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
-                const spousePos = positions.get(spouseId);
-                if (spousePos) spousePos.x += shift;
-              }
-            }
-            blocks[j].minX += shift;
-            blocks[j].maxX += shift;
-          }
-        }
-      }
-    }
-  }
+  // ═══ 11d2. (removed — was enforcing excessive branch gaps) ═══
 
   // ═══ 11e. FINAL COLLISION PASS (post-deinterleave) ═══
   for (let pass = 0; pass < 10; pass++) {
