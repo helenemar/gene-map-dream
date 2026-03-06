@@ -487,25 +487,41 @@ export function computeAutoLayout(
       const cw = coupleWidth(u);
       const coupleLeft = centerX - cw / 2;
 
-      // Determine lineage member (has a parent union) vs spouse (in-law)
+      // Determine LEFT/RIGHT placement based on family size:
+      // The partner with MORE family (ancestors + descendants) goes on the side
+      // with more space (outer edge). For root couples, use descendant count.
       const p1IsLineage = parentUnionOf.has(u.partner1);
       const p2IsLineage = parentUnionOf.has(u.partner2);
 
+      // Count total family connections for each partner
+      const p1Family = countDescendants(u.partner1, memberMap, partnerUnions, unionMap) +
+                       countAncestors(u.partner1, memberMap, parentUnionOf, unionMap);
+      const p2Family = countDescendants(u.partner2, memberMap, partnerUnions, unionMap) +
+                       countAncestors(u.partner2, memberMap, parentUnionOf, unionMap);
+
       let leftId: string, rightId: string;
       if (p1IsLineage && !p2IsLineage) {
-        // p2 is spouse → spouse LEFT, lineage RIGHT
+        // p2 is spouse → spouse on the side AWAY from lineage's family
+        // If lineage (p1) has bigger family, put them on the outer edge (LEFT if first child)
         leftId = u.partner2;
         rightId = u.partner1;
       } else if (p2IsLineage && !p1IsLineage) {
-        // p1 is spouse → spouse LEFT, lineage RIGHT
         leftId = u.partner1;
         rightId = u.partner2;
       } else {
-        // Both lineage or both in-law: fallback to male left
-        const m1 = memberMap.get(u.partner1);
-        [leftId, rightId] = m1 && m1.gender === 'male'
-          ? [u.partner1, u.partner2]
-          : [u.partner2, u.partner1];
+        // Both lineage or both in-law: partner with BIGGER family goes LEFT
+        // (so their family can expand leftward without crossing)
+        if (p1Family !== p2Family) {
+          [leftId, rightId] = p1Family > p2Family
+            ? [u.partner1, u.partner2]
+            : [u.partner2, u.partner1];
+        } else {
+          // Fallback: male left
+          const m1 = memberMap.get(u.partner1);
+          [leftId, rightId] = m1 && m1.gender === 'male'
+            ? [u.partner1, u.partner2]
+            : [u.partner2, u.partner1];
+        }
       }
 
       if (!positions.has(leftId)) positions.set(leftId, { x: coupleLeft, y });
