@@ -475,9 +475,17 @@ export function computeAutoLayout(
               const lineageMember = slot.memberId;
               const spouseId = u.partner1 === lineageMember ? u.partner2 : u.partner1;
 
-              // RULE: Spouse (in-law) always placed LEFT of lineage member
-              if (!positions.has(spouseId)) positions.set(spouseId, { x: coupleLeft, y: childY });
-              if (!positions.has(lineageMember)) positions.set(lineageMember, { x: coupleLeft + CARD_W + gap, y: childY });
+              // RULE: Spouse on OUTER side of sibling line
+              // Last slot → spouse RIGHT (outside), First/middle → spouse LEFT (outside)
+              if (isLastSlot && !isFirstSlot) {
+                // Lineage LEFT, spouse RIGHT
+                if (!positions.has(lineageMember)) positions.set(lineageMember, { x: coupleLeft, y: childY });
+                if (!positions.has(spouseId)) positions.set(spouseId, { x: coupleLeft + CARD_W + gap, y: childY });
+              } else {
+                // Spouse LEFT, lineage RIGHT
+                if (!positions.has(spouseId)) positions.set(spouseId, { x: coupleLeft, y: childY });
+                if (!positions.has(lineageMember)) positions.set(lineageMember, { x: coupleLeft + CARD_W + gap, y: childY });
+              }
             } else {
               if (!positions.has(slot.memberId)) {
                 positions.set(slot.memberId, { x: slotCenter - CARD_W / 2, y: childY });
