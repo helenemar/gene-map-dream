@@ -41,7 +41,9 @@ const MAX_ZOOM = 3;
 const ZOOM_SENSITIVITY = 0.002;
 const DOT_SPACING = 20;
 const SNAP_GRID_X = 20;
-const SNAP_GRID_Y = 50;
+const SNAP_GRID_Y = 20;  // Fine grid for smooth dragging
+const LEVEL_SPACING_SNAP = 250; // Must match autoLayout LEVEL_SPACING
+const SNAP_LEVEL_THRESHOLD = 40; // Snap to generation Y row when within this distance
 const STORAGE_KEY = 'genogy-member-positions';
 
 type Side = 'top' | 'bottom' | 'left' | 'right';
@@ -417,7 +419,25 @@ const GenogramEditor: React.FC = () => {
       let newY = dragInfo.memberY + dy;
       if (snapToGrid) {
         newX = Math.round(newX / SNAP_GRID_X) * SNAP_GRID_X;
-        newY = Math.round(newY / SNAP_GRID_Y) * SNAP_GRID_Y;
+        // Snap Y to nearest occupied generation row (other members' Y positions)
+        // This keeps manually-dragged cards aligned with auto-layout rows
+        const occupiedYs = new Set<number>();
+        for (const other of members) {
+          if (other.id !== dragInfo.id) occupiedYs.add(other.y);
+        }
+        let bestSnapY = Math.round(newY / SNAP_GRID_Y) * SNAP_GRID_Y;
+        let bestDist = SNAP_LEVEL_THRESHOLD + 1;
+        for (const oy of occupiedYs) {
+          const dist = Math.abs(newY - oy);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestSnapY = oy;
+          }
+        }
+        if (bestDist > SNAP_LEVEL_THRESHOLD) {
+          bestSnapY = Math.round(newY / SNAP_GRID_Y) * SNAP_GRID_Y;
+        }
+        newY = bestSnapY;
       }
       // Smart guides: detect alignment with other members on same generation
       const GUIDE_THRESHOLD = 8;
