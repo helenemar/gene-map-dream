@@ -1231,6 +1231,18 @@ export function computeAutoLayout(
   }
   compactCouples();
 
+  // Final re-center after all compaction to ensure parents stay centered above children
+  for (let iter = 0; iter < 3; iter++) {
+    const a = reCenterParents();
+    const b = centerSingleChildren();
+    const c = reCenterCrossFamilyChildren();
+    if (!a && !b && !c) break;
+    for (let pass = 0; pass < 5; pass++) {
+      if (!simpleCollisionPass()) break;
+    }
+    compactCouples();
+  }
+
   // ═══ 11i. INJECT LOCKED POSITIONS & ADAPT PARTNERS ═══
   // Strategy: run normal centering first, then compute offset between where
   // the layout placed each locked member vs where they actually are.
