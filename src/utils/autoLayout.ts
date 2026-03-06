@@ -595,25 +595,33 @@ export function computeAutoLayout(
               const cw = coupleWidth(u);
               const coupleLeft = slotCenter - cw / 2;
 
-              // Couple-First: lineage member stays on inner side (closest to siblings),
-              // spouse (in-law) goes on OUTER side (away from sibling line)
+              // Smart positioning: member with bigger family goes on OUTER side
+              // (where there's more horizontal space for their family to expand)
               const isLastSlot = slots.indexOf(slot) === slots.length - 1;
               const isFirstSlot = slots.indexOf(slot) === 0;
 
-              // Determine lineage member vs spouse
               const lineageMember = slot.memberId;
               const spouseId = u.partner1 === lineageMember ? u.partner2 : u.partner1;
 
-              // RULE: Spouse on OUTER side of sibling line
-              // Last slot → spouse RIGHT (outside), First/middle → spouse LEFT (outside)
+              // Count family size for each partner
+              const lineageFamily = countDescendants(lineageMember, memberMap, partnerUnions, unionMap) +
+                                    countAncestors(lineageMember, memberMap, parentUnionOf, unionMap);
+              const spouseFamily = countDescendants(spouseId, memberMap, partnerUnions, unionMap) +
+                                   countAncestors(spouseId, memberMap, parentUnionOf, unionMap);
+
+              // Member with bigger family goes on OUTER side (more space)
+              // First/middle → outer is LEFT, Last → outer is RIGHT
+              const biggerFamilyMember = spouseFamily > lineageFamily ? spouseId : lineageMember;
+              const smallerFamilyMember = biggerFamilyMember === lineageMember ? spouseId : lineageMember;
+
               if (isLastSlot && !isFirstSlot) {
-                // Lineage LEFT, spouse RIGHT
-                if (!positions.has(lineageMember)) positions.set(lineageMember, { x: coupleLeft, y: childY });
-                if (!positions.has(spouseId)) positions.set(spouseId, { x: coupleLeft + CARD_W + gap, y: childY });
+                // Outer is RIGHT → bigger family member RIGHT
+                if (!positions.has(smallerFamilyMember)) positions.set(smallerFamilyMember, { x: coupleLeft, y: childY });
+                if (!positions.has(biggerFamilyMember)) positions.set(biggerFamilyMember, { x: coupleLeft + CARD_W + gap, y: childY });
               } else {
-                // Spouse LEFT, lineage RIGHT
-                if (!positions.has(spouseId)) positions.set(spouseId, { x: coupleLeft, y: childY });
-                if (!positions.has(lineageMember)) positions.set(lineageMember, { x: coupleLeft + CARD_W + gap, y: childY });
+                // Outer is LEFT → bigger family member LEFT
+                if (!positions.has(biggerFamilyMember)) positions.set(biggerFamilyMember, { x: coupleLeft, y: childY });
+                if (!positions.has(smallerFamilyMember)) positions.set(smallerFamilyMember, { x: coupleLeft + CARD_W + gap, y: childY });
               }
             } else {
               if (!positions.has(slot.memberId)) {
