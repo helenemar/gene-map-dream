@@ -989,6 +989,10 @@ export function computeAutoLayout(
   for (let pass = 0; pass < 5; pass++) {
     if (!reCenterParents()) break;
   }
+  // Re-center cross-family children below their parents
+  for (let pass = 0; pass < 5; pass++) {
+    if (!reCenterCrossFamilyChildren()) break;
+  }
 
   // Collision resolution
   for (let pass = 0; pass < 10; pass++) {
@@ -1003,9 +1007,11 @@ export function computeAutoLayout(
     if (!simpleCollisionPass()) break;
   }
 
-  // Final re-center
+  // Final re-center (both regular and cross-family)
   for (let pass = 0; pass < 3; pass++) {
-    if (!reCenterParents()) break;
+    const a = reCenterParents();
+    const b = reCenterCrossFamilyChildren();
+    if (!a && !b) break;
   }
 
   // Final collision + compact
