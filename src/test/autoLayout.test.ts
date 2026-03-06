@@ -99,6 +99,63 @@ describe('autoLayout cross-family unions', () => {
   });
 });
 
+describe('autoLayout parent centering above direct children only', () => {
+  it('centers parents over direct children, excluding in-laws', () => {
+    const members: FamilyMember[] = [
+      makeMember('dad', 'Dad', 'male', 1950),
+      makeMember('mom', 'Mom', 'female', 1952),
+      makeMember('child1', 'Child1', 'male', 1975),
+      makeMember('child2', 'Child2', 'female', 1978),
+      makeMember('spouse1', 'Spouse1', 'female', 1976), // in-law
+    ];
+    const unions: Union[] = [
+      { id: 'u-parents', partner1: 'dad', partner2: 'mom', status: 'married', children: ['child1', 'child2'] },
+      { id: 'u-child1', partner1: 'child1', partner2: 'spouse1', status: 'married', children: [] },
+    ];
+
+    const result = computeAutoLayout(members, unions, []);
+    const dadX = result.positions.get('dad')!.x;
+    const momX = result.positions.get('mom')!.x;
+    const child1X = result.positions.get('child1')!.x;
+    const child2X = result.positions.get('child2')!.x;
+    const spouse1X = result.positions.get('spouse1')!.x;
+
+    // Midpoint of parent couple
+    const parentMid = (dadX + momX + CARD_W) / 2;
+    // Midpoint of direct children only (excluding spouse1)
+    const childrenMid = (Math.min(child1X, child2X) + Math.max(child1X, child2X) + CARD_W) / 2;
+
+    // Parent midpoint should be close to children midpoint (within 50px tolerance)
+    expect(Math.abs(parentMid - childrenMid)).toBeLessThan(50);
+
+    // Spouse1 should NOT be between the two children (it's outside the sibling block)
+    const childMinX = Math.min(child1X, child2X);
+    const childMaxX = Math.max(child1X, child2X);
+    expect(spouse1X < childMinX || spouse1X > childMaxX).toBe(true);
+  });
+
+  it('centers single-child parents exactly over the child', () => {
+    const members: FamilyMember[] = [
+      makeMember('dad', 'Dad', 'male', 1950),
+      makeMember('mom', 'Mom', 'female', 1952),
+      makeMember('only', 'Only', 'male', 1980),
+    ];
+    const unions: Union[] = [
+      { id: 'u-parents', partner1: 'dad', partner2: 'mom', status: 'married', children: ['only'] },
+    ];
+
+    const result = computeAutoLayout(members, unions, []);
+    const dadX = result.positions.get('dad')!.x;
+    const momX = result.positions.get('mom')!.x;
+    const onlyX = result.positions.get('only')!.x;
+
+    const parentMid = (dadX + momX + CARD_W) / 2;
+    const childMid = onlyX + CARD_W / 2;
+
+    expect(Math.abs(parentMid - childMid)).toBeLessThan(50);
+  });
+});
+
 describe('autoLayout spouse placement (left/right rule)', () => {
   // 3 siblings: Alice (eldest), Bob (middle), Charlie (youngest)
   // Each has a spouse. Rule: spouse on OUTER side of sibling line.
