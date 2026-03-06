@@ -1203,12 +1203,15 @@ const GenogramEditor: React.FC = () => {
 
   // ─── Auto-layout: reorganize tree ───
   const handleAutoLayout = useCallback(() => {
-    const result = computeAutoLayout(members, unions, emotionalLinks);
+    // Collect locked members' current positions
+    const lockedPositions = new Map<string, { x: number; y: number }>();
+    for (const m of members) {
+      if (m.locked) lockedPositions.set(m.id, { x: m.x, y: m.y });
+    }
+    const result = computeAutoLayout(members, unions, emotionalLinks, lockedPositions.size > 0 ? lockedPositions : undefined);
     recordSnapshot();
     setIsAnimating(true);
     setMembers(prev => prev.map(m => {
-      // Skip locked members — keep their manual position
-      if (m.locked) return m;
       const pos = result.positions.get(m.id);
       return pos ? { ...m, x: pos.x, y: pos.y } : m;
     }));
