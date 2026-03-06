@@ -865,7 +865,7 @@ export function computeAutoLayout(
   }
 
   // ═══ 11d2. ENSURE CHILDREN OF DIFFERENT UNIONS DON'T INTERLEAVE ═══
-  // Lighter version: just ensure non-overlapping bounding boxes with SIBLING_GAP
+  // Only fix actual overlaps — don't force extra gaps
   {
     const unionsByChildGen = new Map<number, Union[]>();
     for (const u of unions) {
@@ -878,18 +878,16 @@ export function computeAutoLayout(
     for (const [, genUnions] of unionsByChildGen) {
       if (genUnions.length < 2) continue;
 
-      // Compute bounding box per union (children + their spouses)
-      const blocks: { union: Union; minX: number; maxX: number; memberIds: string[] }[] = [];
+      const blocks: { union: Union; minX: number; maxX: number; childIds: string[] }[] = [];
       for (const u of genUnions) {
         const childIds = u.children.filter(cid => positions.has(cid));
         if (childIds.length === 0) continue;
         let minX = Infinity, maxX = -Infinity;
-        const allIds: string[] = [];
         for (const cid of childIds) {
           const pos = positions.get(cid)!;
           minX = Math.min(minX, pos.x);
           maxX = Math.max(maxX, pos.x + CARD_W);
-          allIds.push(cid);
+          // Include spouse in bounding box
           for (const uid of (partnerUnions.get(cid) || [])) {
             const pu = unionMap.get(uid);
             if (!pu) continue;
@@ -898,28 +896,30 @@ export function computeAutoLayout(
             if (spousePos) {
               minX = Math.min(minX, spousePos.x);
               maxX = Math.max(maxX, spousePos.x + CARD_W);
-              allIds.push(spouseId);
             }
           }
         }
-        blocks.push({ union: u, minX, maxX, memberIds: allIds });
+        blocks.push({ union: u, minX, maxX, childIds });
       }
 
       blocks.sort((a, b) => a.minX - b.minX);
 
-      // Check for overlapping blocks and shift apart
+      // Only fix overlaps (gap < MIN_CARD_GAP)
       for (let i = 0; i < blocks.length - 1; i++) {
-        const leftBlock = blocks[i];
-        const rightBlock = blocks[i + 1];
-        const requiredGap = SIBLING_GAP;
-        const currentGap = rightBlock.minX - leftBlock.maxX;
-        if (currentGap < requiredGap) {
-          const shift = requiredGap - currentGap;
-          // Shift right block and all subsequent blocks
+        const currentGap = blocks[i + 1].minX - blocks[i].maxX;
+        if (currentGap < MIN_CARD_GAP) {
+          const shift = MIN_CARD_GAP - currentGap;
           for (let j = i + 1; j < blocks.length; j++) {
-            for (const mid of blocks[j].memberIds) {
-              const pos = positions.get(mid);
+            for (const cid of blocks[j].childIds) {
+              const pos = positions.get(cid);
               if (pos) pos.x += shift;
+              for (const uid of (partnerUnions.get(cid) || [])) {
+                const pu = unionMap.get(uid);
+                if (!pu) continue;
+                const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+                const spousePos = positions.get(spouseId);
+                if (spousePos) spousePos.x += shift;
+              }
             }
             blocks[j].minX += shift;
             blocks[j].maxX += shift;
