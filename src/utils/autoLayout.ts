@@ -45,6 +45,51 @@ interface TreeNode {
 }
 
 // ═══ HELPERS ═══
+
+/** Count total descendants (children, grandchildren, etc.) of a member through all their unions */
+function countDescendants(
+  memberId: string,
+  memberMap: Map<string, FamilyMember>,
+  partnerUnions: Map<string, string[]>,
+  unionMap: Map<string, Union>,
+  visited = new Set<string>(),
+): number {
+  if (visited.has(memberId)) return 0;
+  visited.add(memberId);
+  let count = 0;
+  for (const uid of (partnerUnions.get(memberId) || [])) {
+    const u = unionMap.get(uid);
+    if (!u) continue;
+    for (const cid of u.children) {
+      if (!visited.has(cid) && memberMap.has(cid)) {
+        count += 1;
+        count += countDescendants(cid, memberMap, partnerUnions, unionMap, visited);
+      }
+    }
+  }
+  return count;
+}
+
+/** Count total ancestors (parents, grandparents, etc.) reachable from a member */
+function countAncestors(
+  memberId: string,
+  memberMap: Map<string, FamilyMember>,
+  parentUnionOf: Map<string, string>,
+  unionMap: Map<string, Union>,
+  visited = new Set<string>(),
+): number {
+  if (visited.has(memberId)) return 0;
+  visited.add(memberId);
+  const puId = parentUnionOf.get(memberId);
+  if (!puId) return 0;
+  const pu = unionMap.get(puId);
+  if (!pu) return 0;
+  let count = 2; // both parents
+  count += countAncestors(pu.partner1, memberMap, parentUnionOf, unionMap, visited);
+  count += countAncestors(pu.partner2, memberMap, parentUnionOf, unionMap, visited);
+  return count;
+}
+
 function coupleGap(union: Union): number {
   let labelLen = 0;
   if (union.marriageYear) labelLen += `R: ${union.marriageYear}`.length;
