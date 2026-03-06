@@ -1089,17 +1089,20 @@ export function computeAutoLayout(
     }
   }
 
-  // Phase 5: Sequential passes (proven to give best results at 40% zoom)
+  // Phase 5: Sort children by parent order (prevents crossings)
+  sortChildrenByParentOrder();
+
+  // Collision resolution
+  for (let pass = 0; pass < 10; pass++) {
+    if (!simpleCollisionPass()) break;
+  }
+
   // Re-center parents above children
   for (let pass = 0; pass < 5; pass++) {
     if (!reCenterParents()) break;
   }
-  // Re-center cross-family children below their parents
-  for (let pass = 0; pass < 5; pass++) {
-    if (!reCenterCrossFamilyChildren()) break;
-  }
 
-  // Collision resolution
+  // Collision resolution again
   for (let pass = 0; pass < 10; pass++) {
     if (!simpleCollisionPass()) break;
   }
@@ -1112,11 +1115,9 @@ export function computeAutoLayout(
     if (!simpleCollisionPass()) break;
   }
 
-  // Final re-center (both regular and cross-family)
+  // Final re-center
   for (let pass = 0; pass < 3; pass++) {
-    const a = reCenterParents();
-    const b = reCenterCrossFamilyChildren();
-    if (!a && !b) break;
+    if (!reCenterParents()) break;
   }
 
   // Final collision + compact
