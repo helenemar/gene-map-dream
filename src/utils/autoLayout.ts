@@ -957,25 +957,48 @@ export function computeAutoLayout(
   }
 
   // ═══ 11i. INJECT LOCKED POSITIONS & ADAPT PARTNERS ═══
-  // Locked members keep their absolute position. Partners and nearby members adapt.
+  // Strategy: run normal centering first, then compute offset between where
+  // the layout placed each locked member vs where they actually are.
+  // Use the average offset to shift ALL non-locked members into the locked
+  // members' coordinate space, then override locked positions exactly.
   if (lockedPositions && lockedPositions.size > 0) {
-    // First, compute the centering offset the normal layout would apply,
-    // so we can translate locked (absolute) coords into the same coordinate space.
-    // We'll apply locked positions AFTER centering, so we need to do centering first,
-    // then override locked, then re-resolve.
-
-    // Temporary center pass to align coordinate spaces
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    for (const pos of positions.values()) {
-      minX = Math.min(minX, pos.x);
-      minY = Math.min(minY, pos.y);
-      maxX = Math.max(maxX, pos.x + CARD_W);
-      maxY = Math.max(maxY, pos.y + CARD_H);
+    // First, do the normal centering (same as step 12)
+    {
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      for (const pos of positions.values()) {
+        minX = Math.min(minX, pos.x);
+        minY = Math.min(minY, pos.y);
+        maxX = Math.max(maxX, pos.x + CARD_W);
+        maxY = Math.max(maxY, pos.y + CARD_H);
+      }
+      const ccx = (minX + maxX) / 2, ccy = (minY + maxY) / 2;
+      for (const pos of positions.values()) { pos.x -= ccx; pos.y -= ccy; }
     }
-    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
-    for (const pos of positions.values()) { pos.x -= cx; pos.y -= cy; }
 
-    // Now override locked members with their absolute positions
+    // Now positions are centered (same coord space as what the user sees).
+    // For each locked member, compute the delta from layout position → locked position.
+    let totalDx = 0, totalDy = 0, count = 0;
+    for (const [id, lockedPos] of lockedPositions) {
+      const pos = positions.get(id);
+      if (pos) {
+        totalDx += lockedPos.x - pos.x;
+        totalDy += lockedPos.y - pos.y;
+        count++;
+      }
+    }
+
+    // Shift ALL positions by average delta so non-locked members land
+    // in the same coordinate space as locked members
+    if (count > 0) {
+      const avgDx = totalDx / count;
+      const avgDy = totalDy / count;
+      for (const pos of positions.values()) {
+        pos.x += avgDx;
+        pos.y += avgDy;
+      }
+    }
+
+    // Override locked members with their exact positions
     const lockedIds = new Set<string>();
     for (const [id, lockedPos] of lockedPositions) {
       const pos = positions.get(id);
