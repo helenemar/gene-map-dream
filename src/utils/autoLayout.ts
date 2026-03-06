@@ -789,6 +789,54 @@ export function computeAutoLayout(
     return anyShift;
   }
 
+  // ═══ HELPER: Center cross-family children below their parents ═══
+  // For cross-family unions, we can't move parents (they belong to different branches).
+  // Instead, move children + their spouses to center under the parent midpoint.
+  // Only direct children count for centering (not their spouses like Constance).
+  function reCenterCrossFamilyChildren(): boolean {
+    let anyShift = false;
+    for (const cu of crossFamilyUnions) {
+      if (cu.children.length === 0) continue;
+      const p1 = positions.get(cu.partner1);
+      const p2 = positions.get(cu.partner2);
+      if (!p1 || !p2) continue;
+
+      const parentMidX = (Math.min(p1.x, p2.x) + Math.max(p1.x, p2.x) + CARD_W) / 2;
+
+      // Center only on direct children (NOT their spouses)
+      const childPositions = cu.children
+        .map(cid => positions.get(cid))
+        .filter((p): p is { x: number; y: number } => !!p);
+      if (childPositions.length === 0) continue;
+
+      const childMinX = Math.min(...childPositions.map(p => p.x));
+      const childMaxX = Math.max(...childPositions.map(p => p.x + CARD_W));
+      const childCenterX = (childMinX + childMaxX) / 2;
+      const dx = parentMidX - childCenterX;
+
+      if (Math.abs(dx) > 3) {
+        // Shift all children, their spouses, and descendants
+        for (const cid of cu.children) {
+          const pos = positions.get(cid);
+          if (pos) pos.x += dx;
+          for (const uid of (partnerUnions.get(cid) || [])) {
+            const pu = unionMap.get(uid);
+            if (!pu) continue;
+            const spouseId = pu.partner1 === cid ? pu.partner2 : pu.partner1;
+            const sp = positions.get(spouseId);
+            if (sp) sp.x += dx;
+            // Also shift grandchildren
+            for (const gcid of pu.children) {
+              shiftMemberAndDescendants(gcid, dx, positions, partnerUnions, unionMap, memberMap);
+            }
+          }
+        }
+        anyShift = true;
+      }
+    }
+    return anyShift;
+  }
+
   // ═══ HELPER: Sort children at each generation by parent X order ═══
   // This prevents crossings by ensuring children follow the same left-to-right
   // order as their parents.
@@ -1157,6 +1205,11 @@ export function computeAutoLayout(
     if (!centerSingleChildren()) break;
   }
 
+  // Center cross-family children below their parents
+  for (let pass = 0; pass < 3; pass++) {
+    if (!reCenterCrossFamilyChildren()) break;
+  }
+
   // Final collision + compact
   for (let pass = 0; pass < 5; pass++) {
     if (!simpleCollisionPass()) break;
@@ -1170,7 +1223,8 @@ export function computeAutoLayout(
   for (let pass = 0; pass < 3; pass++) {
     const a = reCenterParents();
     const b = centerSingleChildren();
-    if (!a && !b) break;
+    const c = reCenterCrossFamilyChildren();
+    if (!a && !b && !c) break;
   }
   for (let pass = 0; pass < 5; pass++) {
     if (!simpleCollisionPass()) break;
