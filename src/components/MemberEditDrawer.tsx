@@ -140,10 +140,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
     if (!member) return null;
     return {
       ...member,
-      firstName: firstName || 'Nouveau',
+      firstName: firstName || '',
       lastName: lastName || member.lastName,
       birthName: birthName || undefined,
-      birthYear: parsedBirthYear && !isNaN(parsedBirthYear) ? parsedBirthYear : currentYear - 30,
+      birthYear: parsedBirthYear && !isNaN(parsedBirthYear) ? parsedBirthYear : 0,
       birthYearUnsure: birthYearUnsure || undefined,
       deathYear: parsedDeathYear && !isNaN(parsedDeathYear) ? parsedDeathYear : undefined,
       deathYearUnsure: deathYearUnsure || undefined,
