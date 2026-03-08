@@ -502,27 +502,44 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               <Separator className="opacity-50" />
 
-              {/* ── Identité & Orientation ── */}
+              {/* ── Identité de genre ── */}
               <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité & Orientation</span>
-                <div className="flex flex-col gap-2">
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité de genre</span>
+                <div className="flex flex-wrap gap-1.5">
                   {GENDER_IDENTITY_OPTIONS.map(opt => (
-                    <label key={opt.id} className="flex items-center gap-2 cursor-pointer">
-                      <Checkbox
-                        checked={genderIdentity === opt.id}
-                        onCheckedChange={(v) => setGenderIdentity(v ? opt.id : 'cisgender')}
-                      />
-                      <span className="text-xs text-muted-foreground">{opt.label}</span>
-                    </label>
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setGenderIdentity(genderIdentity === opt.id ? 'cisgender' : opt.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                        genderIdentity === opt.id
+                          ? 'bg-primary/10 border-primary/30 text-foreground'
+                          : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
                   ))}
+                </div>
+              </div>
+
+              {/* ── Orientation sexuelle ── */}
+              <div className="flex flex-col gap-2">
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Orientation sexuelle</span>
+                <div className="flex flex-wrap gap-1.5">
                   {SEXUAL_ORIENTATION_OPTIONS.map(opt => (
-                    <label key={opt.id} className="flex items-center gap-2 cursor-pointer">
-                      <Checkbox
-                        checked={sexualOrientation === opt.id}
-                        onCheckedChange={(v) => setSexualOrientation(v ? opt.id : 'heterosexual')}
-                      />
-                      <span className="text-xs text-muted-foreground">{opt.label}</span>
-                    </label>
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setSexualOrientation(sexualOrientation === opt.id ? 'heterosexual' : opt.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                        sexualOrientation === opt.id
+                          ? 'bg-primary/10 border-primary/30 text-foreground'
+                          : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
                   ))}
                 </div>
               </div>
