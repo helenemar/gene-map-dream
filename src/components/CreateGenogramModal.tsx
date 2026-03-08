@@ -114,7 +114,7 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
         isAdoption: isAdopted,
       };
 
-      const genogramName = `${firstName.trim()} ${lastName.trim()}`;
+      const genogramName = `Génogramme de ${firstName.trim()} ${lastName.trim()}`;
 
       const { data, error } = await supabase
         .from('genograms')
