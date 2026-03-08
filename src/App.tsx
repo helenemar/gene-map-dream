@@ -32,6 +32,7 @@ const App = () => (
             <Route path="/editor" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
             <Route path="/editor/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
             <Route path="/tree/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
+            <Route path="/shared/:token" element={<SharedGenogram />} />
             <Route path="/design-system" element={<DesignSystemPage />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="*" element={<NotFound />} />
