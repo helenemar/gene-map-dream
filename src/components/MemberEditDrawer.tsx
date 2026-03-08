@@ -916,8 +916,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           <span className="text-sm text-foreground">{linkType?.label || union.status}</span>
                           <span className="text-sm text-muted-foreground">avec</span>
                           <span className="text-sm font-medium text-foreground truncate">{partnerName}</span>
-                          {union.marriageYear && (
-                            <span className="text-[10px] text-muted-foreground ml-auto shrink-0">({union.marriageYear})</span>
+                          {(union.eventYear ?? union.marriageYear) && (
+                            <span className="text-[10px] text-muted-foreground ml-auto shrink-0">({union.eventYear ?? union.marriageYear})</span>
                           )}
                         </div>
                       );
