@@ -11,6 +11,7 @@ import GenogramEditor from "./pages/GenogramEditor";
 import DesignSystemPage from "./pages/DesignSystem";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
+import SharedGenogram from "./pages/SharedGenogram";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/editor" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
             <Route path="/editor/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
             <Route path="/tree/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
+            <Route path="/shared/:token" element={<SharedGenogram />} />
             <Route path="/design-system" element={<DesignSystemPage />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="*" element={<NotFound />} />

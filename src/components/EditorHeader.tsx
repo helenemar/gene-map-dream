@@ -21,6 +21,7 @@ interface EditorHeaderProps {
   saveStatus?: SaveStatus;
   onOpenNotes?: () => void;
   noteCount?: number;
+  onShare?: () => void;
 }
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -72,6 +73,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   saveStatus = 'idle',
   onOpenNotes,
   noteCount = 0,
+  onShare,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -215,7 +217,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button variant="brand" size="sm" className="gap-2 text-xs">
+        <Button variant="brand" size="sm" className="gap-2 text-xs" onClick={onShare}>
           <Share2 className="w-3.5 h-3.5" />
           Partager
         </Button>
