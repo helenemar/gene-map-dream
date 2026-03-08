@@ -238,7 +238,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
                  member.perinatalType === 'abortion' ? 'IVG' : 'Mortinaissance'}
               </span>
               {member.birthYear > 0 && (
-                <span className="text-[11px] text-muted-foreground">{member.birthYear}</span>
+                <span className="text-[11px] text-muted-foreground">{member.birthYearUnsure ? '~' : ''}{member.birthYear}</span>
               )}
             </div>
           ) : (
