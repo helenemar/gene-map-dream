@@ -624,12 +624,11 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   Notes cliniques
                 </Label>
                 <Textarea
-                  className="text-sm border-border/50 bg-card focus-visible:ring-primary/30 min-h-[80px] resize-none"
-                  placeholder="Observations, contexte familial…"
+                  className="text-sm border-border/50 bg-card focus-visible:ring-primary/30 min-h-[100px] resize-y"
+                  placeholder="Observations, antécédents, contexte familial particulier..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                 />
-                <span className="text-[9px] text-muted-foreground/50">Supporte **gras**, *italique* et - listes</span>
               </div>
 
               <Separator className="opacity-50" />
