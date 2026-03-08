@@ -73,6 +73,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   saveStatus = 'idle',
   onOpenNotes,
   noteCount = 0,
+  onShare,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
