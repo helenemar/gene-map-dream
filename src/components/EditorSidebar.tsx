@@ -30,6 +30,8 @@ interface EditorSidebarProps {
   onToggleSoloEmotional: (type: EmotionalLinkType) => void;
   emotionalLinksVisible: boolean;
   onToggleEmotionalLinksVisible: () => void;
+  pathologiesVisible: boolean;
+  onTogglePathologiesVisible: () => void;
   dynamicPathologies?: DynamicPathology[];
   onAddPathology?: (name: string, colorHex: string) => Promise<{ data: any; error: any } | undefined>;
 }
