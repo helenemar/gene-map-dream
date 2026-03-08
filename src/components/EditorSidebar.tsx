@@ -115,7 +115,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
         {/* ═══ 1. MEMBRES ═══ */}
         <AccordionItem value="members" className="border-b border-border">
           <AccordionTrigger className="px-4 py-3 text-sm font-semibold text-foreground hover:bg-accent/50 hover:no-underline">
-            Membres ({members.length})
+            Membres ({members.filter(m => !m.perinatalType).length})
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-3">
             <div className="space-y-0.5">
