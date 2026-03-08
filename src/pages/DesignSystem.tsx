@@ -652,7 +652,7 @@ const DesignSystemPage: React.FC = () => {
                   <line x1="58" y1="14" x2="14" y2="58" stroke="currentColor" strokeWidth="2.5" />
                 </svg>
                 <div className="text-center">
-                  <span className="text-xs font-semibold text-foreground">Mort-né (H)</span>
+                  <span className="text-xs font-semibold text-foreground">Mortinaissance (H)</span>
                   <p className="text-[10px] text-muted-foreground">stillbirth · male</p>
                 </div>
               </div>
