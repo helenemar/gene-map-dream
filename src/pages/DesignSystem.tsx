@@ -639,7 +639,7 @@ const DesignSystemPage: React.FC = () => {
                   <line x1="-2" y1="20" x2="42" y2="20" stroke="currentColor" strokeWidth="2" />
                 </svg>
                 <div className="text-center">
-                  <span className="text-xs font-semibold text-foreground">Avortement</span>
+                  <span className="text-xs font-semibold text-foreground">IVG</span>
                   <p className="text-[10px] text-muted-foreground">abortion</p>
                 </div>
               </div>
