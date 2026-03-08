@@ -1679,6 +1679,14 @@ const GenogramEditor: React.FC = () => {
           genogramName={fileName}
         />
       )}
+      {genogramId && (
+        <ShareModal
+          open={shareModalOpen}
+          onOpenChange={setShareModalOpen}
+          genogramId={genogramId}
+          genogramName={fileName}
+        />
+      )}
     </div>
   );
 };
