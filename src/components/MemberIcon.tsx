@@ -78,11 +78,13 @@ const MemberIcon: React.FC<MemberIconProps> = ({
   const colors = pathologyColors.slice(0, 4);
   const fillRects = buildFillRects(colors, sqX, sqY, sqW, sqH);
 
+  const pad = isIndexPatient ? sw * 3 : 0;
+
   return (
     <svg
-      width={s}
-      height={s}
-      viewBox={`0 0 ${s} ${s}`}
+      width={s + pad * 2}
+      height={s + pad * 2}
+      viewBox={`${-pad} ${-pad} ${s + pad * 2} ${s + pad * 2}`}
       fill="none"
       className={className}
       style={{ display: 'block' }}
