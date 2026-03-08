@@ -141,7 +141,18 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
         {/* ═══ 2. PATHOLOGIES ═══ */}
         <AccordionItem value="pathologies" className="border-b border-border">
           <AccordionTrigger className="px-4 py-3 text-sm font-semibold text-foreground hover:bg-accent/50 hover:no-underline">
-            Pathologies
+            <span className="flex-1 text-left">Pathologies</span>
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onTogglePathologiesVisible(); }}
+              className={`p-1 rounded-md transition-colors mr-1 ${
+                pathologiesVisible
+                  ? 'text-muted-foreground hover:text-foreground'
+                  : 'text-muted-foreground/40 hover:text-muted-foreground'
+              }`}
+              title={pathologiesVisible ? 'Masquer les pathologies' : 'Afficher les pathologies'}
+            >
+              {pathologiesVisible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+            </button>
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-3">
             <div className="space-y-2">
