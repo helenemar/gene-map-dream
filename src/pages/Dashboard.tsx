@@ -286,10 +286,10 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen bg-card">
       {/* ── Top Nav ── */}
       <header className="h-[64px] bg-card border-b border-border flex items-center justify-between px-8">
-        <div className="flex items-center gap-2.5">
-          <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
-          <span className="text-[15px] font-semibold text-foreground tracking-tight">Genogy</span>
-        </div>
+         <a href="/" className="flex items-center gap-2.5">
+           <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
+           <span className="text-[15px] font-semibold text-foreground tracking-tight">Genogy</span>
+         </a>
         <div className="flex items-center gap-2">
           <Button variant="beta" size="sm" className="h-9 px-4 text-xs font-bold" onClick={() => setBetaModalOpen(true)}>
             <Atom className="w-3.5 h-3.5" />
