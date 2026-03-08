@@ -38,11 +38,41 @@ function downloadBlob(blob: Blob, filename: string) {
  * @param contentDiv - the inner transformed div (first child of canvasRef)
  * @param fileName - base file name (without extension)
  */
+/**
+ * Compute the actual rendered bounding box of all child elements inside a container.
+ */
+function getRenderedBounds(contentDiv: HTMLElement, padding = 40) {
+  const children = contentDiv.querySelectorAll('[data-member-card], svg, [class*="absolute"]');
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+  children.forEach(child => {
+    const el = child as HTMLElement;
+    // Skip the container itself
+    if (el === contentDiv) return;
+    const rect = el.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+    const contentRect = contentDiv.getBoundingClientRect();
+    const x = rect.left - contentRect.left;
+    const y = rect.top - contentRect.top;
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x + rect.width);
+    maxY = Math.max(maxY, y + rect.height);
+  });
+
+  if (!isFinite(minX)) return { x: 0, y: 0, w: 800, h: 600 };
+  return {
+    x: minX - padding,
+    y: minY - padding,
+    w: maxX - minX + padding * 2,
+    h: maxY - minY + padding * 2,
+  };
+}
+
 export async function exportAsPng(
   canvasRef: HTMLDivElement,
   fileName: string,
 ) {
-  // Find the inner content div (the one with the transform)
   const contentDiv = canvasRef.querySelector('.absolute') as HTMLElement;
   if (!contentDiv) return;
 
@@ -52,18 +82,24 @@ export async function exportAsPng(
   contentDiv.style.transform = 'none';
   contentDiv.style.transformOrigin = '0 0';
 
-  // Hide the canvas background dots
   const originalBg = canvasRef.style.backgroundImage;
   canvasRef.style.backgroundImage = 'none';
 
   try {
+    // Compute actual content bounds after resetting transform
+    const bounds = getRenderedBounds(contentDiv);
+
     const canvas = await html2canvas(contentDiv, {
       backgroundColor: '#ffffff',
       scale: 2,
       useCORS: true,
       logging: false,
-      width: contentDiv.scrollWidth,
-      height: contentDiv.scrollHeight,
+      x: bounds.x,
+      y: bounds.y,
+      width: bounds.w,
+      height: bounds.h,
+      scrollX: 0,
+      scrollY: 0,
     });
 
     canvas.toBlob((blob) => {
