@@ -600,7 +600,7 @@ const DesignSystemPage: React.FC = () => {
         </SubSection>
 
         {/* Pregnancy / Miscarriage / Abortion / Stillbirth symbols */}
-        <SubSection title="Symboles périnataux (Grossesse, Fausse couche, IVG, Mort-né)">
+        <SubSection title="Symboles périnataux (Grossesse, Interruption spontanée de grossesse, IVG, Mort-né)">
           <p className="text-sm text-muted-foreground mb-4">
             Symboles triangulaires et croisés utilisés pour les événements périnataux dans le génogramme.
           </p>
@@ -617,7 +617,7 @@ const DesignSystemPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Fausse couche — triangle + X qui dépasse */}
+              {/* Interruption spontanée de grossesse — triangle + X qui dépasse */}
               <div className="flex flex-col items-center gap-3">
                 <svg width="72" height="72" viewBox="-4 -4 48 48" fill="none" className="text-foreground">
                   <polygon points="20,0 40,40 0,40" stroke="currentColor" strokeWidth="2" fill="white" strokeLinejoin="miter" />
@@ -625,7 +625,7 @@ const DesignSystemPage: React.FC = () => {
                   <line x1="42" y1="42" x2="-2" y2="-2" stroke="currentColor" strokeWidth="2" />
                 </svg>
                 <div className="text-center">
-                  <span className="text-xs font-semibold text-foreground">Fausse couche</span>
+                  <span className="text-xs font-semibold text-foreground">ISG</span>
                   <p className="text-[10px] text-muted-foreground">miscarriage</p>
                 </div>
               </div>
