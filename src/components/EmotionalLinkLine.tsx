@@ -60,6 +60,14 @@ function computeControlPoint(
   // Base curvature — scales gently with distance for elegant arcs
   let baseCurvature = 0.2 + Math.min(dist * 0.00015, 0.15);
 
+  // When the link is nearly vertical, force a strong curvature so it arcs
+  // clearly to the side and doesn't overlap with structural filiation lines
+  const angle = Math.abs(dx) / (dist || 1);
+  if (angle < 0.25) {
+    // Nearly vertical: force minimum curvature of 0.45 so the arc is clearly offset
+    baseCurvature = Math.max(baseCurvature, 0.45);
+  }
+
   // Collision check: does segment A→B pass through any card?
   const hasCollision = cardRects.some(r => {
     if (excludeIds.includes(r.id)) return false;
