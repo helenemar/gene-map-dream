@@ -193,23 +193,17 @@ function renderCardAsSvg(cardEl: HTMLElement, contentRect: DOMRect): string {
       serialized = serialized.replace(new RegExp(escaped, 'g'), safeId);
     });
 
-    // Remove xmlns on the root svg to avoid duplication, then re-wrap as nested <svg>
-    // Nested <svg> with explicit x/y/width/height works better than <g transform>
-    // because it handles viewBox clipping correctly
-    serialized = serialized
-      .replace(/xmlns="[^"]*"/g, '')
-      .replace(/xmlns:xlink="[^"]*"/g, '');
+    // Rebuild the opening <svg> tag with correct attributes, removing duplicates
+    // Extract the viewBox from the original
+    const vbMatch = serialized.match(/viewBox="([^"]*)"/);
+    const viewBox = vbMatch ? vbMatch[1] : `0 0 ${iconW} ${iconH}`;
 
-    // Inject position attributes into the <svg> tag
-    serialized = serialized.replace(
-      /^<svg/,
-      `<svg xmlns="http://www.w3.org/2000/svg" x="${iconX}" y="${iconY}" width="${iconW}" height="${iconH}" overflow="visible"`
-    );
+    // Extract inner content (everything between <svg ...> and </svg>)
+    const innerMatch = serialized.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
+    const innerContent = innerMatch ? innerMatch[1] : '';
 
-    svg += serialized;
-
-    console.log('[EXPORT DEBUG] Icon found:', iconW, 'x', iconH, 'at', iconX, iconY);
-    console.log('[EXPORT DEBUG] First 300 chars:', serialized.substring(0, 300));
+    // Build a clean nested <svg> with no duplicate attributes
+    svg += `<svg xmlns="http://www.w3.org/2000/svg" x="${iconX}" y="${iconY}" width="${iconW}" height="${iconH}" viewBox="${viewBox}" fill="none" overflow="visible">${innerContent}</svg>`;
   } else {
     console.log('[EXPORT DEBUG] No icon SVG found in card');
     // Fallback: draw a simple shape based on what we can infer
