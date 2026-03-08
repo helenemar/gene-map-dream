@@ -13,6 +13,8 @@ export interface MemberIconProps {
   className?: string;
   /** If set, renders a perinatal triangle symbol instead of the normal shape */
   perinatalType?: PerinatalType;
+  /** Index patient — renders double border */
+  isIndexPatient?: boolean;
 }
 
 /**
@@ -35,6 +37,7 @@ const MemberIcon: React.FC<MemberIconProps> = ({
   size = 48,
   className,
   perinatalType,
+  isIndexPatient = false,
 }) => {
   // Unique ID for clipPath (needed when multiple icons on same page)
   const clipId = React.useId();
@@ -75,11 +78,13 @@ const MemberIcon: React.FC<MemberIconProps> = ({
   const colors = pathologyColors.slice(0, 4);
   const fillRects = buildFillRects(colors, sqX, sqY, sqW, sqH);
 
+  const pad = isIndexPatient ? sw * 3 : 0;
+
   return (
     <svg
-      width={s}
-      height={s}
-      viewBox={`0 0 ${s} ${s}`}
+      width={s + pad * 2}
+      height={s + pad * 2}
+      viewBox={`${-pad} ${-pad} ${s + pad * 2} ${s + pad * 2}`}
       fill="none"
       className={className}
       style={{ display: 'block' }}
@@ -129,6 +134,23 @@ const MemberIcon: React.FC<MemberIconProps> = ({
         <polygon points={`${cx},${half} ${s - half},${cy} ${cx},${s - half} ${half},${cy}`} stroke={mainStroke} strokeWidth={sw} fill="none" />
       ) : (
         <rect x={sqX} y={sqY} width={sqW} height={sqH} stroke={mainStroke} strokeWidth={sw} />
+      )}
+
+      {/* Layer 2b: Index patient double border */}
+      {isIndexPatient && (
+        gender === 'female' ? (
+          <circle cx={cx} cy={cy} r={circleR + sw * 2} stroke={mainStroke} strokeWidth={sw} fill="none" />
+        ) : gender === 'non-binary' ? null : (
+          <rect
+            x={sqX - sw * 2}
+            y={sqY - sw * 2}
+            width={sqW + sw * 4}
+            height={sqH + sw * 4}
+            stroke={mainStroke}
+            strokeWidth={sw}
+            fill="none"
+          />
+        )
       )}
 
       {/* Layer 3: Transgender inner shape */}

@@ -210,6 +210,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
               pathologyColors={memberPathologies.map(p => p.color_hex)}
               size={compact ? 36 : 48}
               className="text-foreground"
+              isIndexPatient={member.isIndexPatient}
             />
           )}
         </div>

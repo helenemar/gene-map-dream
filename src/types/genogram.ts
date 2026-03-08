@@ -55,6 +55,8 @@ export interface FamilyMember {
   perinatalType?: PerinatalType;
   /** When true, auto-layout (Réorganiser) will not move this member */
   locked?: boolean;
+  /** Index patient (proposant) — rendered with double border */
+  isIndexPatient?: boolean;
 }
 
 export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed' | 'love_affair';
