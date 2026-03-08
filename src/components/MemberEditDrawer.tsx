@@ -636,17 +636,27 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               {/* ── Unions (editing) ── */}
               {memberUnions.length > 0 && (
                 <div className="flex flex-col gap-2">
-                  <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Relations de couple</span>
+                  <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider flex items-center gap-1">
+                    <Heart className="w-3 h-3" />
+                    Relations ({memberUnions.length})
+                  </span>
                   {memberUnions.map(union => {
                     const partnerId = union.partner1 === member.id ? union.partner2 : union.partner1;
                     const partner = allMembers.find(m => m.id === partnerId);
                     const partnerName = partner ? `${partner.firstName} ${partner.lastName}` : partnerId;
-                    const linkType = FAMILY_LINK_TYPES.find(t => t.id === union.status);
+                    const childCount = union.children.length;
                     return (
                       <div key={union.id} className="flex flex-col gap-2 p-2.5 rounded-lg bg-accent/10 border border-border/30">
                         <div className="flex items-center gap-2">
-                          <Heart className="w-3.5 h-3.5 text-primary/60" />
-                          <span className="text-sm font-medium text-foreground truncate">{partnerName}</span>
+                          {partner && (
+                            <MemberIcon gender={partner.gender} size={20} className="text-foreground shrink-0" />
+                          )}
+                          <span className="text-sm font-medium text-foreground truncate flex-1">{partnerName}</span>
+                          {childCount > 0 && (
+                            <span className="text-[10px] text-muted-foreground bg-accent/30 border border-border/40 rounded-full px-2 py-0.5 shrink-0">
+                              {childCount} enfant{childCount > 1 ? 's' : ''}
+                            </span>
+                          )}
                         </div>
                         <Select
                           value={union.status}
@@ -663,9 +673,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                             ))}
                           </SelectContent>
                         </Select>
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-2 gap-2">
                           <div className="flex flex-col gap-0.5">
-                            <Label className="text-[9px] text-muted-foreground">Rencontre</Label>
+                            <Label className="text-[9px] text-muted-foreground uppercase">Année de rencontre</Label>
                             <Input
                               className="h-7 text-xs border-border/50 bg-card"
                               type="number"
@@ -675,17 +685,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                             />
                           </div>
                           <div className="flex flex-col gap-0.5">
-                            <Label className="text-[9px] text-muted-foreground">Événement</Label>
-                            <Input
-                              className="h-7 text-xs border-border/50 bg-card"
-                              type="number"
-                              placeholder="—"
-                              value={(union.eventYear ?? union.marriageYear) || ''}
-                              onChange={(e) => onUpdateUnion?.(union.id, { eventYear: e.target.value ? parseInt(e.target.value) : undefined, marriageYear: e.target.value ? parseInt(e.target.value) : undefined })}
-                            />
-                          </div>
-                          <div className="flex flex-col gap-0.5">
-                            <Label className="text-[9px] text-muted-foreground">Fin</Label>
+                            <Label className="text-[9px] text-muted-foreground uppercase">Fin</Label>
                             <Input
                               className="h-7 text-xs border-border/50 bg-card"
                               type="number"
