@@ -159,6 +159,7 @@ const GenogramEditor: React.FC = () => {
   const [smartGuides, setSmartGuides] = useState<{ type: 'horizontal' | 'vertical'; pos: number; from: number; to: number }[]>([]);
   const [highlightedUnionStatus, setHighlightedUnionStatus] = useState<UnionStatus | null>(null);
   const [soloEmotionalType, setSoloEmotionalType] = useState<EmotionalLinkType | null>(null);
+  const [emotionalLinksVisible, setEmotionalLinksVisible] = useState(true);
   const [zoom, setZoom] = useState(1);
   const [presentationMode, setPresentationMode] = useState(false);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -1331,6 +1332,8 @@ const GenogramEditor: React.FC = () => {
             onHighlightUnionStatus={setHighlightedUnionStatus}
             soloEmotionalType={soloEmotionalType}
             onToggleSoloEmotional={handleToggleSoloEmotional}
+            emotionalLinksVisible={emotionalLinksVisible}
+            onToggleEmotionalLinksVisible={() => setEmotionalLinksVisible(prev => !prev)}
             dynamicPathologies={dynamicPathologies}
             onAddPathology={addPathology}
           />
@@ -1430,7 +1433,8 @@ const GenogramEditor: React.FC = () => {
                     const isDimmed = !!hoveredMember && link.from !== hoveredMember && link.to !== hoveredMember;
                     const isSearchHighlighted = search.isActive && search.matchedEmotionalLinkIds.has(link.id);
                     const isSearchDimmed = search.isActive && !isSearchHighlighted;
-                    // Solo mode: hide links that don't match the solo type
+                    // Visibility toggle or solo mode
+                    if (!emotionalLinksVisible) return null;
                     const isSoloHidden = soloEmotionalType !== null && link.type !== soloEmotionalType;
                     if (isSoloHidden) return null;
                     return (
