@@ -630,7 +630,7 @@ const DesignSystemPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Avortement — triangle + X qui dépasse + ligne horizontale */}
+              {/* IVG — triangle + X qui dépasse + ligne horizontale */}
               <div className="flex flex-col items-center gap-3">
                 <svg width="72" height="72" viewBox="-4 -4 48 48" fill="none" className="text-foreground">
                   <polygon points="20,0 40,40 0,40" stroke="currentColor" strokeWidth="2" fill="white" strokeLinejoin="miter" />
