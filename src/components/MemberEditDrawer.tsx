@@ -914,7 +914,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <>
                   <Separator className="opacity-50" />
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité & Orientation</span>
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité de genre et orientation sexuelle</span>
                     <div className="flex flex-wrap gap-1.5">
                       {isTransgender && (
                         <span className="px-2 py-0.5 rounded-full text-xs bg-accent/30 border border-border/50 text-foreground">Transgenre</span>
