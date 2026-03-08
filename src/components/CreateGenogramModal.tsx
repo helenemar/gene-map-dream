@@ -144,7 +144,7 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
       resetForm();
       onOpenChange(false);
 
-      toast.success(`Génogramme créé avec le patient ${lastName.trim()}`);
+      toast.success(`Génogramme créé avec le patient ${firstName.trim()} ${lastName.trim()}`);
       navigate(`/editor/${data.id}`);
     } catch (err: any) {
       toast.error(err.message || 'Erreur lors de la création');
