@@ -160,7 +160,10 @@ function renderCardAsSvg(cardEl: HTMLElement, contentRect: DOMRect): string {
     fill="${bgColor}" stroke="${actualBorder}" stroke-width="1" />`;
 
   // Extract SVG icon from the card and clone it
-  const iconSvg = cardEl.querySelector(':scope svg, :scope div svg') as SVGElement;
+  // Look for the MemberIcon SVG specifically (inside the icon container div)
+  const iconContainer = cardEl.querySelector('.relative.w-12, .relative.w-9');
+  const iconSvg = iconContainer?.querySelector('svg') as SVGElement | null;
+  
   if (iconSvg) {
     const iconRect = iconSvg.getBoundingClientRect();
     const iconX = iconRect.left - contentRect.left;
@@ -168,16 +171,15 @@ function renderCardAsSvg(cardEl: HTMLElement, contentRect: DOMRect): string {
     const iconW = iconRect.width;
     const iconH = iconRect.height;
 
-    const clone = iconSvg.cloneNode(true) as SVGElement;
-    resolveAllSvgColors(clone, iconSvg);
-
-    // Resolve `currentColor` to the actual foreground color
-    let serialized = new XMLSerializer().serializeToString(clone);
+    // Serialize the original SVG, resolve colors and IDs
+    let serialized = new XMLSerializer().serializeToString(iconSvg);
     serialized = serialized.replace(/currentColor/gi, fgColor);
+    // Also resolve any hsl(var(...)) patterns
+    serialized = serialized.replace(/hsl\(var\(--[^)]+\)[^)]*\)/gi, (match) => {
+      return resolveColorCached(match);
+    });
 
-    // Fix React useId() clip-path IDs containing colons (e.g. ":r1:")
-    // which break url() references in serialized SVG
-    // Match any id containing colons (React useId pattern)
+    // Fix React useId() IDs containing colons
     const allIds = new Set<string>();
     const idRegex = /id="([^"]*:[^"]*)"/g;
     let match;
@@ -186,30 +188,43 @@ function renderCardAsSvg(cardEl: HTMLElement, contentRect: DOMRect): string {
     }
     let counter = 0;
     allIds.forEach(reactId => {
-      const safeId = `exp-${counter++}-${Math.random().toString(36).slice(2, 6)}`;
-      // Escape special regex chars in the ID
+      const safeId = `icon${counter++}${Math.random().toString(36).slice(2, 8)}`;
       const escaped = reactId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       serialized = serialized.replace(new RegExp(escaped, 'g'), safeId);
     });
 
-    // Parse the viewBox to compute scaling
-    const vb = clone.getAttribute('viewBox') || `0 0 ${iconW} ${iconH}`;
-    const vbParts = vb.split(/[\s,]+/).map(Number);
-    const vbX = vbParts[0] || 0;
-    const vbY = vbParts[1] || 0;
-    const vbW = vbParts[2] || iconW;
-    const vbH = vbParts[3] || iconH;
-    const scaleX = iconW / vbW;
-    const scaleY = iconH / vbH;
+    // Remove xmlns on the root svg to avoid duplication, then re-wrap as nested <svg>
+    // Nested <svg> with explicit x/y/width/height works better than <g transform>
+    // because it handles viewBox clipping correctly
+    serialized = serialized
+      .replace(/xmlns="[^"]*"/g, '')
+      .replace(/xmlns:xlink="[^"]*"/g, '');
 
-    // Extract inner content (remove outer <svg> wrapper)
-    const innerMatch = serialized.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
-    const innerContent = innerMatch ? innerMatch[1] : '';
+    // Inject position attributes into the <svg> tag
+    serialized = serialized.replace(
+      /^<svg/,
+      `<svg xmlns="http://www.w3.org/2000/svg" x="${iconX}" y="${iconY}" width="${iconW}" height="${iconH}" overflow="visible"`
+    );
 
-    // Use <g> with transform instead of nested <svg> (nested SVGs fail in SVG→Image pipeline)
-    svg += `<g transform="translate(${iconX - vbX * scaleX}, ${iconY - vbY * scaleY}) scale(${scaleX}, ${scaleY})">
-      ${innerContent}
-    </g>`;
+    svg += serialized;
+
+    console.log('[EXPORT DEBUG] Icon found:', iconW, 'x', iconH, 'at', iconX, iconY);
+    console.log('[EXPORT DEBUG] First 300 chars:', serialized.substring(0, 300));
+  } else {
+    console.log('[EXPORT DEBUG] No icon SVG found in card');
+    // Fallback: draw a simple shape based on what we can infer
+    const shapeX = x + CARD_PAD_X;
+    const shapeY = y + CARD_PAD_Y;
+    const shapeSize = 48;
+    // Check if card has a circle or rect (female vs male)
+    const hasCircle = cardEl.querySelector('circle[stroke]');
+    if (hasCircle) {
+      svg += `<circle cx="${shapeX + shapeSize/2}" cy="${shapeY + shapeSize/2}" r="${shapeSize/2 - 1}" 
+        fill="white" stroke="${fgColor}" stroke-width="2" />`;
+    } else {
+      svg += `<rect x="${shapeX + 1}" y="${shapeY + 1}" width="${shapeSize - 2}" height="${shapeSize - 2}" 
+        fill="white" stroke="${fgColor}" stroke-width="2" />`;
+    }
   }
 
   // Extract text content from the card
