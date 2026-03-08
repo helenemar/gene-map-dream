@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf';
+import { FamilyMember } from '@/types/genogram';
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
@@ -26,10 +27,21 @@ function resolveColor(raw: string): string {
   return resolved || raw;
 }
 
+// Cache resolved colors to avoid repeated DOM operations
+const colorCache = new Map<string, string>();
+function resolveColorCached(raw: string): string {
+  if (!raw || (!raw.includes('var(') && !raw.includes('hsl('))) return raw;
+  const cached = colorCache.get(raw);
+  if (cached) return cached;
+  const resolved = resolveColor(raw);
+  colorCache.set(raw, resolved);
+  return resolved;
+}
+
 /**
  * Deep-resolve all CSS variable colors in a cloned SVG element tree.
  */
-function resolveAllColors(svgClone: SVGElement, svgOriginal: SVGElement) {
+function resolveAllSvgColors(svgClone: SVGElement, svgOriginal: SVGElement) {
   const colorAttrs = ['stroke', 'fill', 'stop-color', 'flood-color', 'lighting-color', 'color'];
 
   const allCloned = [svgClone, ...Array.from(svgClone.querySelectorAll('*'))];
@@ -42,41 +54,29 @@ function resolveAllColors(svgClone: SVGElement, svgOriginal: SVGElement) {
     colorAttrs.forEach(attr => {
       const val = clonedEl.getAttribute(attr);
       if (val && (val.includes('var(') || val.includes('hsl('))) {
-        clonedEl.setAttribute(attr, resolveColor(val));
+        clonedEl.setAttribute(attr, resolveColorCached(val));
       }
     });
 
-    // Resolve stroke-opacity, fill-opacity from computed styles
+    // Resolve computed styles from CSS classes
     if (origEl && origEl instanceof Element) {
       const computed = getComputedStyle(origEl);
 
-      // If stroke/fill not set as attribute but comes from CSS class
-      colorAttrs.forEach(attr => {
-        const currentVal = clonedEl.getAttribute(attr);
-        if (!currentVal || currentVal === 'none') {
-          const cssProp = attr === 'stop-color' ? 'stopColor' : attr;
-          const computedVal = (computed as any)[cssProp];
-          if (computedVal && computedVal !== 'none' && computedVal !== '') {
-            clonedEl.setAttribute(attr, computedVal);
-          }
-        }
-      });
-
-      // Copy computed stroke/fill for elements using CSS classes
-      const computedStroke = computed.stroke;
-      const computedFill = computed.fill;
-      if (computedStroke && computedStroke !== 'none' && !clonedEl.getAttribute('stroke')) {
-        clonedEl.setAttribute('stroke', computedStroke);
+      // Copy computed stroke/fill if not already set
+      if (!clonedEl.getAttribute('stroke') || clonedEl.getAttribute('stroke') === '') {
+        const s = computed.stroke;
+        if (s && s !== 'none' && s !== '') clonedEl.setAttribute('stroke', s);
       }
-      if (computedFill && !clonedEl.getAttribute('fill')) {
-        clonedEl.setAttribute('fill', computedFill);
+      if (!clonedEl.getAttribute('fill') || clonedEl.getAttribute('fill') === '') {
+        const f = computed.fill;
+        if (f && f !== '') clonedEl.setAttribute('fill', f);
       }
 
-      // Copy opacity attributes
-      const strokeOpacity = clonedEl.getAttribute('stroke-opacity') || (origEl as Element).getAttribute('stroke-opacity');
-      if (strokeOpacity) clonedEl.setAttribute('stroke-opacity', strokeOpacity);
-      const fillOpacity = clonedEl.getAttribute('fill-opacity') || (origEl as Element).getAttribute('fill-opacity');
-      if (fillOpacity) clonedEl.setAttribute('fill-opacity', fillOpacity);
+      // Copy opacity
+      const so = (origEl as Element).getAttribute('stroke-opacity');
+      if (so) clonedEl.setAttribute('stroke-opacity', so);
+      const fo = (origEl as Element).getAttribute('fill-opacity');
+      if (fo) clonedEl.setAttribute('fill-opacity', fo);
 
       // Copy stroke-width, stroke-dasharray
       if (!clonedEl.getAttribute('stroke-width')) {
@@ -92,34 +92,6 @@ function resolveAllColors(svgClone: SVGElement, svgOriginal: SVGElement) {
 
   // Remove masks that hide content
   svgClone.querySelectorAll('[mask]').forEach(el => el.removeAttribute('mask'));
-}
-
-/**
- * Inline all computed styles on an HTML element tree for foreignObject export.
- */
-function inlineComputedStyles(el: HTMLElement, orig: HTMLElement) {
-  const computed = getComputedStyle(orig);
-  const important = [
-    'color', 'background-color', 'background', 'font-family', 'font-size', 'font-weight',
-    'line-height', 'letter-spacing', 'text-align', 'padding', 'margin', 'border',
-    'border-radius', 'display', 'flex-direction', 'align-items', 'justify-content',
-    'gap', 'width', 'height', 'min-width', 'min-height', 'max-width', 'overflow',
-    'box-sizing', 'position', 'opacity', 'text-decoration', 'white-space',
-    'border-color', 'border-width', 'border-style', 'box-shadow',
-  ];
-  important.forEach(prop => {
-    const val = computed.getPropertyValue(prop);
-    if (val) el.style.setProperty(prop, val);
-  });
-
-  // Recurse into children
-  const clonedChildren = el.children;
-  const origChildren = orig.children;
-  for (let i = 0; i < clonedChildren.length && i < origChildren.length; i++) {
-    if (clonedChildren[i] instanceof HTMLElement && origChildren[i] instanceof HTMLElement) {
-      inlineComputedStyles(clonedChildren[i] as HTMLElement, origChildren[i] as HTMLElement);
-    }
-  }
 }
 
 // ─── Bounds ─────────────────────────────────────────────────────────
@@ -141,7 +113,6 @@ function getMemberBounds(contentDiv: HTMLElement, padding = 80) {
 
   if (!isFinite(minX)) return { x: 0, y: 0, w: 800, h: 600 };
 
-  // Extra space for emotional link arcs
   const extra = 150;
   return {
     x: minX - padding - extra,
@@ -151,11 +122,148 @@ function getMemberBounds(contentDiv: HTMLElement, padding = 80) {
   };
 }
 
+// ─── Pure SVG Card Renderer ─────────────────────────────────────────
+
+const CARD_W = 220;
+const CARD_H_BASE = 64;
+const CARD_PAD_X = 16;
+const CARD_PAD_Y = 12;
+const ICON_SIZE = 48;
+const ICON_GAP = 12;
+
+/**
+ * Read card info from the DOM and render as pure SVG elements.
+ * This avoids foreignObject which doesn't work in SVG→Image→Canvas pipeline.
+ */
+function renderCardAsSvg(cardEl: HTMLElement, contentRect: DOMRect): string {
+  const rect = cardEl.getBoundingClientRect();
+  const x = rect.left - contentRect.left;
+  const y = rect.top - contentRect.top;
+  const w = rect.width;
+  const h = rect.height;
+
+  // Read colors from computed styles
+  const bgColor = resolveColorCached('hsl(var(--card))');
+  const borderColor = resolveColorCached('hsl(var(--border))');
+  const fgColor = resolveColorCached('hsl(var(--foreground))');
+  const mutedFg = resolveColorCached('hsl(var(--muted-foreground))');
+  const mutedBg = resolveColorCached('hsl(var(--muted))');
+
+  // Check if card has purple border (selected/highlighted)
+  const computed = getComputedStyle(cardEl.querySelector('.relative') || cardEl);
+  const actualBorder = computed.borderColor || borderColor;
+
+  let svg = '';
+
+  // Card background with rounded corners
+  svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="12" ry="12" 
+    fill="${bgColor}" stroke="${actualBorder}" stroke-width="1" />`;
+
+  // Extract SVG icon from the card and clone it
+  const iconSvg = cardEl.querySelector(':scope svg, :scope div svg') as SVGElement;
+  if (iconSvg) {
+    const iconRect = iconSvg.getBoundingClientRect();
+    const iconX = iconRect.left - contentRect.left;
+    const iconY = iconRect.top - contentRect.top;
+    const iconW = iconRect.width;
+    const iconH = iconRect.height;
+
+    const clone = iconSvg.cloneNode(true) as SVGElement;
+    resolveAllSvgColors(clone, iconSvg);
+    
+    // Remove width/height/viewBox from clone and wrap in positioned group
+    const vb = clone.getAttribute('viewBox') || `0 0 ${iconW} ${iconH}`;
+    const innerContent = clone.innerHTML;
+    
+    svg += `<svg x="${iconX}" y="${iconY}" width="${iconW}" height="${iconH}" viewBox="${vb}" fill="none">
+      ${innerContent}
+    </svg>`;
+  }
+
+  // Extract text content from the card
+  const textContainer = cardEl.querySelector('.min-w-0');
+  if (textContainer) {
+    const textX = x + CARD_PAD_X + ICON_SIZE + ICON_GAP;
+    const textBaseY = y + CARD_PAD_Y;
+
+    // Name (first line - semibold)
+    const nameEl = textContainer.querySelector('.font-semibold, .font-medium');
+    const name = nameEl?.textContent?.trim() || '';
+    if (name) {
+      svg += `<text x="${textX}" y="${textBaseY + 13}" 
+        font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="600" 
+        fill="${fgColor}">${escapeXml(name)}</text>`;
+    }
+
+    // Age badge
+    const badgeEl = textContainer.querySelector('.rounded-full');
+    if (badgeEl) {
+      const badgeText = badgeEl.textContent?.trim() || '';
+      if (badgeText) {
+        const badgeW = badgeText.length * 7 + 12;
+        const badgeX = x + w - CARD_PAD_X - badgeW;
+        const badgeY = textBaseY + 2;
+        svg += `<rect x="${badgeX}" y="${badgeY}" width="${badgeW}" height="20" rx="10" fill="${mutedBg}" />`;
+        svg += `<text x="${badgeX + badgeW / 2}" y="${badgeY + 14}" 
+          text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="11" font-weight="500" 
+          fill="${mutedFg}">${escapeXml(badgeText)}</text>`;
+      }
+    }
+
+    // Year line (second line)
+    const yearSpans = textContainer.querySelectorAll('.text-xs .whitespace-nowrap, .text-\\[11px\\]');
+    let yearText = '';
+    yearSpans.forEach(span => {
+      const t = span.textContent?.trim();
+      if (t && /\d{3,4}/.test(t)) yearText = t;
+    });
+    if (!yearText) {
+      // Fallback: look for any span with year-like content
+      const allSpans = textContainer.querySelectorAll('span');
+      allSpans.forEach(span => {
+        const t = span.textContent?.trim();
+        if (t && /^\~?\d{3,4}\s*-/.test(t)) yearText = t;
+      });
+    }
+    if (yearText) {
+      svg += `<text x="${textX}" y="${textBaseY + 28}" 
+        font-family="Inter, system-ui, sans-serif" font-size="11" 
+        fill="${mutedFg}">${escapeXml(yearText)}</text>`;
+    }
+
+    // Profession line (third line)
+    const profLines = textContainer.querySelectorAll('.text-xs');
+    let profText = '';
+    profLines.forEach(el => {
+      const spans = el.querySelectorAll('span.whitespace-nowrap');
+      spans.forEach(span => {
+        const t = span.textContent?.trim();
+        if (t && !/\d{3,4}/.test(t) && t !== name) profText = t;
+      });
+    });
+    if (profText) {
+      svg += `<text x="${textX}" y="${textBaseY + 42}" 
+        font-family="Inter, system-ui, sans-serif" font-size="12" 
+        fill="${mutedFg}">${escapeXml(profText)}</text>`;
+    }
+  }
+
+  return svg;
+}
+
+function escapeXml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
 // ─── Build Export SVG ───────────────────────────────────────────────
 
 function buildExportSvg(canvasRef: HTMLDivElement): { svgString: string; width: number; height: number } | null {
   const contentDiv = canvasRef.querySelector('.absolute') as HTMLElement;
   if (!contentDiv) return null;
+
+  // Clear color cache
+  colorCache.clear();
 
   // Reset transform temporarily to get real positions
   const origTransform = contentDiv.style.transform;
@@ -172,96 +280,45 @@ function buildExportSvg(canvasRef: HTMLDivElement): { svgString: string; width: 
 
     let svgInner = '';
 
-    // 1. Clone all SVG elements (link lines, etc.)
-    const svgElements = contentDiv.querySelectorAll(':scope > svg, :scope > div > svg');
-    // Also get SVGs that are direct children or in wrapper divs
+    // 1. Clone all SVG elements (link lines — family, emotional, elastic)
     const allSvgs = contentDiv.querySelectorAll('svg');
-
     const processedSvgs = new Set<SVGElement>();
+
     allSvgs.forEach(svg => {
       if (processedSvgs.has(svg)) return;
-      // Skip SVGs inside member cards (icons etc) — we handle those via foreignObject
+      // Skip SVGs inside member cards — we render those separately
       if (svg.closest('[data-member-card]')) return;
       processedSvgs.add(svg);
 
       const clone = svg.cloneNode(true) as SVGElement;
-      resolveAllColors(clone, svg);
+      resolveAllSvgColors(clone, svg);
 
-      // Get SVG position relative to content div
-      const svgRect = svg.getBoundingClientRect();
-      const svgX = svgRect.left - contentRect.left;
-      const svgY = svgRect.top - contentRect.top;
+      // Remove any buttons or interactive elements from cloned SVGs
+      clone.querySelectorAll('foreignObject').forEach(fo => fo.remove());
 
-      // For SVGs with width:1, height:1, overflow:visible — they use absolute positioning
-      // and their content coordinates are already in the content div's coordinate space
       const style = svg.style;
       const isOverflowSvg = style.overflow === 'visible' &&
         (style.width === '1px' || svg.getAttribute('width') === '1');
 
       if (isOverflowSvg) {
-        // Content is already in absolute coords, just wrap inner content
+        // Content is already in absolute coords
         svgInner += clone.innerHTML;
       } else {
-        // Position the SVG content with a transform
+        const svgRect = svg.getBoundingClientRect();
+        const svgX = svgRect.left - contentRect.left;
+        const svgY = svgRect.top - contentRect.top;
         svgInner += `<g transform="translate(${svgX}, ${svgY})">${clone.innerHTML}</g>`;
       }
     });
 
-    // 2. Capture member cards as foreignObject
+    // 2. Render member cards as pure SVG
     const cards = contentDiv.querySelectorAll('[data-member-card]');
     cards.forEach(card => {
-      const el = card as HTMLElement;
-      const rect = el.getBoundingClientRect();
-      const x = rect.left - contentRect.left;
-      const y = rect.top - contentRect.top;
-
-      // Clone and inline all styles
-      const clone = el.cloneNode(true) as HTMLElement;
-
-      // Remove buttons and interactive elements
-      clone.querySelectorAll('button, [data-radix-popper-content-wrapper]').forEach(btn => btn.remove());
-
-      // Inline all computed styles
-      inlineComputedStyles(clone, el);
-
-      // Handle SVG icons inside cards — resolve their colors too
-      const cardSvgs = clone.querySelectorAll('svg');
-      const origCardSvgs = el.querySelectorAll('svg');
-      cardSvgs.forEach((svg, idx) => {
-        if (origCardSvgs[idx]) {
-          resolveAllColors(svg, origCardSvgs[idx]);
-        }
-      });
-
-      svgInner += `<foreignObject x="${x}" y="${y}" width="${rect.width + 2}" height="${rect.height + 2}">
-        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: Inter, system-ui, -apple-system, sans-serif; font-size: 12px;">
-          ${clone.outerHTML}
-        </div>
-      </foreignObject>`;
-    });
-
-    // 3. Also capture UnionBadge and RelationshipBadge elements
-    const badges = contentDiv.querySelectorAll('[data-union-badge], [data-relationship-badge]');
-    badges.forEach(badge => {
-      const el = badge as HTMLElement;
-      if (el.closest('[data-member-card]')) return; // Skip if inside a card
-      const rect = el.getBoundingClientRect();
-      const x = rect.left - contentRect.left;
-      const y = rect.top - contentRect.top;
-
-      const clone = el.cloneNode(true) as HTMLElement;
-      clone.querySelectorAll('button').forEach(btn => btn.remove());
-      inlineComputedStyles(clone, el);
-
-      svgInner += `<foreignObject x="${x}" y="${y}" width="${rect.width + 2}" height="${rect.height + 2}">
-        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: Inter, system-ui, -apple-system, sans-serif; font-size: 11px;">
-          ${clone.outerHTML}
-        </div>
-      </foreignObject>`;
+      svgInner += renderCardAsSvg(card as HTMLElement, contentRect);
     });
 
     const svgString = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   viewBox="${bounds.x} ${bounds.y} ${bounds.w} ${bounds.h}"
   width="${bounds.w}" height="${bounds.h}">
   <rect x="${bounds.x}" y="${bounds.y}" width="${bounds.w}" height="${bounds.h}" fill="white"/>
@@ -272,6 +329,7 @@ function buildExportSvg(canvasRef: HTMLDivElement): { svgString: string; width: 
   } finally {
     contentDiv.style.transform = origTransform;
     contentDiv.style.transformOrigin = origTransformOrigin;
+    colorCache.clear();
   }
 }
 
@@ -318,7 +376,6 @@ export async function exportAsPng(canvasRef: HTMLDivElement, fileName: string) {
       if (blob) downloadBlob(blob, `${fileName}.png`);
     }, 'image/png');
   } catch {
-    // Fallback: download as SVG if canvas conversion fails
     console.warn('PNG export failed, falling back to SVG');
     const blob = new Blob([result.svgString], { type: 'image/svg+xml;charset=utf-8' });
     downloadBlob(blob, `${fileName}.svg`);
@@ -339,7 +396,6 @@ export async function exportAsPdf(canvasRef: HTMLDivElement, fileName: string) {
 
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
-    // Header
     pdf.setFillColor(245, 245, 245);
     pdf.rect(0, 0, pageW, headerH + 4, 'F');
     pdf.setFont('helvetica', 'bold');
