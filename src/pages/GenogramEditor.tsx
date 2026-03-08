@@ -822,10 +822,10 @@ const GenogramEditor: React.FC = () => {
 
     const newChild: FamilyMember = {
       id: `m-${Date.now()}`,
-      firstName: 'Nouveau',
+      firstName: '',
       lastName: source.lastName || '',
-      birthYear: currentYear - 5,
-      age: 5,
+      birthYear: 0,
+      age: 0,
       profession: '',
       gender: 'female',
       x: coupleCenterX,
