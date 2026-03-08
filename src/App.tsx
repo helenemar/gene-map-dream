@@ -11,6 +11,7 @@ import GenogramEditor from "./pages/GenogramEditor";
 import DesignSystemPage from "./pages/DesignSystem";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
+import SharedGenogram from "./pages/SharedGenogram";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
