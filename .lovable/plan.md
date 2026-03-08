@@ -1,14 +1,49 @@
 
 
-## Problème
+## Diagnostic
 
-Le `CORNER_INSET = 10` décale les points d'ancrage de 10px **à l'intérieur** de la carte. Comme les cartes ont un `z-index: 2` et le SVG un `z-index: 1`, les extrémités des lignes sont cachées sous la carte, créant un espace visible entre la fin de la courbe et le bord de la carte.
+L'export produit des pages quasi-blanches car **html2canvas ne sait pas rendre les SVGs complexes** utilisés pour les liens familiaux et émotionnels. Les problèmes concrets :
 
-Pour `rounded-xl` (rayon de 12px), le point où la bordure arrondie rejoint le coin mathématique est à environ 3.5px du coin. Mettre `CORNER_INSET = 0` ferait que les lignes terminent exactement au coin géométrique de la carte — le point le plus externe — ce qui donne l'impression visuelle qu'elles touchent la carte.
+1. **Couleurs CSS variables** : les strokes utilisent `hsl(var(--foreground))` que html2canvas ne résout pas
+2. **SVGs overflow:visible** : les SVGs ont `width:1, height:1` avec `overflow:visible` -- html2canvas clip au dimensions déclarées  
+3. **Masques SVG** : le `<mask id="card-depth-mask">` rend les liens invisibles dans la capture
+4. **Fondamentalement** : html2canvas est conçu pour le HTML, pas pour des SVGs complexes avec Bézier, defs/masks, etc.
 
-## Plan
+## Approche : Remplacement complet de la stratégie d'export
 
-**Un seul changement dans `src/pages/GenogramEditor.tsx` ligne 31 :**
+Abandonner html2canvas au profit d'un **rendu SVG natif** converti en image via le navigateur :
 
-Passer `CORNER_INSET` de `10` à `0` pour que les ancres correspondent exactement aux coins de la bounding box de la carte.
+### Etape 1 -- Construire un SVG complet programmatiquement
+
+Créer une fonction `buildExportSvg()` dans `exportCanvas.ts` qui :
+- Collecte tous les SVGs enfants du content div (liens familiaux, émotionnels, guides)
+- Clone et résout toutes les couleurs CSS variables en valeurs concrètes (rgb/hex)
+- Capture les cartes membres via `<foreignObject>` avec leurs styles inline complets
+- Assemble le tout dans un seul SVG avec le bon viewBox
+
+### Etape 2 -- SVG → Canvas via Image native
+
+```text
+SVG string → Blob URL → new Image() → canvas.drawImage()
+```
+
+Le navigateur rend le SVG nativement (il gère parfaitement les Bézier, masks, etc.), puis on dessine l'image résultante sur un canvas HTML5 standard.
+
+### Etape 3 -- Canvas → PNG / PDF
+
+- PNG : `canvas.toBlob()` comme avant
+- PDF : `canvas.toDataURL()` + jsPDF comme avant  
+- SVG : télécharger directement le SVG assemblé
+
+### Fichiers modifiés
+
+- **`src/utils/exportCanvas.ts`** : Réécriture complète de `captureCanvas()` avec la nouvelle approche SVG→Image→Canvas. Conservation de l'API publique (`exportAsPng`, `exportAsPdf`, `exportAsSvg`).
+
+### Détail technique de la résolution des couleurs
+
+Pour chaque élément SVG cloné, on itère sur les attributs `stroke`, `fill`, `opacity` et on résout les `var()` via un élément temporaire injecté dans le DOM. On résout aussi les classes Tailwind (`fill-muted-foreground`, etc.) en lisant `getComputedStyle` sur l'élément original.
+
+### Gestion des foreignObject (cartes)
+
+Pour chaque `[data-member-card]`, on sérialise le HTML avec les styles computés inlinés (pas de classes CSS, tout en `style="..."`) pour que le SVG soit auto-suffisant. Cela inclut les couleurs de fond, bordures, polices, tailles.
 
