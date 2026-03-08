@@ -600,7 +600,7 @@ const DesignSystemPage: React.FC = () => {
         </SubSection>
 
         {/* Pregnancy / Miscarriage / Abortion / Stillbirth symbols */}
-        <SubSection title="Symboles périnataux (Grossesse, Fausse couche, IVG, Mort-né)">
+        <SubSection title="Symboles périnataux (Grossesse, Interruption spontanée de grossesse, IVG, Mort-né)">
           <p className="text-sm text-muted-foreground mb-4">
             Symboles triangulaires et croisés utilisés pour les événements périnataux dans le génogramme.
           </p>
