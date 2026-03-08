@@ -80,6 +80,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
   onFocusMember, onBack,
   highlightedUnionStatus, onHighlightUnionStatus,
   soloEmotionalType, onToggleSoloEmotional,
+  emotionalLinksVisible, onToggleEmotionalLinksVisible,
   dynamicPathologies = [], onAddPathology,
 }) => {
   const [addPathologyModalOpen, setAddPathologyModalOpen] = useState(false);
