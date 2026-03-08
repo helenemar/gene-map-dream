@@ -159,10 +159,9 @@ function renderCardAsSvg(cardEl: HTMLElement, contentRect: DOMRect): string {
   svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="12" ry="12" 
     fill="${bgColor}" stroke="${actualBorder}" stroke-width="1" />`;
 
-  // Extract SVG icon from the card and clone it
-  // Look for the MemberIcon SVG specifically (inside the icon container div)
-  const iconContainer = cardEl.querySelector('.relative.w-12, .relative.w-9');
-  const iconSvg = iconContainer?.querySelector('svg') as SVGElement | null;
+  // Draw the member icon programmatically (pure SVG shapes, no DOM serialization)
+  const iconContainer = cardEl.querySelector('svg') as SVGElement | null;
+  const iconSvg = iconContainer;
   
   if (iconSvg) {
     const iconRect = iconSvg.getBoundingClientRect();
