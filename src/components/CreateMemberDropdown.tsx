@@ -90,6 +90,7 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
   disabledOptions,
   showParentSplit = false,
 }) => {
+  const [perinatalOpen, setPerinatalOpen] = useState(false);
   // Build option list: replace 'parent' with sub-options when split is active
   const options: RelOptionDef[] = showParentSplit
     ? [...PARENT_SUB_OPTIONS, ...BASE_OPTIONS.filter(o => o.id !== 'parent')]
