@@ -72,6 +72,7 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
         x: 0,
         y: 0,
         pathologies: [],
+        isIndexPatient: true,
       };
 
       const fatherMember = {
