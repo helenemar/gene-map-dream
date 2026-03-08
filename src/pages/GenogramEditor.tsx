@@ -1493,7 +1493,7 @@ const GenogramEditor: React.FC = () => {
                 onLinkDragStart={handleLinkDragStart}
                 onCancelAnchor={handleCancelAnchor}
                 disabledOptions={getDisabledOptions(member.id)}
-                dynamicPathologies={dynamicPathologies}
+                dynamicPathologies={pathologiesVisible ? dynamicPathologies : []}
                 showParentSplit={shouldShowParentSplit(member.id)}
                 isAdopted={isMemberAdopted(member.id)}
               />
