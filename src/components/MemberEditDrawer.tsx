@@ -644,7 +644,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     const partnerId = union.partner1 === member.id ? union.partner2 : union.partner1;
                     const partner = allMembers.find(m => m.id === partnerId);
                     const partnerName = partner ? `${partner.firstName} ${partner.lastName}` : partnerId;
-                    const childCount = union.children.length;
+                    const childCount = union.children.filter(cId => {
+                      const child = allMembers.find(m => m.id === cId);
+                      return !child?.perinatalType || child.perinatalType === 'stillborn';
+                    }).length;
                     return (
                       <div key={union.id} className="flex flex-col gap-2 p-2.5 rounded-lg bg-accent/10 border border-border/30">
                         <div className="flex items-center gap-2">
