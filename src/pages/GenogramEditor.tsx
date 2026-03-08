@@ -672,7 +672,7 @@ const GenogramEditor: React.FC = () => {
     const perinatalLabels: Record<string, string> = {
       pregnancy: 'Grossesse',
       miscarriage: 'Fausse couche',
-      abortion: 'Avortement',
+      abortion: 'IVG',
       stillborn: 'Mort-né',
     };
 

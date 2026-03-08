@@ -235,7 +235,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
               <span className="font-medium text-sm text-foreground whitespace-nowrap">
                 {member.perinatalType === 'pregnancy' ? 'Grossesse' :
                  member.perinatalType === 'miscarriage' ? 'Fausse couche' :
-                 member.perinatalType === 'abortion' ? 'Avortement' : 'Mort-né'}
+                 member.perinatalType === 'abortion' ? 'IVG' : 'Mort-né'}
               </span>
               {member.birthYear > 0 && (
                 <span className="text-[11px] text-muted-foreground">{member.birthYear}</span>
