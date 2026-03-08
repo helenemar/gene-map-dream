@@ -502,27 +502,44 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               <Separator className="opacity-50" />
 
-              {/* ── Identité & Orientation ── */}
+              {/* ── Identité de genre ── */}
               <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité & Orientation</span>
-                <div className="flex flex-col gap-2">
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité de genre</span>
+                <div className="flex flex-wrap gap-1.5">
                   {GENDER_IDENTITY_OPTIONS.map(opt => (
-                    <label key={opt.id} className="flex items-center gap-2 cursor-pointer">
-                      <Checkbox
-                        checked={genderIdentity === opt.id}
-                        onCheckedChange={(v) => setGenderIdentity(v ? opt.id : 'cisgender')}
-                      />
-                      <span className="text-xs text-muted-foreground">{opt.label}</span>
-                    </label>
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setGenderIdentity(genderIdentity === opt.id ? 'cisgender' : opt.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                        genderIdentity === opt.id
+                          ? 'bg-primary/10 border-primary/30 text-foreground'
+                          : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
                   ))}
+                </div>
+              </div>
+
+              {/* ── Orientation sexuelle ── */}
+              <div className="flex flex-col gap-2">
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Orientation sexuelle</span>
+                <div className="flex flex-wrap gap-1.5">
                   {SEXUAL_ORIENTATION_OPTIONS.map(opt => (
-                    <label key={opt.id} className="flex items-center gap-2 cursor-pointer">
-                      <Checkbox
-                        checked={sexualOrientation === opt.id}
-                        onCheckedChange={(v) => setSexualOrientation(v ? opt.id : 'heterosexual')}
-                      />
-                      <span className="text-xs text-muted-foreground">{opt.label}</span>
-                    </label>
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setSexualOrientation(sexualOrientation === opt.id ? 'heterosexual' : opt.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                        sexualOrientation === opt.id
+                          ? 'bg-primary/10 border-primary/30 text-foreground'
+                          : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
                   ))}
                 </div>
               </div>
@@ -531,43 +548,40 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               {/* ── Pathologies ── */}
               <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Pathologies</span>
-                  {onAddPathology && (
-                    <button
-                      onClick={() => setAddPathologyModalOpen(true)}
-                      className="text-[10px] text-primary hover:text-primary/80 font-medium flex items-center gap-0.5"
-                    >
-                      <Plus className="w-3 h-3" />
-                      Ajouter
-                    </button>
-                  )}
-                </div>
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
+                  Pathologies ({selectedPathologies.length})
+                </span>
                 {dynamicPathologies.length === 0 ? (
                   <p className="text-xs text-muted-foreground/50 italic">Aucune pathologie définie</p>
                 ) : (
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-col gap-1">
                     {dynamicPathologies.map(p => (
-                      <button
+                      <label
                         key={p.id}
-                        onClick={() => togglePathology(p.id)}
-                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-                          selectedPathologies.includes(p.id)
-                            ? 'border-primary/40 bg-primary/10 text-foreground shadow-sm'
-                            : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
-                        }`}
+                        className="flex items-center gap-2.5 py-1.5 cursor-pointer hover:bg-accent/20 rounded-md px-1 -mx-1 transition-colors"
                       >
+                        <Checkbox
+                          checked={selectedPathologies.includes(p.id)}
+                          onCheckedChange={() => togglePathology(p.id)}
+                          className="border-primary/40"
+                        />
                         <span
-                          className="w-2.5 h-2.5 rounded-full shrink-0"
+                          className="w-3.5 h-3.5 rounded shrink-0"
                           style={{ backgroundColor: p.color_hex }}
                         />
-                        {p.name}
-                        {selectedPathologies.includes(p.id) && (
-                          <Check className="w-3 h-3 text-primary" />
-                        )}
-                      </button>
+                        <span className="text-sm text-foreground">{p.name}</span>
+                      </label>
                     ))}
                   </div>
+                )}
+                {onAddPathology && (
+                  <button
+                    onClick={() => setAddPathologyModalOpen(true)}
+                    className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-dashed border-border/60 text-sm text-muted-foreground hover:border-border hover:text-foreground transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Ajouter une pathologie
+                  </button>
                 )}
               </div>
 
@@ -586,31 +600,18 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               <Separator className="opacity-50" />
 
-              {/* ── Jumeaux ── */}
+              {/* ── Jumeaux / Triplés ── */}
               <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Jumeaux</span>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1">
-                    <Label className="text-[10px] text-muted-foreground">Groupe</Label>
-                    <Input
-                      className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30"
-                      placeholder="ex: A"
-                      value={twinGroup}
-                      onChange={(e) => setTwinGroup(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <Label className="text-[10px] text-muted-foreground">Type</Label>
-                    <Select value={twinType} onValueChange={(v) => setTwinType(v as TwinType | '')}>
-                      <SelectTrigger className="h-8 text-sm border-border/50 bg-card">
-                        <SelectValue placeholder="—" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="monozygotic">Monozygote</SelectItem>
-                        <SelectItem value="dizygotic">Dizygote</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Jumeaux / Triplés</span>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-xs text-muted-foreground">Groupe de jumeaux</Label>
+                  <Input
+                    className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30"
+                    placeholder="ex: twin-1 (vide si pas jumeau)"
+                    value={twinGroup}
+                    onChange={(e) => setTwinGroup(e.target.value)}
+                  />
+                  <span className="text-[9px] text-muted-foreground/60">Les membres partageant le même identifiant seront affichés comme jumeaux/triplés.</span>
                 </div>
               </div>
 
@@ -623,12 +624,11 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   Notes cliniques
                 </Label>
                 <Textarea
-                  className="text-sm border-border/50 bg-card focus-visible:ring-primary/30 min-h-[80px] resize-none"
-                  placeholder="Observations, contexte familial…"
+                  className="text-sm border-border/50 bg-card focus-visible:ring-primary/30 min-h-[100px] resize-y"
+                  placeholder="Observations, antécédents, contexte familial particulier..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                 />
-                <span className="text-[9px] text-muted-foreground/50">Supporte **gras**, *italique* et - listes</span>
               </div>
 
               <Separator className="opacity-50" />
@@ -636,17 +636,27 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               {/* ── Unions (editing) ── */}
               {memberUnions.length > 0 && (
                 <div className="flex flex-col gap-2">
-                  <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Relations de couple</span>
+                  <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider flex items-center gap-1">
+                    <Heart className="w-3 h-3" />
+                    Relations ({memberUnions.length})
+                  </span>
                   {memberUnions.map(union => {
                     const partnerId = union.partner1 === member.id ? union.partner2 : union.partner1;
                     const partner = allMembers.find(m => m.id === partnerId);
                     const partnerName = partner ? `${partner.firstName} ${partner.lastName}` : partnerId;
-                    const linkType = FAMILY_LINK_TYPES.find(t => t.id === union.status);
+                    const childCount = union.children.length;
                     return (
                       <div key={union.id} className="flex flex-col gap-2 p-2.5 rounded-lg bg-accent/10 border border-border/30">
                         <div className="flex items-center gap-2">
-                          <Heart className="w-3.5 h-3.5 text-primary/60" />
-                          <span className="text-sm font-medium text-foreground truncate">{partnerName}</span>
+                          {partner && (
+                            <MemberIcon gender={partner.gender} size={20} className="text-foreground shrink-0" />
+                          )}
+                          <span className="text-sm font-medium text-foreground truncate flex-1">{partnerName}</span>
+                          {childCount > 0 && (
+                            <span className="text-[10px] text-muted-foreground bg-accent/30 border border-border/40 rounded-full px-2 py-0.5 shrink-0">
+                              {childCount} enfant{childCount > 1 ? 's' : ''}
+                            </span>
+                          )}
                         </div>
                         <Select
                           value={union.status}
@@ -663,9 +673,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                             ))}
                           </SelectContent>
                         </Select>
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-2 gap-2">
                           <div className="flex flex-col gap-0.5">
-                            <Label className="text-[9px] text-muted-foreground">Rencontre</Label>
+                            <Label className="text-[9px] text-muted-foreground uppercase">Année de rencontre</Label>
                             <Input
                               className="h-7 text-xs border-border/50 bg-card"
                               type="number"
@@ -675,17 +685,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                             />
                           </div>
                           <div className="flex flex-col gap-0.5">
-                            <Label className="text-[9px] text-muted-foreground">Événement</Label>
-                            <Input
-                              className="h-7 text-xs border-border/50 bg-card"
-                              type="number"
-                              placeholder="—"
-                              value={(union.eventYear ?? union.marriageYear) || ''}
-                              onChange={(e) => onUpdateUnion?.(union.id, { eventYear: e.target.value ? parseInt(e.target.value) : undefined, marriageYear: e.target.value ? parseInt(e.target.value) : undefined })}
-                            />
-                          </div>
-                          <div className="flex flex-col gap-0.5">
-                            <Label className="text-[9px] text-muted-foreground">Fin</Label>
+                            <Label className="text-[9px] text-muted-foreground uppercase">Fin</Label>
                             <Input
                               className="h-7 text-xs border-border/50 bg-card"
                               type="number"
@@ -702,64 +702,63 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               )}
 
               {/* ── Emotional links (editing) ── */}
-              {emotionalLinks.filter(l => l.from === member.id || l.to === member.id).length > 0 && (
-                <>
-                  <Separator className="opacity-50" />
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Liens émotionnels</span>
-                    {emotionalLinks
-                      .filter(l => l.from === member.id || l.to === member.id)
-                      .map(link => {
-                        const otherId = link.from === member.id ? link.to : link.from;
-                        const other = allMembers.find(m => m.id === otherId);
-                        const otherName = other ? `${other.firstName} ${other.lastName}` : otherId;
-                        return (
-                          <div key={link.id} className="flex items-center gap-2 p-2 rounded-lg bg-accent/10 border border-border/30">
-                            <div className="flex-1 min-w-0">
-                              <Select
-                                value={link.type}
-                                onValueChange={(v) => onUpdateEmotionalLink?.(link.id, v as EmotionalLinkType)}
-                              >
-                                <SelectTrigger className="h-7 text-xs border-border/50 bg-card">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {EMOTIONAL_LINK_TYPES.map(t => (
-                                    <SelectItem key={t.id} value={t.id} className="text-xs">
-                                      {t.label}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <span className="text-[10px] text-muted-foreground mt-0.5 block truncate">avec {otherName}</span>
-                            </div>
-                            <button
-                              onClick={() => onDeleteEmotionalLink?.(link.id)}
-                              className="shrink-0 w-6 h-6 rounded flex items-center justify-center hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+              <div className="flex flex-col gap-2">
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Liens émotionnels</span>
+                {emotionalLinks.filter(l => l.from === member.id || l.to === member.id).length === 0 ? (
+                  <p className="text-xs text-muted-foreground/50">Aucun lien émotionnel.</p>
+                ) : (
+                  emotionalLinks
+                    .filter(l => l.from === member.id || l.to === member.id)
+                    .map(link => {
+                      const otherId = link.from === member.id ? link.to : link.from;
+                      const other = allMembers.find(m => m.id === otherId);
+                      const otherName = other ? `${other.firstName} ${other.lastName}` : otherId;
+                      return (
+                        <div key={link.id} className="flex items-center gap-2 p-2 rounded-lg bg-accent/10 border border-border/30">
+                          <div className="flex-1 min-w-0">
+                            <Select
+                              value={link.type}
+                              onValueChange={(v) => onUpdateEmotionalLink?.(link.id, v as EmotionalLinkType)}
                             >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
+                              <SelectTrigger className="h-7 text-xs border-border/50 bg-card">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {EMOTIONAL_LINK_TYPES.map(t => (
+                                  <SelectItem key={t.id} value={t.id} className="text-xs">
+                                    {t.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <span className="text-[10px] text-muted-foreground mt-0.5 block truncate">avec {otherName}</span>
                           </div>
-                        );
-                    })}
-                  </div>
-                </>
-              )}
+                          <button
+                            onClick={() => onDeleteEmotionalLink?.(link.id)}
+                            className="shrink-0 w-6 h-6 rounded flex items-center justify-center hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      );
+                    })
+                )}
+              </div>
 
               <Separator className="opacity-50" />
 
               {/* ── Action buttons ── */}
-              <div className="flex items-center gap-2 pb-2">
-                <Button onClick={handleSave} size="sm" className="flex-1">
-                  <Check className="w-3.5 h-3.5 mr-1.5" />
+              <div className="flex flex-col items-center gap-3 pb-4 pt-1">
+                <Button onClick={handleSave} className="w-full">
                   Enregistrer
                 </Button>
                 {onDelete && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="text-destructive border-destructive/30 hover:bg-destructive/10">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                      <button className="flex items-center gap-2 text-sm text-destructive hover:text-destructive/80 transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                        Supprimer ce membre
+                      </button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
