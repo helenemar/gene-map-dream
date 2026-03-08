@@ -69,7 +69,10 @@ const ParentPicker: React.FC<ParentPickerProps> = ({
             const partnerName = partner.isPlaceholder
               ? 'Parent inconnu'
               : `${partner.firstName} ${partner.lastName}`;
-            const childCount = union.children.length;
+            const childCount = union.children.filter(cId => {
+              const child = members.find(m => m.id === cId);
+              return !child?.perinatalType || child.perinatalType === 'stillborn';
+            }).length;
 
             return (
               <button
@@ -91,9 +94,6 @@ const ParentPicker: React.FC<ParentPickerProps> = ({
                     <span className="text-[10px] text-muted-foreground">
                       {getStatusIcon(union.status)} {getStatusLabel(union.status)}
                     </span>
-                    {(union.eventYear ?? union.marriageYear) && (
-                      <span className="text-[10px] text-muted-foreground">· {union.eventYear ?? union.marriageYear}</span>
-                    )}
                     <span className="text-[10px] text-muted-foreground/60 ml-auto">
                       {childCount} enfant{childCount !== 1 ? 's' : ''}
                     </span>
