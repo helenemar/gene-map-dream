@@ -138,7 +138,38 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
           </AccordionContent>
         </AccordionItem>
 
-        {/* ═══ 2. PATHOLOGIES ═══ */}
+        {/* ═══ 2. LIENS FAMILIAUX ═══ */}
+        <AccordionItem value="family-links" className="border-b border-border">
+          <AccordionTrigger className="px-4 py-3 text-sm font-semibold text-foreground hover:bg-accent/50 hover:no-underline">
+            Liens familiaux
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-3">
+            <div className="space-y-1">
+              {FAMILY_LINK_TYPES.map(link => {
+                const hasIcon = ['divorced', 'separated', 'widowed', 'love_affair', 'common_law'].includes(link.id);
+                return (
+                  <div
+                    key={link.id}
+                    className="flex items-center gap-2.5 text-sm py-1.5 px-1.5 -mx-1.5 rounded-md text-foreground/80"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-card border border-border/60 flex items-center justify-center shrink-0 shadow-sm">
+                      {hasIcon ? (
+                        <StatusIcon status={link.id} size={16} />
+                      ) : (
+                        <svg width={16} height={16} viewBox="0 0 16 16">
+                          <line x1={2} y1={8} x2={14} y2={8} stroke="hsl(var(--foreground))" strokeWidth={2} />
+                        </svg>
+                      )}
+                    </div>
+                    <span className="flex-1">{link.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* ═══ 3. PATHOLOGIES ═══ */}
         <AccordionItem value="pathologies" className="border-b border-border">
           <AccordionTrigger className="px-4 py-3 text-sm font-semibold text-foreground hover:bg-accent/50 hover:no-underline">
             <span className="flex-1 text-left">Pathologies</span>
@@ -184,37 +215,6 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                 }}
                 usedColors={dynamicPathologies.map(p => p.color_hex)}
               />
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        {/* ═══ 3. LIENS FAMILIAUX (Highlight on hover) ═══ */}
-        <AccordionItem value="family-links" className="border-b border-border">
-          <AccordionTrigger className="px-4 py-3 text-sm font-semibold text-foreground hover:bg-accent/50 hover:no-underline">
-            Liens familiaux
-          </AccordionTrigger>
-          <AccordionContent className="px-4 pb-3">
-            <div className="space-y-1">
-              {FAMILY_LINK_TYPES.map(link => {
-                const hasIcon = ['divorced', 'separated', 'widowed', 'love_affair', 'common_law'].includes(link.id);
-                return (
-                  <div
-                    key={link.id}
-                    className="flex items-center gap-2.5 text-sm py-1.5 px-1.5 -mx-1.5 rounded-md text-foreground/80"
-                  >
-                    <div className="w-7 h-7 rounded-full bg-card border border-border/60 flex items-center justify-center shrink-0 shadow-sm">
-                      {hasIcon ? (
-                        <StatusIcon status={link.id} size={16} />
-                      ) : (
-                        <svg width={16} height={16} viewBox="0 0 16 16">
-                          <line x1={2} y1={8} x2={14} y2={8} stroke="hsl(var(--foreground))" strokeWidth={2} />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="flex-1">{link.label}</span>
-                  </div>
-                );
-              })}
             </div>
           </AccordionContent>
         </AccordionItem>
