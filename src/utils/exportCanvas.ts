@@ -204,18 +204,22 @@ function renderCardAsSvg(cardEl: HTMLElement, contentRect: DOMRect): string {
     // Build a clean nested <svg> with no duplicate attributes
     svg += `<svg xmlns="http://www.w3.org/2000/svg" x="${iconX}" y="${iconY}" width="${iconW}" height="${iconH}" viewBox="${viewBox}" fill="none" overflow="visible">${innerContent}</svg>`;
   } else {
-    console.log('[EXPORT DEBUG] No icon SVG found in card');
-    // Fallback: draw a simple shape based on what we can infer
+    // Fallback: draw a simple shape based on DOM inspection
     const shapeX = x + CARD_PAD_X;
     const shapeY = y + CARD_PAD_Y;
     const shapeSize = 48;
-    // Check if card has a circle or rect (female vs male)
-    const hasCircle = cardEl.querySelector('circle[stroke]');
+    const hasCircle = cardEl.querySelector('circle');
+    const hasPolygon = cardEl.querySelector('polygon');
     if (hasCircle) {
-      svg += `<circle cx="${shapeX + shapeSize/2}" cy="${shapeY + shapeSize/2}" r="${shapeSize/2 - 1}" 
+      svg += `<circle cx="${shapeX + shapeSize/2}" cy="${shapeY + shapeSize/2}" r="${shapeSize/2 - 2}" 
+        fill="white" stroke="${fgColor}" stroke-width="2" />`;
+    } else if (hasPolygon) {
+      // Non-binary diamond
+      const cx = shapeX + shapeSize/2, cy = shapeY + shapeSize/2, r = shapeSize/2 - 2;
+      svg += `<polygon points="${cx},${cy-r} ${cx+r},${cy} ${cx},${cy+r} ${cx-r},${cy}" 
         fill="white" stroke="${fgColor}" stroke-width="2" />`;
     } else {
-      svg += `<rect x="${shapeX + 1}" y="${shapeY + 1}" width="${shapeSize - 2}" height="${shapeSize - 2}" 
+      svg += `<rect x="${shapeX + 2}" y="${shapeY + 2}" width="${shapeSize - 4}" height="${shapeSize - 4}" 
         fill="white" stroke="${fgColor}" stroke-width="2" />`;
     }
   }
