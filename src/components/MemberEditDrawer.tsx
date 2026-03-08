@@ -538,7 +538,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
                       }`}
                     >
-                      {opt.label}
+                      {gender === 'female' ? opt.labelF : opt.labelM}
                     </button>
                   ))}
                 </div>
