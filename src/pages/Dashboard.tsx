@@ -384,7 +384,7 @@ const Dashboard: React.FC = () => {
                     </TableHead>
                     <TableHead className="text-right">
                       <button onClick={() => toggleSort('updated_at')} className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider ml-auto">
-                        Dernière modifications <ArrowUpDown className="w-3 h-3" />
+                        Dernière modification <ArrowUpDown className="w-3 h-3" />
                       </button>
                     </TableHead>
                     <TableHead className="text-right">
