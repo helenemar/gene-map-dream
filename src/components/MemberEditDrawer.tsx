@@ -548,43 +548,40 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               {/* ── Pathologies ── */}
               <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Pathologies</span>
-                  {onAddPathology && (
-                    <button
-                      onClick={() => setAddPathologyModalOpen(true)}
-                      className="text-[10px] text-primary hover:text-primary/80 font-medium flex items-center gap-0.5"
-                    >
-                      <Plus className="w-3 h-3" />
-                      Ajouter
-                    </button>
-                  )}
-                </div>
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
+                  Pathologies ({selectedPathologies.length})
+                </span>
                 {dynamicPathologies.length === 0 ? (
                   <p className="text-xs text-muted-foreground/50 italic">Aucune pathologie définie</p>
                 ) : (
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-col gap-1">
                     {dynamicPathologies.map(p => (
-                      <button
+                      <label
                         key={p.id}
-                        onClick={() => togglePathology(p.id)}
-                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-                          selectedPathologies.includes(p.id)
-                            ? 'border-primary/40 bg-primary/10 text-foreground shadow-sm'
-                            : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
-                        }`}
+                        className="flex items-center gap-2.5 py-1.5 cursor-pointer hover:bg-accent/20 rounded-md px-1 -mx-1 transition-colors"
                       >
+                        <Checkbox
+                          checked={selectedPathologies.includes(p.id)}
+                          onCheckedChange={() => togglePathology(p.id)}
+                          className="border-primary/40"
+                        />
                         <span
-                          className="w-2.5 h-2.5 rounded-full shrink-0"
+                          className="w-3.5 h-3.5 rounded shrink-0"
                           style={{ backgroundColor: p.color_hex }}
                         />
-                        {p.name}
-                        {selectedPathologies.includes(p.id) && (
-                          <Check className="w-3 h-3 text-primary" />
-                        )}
-                      </button>
+                        <span className="text-sm text-foreground">{p.name}</span>
+                      </label>
                     ))}
                   </div>
+                )}
+                {onAddPathology && (
+                  <button
+                    onClick={() => setAddPathologyModalOpen(true)}
+                    className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-dashed border-border/60 text-sm text-muted-foreground hover:border-border hover:text-foreground transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Ajouter une pathologie
+                  </button>
                 )}
               </div>
 
