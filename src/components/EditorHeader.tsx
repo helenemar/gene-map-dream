@@ -21,6 +21,7 @@ interface EditorHeaderProps {
   saveStatus?: SaveStatus;
   onOpenNotes?: () => void;
   noteCount?: number;
+  onShare?: () => void;
 }
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
