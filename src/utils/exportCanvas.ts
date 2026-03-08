@@ -132,13 +132,20 @@ export async function exportAsPdf(
   canvasRef.style.backgroundImage = 'none';
 
   try {
+    // Compute actual content bounds after resetting transform
+    const bounds = getRenderedBounds(contentDiv);
+
     const canvas = await html2canvas(contentDiv, {
       backgroundColor: '#ffffff',
       scale: 2,
       useCORS: true,
       logging: false,
-      width: contentDiv.scrollWidth,
-      height: contentDiv.scrollHeight,
+      x: bounds.x,
+      y: bounds.y,
+      width: bounds.w,
+      height: bounds.h,
+      scrollX: 0,
+      scrollY: 0,
     });
 
     // A4 landscape dimensions in mm
