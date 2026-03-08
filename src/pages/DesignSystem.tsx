@@ -657,7 +657,7 @@ const DesignSystemPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Mort-né Femme — petit cercle + X qui dépasse */}
+              {/* Mortinaissance Femme — petit cercle + X qui dépasse */}
               <div className="flex flex-col items-center gap-3">
                 <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
                   <circle cx="36" cy="36" r="16" stroke="currentColor" strokeWidth="2.5" fill="white" />
