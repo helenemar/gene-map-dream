@@ -239,28 +239,55 @@ async function captureCanvas(canvasRef: HTMLDivElement): Promise<HTMLCanvasEleme
 
   const restore = prepareForCapture(contentDiv, canvasRef);
 
+  // Temporarily give the content div explicit dimensions so html2canvas can render it
+  const origWidth = contentDiv.style.width;
+  const origHeight = contentDiv.style.height;
+  const origMinWidth = contentDiv.style.minWidth;
+  const origMinHeight = contentDiv.style.minHeight;
+  const origPosition = contentDiv.style.position;
+  const origOverflow = canvasRef.style.overflow;
+
   try {
     // Small delay to let DOM settle after modifications
     await new Promise(r => setTimeout(r, 50));
 
     const bounds = getMemberBounds(contentDiv);
 
+    // Set explicit dimensions to encompass all content
+    const totalW = bounds.x + bounds.w + 200;
+    const totalH = bounds.y + bounds.h + 200;
+    contentDiv.style.width = `${Math.max(totalW, 2000)}px`;
+    contentDiv.style.height = `${Math.max(totalH, 2000)}px`;
+    contentDiv.style.minWidth = `${Math.max(totalW, 2000)}px`;
+    contentDiv.style.minHeight = `${Math.max(totalH, 2000)}px`;
+    contentDiv.style.position = 'relative';
+    canvasRef.style.overflow = 'visible';
+
+    // Another small delay after dimension changes
+    await new Promise(r => setTimeout(r, 50));
+
     const canvas = await html2canvas(contentDiv, {
       backgroundColor: '#ffffff',
       scale: 2,
       useCORS: true,
       logging: false,
-      x: bounds.x,
-      y: bounds.y,
+      x: Math.max(0, bounds.x),
+      y: Math.max(0, bounds.y),
       width: bounds.w,
       height: bounds.h,
       scrollX: 0,
       scrollY: 0,
-      foreignObjectRendering: true,
+      foreignObjectRendering: false,
     });
 
     return canvas;
   } finally {
+    contentDiv.style.width = origWidth;
+    contentDiv.style.height = origHeight;
+    contentDiv.style.minWidth = origMinWidth;
+    contentDiv.style.minHeight = origMinHeight;
+    contentDiv.style.position = origPosition;
+    canvasRef.style.overflow = origOverflow;
     restore();
   }
 }
