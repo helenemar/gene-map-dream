@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -90,6 +90,7 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
   disabledOptions,
   showParentSplit = false,
 }) => {
+  const [perinatalOpen, setPerinatalOpen] = useState(false);
   // Build option list: replace 'parent' with sub-options when split is active
   const options: RelOptionDef[] = showParentSplit
     ? [...PARENT_SUB_OPTIONS, ...BASE_OPTIONS.filter(o => o.id !== 'parent')]
@@ -142,8 +143,11 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
             </>
           )}
           {BASE_OPTIONS.filter(o => showParentSplit ? o.id !== 'parent' : true).map(renderItem)}
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="flex items-center gap-2.5 py-2 cursor-pointer">
+          <DropdownMenuSub open={perinatalOpen} onOpenChange={setPerinatalOpen}>
+            <DropdownMenuSubTrigger
+              className="flex items-center gap-2.5 py-2 cursor-pointer"
+              onClick={(e) => { e.preventDefault(); setPerinatalOpen(prev => !prev); }}
+            >
               <span className="text-muted-foreground"><Triangle className="w-4 h-4" /></span>
               <span className="text-sm font-medium">Événements périnataux</span>
             </DropdownMenuSubTrigger>
