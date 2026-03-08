@@ -678,10 +678,10 @@ const GenogramEditor: React.FC = () => {
 
     const newChild: FamilyMember = {
       id: `m-${Date.now()}`,
-      firstName: perinatal ? (perinatalLabels[perinatal] || 'Nouveau') : 'Nouveau',
+      firstName: perinatal ? (perinatalLabels[perinatal] || '') : '',
       lastName: perinatal ? '' : (source?.lastName || ''),
-      birthYear: perinatal ? currentYear : currentYear - 5,
-      age: perinatal ? 0 : 5,
+      birthYear: perinatal ? currentYear : 0,
+      age: 0,
       profession: '',
       gender: pendingStillbornGender || 'female',
       x: source?.x ?? 200,
