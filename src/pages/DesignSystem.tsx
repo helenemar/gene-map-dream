@@ -600,7 +600,7 @@ const DesignSystemPage: React.FC = () => {
         </SubSection>
 
         {/* Pregnancy / Miscarriage / Abortion / Stillbirth symbols */}
-        <SubSection title="Symboles périnataux (Grossesse, Interruption spontanée de grossesse, IVG, Mort-né)">
+        <SubSection title="Symboles périnataux (Grossesse, Interruption spontanée de grossesse, IVG, Mortinaissance)">
           <p className="text-sm text-muted-foreground mb-4">
             Symboles triangulaires et croisés utilisés pour les événements périnataux dans le génogramme.
           </p>
@@ -644,7 +644,7 @@ const DesignSystemPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Mort-né Homme — petit carré + X qui dépasse */}
+              {/* Mortinaissance Homme — petit carré + X qui dépasse */}
               <div className="flex flex-col items-center gap-3">
                 <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
                   <rect x="20" y="20" width="32" height="32" stroke="currentColor" strokeWidth="2.5" fill="white" />
@@ -652,12 +652,12 @@ const DesignSystemPage: React.FC = () => {
                   <line x1="58" y1="14" x2="14" y2="58" stroke="currentColor" strokeWidth="2.5" />
                 </svg>
                 <div className="text-center">
-                  <span className="text-xs font-semibold text-foreground">Mort-né (H)</span>
+                  <span className="text-xs font-semibold text-foreground">Mortinaissance (H)</span>
                   <p className="text-[10px] text-muted-foreground">stillbirth · male</p>
                 </div>
               </div>
 
-              {/* Mort-né Femme — petit cercle + X qui dépasse */}
+              {/* Mortinaissance Femme — petit cercle + X qui dépasse */}
               <div className="flex flex-col items-center gap-3">
                 <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
                   <circle cx="36" cy="36" r="16" stroke="currentColor" strokeWidth="2.5" fill="white" />
@@ -665,7 +665,7 @@ const DesignSystemPage: React.FC = () => {
                   <line x1="58" y1="14" x2="14" y2="58" stroke="currentColor" strokeWidth="2.5" />
                 </svg>
                 <div className="text-center">
-                  <span className="text-xs font-semibold text-foreground">Mort-né (F)</span>
+                  <span className="text-xs font-semibold text-foreground">Mortinaissance (F)</span>
                   <p className="text-[10px] text-muted-foreground">stillbirth · female</p>
                 </div>
               </div>
