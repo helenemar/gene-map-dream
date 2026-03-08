@@ -134,6 +134,23 @@ const MemberIcon: React.FC<MemberIconProps> = ({
         <rect x={sqX} y={sqY} width={sqW} height={sqH} stroke={mainStroke} strokeWidth={sw} />
       )}
 
+      {/* Layer 2b: Index patient double border */}
+      {isIndexPatient && (
+        gender === 'female' ? (
+          <circle cx={cx} cy={cy} r={circleR + sw * 2} stroke={mainStroke} strokeWidth={sw} fill="none" />
+        ) : gender === 'non-binary' ? null : (
+          <rect
+            x={sqX - sw * 2}
+            y={sqY - sw * 2}
+            width={sqW + sw * 4}
+            height={sqH + sw * 4}
+            stroke={mainStroke}
+            strokeWidth={sw}
+            fill="none"
+          />
+        )
+      )}
+
       {/* Layer 3: Transgender inner shape */}
       {isTransgender && (
         gender === 'male' ? (
