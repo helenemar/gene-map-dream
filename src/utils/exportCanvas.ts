@@ -170,11 +170,33 @@ function renderCardAsSvg(cardEl: HTMLElement, contentRect: DOMRect): string {
 
     const clone = iconSvg.cloneNode(true) as SVGElement;
     resolveAllSvgColors(clone, iconSvg);
-    
-    // Remove width/height/viewBox from clone and wrap in positioned group
+
+    // Resolve `currentColor` to the actual foreground color
+    const resolvedCurrentColor = fgColor;
+    let serialized = new XMLSerializer().serializeToString(clone);
+    serialized = serialized.replace(/currentColor/gi, resolvedCurrentColor);
+
+    // Fix React useId() clip-path IDs containing colons (e.g. ":r1:") 
+    // which break url() references in serialized SVG
+    const clipIdRegex = /id="clip-(:[^"]+:)"/g;
+    const usedIds = new Set<string>();
+    let match;
+    while ((match = clipIdRegex.exec(serialized)) !== null) {
+      usedIds.add(match[1]);
+    }
+    let counter = 0;
+    usedIds.forEach(reactId => {
+      const safeId = `export-clip-${counter++}`;
+      // Replace both the definition and all references
+      serialized = serialized.split(`clip-${reactId}`).join(safeId);
+    });
+
+    // Remove the outer <svg> wrapper from serialized string and wrap with positioning
     const vb = clone.getAttribute('viewBox') || `0 0 ${iconW} ${iconH}`;
-    const innerContent = clone.innerHTML;
-    
+    // Extract inner content from serialized SVG
+    const innerMatch = serialized.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
+    const innerContent = innerMatch ? innerMatch[1] : '';
+
     svg += `<svg x="${iconX}" y="${iconY}" width="${iconW}" height="${iconH}" viewBox="${vb}" fill="none">
       ${innerContent}
     </svg>`;
