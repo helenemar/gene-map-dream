@@ -1,5 +1,6 @@
-import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+
+// ─── Helpers ────────────────────────────────────────────────────────
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -13,11 +14,10 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 /**
- * Resolve a CSS color that may contain var() references to a concrete rgb/hex value.
+ * Resolve a CSS color that may contain var() or hsl(var(...)) to a concrete rgb value.
  */
-function resolveColor(raw: string, el: Element): string {
-  if (!raw || !raw.includes('var(')) return raw;
-  // Create a temp element, apply the color, read back the computed value
+function resolveColor(raw: string): string {
+  if (!raw || (!raw.includes('var(') && !raw.includes('hsl('))) return raw;
   const temp = document.createElement('div');
   temp.style.color = raw;
   document.body.appendChild(temp);
@@ -27,164 +27,105 @@ function resolveColor(raw: string, el: Element): string {
 }
 
 /**
- * Inline all CSS-variable-based colors in SVG elements so html2canvas can render them.
- * Returns a restore function.
+ * Deep-resolve all CSS variable colors in a cloned SVG element tree.
  */
-function inlineSvgColors(container: HTMLElement): () => void {
-  const restores: (() => void)[] = [];
-  const svgEls = container.querySelectorAll('svg *');
+function resolveAllColors(svgClone: SVGElement, svgOriginal: SVGElement) {
+  const colorAttrs = ['stroke', 'fill', 'stop-color', 'flood-color', 'lighting-color', 'color'];
 
-  const colorAttrs = ['stroke', 'fill', 'stop-color', 'flood-color', 'lighting-color'];
+  const allCloned = [svgClone, ...Array.from(svgClone.querySelectorAll('*'))];
+  const allOriginal = [svgOriginal, ...Array.from(svgOriginal.querySelectorAll('*'))];
 
-  svgEls.forEach(el => {
+  allCloned.forEach((clonedEl, i) => {
+    const origEl = allOriginal[i];
+
+    // Resolve attribute-level colors
     colorAttrs.forEach(attr => {
-      const val = el.getAttribute(attr);
-      if (val && val.includes('var(')) {
-        const resolved = resolveColor(val, el);
-        el.setAttribute(attr, resolved);
-        restores.push(() => el.setAttribute(attr, val));
+      const val = clonedEl.getAttribute(attr);
+      if (val && (val.includes('var(') || val.includes('hsl('))) {
+        clonedEl.setAttribute(attr, resolveColor(val));
       }
     });
-    // Also check inline style
-    const htmlEl = el as HTMLElement;
-    if (htmlEl.style) {
-      const styleColor = htmlEl.style.color;
-      if (styleColor && styleColor.includes('var(')) {
-        const resolved = resolveColor(styleColor, el);
-        htmlEl.style.color = resolved;
-        restores.push(() => { htmlEl.style.color = styleColor; });
-      }
-    }
-  });
 
-  // Also handle SVG root elements' stroke/fill on <svg> itself
-  const svgRoots = container.querySelectorAll('svg');
-  svgRoots.forEach(svg => {
-    colorAttrs.forEach(attr => {
-      const val = svg.getAttribute(attr);
-      if (val && val.includes('var(')) {
-        const resolved = resolveColor(val, svg);
-        svg.setAttribute(attr, resolved);
-        restores.push(() => svg.setAttribute(attr, val));
-      }
-    });
-  });
+    // Resolve stroke-opacity, fill-opacity from computed styles
+    if (origEl && origEl instanceof Element) {
+      const computed = getComputedStyle(origEl);
 
-  return () => restores.forEach(fn => fn());
-}
-
-/**
- * Expand all SVGs that have width:1/height:1 + overflow:visible to cover actual content.
- * html2canvas clips to the SVG element dimensions, so we need them to be large enough.
- */
-function expandSvgDimensions(container: HTMLElement): () => void {
-  const restores: (() => void)[] = [];
-  const svgs = container.querySelectorAll('svg');
-
-  svgs.forEach(svg => {
-    const style = svg.style;
-    // Detect the pattern: width=1, height=1, overflow=visible
-    if (
-      (style.width === '1px' || svg.getAttribute('width') === '1') &&
-      (style.height === '1px' || svg.getAttribute('height') === '1') &&
-      style.overflow === 'visible'
-    ) {
-      const origW = style.width;
-      const origH = style.height;
-      const origOverflow = style.overflow;
-
-      // Set to a huge size to capture all overflow content
-      style.width = '20000px';
-      style.height = '20000px';
-      style.overflow = 'visible';
-
-      restores.push(() => {
-        style.width = origW;
-        style.height = origH;
-        style.overflow = origOverflow;
+      // If stroke/fill not set as attribute but comes from CSS class
+      colorAttrs.forEach(attr => {
+        const currentVal = clonedEl.getAttribute(attr);
+        if (!currentVal || currentVal === 'none') {
+          const cssProp = attr === 'stop-color' ? 'stopColor' : attr;
+          const computedVal = (computed as any)[cssProp];
+          if (computedVal && computedVal !== 'none' && computedVal !== '') {
+            clonedEl.setAttribute(attr, computedVal);
+          }
+        }
       });
+
+      // Copy computed stroke/fill for elements using CSS classes
+      const computedStroke = computed.stroke;
+      const computedFill = computed.fill;
+      if (computedStroke && computedStroke !== 'none' && !clonedEl.getAttribute('stroke')) {
+        clonedEl.setAttribute('stroke', computedStroke);
+      }
+      if (computedFill && !clonedEl.getAttribute('fill')) {
+        clonedEl.setAttribute('fill', computedFill);
+      }
+
+      // Copy opacity attributes
+      const strokeOpacity = clonedEl.getAttribute('stroke-opacity') || (origEl as Element).getAttribute('stroke-opacity');
+      if (strokeOpacity) clonedEl.setAttribute('stroke-opacity', strokeOpacity);
+      const fillOpacity = clonedEl.getAttribute('fill-opacity') || (origEl as Element).getAttribute('fill-opacity');
+      if (fillOpacity) clonedEl.setAttribute('fill-opacity', fillOpacity);
+
+      // Copy stroke-width, stroke-dasharray
+      if (!clonedEl.getAttribute('stroke-width')) {
+        const sw = computed.strokeWidth;
+        if (sw && sw !== '0' && sw !== '0px') clonedEl.setAttribute('stroke-width', sw);
+      }
+      if (!clonedEl.getAttribute('stroke-dasharray')) {
+        const sd = computed.strokeDasharray;
+        if (sd && sd !== 'none') clonedEl.setAttribute('stroke-dasharray', sd);
+      }
     }
   });
 
-  return () => restores.forEach(fn => fn());
+  // Remove masks that hide content
+  svgClone.querySelectorAll('[mask]').forEach(el => el.removeAttribute('mask'));
 }
 
 /**
- * Remove SVG masks temporarily so content renders fully opaque.
+ * Inline all computed styles on an HTML element tree for foreignObject export.
  */
-function removeSvgMasks(container: HTMLElement): () => void {
-  const restores: (() => void)[] = [];
-  const masked = container.querySelectorAll('[mask]');
+function inlineComputedStyles(el: HTMLElement, orig: HTMLElement) {
+  const computed = getComputedStyle(orig);
+  const important = [
+    'color', 'background-color', 'background', 'font-family', 'font-size', 'font-weight',
+    'line-height', 'letter-spacing', 'text-align', 'padding', 'margin', 'border',
+    'border-radius', 'display', 'flex-direction', 'align-items', 'justify-content',
+    'gap', 'width', 'height', 'min-width', 'min-height', 'max-width', 'overflow',
+    'box-sizing', 'position', 'opacity', 'text-decoration', 'white-space',
+    'border-color', 'border-width', 'border-style', 'box-shadow',
+  ];
+  important.forEach(prop => {
+    const val = computed.getPropertyValue(prop);
+    if (val) el.style.setProperty(prop, val);
+  });
 
-  masked.forEach(el => {
-    const maskVal = el.getAttribute('mask');
-    if (maskVal) {
-      el.removeAttribute('mask');
-      restores.push(() => el.setAttribute('mask', maskVal));
+  // Recurse into children
+  const clonedChildren = el.children;
+  const origChildren = orig.children;
+  for (let i = 0; i < clonedChildren.length && i < origChildren.length; i++) {
+    if (clonedChildren[i] instanceof HTMLElement && origChildren[i] instanceof HTMLElement) {
+      inlineComputedStyles(clonedChildren[i] as HTMLElement, origChildren[i] as HTMLElement);
     }
-  });
-
-  return () => restores.forEach(fn => fn());
-}
-
-/**
- * Hide transient UI elements that shouldn't appear in exports (buttons, tooltips, guides).
- */
-function hideTransientUI(container: HTMLElement): () => void {
-  const restores: (() => void)[] = [];
-
-  // Hide action buttons on cards (the + buttons, edit buttons, etc.)
-  const buttons = container.querySelectorAll('button, [data-radix-popper-content-wrapper]');
-  buttons.forEach(btn => {
-    const el = btn as HTMLElement;
-    const orig = el.style.display;
-    el.style.display = 'none';
-    restores.push(() => { el.style.display = orig; });
-  });
-
-  return () => restores.forEach(fn => fn());
-}
-
-/**
- * Prepare the content div for html2canvas capture. Returns a single restore function.
- */
-function prepareForCapture(contentDiv: HTMLElement, canvasRef: HTMLDivElement) {
-  const restoreColors = inlineSvgColors(contentDiv);
-  const restoreSvgDims = expandSvgDimensions(contentDiv);
-  const restoreMasks = removeSvgMasks(contentDiv);
-  const restoreUI = hideTransientUI(contentDiv);
-
-  // Reset transform
-  const origTransform = contentDiv.style.transform;
-  const origTransformOrigin = contentDiv.style.transformOrigin;
-  contentDiv.style.transform = 'none';
-  contentDiv.style.transformOrigin = '0 0';
-
-  // Hide dot grid
-  const origBg = canvasRef.style.backgroundImage;
-  canvasRef.style.backgroundImage = 'none';
-
-  return () => {
-    contentDiv.style.transform = origTransform;
-    contentDiv.style.transformOrigin = origTransformOrigin;
-    canvasRef.style.backgroundImage = origBg;
-    restoreUI();
-    restoreMasks();
-    restoreSvgDims();
-    restoreColors();
-  };
-}
-
-/**
- * Compute bounding box from member positions (more reliable than DOM measurement).
- */
-function getMemberBounds(contentDiv: HTMLElement, padding = 60) {
-  const cards = contentDiv.querySelectorAll('[data-member-card]');
-  if (cards.length === 0) {
-    // Fallback: try to measure from DOM
-    return getDomBounds(contentDiv, padding);
   }
+}
 
+// ─── Bounds ─────────────────────────────────────────────────────────
+
+function getMemberBounds(contentDiv: HTMLElement, padding = 80) {
+  const cards = contentDiv.querySelectorAll('[data-member-card]');
   const contentRect = contentDiv.getBoundingClientRect();
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
 
@@ -200,254 +141,260 @@ function getMemberBounds(contentDiv: HTMLElement, padding = 60) {
 
   if (!isFinite(minX)) return { x: 0, y: 0, w: 800, h: 600 };
 
-  // Add extra space for emotional links that arc outside card bounds
-  const extraSpace = 120;
+  // Extra space for emotional link arcs
+  const extra = 150;
   return {
-    x: minX - padding - extraSpace,
-    y: minY - padding - extraSpace,
-    w: maxX - minX + (padding + extraSpace) * 2,
-    h: maxY - minY + (padding + extraSpace) * 2,
+    x: minX - padding - extra,
+    y: minY - padding - extra,
+    w: maxX - minX + (padding + extra) * 2,
+    h: maxY - minY + (padding + extra) * 2,
   };
 }
 
-function getDomBounds(contentDiv: HTMLElement, padding = 60) {
-  const children = contentDiv.children;
-  const contentRect = contentDiv.getBoundingClientRect();
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+// ─── Build Export SVG ───────────────────────────────────────────────
 
-  for (let i = 0; i < children.length; i++) {
-    const rect = (children[i] as HTMLElement).getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) continue;
-    const x = rect.left - contentRect.left;
-    const y = rect.top - contentRect.top;
-    minX = Math.min(minX, x);
-    minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x + rect.width);
-    maxY = Math.max(maxY, y + rect.height);
-  }
-
-  if (!isFinite(minX)) return { x: 0, y: 0, w: 800, h: 600 };
-  return { x: minX - padding, y: minY - padding, w: maxX - minX + padding * 2, h: maxY - minY + padding * 2 };
-}
-
-/**
- * Core capture function used by both PNG and PDF exports.
- */
-async function captureCanvas(canvasRef: HTMLDivElement): Promise<HTMLCanvasElement | null> {
+function buildExportSvg(canvasRef: HTMLDivElement): { svgString: string; width: number; height: number } | null {
   const contentDiv = canvasRef.querySelector('.absolute') as HTMLElement;
   if (!contentDiv) return null;
 
-  // Before anything, force framer-motion animated styles to be real inline styles
-  const cards = contentDiv.querySelectorAll('[data-member-card]');
-  const cardRestores: (() => void)[] = [];
-  cards.forEach(card => {
-    const el = card as HTMLElement;
-    const computed = getComputedStyle(el);
-    const origLeft = el.style.left;
-    const origTop = el.style.top;
-    // framer-motion uses transform, read computed left/top
-    el.style.left = computed.left;
-    el.style.top = computed.top;
-    cardRestores.push(() => {
-      el.style.left = origLeft;
-      el.style.top = origTop;
-    });
-  });
+  // Reset transform temporarily to get real positions
+  const origTransform = contentDiv.style.transform;
+  const origTransformOrigin = contentDiv.style.transformOrigin;
+  contentDiv.style.transform = 'none';
+  contentDiv.style.transformOrigin = '0 0';
 
-  const restore = prepareForCapture(contentDiv, canvasRef);
-
-  // Save originals
-  const origWidth = contentDiv.style.width;
-  const origHeight = contentDiv.style.height;
-  const origOverflow = canvasRef.style.overflow;
+  // Force layout recalc
+  contentDiv.getBoundingClientRect();
 
   try {
-    await new Promise(r => setTimeout(r, 100));
-
     const bounds = getMemberBounds(contentDiv);
+    const contentRect = contentDiv.getBoundingClientRect();
 
-    // Set explicit dimensions to encompass all content
-    const totalW = bounds.x + bounds.w + 500;
-    const totalH = bounds.y + bounds.h + 500;
-    contentDiv.style.width = `${Math.max(totalW, 4000)}px`;
-    contentDiv.style.height = `${Math.max(totalH, 4000)}px`;
-    canvasRef.style.overflow = 'visible';
+    let svgInner = '';
 
-    await new Promise(r => setTimeout(r, 100));
+    // 1. Clone all SVG elements (link lines, etc.)
+    const svgElements = contentDiv.querySelectorAll(':scope > svg, :scope > div > svg');
+    // Also get SVGs that are direct children or in wrapper divs
+    const allSvgs = contentDiv.querySelectorAll('svg');
 
-    const canvas = await html2canvas(contentDiv, {
-      backgroundColor: '#ffffff',
-      scale: 2,
-      useCORS: true,
-      logging: true,
-      x: bounds.x,
-      y: bounds.y,
-      width: bounds.w,
-      height: bounds.h,
-      scrollX: 0,
-      scrollY: 0,
-      windowWidth: totalW,
-      windowHeight: totalH,
-      foreignObjectRendering: false,
+    const processedSvgs = new Set<SVGElement>();
+    allSvgs.forEach(svg => {
+      if (processedSvgs.has(svg)) return;
+      // Skip SVGs inside member cards (icons etc) — we handle those via foreignObject
+      if (svg.closest('[data-member-card]')) return;
+      processedSvgs.add(svg);
+
+      const clone = svg.cloneNode(true) as SVGElement;
+      resolveAllColors(clone, svg);
+
+      // Get SVG position relative to content div
+      const svgRect = svg.getBoundingClientRect();
+      const svgX = svgRect.left - contentRect.left;
+      const svgY = svgRect.top - contentRect.top;
+
+      // For SVGs with width:1, height:1, overflow:visible — they use absolute positioning
+      // and their content coordinates are already in the content div's coordinate space
+      const style = svg.style;
+      const isOverflowSvg = style.overflow === 'visible' &&
+        (style.width === '1px' || svg.getAttribute('width') === '1');
+
+      if (isOverflowSvg) {
+        // Content is already in absolute coords, just wrap inner content
+        svgInner += clone.innerHTML;
+      } else {
+        // Position the SVG content with a transform
+        svgInner += `<g transform="translate(${svgX}, ${svgY})">${clone.innerHTML}</g>`;
+      }
     });
 
-    return canvas;
+    // 2. Capture member cards as foreignObject
+    const cards = contentDiv.querySelectorAll('[data-member-card]');
+    cards.forEach(card => {
+      const el = card as HTMLElement;
+      const rect = el.getBoundingClientRect();
+      const x = rect.left - contentRect.left;
+      const y = rect.top - contentRect.top;
+
+      // Clone and inline all styles
+      const clone = el.cloneNode(true) as HTMLElement;
+
+      // Remove buttons and interactive elements
+      clone.querySelectorAll('button, [data-radix-popper-content-wrapper]').forEach(btn => btn.remove());
+
+      // Inline all computed styles
+      inlineComputedStyles(clone, el);
+
+      // Handle SVG icons inside cards — resolve their colors too
+      const cardSvgs = clone.querySelectorAll('svg');
+      const origCardSvgs = el.querySelectorAll('svg');
+      cardSvgs.forEach((svg, idx) => {
+        if (origCardSvgs[idx]) {
+          resolveAllColors(svg, origCardSvgs[idx]);
+        }
+      });
+
+      svgInner += `<foreignObject x="${x}" y="${y}" width="${rect.width + 2}" height="${rect.height + 2}">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: Inter, system-ui, -apple-system, sans-serif; font-size: 12px;">
+          ${clone.outerHTML}
+        </div>
+      </foreignObject>`;
+    });
+
+    // 3. Also capture UnionBadge and RelationshipBadge elements
+    const badges = contentDiv.querySelectorAll('[data-union-badge], [data-relationship-badge]');
+    badges.forEach(badge => {
+      const el = badge as HTMLElement;
+      if (el.closest('[data-member-card]')) return; // Skip if inside a card
+      const rect = el.getBoundingClientRect();
+      const x = rect.left - contentRect.left;
+      const y = rect.top - contentRect.top;
+
+      const clone = el.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('button').forEach(btn => btn.remove());
+      inlineComputedStyles(clone, el);
+
+      svgInner += `<foreignObject x="${x}" y="${y}" width="${rect.width + 2}" height="${rect.height + 2}">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: Inter, system-ui, -apple-system, sans-serif; font-size: 11px;">
+          ${clone.outerHTML}
+        </div>
+      </foreignObject>`;
+    });
+
+    const svgString = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  viewBox="${bounds.x} ${bounds.y} ${bounds.w} ${bounds.h}"
+  width="${bounds.w}" height="${bounds.h}">
+  <rect x="${bounds.x}" y="${bounds.y}" width="${bounds.w}" height="${bounds.h}" fill="white"/>
+  ${svgInner}
+</svg>`;
+
+    return { svgString, width: bounds.w, height: bounds.h };
   } finally {
-    contentDiv.style.width = origWidth;
-    contentDiv.style.height = origHeight;
-    canvasRef.style.overflow = origOverflow;
-    restore();
-    cardRestores.forEach(fn => fn());
+    contentDiv.style.transform = origTransform;
+    contentDiv.style.transformOrigin = origTransformOrigin;
   }
+}
+
+// ─── SVG → Canvas ──────────────────────────────────────────────────
+
+function svgToCanvas(svgString: string, width: number, height: number, scale = 2): Promise<HTMLCanvasElement> {
+  return new Promise((resolve, reject) => {
+    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+      const ctx = canvas.getContext('2d')!;
+      ctx.scale(scale, scale);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(url);
+      resolve(canvas);
+    };
+
+    img.onerror = (e) => {
+      URL.revokeObjectURL(url);
+      console.error('SVG to image conversion failed:', e);
+      reject(new Error('SVG to image conversion failed'));
+    };
+
+    img.src = url;
+  });
 }
 
 // ─── Public API ─────────────────────────────────────────────────────
 
 export async function exportAsPng(canvasRef: HTMLDivElement, fileName: string) {
-  const canvas = await captureCanvas(canvasRef);
-  if (!canvas) return;
+  const result = buildExportSvg(canvasRef);
+  if (!result) return;
 
-  canvas.toBlob((blob) => {
-    if (blob) downloadBlob(blob, `${fileName}.png`);
-  }, 'image/png');
+  try {
+    const canvas = await svgToCanvas(result.svgString, result.width, result.height);
+    canvas.toBlob((blob) => {
+      if (blob) downloadBlob(blob, `${fileName}.png`);
+    }, 'image/png');
+  } catch {
+    // Fallback: download as SVG if canvas conversion fails
+    console.warn('PNG export failed, falling back to SVG');
+    const blob = new Blob([result.svgString], { type: 'image/svg+xml;charset=utf-8' });
+    downloadBlob(blob, `${fileName}.svg`);
+  }
 }
 
 export async function exportAsPdf(canvasRef: HTMLDivElement, fileName: string) {
-  const canvas = await captureCanvas(canvasRef);
-  if (!canvas) return;
+  const result = buildExportSvg(canvasRef);
+  if (!result) return;
 
-  // A4 landscape dimensions in mm
-  const pageW = 297;
-  const pageH = 210;
-  const margin = 10;
-  const headerH = 14;
+  try {
+    const canvas = await svgToCanvas(result.svgString, result.width, result.height);
 
-  const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const pageW = 297;
+    const pageH = 210;
+    const margin = 10;
+    const headerH = 14;
 
-  // Header
-  pdf.setFillColor(245, 245, 245);
-  pdf.rect(0, 0, pageW, headerH + 4, 'F');
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(12);
-  pdf.setTextColor(30, 30, 30);
-  pdf.text(fileName, margin, headerH - 2);
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
-  // Date on the right
-  const dateStr = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(9);
-  pdf.setTextColor(120, 120, 120);
-  pdf.text(dateStr, pageW - margin, headerH - 2, { align: 'right' });
+    // Header
+    pdf.setFillColor(245, 245, 245);
+    pdf.rect(0, 0, pageW, headerH + 4, 'F');
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(12);
+    pdf.setTextColor(30, 30, 30);
+    pdf.text(fileName, margin, headerH - 2);
 
-  // Thin separator line
-  pdf.setDrawColor(200, 200, 200);
-  pdf.setLineWidth(0.3);
-  pdf.line(margin, headerH + 2, pageW - margin, headerH + 2);
+    const dateStr = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.setTextColor(120, 120, 120);
+    pdf.text(dateStr, pageW - margin, headerH - 2, { align: 'right' });
 
-  // Image area
-  const imgAreaW = pageW - margin * 2;
-  const imgAreaH = pageH - headerH - 4 - margin;
-  const imgAreaY = headerH + 4;
+    pdf.setDrawColor(200, 200, 200);
+    pdf.setLineWidth(0.3);
+    pdf.line(margin, headerH + 2, pageW - margin, headerH + 2);
 
-  const imgData = canvas.toDataURL('image/png');
-  const imgRatio = canvas.width / canvas.height;
-  const areaRatio = imgAreaW / imgAreaH;
+    const imgAreaW = pageW - margin * 2;
+    const imgAreaH = pageH - headerH - 4 - margin;
+    const imgAreaY = headerH + 4;
 
-  let drawW: number, drawH: number, drawX: number, drawY: number;
-  if (imgRatio > areaRatio) {
-    drawW = imgAreaW;
-    drawH = imgAreaW / imgRatio;
-    drawX = margin;
-    drawY = imgAreaY + (imgAreaH - drawH) / 2;
-  } else {
-    drawH = imgAreaH;
-    drawW = imgAreaH * imgRatio;
-    drawX = margin + (imgAreaW - drawW) / 2;
-    drawY = imgAreaY;
+    const imgData = canvas.toDataURL('image/png');
+    const imgRatio = canvas.width / canvas.height;
+    const areaRatio = imgAreaW / imgAreaH;
+
+    let drawW: number, drawH: number, drawX: number, drawY: number;
+    if (imgRatio > areaRatio) {
+      drawW = imgAreaW;
+      drawH = imgAreaW / imgRatio;
+      drawX = margin;
+      drawY = imgAreaY + (imgAreaH - drawH) / 2;
+    } else {
+      drawH = imgAreaH;
+      drawW = imgAreaH * imgRatio;
+      drawX = margin + (imgAreaW - drawW) / 2;
+      drawY = imgAreaY;
+    }
+
+    pdf.addImage(imgData, 'PNG', drawX, drawY, drawW, drawH);
+    pdf.save(`${fileName}.pdf`);
+  } catch {
+    console.warn('PDF export failed');
   }
-
-  pdf.addImage(imgData, 'PNG', drawX, drawY, drawW, drawH);
-  pdf.save(`${fileName}.pdf`);
 }
 
-/**
- * Export SVG by serializing all SVG elements inside the canvas content div.
- */
 export function exportAsSvg(
   canvasRef: HTMLDivElement,
-  members: { x: number; y: number }[],
-  cardW: number,
-  cardH: number,
+  _members: { x: number; y: number }[],
+  _cardW: number,
+  _cardH: number,
   fileName: string,
 ) {
-  const contentDiv = canvasRef.querySelector('.absolute') as HTMLElement;
-  if (!contentDiv) return;
+  const result = buildExportSvg(canvasRef);
+  if (!result) return;
 
-  // Compute bounds from members
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  if (members.length === 0) {
-    minX = 0; minY = 0; maxX = 800; maxY = 600;
-  } else {
-    for (const m of members) {
-      minX = Math.min(minX, m.x);
-      minY = Math.min(minY, m.y);
-      maxX = Math.max(maxX, m.x + cardW);
-      maxY = Math.max(maxY, m.y + cardH);
-    }
-  }
-  const padding = 120;
-  const bounds = {
-    x: minX - padding,
-    y: minY - padding,
-    w: maxX - minX + padding * 2,
-    h: maxY - minY + padding * 2,
-  };
-
-  // Collect all inner SVGs
-  const innerSvgs = contentDiv.querySelectorAll('svg');
-  let svgContent = '';
-
-  innerSvgs.forEach(svg => {
-    const clone = svg.cloneNode(true) as SVGElement;
-    // Resolve CSS variables in the clone
-    const elements = clone.querySelectorAll('*');
-    elements.forEach(el => {
-      ['stroke', 'fill', 'stop-color'].forEach(attr => {
-        const val = el.getAttribute(attr);
-        if (val && val.includes('var(')) {
-          el.setAttribute(attr, resolveColor(val, el));
-        }
-      });
-    });
-    svgContent += clone.innerHTML;
-  });
-
-  // Capture HTML card elements as foreignObject
-  const cards = contentDiv.querySelectorAll('[data-member-card]');
-  cards.forEach(card => {
-    const el = card as HTMLElement;
-    const rect = el.getBoundingClientRect();
-    const contentRect = contentDiv.getBoundingClientRect();
-    const x = rect.left - contentRect.left;
-    const y = rect.top - contentRect.top;
-
-    svgContent += `<foreignObject x="${x}" y="${y}" width="${rect.width}" height="${rect.height}">
-      <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: system-ui, sans-serif; font-size: 12px;">
-        ${el.innerHTML}
-      </div>
-    </foreignObject>`;
-  });
-
-  const svgString = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-  viewBox="${bounds.x} ${bounds.y} ${bounds.w} ${bounds.h}"
-  width="${bounds.w}" height="${bounds.h}">
-  <style>
-    text { font-family: system-ui, -apple-system, sans-serif; }
-  </style>
-  ${svgContent}
-</svg>`;
-
-  const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+  const blob = new Blob([result.svgString], { type: 'image/svg+xml;charset=utf-8' });
   downloadBlob(blob, `${fileName}.svg`);
 }
