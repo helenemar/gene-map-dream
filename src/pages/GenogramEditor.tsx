@@ -160,6 +160,7 @@ const GenogramEditor: React.FC = () => {
   const [highlightedUnionStatus, setHighlightedUnionStatus] = useState<UnionStatus | null>(null);
   const [soloEmotionalType, setSoloEmotionalType] = useState<EmotionalLinkType | null>(null);
   const [emotionalLinksVisible, setEmotionalLinksVisible] = useState(true);
+  const [pathologiesVisible, setPathologiesVisible] = useState(true);
   const [zoom, setZoom] = useState(1);
   const [presentationMode, setPresentationMode] = useState(false);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -1334,6 +1335,8 @@ const GenogramEditor: React.FC = () => {
             onToggleSoloEmotional={handleToggleSoloEmotional}
             emotionalLinksVisible={emotionalLinksVisible}
             onToggleEmotionalLinksVisible={() => setEmotionalLinksVisible(prev => !prev)}
+            pathologiesVisible={pathologiesVisible}
+            onTogglePathologiesVisible={() => setPathologiesVisible(prev => !prev)}
             dynamicPathologies={dynamicPathologies}
             onAddPathology={addPathology}
           />
@@ -1490,7 +1493,7 @@ const GenogramEditor: React.FC = () => {
                 onLinkDragStart={handleLinkDragStart}
                 onCancelAnchor={handleCancelAnchor}
                 disabledOptions={getDisabledOptions(member.id)}
-                dynamicPathologies={dynamicPathologies}
+                dynamicPathologies={pathologiesVisible ? dynamicPathologies : []}
                 showParentSplit={shouldShowParentSplit(member.id)}
                 isAdopted={isMemberAdopted(member.id)}
               />
