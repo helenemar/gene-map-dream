@@ -1,13 +1,13 @@
 /** Default pathology catalog seeded on genogram creation */
 export const DEFAULT_PATHOLOGIES: { name: string; color_hex: string }[] = [
-  { name: 'Pathologies cardiaques', color_hex: '#EF4444' },
-  { name: 'Diabète', color_hex: '#92400E' },
-  { name: 'Cancer', color_hex: '#3B82F6' },
-  { name: 'Maladies neurodégénératives', color_hex: '#FACC15' },
-  { name: 'Troubles de l\'humeur', color_hex: '#5EEAD4' },
-  { name: 'Troubles anxieux', color_hex: '#C084FC' },
-  { name: 'Troubles du comportement alimentaire', color_hex: '#4ADE80' },
-  { name: 'Troubles liés aux addictions', color_hex: '#FB923C' },
-  { name: 'Troubles psychotiques', color_hex: '#16A34A' },
-  { name: 'Troubles neurodéveloppementaux', color_hex: '#7C3AED' },
+  { name: 'Maladie cardiovasculaire', color_hex: '#E63946' },
+  { name: 'Diabète', color_hex: '#F4A261' },
+  { name: 'Cancer', color_hex: '#457B9D' },
+  { name: 'Maladie neurodégénérative', color_hex: '#2A9D8F' },
+  { name: 'Dépression', color_hex: '#264653' },
+  { name: 'Trouble bipolaire', color_hex: '#E9C46A' },
+  { name: 'Trouble anxieux', color_hex: '#A8DADC' },
+  { name: 'Trouble du comportement alimentaire', color_hex: '#6A994E' },
+  { name: 'Trouble lié à l\'usage de substances', color_hex: '#BC6C25' },
+  { name: 'Trouble psychotique', color_hex: '#7209B7' },
 ];
