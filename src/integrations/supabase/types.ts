@@ -46,6 +46,50 @@ export type Database = {
           },
         ]
       }
+      genogram_shares: {
+        Row: {
+          access_level: Database["public"]["Enums"]["share_access_level"]
+          created_at: string
+          created_by: string
+          genogram_id: string
+          id: string
+          is_active: boolean
+          share_token: string | null
+          shared_with_email: string | null
+          shared_with_user_id: string | null
+        }
+        Insert: {
+          access_level?: Database["public"]["Enums"]["share_access_level"]
+          created_at?: string
+          created_by: string
+          genogram_id: string
+          id?: string
+          is_active?: boolean
+          share_token?: string | null
+          shared_with_email?: string | null
+          shared_with_user_id?: string | null
+        }
+        Update: {
+          access_level?: Database["public"]["Enums"]["share_access_level"]
+          created_at?: string
+          created_by?: string
+          genogram_id?: string
+          id?: string
+          is_active?: boolean
+          share_token?: string | null
+          shared_with_email?: string | null
+          shared_with_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "genogram_shares_genogram_id_fkey"
+            columns: ["genogram_id"]
+            isOneToOne: false
+            referencedRelation: "genograms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       genograms: {
         Row: {
           created_at: string
@@ -140,13 +184,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_shared_genogram: {
+        Args: { p_token: string }
+        Returns: {
+          access_level: Database["public"]["Enums"]["share_access_level"]
+          genogram_data: Json
+          genogram_id: string
+          genogram_name: string
+        }[]
+      }
       owns_genogram: {
         Args: { _genogram_id: string; _user_id: string }
         Returns: boolean
       }
+      update_shared_genogram: {
+        Args: { p_data: Json; p_token: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      share_access_level: "reader" | "editor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -273,6 +330,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      share_access_level: ["reader", "editor"],
+    },
   },
 } as const
