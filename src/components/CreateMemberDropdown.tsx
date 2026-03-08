@@ -64,8 +64,8 @@ const PERINATAL_OPTIONS: RelOptionDef[] = [
   { id: 'perinatal_pregnancy', label: 'Grossesse', icon: <PerinatalSvg><polygon points="20,0 40,40 0,40" fill="white" strokeLinejoin="miter" /></PerinatalSvg> },
   { id: 'perinatal_miscarriage', label: 'Interruption spontanée de grossesse', icon: <PerinatalSvg><polygon points="20,0 40,40 0,40" fill="white" strokeLinejoin="miter" /><line x1="-2" y1="42" x2="42" y2="-2" /><line x1="42" y1="42" x2="-2" y2="-2" /></PerinatalSvg> },
   { id: 'perinatal_abortion', label: 'IVG', icon: <PerinatalSvg><polygon points="20,0 40,40 0,40" fill="white" strokeLinejoin="miter" /><line x1="-2" y1="42" x2="42" y2="-2" /><line x1="42" y1="42" x2="-2" y2="-2" /><line x1="-2" y1="20" x2="42" y2="20" /></PerinatalSvg> },
-  { id: 'perinatal_stillborn_male', label: 'Mort-né (Garçon)', icon: <PerinatalSvg><rect x="6" y="6" width="28" height="28" fill="white" /><line x1="-2" y1="-2" x2="42" y2="42" /><line x1="42" y1="-2" x2="-2" y2="42" /></PerinatalSvg> },
-  { id: 'perinatal_stillborn_female', label: 'Mort-né (Fille)', icon: <PerinatalSvg><circle cx="20" cy="20" r="14" fill="white" /><line x1="-2" y1="-2" x2="42" y2="42" /><line x1="42" y1="-2" x2="-2" y2="42" /></PerinatalSvg> },
+  { id: 'perinatal_stillborn_male', label: 'Mortinaissance (Garçon)', icon: <PerinatalSvg><rect x="6" y="6" width="28" height="28" fill="white" /><line x1="-2" y1="-2" x2="42" y2="42" /><line x1="42" y1="-2" x2="-2" y2="42" /></PerinatalSvg> },
+  { id: 'perinatal_stillborn_female', label: 'Mortinaissance (Fille)', icon: <PerinatalSvg><circle cx="20" cy="20" r="14" fill="white" /><line x1="-2" y1="-2" x2="42" y2="42" /><line x1="42" y1="-2" x2="-2" y2="42" /></PerinatalSvg> },
 ];
 
 const PARENT_SUB_OPTIONS: RelOptionDef[] = [

@@ -197,7 +197,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
     member.perinatalType === 'pregnancy' ? 'Grossesse' :
     member.perinatalType === 'miscarriage' ? 'Interruption spontanée de grossesse' :
     member.perinatalType === 'abortion' ? 'IVG' :
-    member.perinatalType === 'stillborn' ? 'Mort-né' : '';
+    member.perinatalType === 'stillborn' ? 'Mortinaissance' : '';
 
   // ── Perinatal-specific drawer ──
   if (isPerinatal) {

@@ -673,7 +673,7 @@ const GenogramEditor: React.FC = () => {
       pregnancy: 'Grossesse',
       miscarriage: 'Interruption spontanée de grossesse',
       abortion: 'IVG',
-      stillborn: 'Mort-né',
+      stillborn: 'Mortinaissance',
     };
 
     const newChild: FamilyMember = {
