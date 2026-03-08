@@ -159,6 +159,7 @@ const GenogramEditor: React.FC = () => {
   const [smartGuides, setSmartGuides] = useState<{ type: 'horizontal' | 'vertical'; pos: number; from: number; to: number }[]>([]);
   const [highlightedUnionStatus, setHighlightedUnionStatus] = useState<UnionStatus | null>(null);
   const [soloEmotionalType, setSoloEmotionalType] = useState<EmotionalLinkType | null>(null);
+  const [emotionalLinksVisible, setEmotionalLinksVisible] = useState(true);
   const [zoom, setZoom] = useState(1);
   const [presentationMode, setPresentationMode] = useState(false);
   const [pan, setPan] = useState({ x: 0, y: 0 });

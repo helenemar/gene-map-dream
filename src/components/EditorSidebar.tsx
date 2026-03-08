@@ -205,11 +205,24 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
           </AccordionContent>
         </AccordionItem>
 
-        {/* ═══ 4. LIENS ÉMOTIONNELS (Solo toggle) ═══ */}
+        {/* ═══ 4. LIENS ÉMOTIONNELS (Solo toggle + visibility) ═══ */}
         <AccordionItem value="emotional-links" className="border-b border-border">
-          <AccordionTrigger className="px-4 py-3 text-sm font-semibold text-foreground hover:bg-accent/50 hover:no-underline">
-            Liens émotionnels
-          </AccordionTrigger>
+          <div className="flex items-center">
+            <AccordionTrigger className="px-4 py-3 text-sm font-semibold text-foreground hover:bg-accent/50 hover:no-underline flex-1">
+              Liens émotionnels
+            </AccordionTrigger>
+            <button
+              onClick={(e) => { e.stopPropagation(); onToggleEmotionalLinksVisible(); }}
+              className={`mr-3 p-1.5 rounded-md transition-colors ${
+                emotionalLinksVisible
+                  ? 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                  : 'text-muted-foreground/40 hover:text-muted-foreground hover:bg-accent/50'
+              }`}
+              title={emotionalLinksVisible ? 'Masquer les liens émotionnels' : 'Afficher les liens émotionnels'}
+            >
+              {emotionalLinksVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            </button>
+          </div>
           <AccordionContent className="px-4 pb-3">
             <div className="space-y-1.5">
               {EMOTIONAL_LINK_TYPES.map(link => {
