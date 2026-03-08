@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import DossierNotesModal, { useGenogramNoteCount } from '@/components/DossierNotesModal';
+import ShareModal from '@/components/ShareModal';
 import EditorHeader from '@/components/EditorHeader';
 import EditorSidebar from '@/components/EditorSidebar';
 import MemberCard from '@/components/MemberCard';
