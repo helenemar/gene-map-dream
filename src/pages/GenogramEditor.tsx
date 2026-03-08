@@ -1335,6 +1335,8 @@ const GenogramEditor: React.FC = () => {
             onToggleSoloEmotional={handleToggleSoloEmotional}
             emotionalLinksVisible={emotionalLinksVisible}
             onToggleEmotionalLinksVisible={() => setEmotionalLinksVisible(prev => !prev)}
+            pathologiesVisible={pathologiesVisible}
+            onTogglePathologiesVisible={() => setPathologiesVisible(prev => !prev)}
             dynamicPathologies={dynamicPathologies}
             onAddPathology={addPathology}
           />
