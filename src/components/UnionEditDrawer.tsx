@@ -182,24 +182,26 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
             </div>
           </div>
 
-          {/* End year */}
-          <div className="flex flex-col gap-2">
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Année de fin
-            </Label>
-            <div className="flex items-center gap-1">
-              <Input
-                type="number"
-                placeholder="ex: 2018"
-                className="h-9 flex-1"
-                value={eff.endYear ?? ''}
-                onChange={(e) => handleYearChange('endYear', e.target.value)}
-                min={1900}
-                max={2100}
-              />
-              <UnsureButton field="endYearUnsure" value={eff.endYearUnsure} />
+          {/* End year — hidden for statuses where the event year already represents the end */}
+          {!['separated', 'divorced', 'widowed'].includes(union.status) && (
+            <div className="flex flex-col gap-2">
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Année de fin
+              </Label>
+              <div className="flex items-center gap-1">
+                <Input
+                  type="number"
+                  placeholder="ex: 2018"
+                  className="h-9 flex-1"
+                  value={eff.endYear ?? ''}
+                  onChange={(e) => handleYearChange('endYear', e.target.value)}
+                  min={1900}
+                  max={2100}
+                />
+                <UnsureButton field="endYearUnsure" value={eff.endYearUnsure} />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Notes */}
           <div className="flex flex-col gap-2 pt-2">
