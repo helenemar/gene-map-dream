@@ -68,7 +68,18 @@ export interface Union {
   partner1: string;
   partner2: string;
   status: UnionStatus;
+  /** Année de rencontre */
+  meetingYear?: number;
+  meetingYearUnsure?: boolean;
+  /** Année de l'événement (mariage, union libre, etc.) */
+  eventYear?: number;
+  eventYearUnsure?: boolean;
+  /** Année de fin (divorce, séparation, veuvage, etc.) */
+  endYear?: number;
+  endYearUnsure?: boolean;
+  /** @deprecated use meetingYear */
   marriageYear?: number;
+  /** @deprecated use endYear */
   divorceYear?: number;
   children: string[]; // member IDs
   /** If true, children in this union are adopted (dashed filiation line with tick) */

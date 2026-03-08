@@ -17,19 +17,31 @@ const RelationshipBadge: React.FC<RelationshipBadgeProps> = ({
   offsetForMark = false,
   onClick,
 }) => {
-  const hasMarriage = !!union.marriageYear;
-  const hasDivorce = !!union.divorceYear;
-  if (!hasMarriage && !hasDivorce) return null;
+  const meetingYear = union.meetingYear;
+  const eventYear = union.eventYear ?? union.marriageYear;
+  const endYear = union.endYear ?? union.divorceYear;
 
-  // Build label: "R: 1981  V: 2018"
+  const hasAny = !!meetingYear || !!eventYear || !!endYear;
+  if (!hasAny) return null;
+
   const parts: string[] = [];
-  if (hasMarriage) parts.push(`R: ${union.marriageYear}`);
-  if (hasDivorce) parts.push(`V: ${union.divorceYear}`);
+  if (meetingYear) {
+    const u = union.meetingYearUnsure ? '~' : '';
+    parts.push(`R: ${u}${meetingYear}`);
+  }
+  if (eventYear) {
+    const prefix = union.status === 'married' ? 'M' : 'E';
+    const u = union.eventYearUnsure ? '~' : '';
+    parts.push(`${prefix}: ${u}${eventYear}`);
+  }
+  if (endYear) {
+    const u = union.endYearUnsure ? '~' : '';
+    parts.push(`F: ${u}${endYear}`);
+  }
   const label = parts.join('    ');
 
-  const badgeWidth = parts.length === 1 ? 64 : 120;
+  const badgeWidth = parts.length <= 1 ? 64 : parts.length === 2 ? 120 : 180;
   const badgeHeight = 24;
-  // Place above status marks for divorce/separation, else below line
   const yOffset = offsetForMark ? -22 : -badgeHeight / 2;
 
   return (

@@ -63,19 +63,32 @@ export const StatusIcon: React.FC<{ status: UnionStatus; size?: number }> = ({ s
   }
 };
 
-/** Get label for the date row */
+/** Build date label with unsure markers */
 function getDateLabel(union: Union): string | null {
   const parts: string[] = [];
-  if (union.marriageYear) {
-    const prefix = union.status === 'married' ? 'M' : 'R';
-    parts.push(`${prefix}: ${union.marriageYear}`);
+
+  const meetingYear = union.meetingYear;
+  const eventYear = union.eventYear ?? union.marriageYear;
+  const endYear = union.endYear ?? union.divorceYear;
+
+  if (meetingYear) {
+    const unsure = union.meetingYearUnsure ? '~' : '';
+    parts.push(`R: ${unsure}${meetingYear}`);
   }
-  if (union.divorceYear) {
+  if (eventYear) {
     const prefix =
-      union.status === 'widowed' ? 'V' :
+      union.status === 'married' ? 'M' :
       union.status === 'divorced' ? 'D' :
-      union.status === 'separated' ? 'S' : 'V';
-    parts.push(`${prefix}: ${union.divorceYear}`);
+      union.status === 'separated' ? 'S' :
+      union.status === 'widowed' ? 'V' :
+      union.status === 'common_law' ? 'UL' :
+      union.status === 'love_affair' ? 'L' : 'E';
+    const unsure = union.eventYearUnsure ? '~' : '';
+    parts.push(`${prefix}: ${unsure}${eventYear}`);
+  }
+  if (endYear) {
+    const unsure = union.endYearUnsure ? '~' : '';
+    parts.push(`F: ${unsure}${endYear}`);
   }
   return parts.length > 0 ? parts.join('   ') : null;
 }
@@ -86,22 +99,14 @@ function hasStatusIcon(status: UnionStatus): boolean {
 
 /*
  * ─── Atomic UnionBadge ─────────────────────────────────────────────
- *
- * Renders a SINGLE fused vertical block centered exactly on the union
- * line midpoint (x, y). The pill sits on top, and the icon circle
- * overlaps the pill's bottom edge so they read as one object.
- *
- * The entire group uses a pure-SVG approach (rect + text + circle)
- * to avoid foreignObject alignment quirks across browsers.
  */
 
 const PILL_H = 32;
 const PILL_RX = 16;
-const PILL_PAD_X = 12;   // horizontal padding each side
-const ICON_R = 14;       // circle radius
+const PILL_PAD_X = 12;
+const ICON_R = 14;
 const ICON_D = ICON_R * 2;
-const OVERLAP = 0;
-const GAP = 4;           // gap between pill bottom and icon top
+const GAP = 4;
 const FONT_SIZE = 11;
 
 const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
@@ -111,15 +116,12 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
 
   if (!label && !showIcon && !hasNotes) return null;
 
-  // Hug-content width: char width × count + padding (7.2px per char at font-size 11)
   const pillW = label ? Math.max(label.length * 7.2 + PILL_PAD_X * 2, 56) : 0;
   const blockW = Math.max(pillW, showIcon ? ICON_D : 0);
 
-  // Layout: icon center ON the union line Y, pill ABOVE with a gap
   const pillY = showIcon ? -(PILL_H + GAP) : 0;
   const iconCenterLocal = showIcon ? ICON_R : 0;
 
-  // Group positioned so icon center aligns with line Y
   const groupX = x - blockW / 2;
   const groupY = showIcon ? y - ICON_R : y - PILL_H / 2;
 
@@ -132,14 +134,12 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
       style={{ cursor: 'pointer', pointerEvents: 'auto' }}
       onClick={(e) => { e.stopPropagation(); onClick?.(); }}
     >
-      {/* Drop shadow filter */}
       <defs>
         <filter id={`badge-shadow-${union.id}`} x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="1" stdDeviation="2" floodColor="rgba(0,0,0,0.08)" />
         </filter>
       </defs>
 
-      {/* ── Date pill ── */}
       {label && (
         <>
           <rect
@@ -171,10 +171,8 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
         </>
       )}
 
-      {/* ── Icon circle (overlapping pill bottom) ── */}
       {showIcon && (
         <>
-          {/* White opaque background — hides the union line behind it */}
           <circle
             cx={blockW / 2}
             cy={iconCenterLocal}
@@ -184,7 +182,6 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
             strokeWidth={0.8}
             strokeOpacity={0.5}
           />
-          {/* Drop shadow simulation */}
           <circle
             cx={blockW / 2}
             cy={iconCenterLocal + 0.5}
@@ -193,14 +190,12 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
             stroke="hsla(0,0%,0%,0.06)"
             strokeWidth={1.5}
           />
-          {/* Icon positioned inside the circle */}
           <g transform={`translate(${blockW / 2 - 8}, ${iconCenterLocal - 8})`}>
             <StatusIcon status={union.status} size={16} />
           </g>
         </>
       )}
 
-      {/* ── Notes indicator ── */}
       {hasNotes && (() => {
         const noteY = showIcon
           ? iconCenterLocal + ICON_R + 6
@@ -248,6 +243,9 @@ export const UnionBadgePreview: React.FC<{ status: UnionStatus; marriageYear?: n
     partner1: '',
     partner2: '',
     status,
+    eventYear: marriageYear,
+    endYear,
+    // Legacy compat
     marriageYear,
     divorceYear: endYear,
     children: [],

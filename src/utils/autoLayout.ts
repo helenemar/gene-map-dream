@@ -92,8 +92,9 @@ function countAncestors(
 
 function coupleGap(union: Union): number {
   let labelLen = 0;
-  if (union.marriageYear) labelLen += `R: ${union.marriageYear}`.length;
-  if (union.divorceYear) labelLen += `   D: ${union.divorceYear}`.length;
+  if (union.meetingYear) labelLen += `R: ${union.meetingYear}`.length;
+  if (union.eventYear ?? union.marriageYear) labelLen += `   E: ${union.eventYear ?? union.marriageYear}`.length;
+  if (union.endYear ?? union.divorceYear) labelLen += `   F: ${union.endYear ?? union.divorceYear}`.length;
   if (labelLen > 0) {
     const badgeW = Math.max(labelLen * 7.2 + 24, 56);
     return Math.max(badgeW + BADGE_SAFETY, MIN_BADGE_GAP);

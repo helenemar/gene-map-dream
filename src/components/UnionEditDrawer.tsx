@@ -16,8 +16,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
+import { HelpCircle } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from '@/components/ui/tooltip';
 
 interface UnionEditDrawerProps {
   union: Union | null;
@@ -26,6 +32,27 @@ interface UnionEditDrawerProps {
   onUpdate: (updated: Union) => void;
   getMemberName: (id: string) => string;
 }
+
+/** Helper: get the effective meeting/event/end years, falling back to legacy fields */
+function getEffectiveYears(union: Union) {
+  return {
+    meetingYear: union.meetingYear,
+    meetingYearUnsure: union.meetingYearUnsure ?? false,
+    eventYear: union.eventYear ?? union.marriageYear,
+    eventYearUnsure: union.eventYearUnsure ?? false,
+    endYear: union.endYear ?? union.divorceYear,
+    endYearUnsure: union.endYearUnsure ?? false,
+  };
+}
+
+const EVENT_LABELS: Record<UnionStatus, string> = {
+  married: 'Année de mariage',
+  common_law: 'Année d\'union libre',
+  separated: 'Année de séparation',
+  divorced: 'Année de divorce',
+  widowed: 'Année de veuvage',
+  love_affair: 'Année de la liaison',
+};
 
 const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
   union,
@@ -36,30 +63,51 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
 }) => {
   if (!union) return null;
 
+  const eff = getEffectiveYears(union);
+
   const handleStatusChange = (status: UnionStatus) => {
     onUpdate({ ...union, status });
   };
 
-  const handleMarriageYearChange = (val: string) => {
+  const handleYearChange = (field: 'meetingYear' | 'eventYear' | 'endYear', val: string) => {
     const year = val ? parseInt(val, 10) : undefined;
-    onUpdate({ ...union, marriageYear: year && !isNaN(year) ? year : undefined });
-  };
-
-  const handleDivorceYearChange = (val: string) => {
-    const year = val ? parseInt(val, 10) : undefined;
-    onUpdate({ ...union, divorceYear: year && !isNaN(year) ? year : undefined });
-  };
-
-  const endLabel = (() => {
-    switch (union.status) {
-      case 'divorced': return 'Année de divorce';
-      case 'separated': return 'Année de séparation';
-      case 'widowed': return 'Année de veuvage';
-      default: return 'Année de fin';
+    const cleaned = year && !isNaN(year) ? year : undefined;
+    // Also clear legacy fields when using new fields
+    if (field === 'eventYear') {
+      onUpdate({ ...union, eventYear: cleaned, marriageYear: cleaned });
+    } else if (field === 'endYear') {
+      onUpdate({ ...union, endYear: cleaned, divorceYear: cleaned });
+    } else {
+      onUpdate({ ...union, [field]: cleaned });
     }
-  })();
+  };
 
-  const showEndDate = ['divorced', 'separated', 'widowed'].includes(union.status);
+  const toggleUnsure = (field: 'meetingYearUnsure' | 'eventYearUnsure' | 'endYearUnsure') => {
+    onUpdate({ ...union, [field]: !union[field] });
+  };
+
+  const UnsureButton: React.FC<{ field: 'meetingYearUnsure' | 'eventYearUnsure' | 'endYearUnsure'; value: boolean }> = ({ field, value }) => (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            onClick={() => toggleUnsure(field)}
+            className={`shrink-0 w-9 h-9 rounded-lg border flex items-center justify-center transition-colors ${
+              value
+                ? 'bg-primary/10 border-primary/30 text-primary'
+                : 'border-border/50 text-muted-foreground/40 hover:text-muted-foreground hover:border-border'
+            }`}
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="text-xs">
+          {value ? 'Date marquée incertaine' : 'Marquer comme incertain'}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
@@ -96,39 +144,62 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
             </Select>
           </div>
 
-          {/* Marriage year — always shown */}
+          {/* Meeting year */}
           <div className="flex flex-col gap-2">
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Année de mariage
+              Année de rencontre
             </Label>
-            <Input
-              type="number"
-              placeholder="ex: 1981"
-              className="h-9"
-              value={union.marriageYear ?? ''}
-              onChange={(e) => handleMarriageYearChange(e.target.value)}
-              min={1900}
-              max={2100}
-            />
-          </div>
-
-          {/* End year (contextual) */}
-          {showEndDate && (
-            <div className="flex flex-col gap-2">
-              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {endLabel}
-              </Label>
+            <div className="flex items-center gap-1">
               <Input
                 type="number"
-                placeholder="ex: 2018"
-                className="h-9"
-                value={union.divorceYear ?? ''}
-                onChange={(e) => handleDivorceYearChange(e.target.value)}
+                placeholder="ex: 1978"
+                className="h-9 flex-1"
+                value={eff.meetingYear ?? ''}
+                onChange={(e) => handleYearChange('meetingYear', e.target.value)}
                 min={1900}
                 max={2100}
               />
+              <UnsureButton field="meetingYearUnsure" value={eff.meetingYearUnsure} />
             </div>
-          )}
+          </div>
+
+          {/* Event year */}
+          <div className="flex flex-col gap-2">
+            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              {EVENT_LABELS[union.status]}
+            </Label>
+            <div className="flex items-center gap-1">
+              <Input
+                type="number"
+                placeholder="ex: 1981"
+                className="h-9 flex-1"
+                value={eff.eventYear ?? ''}
+                onChange={(e) => handleYearChange('eventYear', e.target.value)}
+                min={1900}
+                max={2100}
+              />
+              <UnsureButton field="eventYearUnsure" value={eff.eventYearUnsure} />
+            </div>
+          </div>
+
+          {/* End year */}
+          <div className="flex flex-col gap-2">
+            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Année de fin
+            </Label>
+            <div className="flex items-center gap-1">
+              <Input
+                type="number"
+                placeholder="ex: 2018"
+                className="h-9 flex-1"
+                value={eff.endYear ?? ''}
+                onChange={(e) => handleYearChange('endYear', e.target.value)}
+                min={1900}
+                max={2100}
+              />
+              <UnsureButton field="endYearUnsure" value={eff.endYearUnsure} />
+            </div>
+          </div>
 
           {/* Notes */}
           <div className="flex flex-col gap-2 pt-2">

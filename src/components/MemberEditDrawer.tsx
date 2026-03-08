@@ -663,25 +663,35 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                             ))}
                           </SelectContent>
                         </Select>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-3 gap-2">
                           <div className="flex flex-col gap-0.5">
-                            <Label className="text-[9px] text-muted-foreground">Année mariage</Label>
+                            <Label className="text-[9px] text-muted-foreground">Rencontre</Label>
                             <Input
                               className="h-7 text-xs border-border/50 bg-card"
                               type="number"
                               placeholder="—"
-                              value={union.marriageYear || ''}
-                              onChange={(e) => onUpdateUnion?.(union.id, { marriageYear: e.target.value ? parseInt(e.target.value) : undefined })}
+                              value={union.meetingYear || ''}
+                              onChange={(e) => onUpdateUnion?.(union.id, { meetingYear: e.target.value ? parseInt(e.target.value) : undefined })}
                             />
                           </div>
                           <div className="flex flex-col gap-0.5">
-                            <Label className="text-[9px] text-muted-foreground">Année séparation</Label>
+                            <Label className="text-[9px] text-muted-foreground">Événement</Label>
                             <Input
                               className="h-7 text-xs border-border/50 bg-card"
                               type="number"
                               placeholder="—"
-                              value={union.divorceYear || ''}
-                              onChange={(e) => onUpdateUnion?.(union.id, { divorceYear: e.target.value ? parseInt(e.target.value) : undefined })}
+                              value={(union.eventYear ?? union.marriageYear) || ''}
+                              onChange={(e) => onUpdateUnion?.(union.id, { eventYear: e.target.value ? parseInt(e.target.value) : undefined, marriageYear: e.target.value ? parseInt(e.target.value) : undefined })}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                            <Label className="text-[9px] text-muted-foreground">Fin</Label>
+                            <Input
+                              className="h-7 text-xs border-border/50 bg-card"
+                              type="number"
+                              placeholder="—"
+                              value={(union.endYear ?? union.divorceYear) || ''}
+                              onChange={(e) => onUpdateUnion?.(union.id, { endYear: e.target.value ? parseInt(e.target.value) : undefined, divorceYear: e.target.value ? parseInt(e.target.value) : undefined })}
                             />
                           </div>
                         </div>
@@ -906,8 +916,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           <span className="text-sm text-foreground">{linkType?.label || union.status}</span>
                           <span className="text-sm text-muted-foreground">avec</span>
                           <span className="text-sm font-medium text-foreground truncate">{partnerName}</span>
-                          {union.marriageYear && (
-                            <span className="text-[10px] text-muted-foreground ml-auto shrink-0">({union.marriageYear})</span>
+                          {(union.eventYear ?? union.marriageYear) && (
+                            <span className="text-[10px] text-muted-foreground ml-auto shrink-0">({union.eventYear ?? union.marriageYear})</span>
                           )}
                         </div>
                       );
