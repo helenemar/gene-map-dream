@@ -644,7 +644,7 @@ const DesignSystemPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Mort-né Homme — petit carré + X qui dépasse */}
+              {/* Mortinaissance Homme — petit carré + X qui dépasse */}
               <div className="flex flex-col items-center gap-3">
                 <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="text-foreground">
                   <rect x="20" y="20" width="32" height="32" stroke="currentColor" strokeWidth="2.5" fill="white" />
