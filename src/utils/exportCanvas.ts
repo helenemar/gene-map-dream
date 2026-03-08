@@ -172,34 +172,44 @@ function renderCardAsSvg(cardEl: HTMLElement, contentRect: DOMRect): string {
     resolveAllSvgColors(clone, iconSvg);
 
     // Resolve `currentColor` to the actual foreground color
-    const resolvedCurrentColor = fgColor;
     let serialized = new XMLSerializer().serializeToString(clone);
-    serialized = serialized.replace(/currentColor/gi, resolvedCurrentColor);
+    serialized = serialized.replace(/currentColor/gi, fgColor);
 
-    // Fix React useId() clip-path IDs containing colons (e.g. ":r1:") 
+    // Fix React useId() clip-path IDs containing colons (e.g. ":r1:")
     // which break url() references in serialized SVG
-    const clipIdRegex = /id="clip-(:[^"]+:)"/g;
-    const usedIds = new Set<string>();
+    // Match any id containing colons (React useId pattern)
+    const allIds = new Set<string>();
+    const idRegex = /id="([^"]*:[^"]*)"/g;
     let match;
-    while ((match = clipIdRegex.exec(serialized)) !== null) {
-      usedIds.add(match[1]);
+    while ((match = idRegex.exec(serialized)) !== null) {
+      allIds.add(match[1]);
     }
     let counter = 0;
-    usedIds.forEach(reactId => {
-      const safeId = `export-clip-${counter++}`;
-      // Replace both the definition and all references
-      serialized = serialized.split(`clip-${reactId}`).join(safeId);
+    allIds.forEach(reactId => {
+      const safeId = `exp-${counter++}-${Math.random().toString(36).slice(2, 6)}`;
+      // Escape special regex chars in the ID
+      const escaped = reactId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      serialized = serialized.replace(new RegExp(escaped, 'g'), safeId);
     });
 
-    // Remove the outer <svg> wrapper from serialized string and wrap with positioning
+    // Parse the viewBox to compute scaling
     const vb = clone.getAttribute('viewBox') || `0 0 ${iconW} ${iconH}`;
-    // Extract inner content from serialized SVG
+    const vbParts = vb.split(/[\s,]+/).map(Number);
+    const vbX = vbParts[0] || 0;
+    const vbY = vbParts[1] || 0;
+    const vbW = vbParts[2] || iconW;
+    const vbH = vbParts[3] || iconH;
+    const scaleX = iconW / vbW;
+    const scaleY = iconH / vbH;
+
+    // Extract inner content (remove outer <svg> wrapper)
     const innerMatch = serialized.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
     const innerContent = innerMatch ? innerMatch[1] : '';
 
-    svg += `<svg x="${iconX}" y="${iconY}" width="${iconW}" height="${iconH}" viewBox="${vb}" fill="none">
+    // Use <g> with transform instead of nested <svg> (nested SVGs fail in SVG→Image pipeline)
+    svg += `<g transform="translate(${iconX - vbX * scaleX}, ${iconY - vbY * scaleY}) scale(${scaleX}, ${scaleY})">
       ${innerContent}
-    </svg>`;
+    </g>`;
   }
 
   // Extract text content from the card
