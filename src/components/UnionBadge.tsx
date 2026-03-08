@@ -119,11 +119,13 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
   const pillW = label ? Math.max(label.length * 7.2 + PILL_PAD_X * 2, 56) : 0;
   const blockW = Math.max(pillW, showIcon ? ICON_D : 0);
 
+  // Always place the pill ABOVE the union line
   const pillY = showIcon ? -(PILL_H + GAP) : 0;
   const iconCenterLocal = showIcon ? ICON_R : 0;
 
   const groupX = x - blockW / 2;
-  const groupY = showIcon ? y - ICON_R : y - PILL_H / 2;
+  // Position so that: with icon → icon centered on line, pill above; without icon → pill above line
+  const groupY = showIcon ? y - ICON_R : y - PILL_H - GAP;
 
   const stroke = 'hsl(var(--border))';
   const bg = 'hsl(var(--card))';
