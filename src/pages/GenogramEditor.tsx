@@ -884,10 +884,10 @@ const GenogramEditor: React.FC = () => {
 
     const newMember: FamilyMember = {
       id: `m-${Date.now()}`,
-      firstName: 'Nouveau',
+      firstName: '',
       lastName: source?.lastName || '',
-      birthYear: currentYear - 30,
-      age: 30,
+      birthYear: 0,
+      age: 0,
       profession: '',
       gender: relationship.startsWith('spouse_') ? (source?.gender === 'male' ? 'female' : 'male') : 'female',
       x: pos.x,
