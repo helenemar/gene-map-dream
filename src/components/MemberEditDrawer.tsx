@@ -538,7 +538,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
                       }`}
                     >
-                      {opt.label}
+                      {gender === 'female' ? opt.labelF : opt.labelM}
                     </button>
                   ))}
                 </div>
@@ -920,10 +920,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                         <span className="px-2 py-0.5 rounded-full text-xs bg-accent/30 border border-border/50 text-foreground">Transgenre</span>
                       )}
                       {isGay && (
-                        <span className="px-2 py-0.5 rounded-full text-xs bg-accent/30 border border-border/50 text-foreground">Homosexuel(le)</span>
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-accent/30 border border-border/50 text-foreground">{member.gender === 'female' ? 'Homosexuelle' : 'Homosexuel'}</span>
                       )}
                       {isBisexual && (
-                        <span className="px-2 py-0.5 rounded-full text-xs bg-accent/30 border border-border/50 text-foreground">Bisexuel(le)</span>
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-accent/30 border border-border/50 text-foreground">{member.gender === 'female' ? 'Bisexuelle' : 'Bisexuel'}</span>
                       )}
                     </div>
                   </div>

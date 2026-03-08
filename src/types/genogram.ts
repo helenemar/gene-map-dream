@@ -10,9 +10,9 @@ export const GENDER_IDENTITY_OPTIONS: { id: GenderIdentity; label: string }[] = 
   { id: 'transgender', label: 'Transgenre' },
 ];
 
-export const SEXUAL_ORIENTATION_OPTIONS: { id: SexualOrientation; label: string }[] = [
-  { id: 'homosexual', label: 'Homosexuel(le)' },
-  { id: 'bisexual', label: 'Bisexuel(le)' },
+export const SEXUAL_ORIENTATION_OPTIONS: { id: SexualOrientation; labelM: string; labelF: string }[] = [
+  { id: 'homosexual', labelM: 'Homosexuel', labelF: 'Homosexuelle' },
+  { id: 'bisexual', labelM: 'Bisexuel', labelF: 'Bisexuelle' },
 ];
 
 export interface FamilyMember {
