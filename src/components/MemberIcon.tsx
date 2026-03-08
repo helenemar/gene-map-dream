@@ -37,6 +37,7 @@ const MemberIcon: React.FC<MemberIconProps> = ({
   size = 48,
   className,
   perinatalType,
+  isIndexPatient = false,
 }) => {
   // Unique ID for clipPath (needed when multiple icons on same page)
   const clipId = React.useId();
