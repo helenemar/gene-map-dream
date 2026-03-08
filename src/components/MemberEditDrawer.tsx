@@ -600,31 +600,18 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               <Separator className="opacity-50" />
 
-              {/* ── Jumeaux ── */}
+              {/* ── Jumeaux / Triplés ── */}
               <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Jumeaux</span>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1">
-                    <Label className="text-[10px] text-muted-foreground">Groupe</Label>
-                    <Input
-                      className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30"
-                      placeholder="ex: A"
-                      value={twinGroup}
-                      onChange={(e) => setTwinGroup(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <Label className="text-[10px] text-muted-foreground">Type</Label>
-                    <Select value={twinType} onValueChange={(v) => setTwinType(v as TwinType | '')}>
-                      <SelectTrigger className="h-8 text-sm border-border/50 bg-card">
-                        <SelectValue placeholder="—" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="monozygotic">Monozygote</SelectItem>
-                        <SelectItem value="dizygotic">Dizygote</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Jumeaux / Triplés</span>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-xs text-muted-foreground">Groupe de jumeaux</Label>
+                  <Input
+                    className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30"
+                    placeholder="ex: twin-1 (vide si pas jumeau)"
+                    value={twinGroup}
+                    onChange={(e) => setTwinGroup(e.target.value)}
+                  />
+                  <span className="text-[9px] text-muted-foreground/60">Les membres partageant le même identifiant seront affichés comme jumeaux/triplés.</span>
                 </div>
               </div>
 
