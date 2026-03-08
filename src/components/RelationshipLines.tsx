@@ -61,8 +61,8 @@ const RelationshipLines: React.FC<RelationshipLinesProps> = ({ members, relation
                   textAnchor="middle"
                   className="fill-muted-foreground text-[10px]"
                 >
-                  {rel.marriageYear && `R: ${rel.marriageYear}`}
-                  {rel.divorceYear && ` V: ${rel.divorceYear}`}
+                  {rel.marriageYear && `E: ${rel.marriageYear}`}
+                  {rel.divorceYear && ` F: ${rel.divorceYear}`}
                 </text>
               )}
             </g>
