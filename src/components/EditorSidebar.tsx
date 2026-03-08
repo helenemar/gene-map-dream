@@ -22,16 +22,14 @@ interface EditorSidebarProps {
   emotionalLinks: EmotionalLink[];
   fileName: string;
   onFileNameChange: (name: string) => void;
-  /** Center canvas on a member */
   onFocusMember: (member: FamilyMember) => void;
-  /** Called when user clicks "Retour" */
   onBack: () => void;
-  /** Hover a union status to highlight matching links on canvas */
   highlightedUnionStatus: UnionStatus | null;
   onHighlightUnionStatus: (status: UnionStatus | null) => void;
-  /** Solo emotional link type — only show this type when active */
   soloEmotionalType: EmotionalLinkType | null;
   onToggleSoloEmotional: (type: EmotionalLinkType) => void;
+  emotionalLinksVisible: boolean;
+  onToggleEmotionalLinksVisible: () => void;
   dynamicPathologies?: DynamicPathology[];
   onAddPathology?: (name: string, colorHex: string) => Promise<{ data: any; error: any } | undefined>;
 }
