@@ -86,7 +86,7 @@ function getDateLabel(union: Union): string | null {
     const unsure = union.eventYearUnsure ? '~' : '';
     parts.push(`${prefix}: ${unsure}${eventYear}`);
   }
-  if (endYear) {
+  if (endYear && !['separated', 'divorced', 'widowed'].includes(union.status)) {
     const unsure = union.endYearUnsure ? '~' : '';
     parts.push(`F: ${unsure}${endYear}`);
   }
