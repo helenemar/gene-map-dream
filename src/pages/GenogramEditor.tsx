@@ -1320,6 +1320,7 @@ const GenogramEditor: React.FC = () => {
         saveStatus={genogramId ? saveStatus : undefined}
         onOpenNotes={() => setNotesModalOpen(true)}
         noteCount={noteCount}
+        onShare={() => genogramId && setShareModalOpen(true)}
       />
       <div className="flex flex-1 overflow-hidden">
         {!presentationMode && (
