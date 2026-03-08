@@ -13,6 +13,8 @@ export interface MemberIconProps {
   className?: string;
   /** If set, renders a perinatal triangle symbol instead of the normal shape */
   perinatalType?: PerinatalType;
+  /** Index patient — renders double border */
+  isIndexPatient?: boolean;
 }
 
 /**
