@@ -1433,7 +1433,8 @@ const GenogramEditor: React.FC = () => {
                     const isDimmed = !!hoveredMember && link.from !== hoveredMember && link.to !== hoveredMember;
                     const isSearchHighlighted = search.isActive && search.matchedEmotionalLinkIds.has(link.id);
                     const isSearchDimmed = search.isActive && !isSearchHighlighted;
-                    // Solo mode: hide links that don't match the solo type
+                    // Visibility toggle or solo mode
+                    if (!emotionalLinksVisible) return null;
                     const isSoloHidden = soloEmotionalType !== null && link.type !== soloEmotionalType;
                     if (isSoloHidden) return null;
                     return (
