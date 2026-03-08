@@ -678,10 +678,10 @@ const GenogramEditor: React.FC = () => {
 
     const newChild: FamilyMember = {
       id: `m-${Date.now()}`,
-      firstName: perinatal ? (perinatalLabels[perinatal] || 'Nouveau') : 'Nouveau',
+      firstName: perinatal ? (perinatalLabels[perinatal] || '') : '',
       lastName: perinatal ? '' : (source?.lastName || ''),
-      birthYear: perinatal ? currentYear : currentYear - 5,
-      age: perinatal ? 0 : 5,
+      birthYear: perinatal ? currentYear : 0,
+      age: 0,
       profession: '',
       gender: pendingStillbornGender || 'female',
       x: source?.x ?? 200,
@@ -822,10 +822,10 @@ const GenogramEditor: React.FC = () => {
 
     const newChild: FamilyMember = {
       id: `m-${Date.now()}`,
-      firstName: 'Nouveau',
+      firstName: '',
       lastName: source.lastName || '',
-      birthYear: currentYear - 5,
-      age: 5,
+      birthYear: 0,
+      age: 0,
       profession: '',
       gender: 'female',
       x: coupleCenterX,
@@ -884,10 +884,10 @@ const GenogramEditor: React.FC = () => {
 
     const newMember: FamilyMember = {
       id: `m-${Date.now()}`,
-      firstName: 'Nouveau',
+      firstName: '',
       lastName: source?.lastName || '',
-      birthYear: currentYear - 30,
-      age: 30,
+      birthYear: 0,
+      age: 0,
       profession: '',
       gender: relationship.startsWith('spouse_') ? (source?.gender === 'male' ? 'female' : 'male') : 'female',
       x: pos.x,
@@ -1005,8 +1005,8 @@ const GenogramEditor: React.FC = () => {
           id: `m-draft-${Date.now() + 1}`,
           firstName: '',
           lastName: '',
-          birthYear: currentYear - 30,
-          age: 30,
+          birthYear: 0,
+          age: 0,
           profession: '',
           gender: 'female',
           x: sourceX + SPOUSE_GAP / 2 + xShift,
