@@ -914,6 +914,7 @@ const GenogramEditor: React.FC = () => {
         partner1: sourceId,
         partner2: newMember.id,
         status,
+        eventYear: currentYear,
         marriageYear: currentYear,
         children: [],
       };
