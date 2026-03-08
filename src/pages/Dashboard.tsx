@@ -58,7 +58,7 @@ const MOCK_GENOGRAMS: GenogramRow[] = [
         { id: 'c3', firstName: 'Clara', lastName: 'Lefèvre', gender: 'female', x: -250, y: 0, birthYear: 1993, age: 33, profession: '', pathologies: ['psychogenic'], twinGroup: 'tw1', twinType: 'dizygotic' },
         { id: 'c4', firstName: 'Lucas', lastName: 'Dupont', gender: 'male', x: -450, y: 0, birthYear: 1995, age: 31, profession: '', pathologies: [] },
         { id: 'c5', firstName: 'Emma', lastName: 'Dupont', gender: 'female', x: -600, y: 0, birthYear: 1998, age: 28, profession: '', pathologies: ['psychogenic'] },
-        // Gen 2 — Fausse couche
+        // Gen 2 — Interruption spontanée de grossesse
         { id: 'c6', firstName: 'FC', lastName: '', gender: 'female', x: 350, y: 0, birthYear: 1996, age: 0, profession: '', pathologies: [], perinatalType: 'miscarriage' },
         // Gen 3 — Petits-enfants
         { id: 'gc1', firstName: 'Théo', lastName: 'Lefèvre', gender: 'male', x: 50, y: 200, birthYear: 2020, age: 6, profession: '', pathologies: [] },

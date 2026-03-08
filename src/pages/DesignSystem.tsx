@@ -625,7 +625,7 @@ const DesignSystemPage: React.FC = () => {
                   <line x1="42" y1="42" x2="-2" y2="-2" stroke="currentColor" strokeWidth="2" />
                 </svg>
                 <div className="text-center">
-                  <span className="text-xs font-semibold text-foreground">Fausse couche</span>
+                  <span className="text-xs font-semibold text-foreground">ISG</span>
                   <p className="text-[10px] text-muted-foreground">miscarriage</p>
                 </div>
               </div>
