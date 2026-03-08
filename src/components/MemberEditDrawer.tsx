@@ -702,64 +702,63 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               )}
 
               {/* ── Emotional links (editing) ── */}
-              {emotionalLinks.filter(l => l.from === member.id || l.to === member.id).length > 0 && (
-                <>
-                  <Separator className="opacity-50" />
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Liens émotionnels</span>
-                    {emotionalLinks
-                      .filter(l => l.from === member.id || l.to === member.id)
-                      .map(link => {
-                        const otherId = link.from === member.id ? link.to : link.from;
-                        const other = allMembers.find(m => m.id === otherId);
-                        const otherName = other ? `${other.firstName} ${other.lastName}` : otherId;
-                        return (
-                          <div key={link.id} className="flex items-center gap-2 p-2 rounded-lg bg-accent/10 border border-border/30">
-                            <div className="flex-1 min-w-0">
-                              <Select
-                                value={link.type}
-                                onValueChange={(v) => onUpdateEmotionalLink?.(link.id, v as EmotionalLinkType)}
-                              >
-                                <SelectTrigger className="h-7 text-xs border-border/50 bg-card">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {EMOTIONAL_LINK_TYPES.map(t => (
-                                    <SelectItem key={t.id} value={t.id} className="text-xs">
-                                      {t.label}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <span className="text-[10px] text-muted-foreground mt-0.5 block truncate">avec {otherName}</span>
-                            </div>
-                            <button
-                              onClick={() => onDeleteEmotionalLink?.(link.id)}
-                              className="shrink-0 w-6 h-6 rounded flex items-center justify-center hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+              <div className="flex flex-col gap-2">
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Liens émotionnels</span>
+                {emotionalLinks.filter(l => l.from === member.id || l.to === member.id).length === 0 ? (
+                  <p className="text-xs text-muted-foreground/50">Aucun lien émotionnel.</p>
+                ) : (
+                  emotionalLinks
+                    .filter(l => l.from === member.id || l.to === member.id)
+                    .map(link => {
+                      const otherId = link.from === member.id ? link.to : link.from;
+                      const other = allMembers.find(m => m.id === otherId);
+                      const otherName = other ? `${other.firstName} ${other.lastName}` : otherId;
+                      return (
+                        <div key={link.id} className="flex items-center gap-2 p-2 rounded-lg bg-accent/10 border border-border/30">
+                          <div className="flex-1 min-w-0">
+                            <Select
+                              value={link.type}
+                              onValueChange={(v) => onUpdateEmotionalLink?.(link.id, v as EmotionalLinkType)}
                             >
-                              <Trash2 className="w-3 h-3" />
-                            </button>
+                              <SelectTrigger className="h-7 text-xs border-border/50 bg-card">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {EMOTIONAL_LINK_TYPES.map(t => (
+                                  <SelectItem key={t.id} value={t.id} className="text-xs">
+                                    {t.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <span className="text-[10px] text-muted-foreground mt-0.5 block truncate">avec {otherName}</span>
                           </div>
-                        );
-                    })}
-                  </div>
-                </>
-              )}
+                          <button
+                            onClick={() => onDeleteEmotionalLink?.(link.id)}
+                            className="shrink-0 w-6 h-6 rounded flex items-center justify-center hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      );
+                    })
+                )}
+              </div>
 
               <Separator className="opacity-50" />
 
               {/* ── Action buttons ── */}
-              <div className="flex items-center gap-2 pb-2">
-                <Button onClick={handleSave} size="sm" className="flex-1">
-                  <Check className="w-3.5 h-3.5 mr-1.5" />
+              <div className="flex flex-col items-center gap-3 pb-4 pt-1">
+                <Button onClick={handleSave} className="w-full">
                   Enregistrer
                 </Button>
                 {onDelete && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="text-destructive border-destructive/30 hover:bg-destructive/10">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                      <button className="flex items-center gap-2 text-sm text-destructive hover:text-destructive/80 transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                        Supprimer ce membre
+                      </button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
