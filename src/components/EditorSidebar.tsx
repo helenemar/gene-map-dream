@@ -115,11 +115,11 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
         {/* ═══ 1. MEMBRES ═══ */}
         <AccordionItem value="members" className="border-b border-border">
           <AccordionTrigger className="px-4 py-3 text-sm font-semibold text-foreground hover:bg-accent/50 hover:no-underline">
-            Membres ({members.length})
+            Membres ({members.filter(m => !m.perinatalType).length})
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-3">
             <div className="space-y-0.5">
-              {[...members].sort((a, b) => a.firstName.localeCompare(b.firstName, 'fr')).map(m => (
+              {[...members].filter(m => !m.perinatalType).sort((a, b) => a.firstName.localeCompare(b.firstName, 'fr')).map(m => (
                 <div
                   key={m.id}
                   className="flex items-center justify-between group py-1.5 text-sm text-foreground/80 hover:text-foreground transition-colors rounded-md hover:bg-accent/30 px-1.5 -mx-1.5"
