@@ -187,6 +187,7 @@ const GenogramEditor: React.FC = () => {
 
   // ─── Notes du dossier ───
   const [notesModalOpen, setNotesModalOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   const noteCount = useGenogramNoteCount(genogramId);
 
   // ─── Auto-save ───
