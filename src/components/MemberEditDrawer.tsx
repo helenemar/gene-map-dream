@@ -673,28 +673,99 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                             ))}
                           </SelectContent>
                         </Select>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="flex flex-col gap-0.5">
-                            <Label className="text-[9px] text-muted-foreground uppercase">Année de rencontre</Label>
-                            <Input
-                              className="h-7 text-xs border-border/50 bg-card"
-                              type="number"
-                              placeholder="—"
-                              value={union.meetingYear || ''}
-                              onChange={(e) => onUpdateUnion?.(union.id, { meetingYear: e.target.value ? parseInt(e.target.value) : undefined })}
-                            />
-                          </div>
-                          <div className="flex flex-col gap-0.5">
-                            <Label className="text-[9px] text-muted-foreground uppercase">Fin</Label>
-                            <Input
-                              className="h-7 text-xs border-border/50 bg-card"
-                              type="number"
-                              placeholder="—"
-                              value={(union.endYear ?? union.divorceYear) || ''}
-                              onChange={(e) => onUpdateUnion?.(union.id, { endYear: e.target.value ? parseInt(e.target.value) : undefined, divorceYear: e.target.value ? parseInt(e.target.value) : undefined })}
-                            />
-                          </div>
-                        </div>
+                        {/* Year fields with unsure buttons */}
+                        {(() => {
+                          const eventLabel: Record<UnionStatus, string> = {
+                            married: 'Année de mariage',
+                            common_law: "Année d'union libre",
+                            separated: 'Année de séparation',
+                            divorced: 'Année de divorce',
+                            widowed: 'Année de veuvage',
+                            love_affair: 'Année de la liaison',
+                          };
+                          const hideEnd = ['separated', 'divorced', 'widowed'].includes(union.status);
+
+                          const UnsureBtn: React.FC<{ active: boolean; onToggle: () => void }> = ({ active, onToggle }) => (
+                            <TooltipProvider delayDuration={200}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    type="button"
+                                    onClick={onToggle}
+                                    className={`shrink-0 w-7 h-7 rounded-md border flex items-center justify-center transition-colors ${
+                                      active
+                                        ? 'bg-primary/10 border-primary/30 text-primary'
+                                        : 'border-border/50 text-muted-foreground/40 hover:text-muted-foreground hover:border-border'
+                                    }`}
+                                  >
+                                    <HelpCircle className="w-3 h-3" />
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs">
+                                  {active ? 'Date marquée incertaine' : 'Marquer comme incertain'}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          );
+
+                          return (
+                            <div className="flex flex-col gap-2">
+                              {/* Meeting year */}
+                              <div className="flex flex-col gap-0.5">
+                                <Label className="text-[9px] text-muted-foreground uppercase">Année de rencontre</Label>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    className="h-7 text-xs border-border/50 bg-card flex-1"
+                                    type="number"
+                                    placeholder="—"
+                                    value={union.meetingYear || ''}
+                                    onChange={(e) => onUpdateUnion?.(union.id, { meetingYear: e.target.value ? parseInt(e.target.value) : undefined })}
+                                  />
+                                  <UnsureBtn
+                                    active={!!union.meetingYearUnsure}
+                                    onToggle={() => onUpdateUnion?.(union.id, { meetingYearUnsure: !union.meetingYearUnsure })}
+                                  />
+                                </div>
+                              </div>
+                              {/* Event year */}
+                              <div className="flex flex-col gap-0.5">
+                                <Label className="text-[9px] text-muted-foreground uppercase">{eventLabel[union.status]}</Label>
+                                <div className="flex items-center gap-1">
+                                  <Input
+                                    className="h-7 text-xs border-border/50 bg-card flex-1"
+                                    type="number"
+                                    placeholder="—"
+                                    value={(union.eventYear ?? union.marriageYear) || ''}
+                                    onChange={(e) => onUpdateUnion?.(union.id, { eventYear: e.target.value ? parseInt(e.target.value) : undefined, marriageYear: e.target.value ? parseInt(e.target.value) : undefined })}
+                                  />
+                                  <UnsureBtn
+                                    active={!!union.eventYearUnsure}
+                                    onToggle={() => onUpdateUnion?.(union.id, { eventYearUnsure: !union.eventYearUnsure })}
+                                  />
+                                </div>
+                              </div>
+                              {/* End year — hidden for statuses where event = end */}
+                              {!hideEnd && (
+                                <div className="flex flex-col gap-0.5">
+                                  <Label className="text-[9px] text-muted-foreground uppercase">Fin</Label>
+                                  <div className="flex items-center gap-1">
+                                    <Input
+                                      className="h-7 text-xs border-border/50 bg-card flex-1"
+                                      type="number"
+                                      placeholder="—"
+                                      value={(union.endYear ?? union.divorceYear) || ''}
+                                      onChange={(e) => onUpdateUnion?.(union.id, { endYear: e.target.value ? parseInt(e.target.value) : undefined, divorceYear: e.target.value ? parseInt(e.target.value) : undefined })}
+                                    />
+                                    <UnsureBtn
+                                      active={!!union.endYearUnsure}
+                                      onToggle={() => onUpdateUnion?.(union.id, { endYearUnsure: !union.endYearUnsure })}
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     );
                   })}
