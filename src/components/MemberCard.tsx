@@ -57,6 +57,10 @@ interface MemberCardProps {
   onLinkDragStart?: (id: string, e: React.MouseEvent) => void;
   /** Called when user wants to cancel anchor-active and go back to selected */
   onCancelAnchor?: (id: string) => void;
+  /** Click handler for the card body (used by MemberNode to separate card clicks from action button clicks) */
+  onCardClick?: () => void;
+  /** Double-click handler for the card body */
+  onCardDoubleClick?: () => void;
 }
 
 const CORNER_DOTS: { side: AnchorSide; style: React.CSSProperties }[] = [
