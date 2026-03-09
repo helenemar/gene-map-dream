@@ -157,12 +157,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           ...(searchHighlighted ? { boxShadow: '0 0 20px hsl(var(--primary) / 0.35), 0 0 40px hsl(var(--primary) / 0.15)' } : {}),
         }}
       >
-        {/* Lock indicator — small icon at top-right of card */}
-        {member.locked && !isStatic && (
-          <div className="absolute -top-2 -right-2 z-20 w-5 h-5 rounded-full bg-primary/90 flex items-center justify-center shadow-sm">
-            <Lock className="w-3 h-3 text-primary-foreground" />
-          </div>
-        )}
+        {/* Lock indicator removed — managed via floating lock panel */}
         {/* Corner anchor dots — absolutely positioned at card corners with negative offset */}
         {showDots && CORNER_DOTS.map(({ side, style }) => (
           <div
@@ -300,20 +295,6 @@ const MemberCard: React.FC<MemberCardProps> = ({
             className="w-8 h-8 min-w-[40px] min-h-[40px] rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
           >
             <PencilLine className="w-4 h-4 text-foreground" />
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); onToggleLock?.(member.id); }}
-            className={`w-8 h-8 min-w-[40px] min-h-[40px] rounded-full border shadow-soft flex items-center justify-center transition-colors ${
-              member.locked
-                ? 'bg-primary/10 border-primary/40 hover:bg-primary/20'
-                : 'bg-card border-border hover:bg-accent'
-            }`}
-            title={member.locked ? 'Déverrouiller la position' : 'Verrouiller la position'}
-          >
-            {member.locked
-              ? <Lock className="w-4 h-4 text-primary" />
-              : <Unlock className="w-4 h-4 text-foreground" />
-            }
           </button>
         </motion.div>
       )}
