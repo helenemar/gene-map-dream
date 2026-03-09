@@ -47,22 +47,24 @@ function MemberNode({ data, id }: NodeProps<MemberFlowNode>) {
     ...rest
   } = data;
 
+  const handleCardClick = React.useCallback(() => {
+    if (presentationMode) {
+      if (!member.isPlaceholder && !member.isDraft) onView?.(id);
+    } else if (member.isPlaceholder || member.isDraft) {
+      onEdit?.(id);
+    } else {
+      onSelect?.(id);
+    }
+  }, [presentationMode, member.isPlaceholder, member.isDraft, onView, onEdit, onSelect, id]);
+
+  const handleDoubleClick = React.useCallback(() => {
+    if (!presentationMode && !member.isPlaceholder && !member.isDraft) {
+      onView?.(id);
+    }
+  }, [presentationMode, member.isPlaceholder, member.isDraft, onView, id]);
+
   return (
     <div
-      onClick={() => {
-        if (presentationMode) {
-          if (!member.isPlaceholder && !member.isDraft) onView?.(id);
-        } else if (member.isPlaceholder || member.isDraft) {
-          onEdit?.(id);
-        } else {
-          onSelect?.(id);
-        }
-      }}
-      onDoubleClick={() => {
-        if (!presentationMode && !member.isPlaceholder && !member.isDraft) {
-          onView?.(id);
-        }
-      }}
       onMouseEnter={() => onHover?.(id)}
       onMouseLeave={() => onHover?.(null)}
       style={{
@@ -80,6 +82,8 @@ function MemberNode({ data, id }: NodeProps<MemberFlowNode>) {
         onEdit={onEdit}
         onView={onView}
         onHover={onHover}
+        onCardClick={handleCardClick}
+        onCardDoubleClick={handleDoubleClick}
         isFadingOut={isFadingOut}
         searchDimmed={searchDimmed}
         {...rest}
