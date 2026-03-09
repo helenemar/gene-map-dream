@@ -837,13 +837,17 @@ const GenogramEditorInner: React.FC = () => {
         const sourceY = members.find(m => m.id === sourceId)?.y ?? 200;
         const yOffset = LEVEL_Y;
 
+        // T-shape: center both parents symmetrically above the child card center
+        const childCenterX = sourceX + CARD_W / 2;
+
         // Check for existing other-type parent union to offset horizontally
         const existingOtherPairUnion = unions.find(u =>
           u.children.includes(sourceId) && u.isAdoption !== isAdoption
         );
-        const xShift = existingOtherPairUnion ? (isAdoption ? SPOUSE_GAP + 40 : -(SPOUSE_GAP + 40)) : 0;
+        const xShift = existingOtherPairUnion ? (isAdoption ? CARD_W + COUPLE_GAP + 40 : -(CARD_W + COUPLE_GAP + 40)) : 0;
 
-        newMember.x = sourceX - SPOUSE_GAP / 2 + xShift;
+        // Parent 1 right-aligned to midpoint, Parent 2 left-aligned from midpoint
+        newMember.x = childCenterX - CARD_W - COUPLE_GAP / 2 + xShift;
         newMember.y = sourceY - yOffset;
         newMember.gender = 'male';
         if (isAdoption) newMember.isAdoptiveParent = true;
@@ -856,7 +860,7 @@ const GenogramEditorInner: React.FC = () => {
           age: 0,
           profession: '',
           gender: 'female',
-          x: sourceX + SPOUSE_GAP / 2 + xShift,
+          x: childCenterX + COUPLE_GAP / 2 + xShift,
           y: sourceY - yOffset,
           pathologies: [],
           isDraft: true,
