@@ -308,7 +308,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
       {/* Action menu — State: Anchor-Active */}
       {activeState === 'anchor-active' && !presentationMode && (
-        <div className="flex items-center gap-2 justify-center mt-2 nopan nodrag">
+        <div className="flex items-center gap-2 justify-center mt-2 nopan nodrag" onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
           <button
             onMouseDown={(e) => {
               e.stopPropagation();
