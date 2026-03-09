@@ -146,6 +146,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
     <>
       {/* Card body — hug contents with min-width, dots inside relative container */}
       <div
+        onClick={onCardClick}
+        onDoubleClick={onCardDoubleClick}
         className={`
           relative overflow-visible flex items-center ${compact ? 'gap-2' : 'gap-3'} rounded-xl bg-card shadow-sm transition-all
           ${(isPlaceholder || isDraft) ? 'border-2 border-dashed' : 'border'}
