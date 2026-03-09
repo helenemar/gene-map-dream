@@ -49,6 +49,7 @@ function MemberNode({ data, id }: NodeProps<MemberFlowNode>) {
 
   return (
     <div
+      className="nopan nodrag nowheel"
       onClick={() => {
         if (presentationMode) {
           if (!member.isPlaceholder && !member.isDraft) onView?.(id);
