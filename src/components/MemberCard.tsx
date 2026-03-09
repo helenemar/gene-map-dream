@@ -270,7 +270,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
       {activeState === 'selected' && !presentationMode && (
         <motion.div
-          className="flex items-center gap-2 justify-center mt-2"
+          className="flex items-center gap-2 justify-center mt-2 nopan nodrag"
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
@@ -278,6 +278,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)} disabledOptions={disabledOptions} showParentSplit={showParentSplit}>
             <button
               onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors"
             >
               <UserPlus className="w-3.5 h-3.5" />
@@ -286,12 +287,14 @@ const MemberCard: React.FC<MemberCardProps> = ({
           </CreateMemberDropdown>
           <button
             onClick={(e) => { e.stopPropagation(); onView?.(member.id); }}
+            onPointerDown={(e) => e.stopPropagation()}
             className="w-8 h-8 min-w-[40px] min-h-[40px] rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
           >
             <Eye className="w-4 h-4 text-foreground" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onEdit?.(member.id); }}
+            onPointerDown={(e) => e.stopPropagation()}
             className="w-8 h-8 min-w-[40px] min-h-[40px] rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
           >
             <PencilLine className="w-4 h-4 text-foreground" />
