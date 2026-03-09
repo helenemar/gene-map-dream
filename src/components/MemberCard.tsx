@@ -57,6 +57,10 @@ interface MemberCardProps {
   onLinkDragStart?: (id: string, e: React.MouseEvent) => void;
   /** Called when user wants to cancel anchor-active and go back to selected */
   onCancelAnchor?: (id: string) => void;
+  /** Click handler for the card body (used by MemberNode to separate card clicks from action button clicks) */
+  onCardClick?: () => void;
+  /** Double-click handler for the card body */
+  onCardDoubleClick?: () => void;
 }
 
 const CORNER_DOTS: { side: AnchorSide; style: React.CSSProperties }[] = [
@@ -88,6 +92,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onHover,
   onLinkDragStart,
   onCancelAnchor,
+  onCardClick,
+  onCardDoubleClick,
   disabledOptions,
   dynamicPathologies = [],
   showParentSplit = false,
@@ -140,6 +146,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
     <>
       {/* Card body — hug contents with min-width, dots inside relative container */}
       <div
+        onClick={onCardClick}
+        onDoubleClick={onCardDoubleClick}
         className={`
           relative overflow-visible flex items-center ${compact ? 'gap-2' : 'gap-3'} rounded-xl bg-card shadow-sm transition-all
           ${(isPlaceholder || isDraft) ? 'border-2 border-dashed' : 'border'}
