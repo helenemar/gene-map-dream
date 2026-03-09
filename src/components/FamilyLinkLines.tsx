@@ -315,7 +315,6 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
     // For single-child unions, draw a straight vertical from union midpoint down to child
     if (effectiveDropCount === 1) {
       const singleChildAnchor = childAnchors[0];
-      const directX = unionMidX;
 
       return (
         <g key={union.id}>
@@ -324,17 +323,18 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
             x2={rightAnchor.x} y2={rightAnchor.y}
             status={union.status}
           />
-          {/* Straight vertical stem */}
-          <line x1={directX} y1={unionLineY} x2={directX} y2={singleChildAnchor.y}
-            stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-            strokeDasharray={union.isAdoption ? '6 4' : undefined} />
-          {/* Horizontal connector from stem to child if not aligned */}
-          {Math.abs(unionMidX - singleChildAnchor.x) > 1 && (
-            <line
-              x1={unionMidX} y1={singleChildAnchor.y}
-              x2={singleChildAnchor.x} y2={singleChildAnchor.y}
+          {/* Orthogonal path: vertical from union midpoint, horizontal to child X, vertical to child */}
+          {Math.abs(unionMidX - singleChildAnchor.x) > 1 ? (
+            <path
+              d={`M ${unionMidX} ${unionLineY} V ${combY} H ${singleChildAnchor.x} V ${singleChildAnchor.y}`}
+              fill="none"
               stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+              strokeDasharray={union.isAdoption ? '6 4' : undefined}
             />
+          ) : (
+            <line x1={unionMidX} y1={unionLineY} x2={unionMidX} y2={singleChildAnchor.y}
+              stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+              strokeDasharray={union.isAdoption ? '6 4' : undefined} />
           )}
         </g>
       );
