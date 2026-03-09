@@ -274,6 +274,9 @@ const MemberCard: React.FC<MemberCardProps> = ({
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
+          onClick={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
         >
           <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)} disabledOptions={disabledOptions} showParentSplit={showParentSplit}>
             <button
