@@ -1670,6 +1670,10 @@ const GenogramEditor: React.FC = () => {
             canUndo={history.canUndo}
             canRedo={history.canRedo}
           />
+
+          {!presentationMode && (
+            <LockPanel members={members} onToggleLock={handleToggleLock} />
+          )}
         </div>
       </div>
       {genogramId && (
