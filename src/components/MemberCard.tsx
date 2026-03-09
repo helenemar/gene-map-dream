@@ -274,6 +274,9 @@ const MemberCard: React.FC<MemberCardProps> = ({
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
+          onClick={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
         >
           <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)} disabledOptions={disabledOptions} showParentSplit={showParentSplit}>
             <button
@@ -305,7 +308,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
       {/* Action menu — State: Anchor-Active */}
       {activeState === 'anchor-active' && !presentationMode && (
-        <div className="flex items-center gap-2 justify-center mt-2 nopan nodrag">
+        <div className="flex items-center gap-2 justify-center mt-2 nopan nodrag" onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
           <button
             onMouseDown={(e) => {
               e.stopPropagation();
