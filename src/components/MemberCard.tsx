@@ -304,12 +304,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
       {/* Action menu — State: Anchor-Active */}
       {activeState === 'anchor-active' && !presentationMode && (
-        <div className="flex items-center gap-2 justify-center mt-2">
+        <div className="flex items-center gap-2 justify-center mt-2 nopan nodrag">
           <button
             onMouseDown={(e) => {
               e.stopPropagation();
               onLinkDragStart?.(member.id, e);
             }}
+            onPointerDown={(e) => e.stopPropagation()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors cursor-crosshair"
             title="Maintenir et glisser vers une autre carte"
           >
@@ -318,6 +319,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           </button>
           <button
             onClick={handleCancelAnchor}
+            onPointerDown={(e) => e.stopPropagation()}
             className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-destructive/10 hover:border-destructive/30 transition-colors"
             title="Annuler"
           >
