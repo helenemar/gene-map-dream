@@ -1,5 +1,20 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import {
+  ReactFlow,
+  ReactFlowProvider,
+  MiniMap,
+  Background,
+  BackgroundVariant,
+  useReactFlow,
+  useViewport,
+  type Node,
+  type NodeChange,
+  applyNodeChanges,
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
+import '@/styles/reactflow-overrides.css';
+
 import DossierNotesModal, { useGenogramNoteCount } from '@/components/DossierNotesModal';
 import ShareModal from '@/components/ShareModal';
 import EditorHeader from '@/components/EditorHeader';
@@ -17,6 +32,9 @@ import MemberEditDrawer from '@/components/MemberEditDrawer';
 import { RelationshipChoice } from '@/components/CreateMemberDropdown';
 import type { DisabledOptions } from '@/components/CreateMemberDropdown';
 import ParentPicker from '@/components/ParentPicker';
+import ViewportOverlay from '@/components/canvas/ViewportOverlay';
+import MemberNode from '@/components/canvas/MemberNode';
+import type { MemberFlowNode } from '@/components/canvas/MemberNode';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -38,15 +56,13 @@ import { Undo2, Redo2 } from 'lucide-react';
 const CARD_W = MEMBER_CARD_W;
 const CARD_H = 64;
 const MARGIN = 5;
-const MIN_ZOOM = 0.15;
-const MAX_ZOOM = 3;
-const ZOOM_SENSITIVITY = 0.002;
-const DOT_SPACING = 20;
 const SNAP_GRID_X = 20;
-const SNAP_GRID_Y = 20;  // Fine grid for smooth dragging
-const LEVEL_SPACING_SNAP = 250; // Must match autoLayout LEVEL_SPACING
-const SNAP_LEVEL_THRESHOLD = 40; // Snap to generation Y row when within this distance
+const SNAP_GRID_Y = 20;
+const LEVEL_SPACING_SNAP = 250;
+const SNAP_LEVEL_THRESHOLD = 40;
 const STORAGE_KEY = 'genogy-member-positions';
+
+const NODE_TYPES = { member: MemberNode };
 
 type Side = 'top' | 'bottom' | 'left' | 'right';
 
@@ -55,10 +71,10 @@ interface AnchorPoint { x: number; y: number; side: Side; }
 /** Corner positions for a card */
 function cardCorners(m: FamilyMember) {
   return [
-    { x: m.x, y: m.y },                     // top-left
-    { x: m.x + CARD_W, y: m.y },            // top-right
-    { x: m.x, y: m.y + CARD_H },            // bottom-left
-    { x: m.x + CARD_W, y: m.y + CARD_H },   // bottom-right
+    { x: m.x, y: m.y },
+    { x: m.x + CARD_W, y: m.y },
+    { x: m.x, y: m.y + CARD_H },
+    { x: m.x + CARD_W, y: m.y + CARD_H },
   ];
 }
 
@@ -130,14 +146,15 @@ function getDirectionalAnchors(from: FamilyMember, to: FamilyMember) {
 }
 
 
-const GenogramEditor: React.FC = () => {
+const GenogramEditorInner: React.FC = () => {
   const { id: genogramId } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const reactFlow = useReactFlow();
   const [dbLoaded, setDbLoaded] = useState(false);
 
   // Initialize with empty state — will be populated from DB or sample data
   const [members, setMembers] = useState<FamilyMember[]>(() => {
-    if (genogramId) return []; // Will load from DB
+    if (genogramId) return [];
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -158,26 +175,19 @@ const GenogramEditor: React.FC = () => {
   const [fileName, setFileName] = useState('Sans titre');
   const [isAnimating, setIsAnimating] = useState(false);
   const [snapToGrid, setSnapToGrid] = useState(true);
-  const [smartGuides, setSmartGuides] = useState<{ type: 'horizontal' | 'vertical'; pos: number; from: number; to: number }[]>([]);
   const [highlightedUnionStatus, setHighlightedUnionStatus] = useState<UnionStatus | null>(null);
   const [soloEmotionalType, setSoloEmotionalType] = useState<EmotionalLinkType | null>(null);
   const [emotionalLinksVisible, setEmotionalLinksVisible] = useState(true);
   const [pathologiesVisible, setPathologiesVisible] = useState(true);
   const [zoom, setZoom] = useState(1);
   const [presentationMode, setPresentationMode] = useState(false);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isPanning, setIsPanning] = useState(false);
-  const [isSpaceDown, setIsSpaceDown] = useState(false);
-  const [dragInfo, setDragInfo] = useState<{
-    id: string; startX: number; startY: number; memberX: number; memberY: number;
-  } | null>(null);
 
   // Link drag state
   const [linkDrag, setLinkDrag] = useState<{
     fromId: string;
     startX: number; startY: number;
     cursorX: number; cursorY: number;
-    snapX?: number; snapY?: number; // snapped target point
+    snapX?: number; snapY?: number;
     snapTargetId?: string;
   } | null>(null);
   const [linkModalTarget, setLinkModalTarget] = useState<{ fromId: string; toId: string } | null>(null);
@@ -185,6 +195,9 @@ const GenogramEditor: React.FC = () => {
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  // React Flow nodes state
+  const [nodes, setNodes] = useState<MemberFlowNode[]>([]);
 
   // ─── Notes du dossier ───
   const [notesModalOpen, setNotesModalOpen] = useState(false);
@@ -211,7 +224,6 @@ const GenogramEditor: React.FC = () => {
       }
       setFileName(data.name);
       const gData = data.data as any;
-      // Deduplicate members by ID (guard against data corruption)
       const rawMembers: FamilyMember[] = gData?.members || [];
       const seen = new Set<string>();
       const loadedMembers = rawMembers.filter(m => {
@@ -224,17 +236,11 @@ const GenogramEditor: React.FC = () => {
       if (gData?.emotionalLinks) setEmotionalLinks(gData.emotionalLinks);
       setDbLoaded(true);
 
-      // Center canvas on first member (patient index) after load
+      // Center on first member after load
       if (loadedMembers.length > 0) {
         requestAnimationFrame(() => {
-          const canvas = canvasRef.current;
-          if (!canvas) return;
-          const rect = canvas.getBoundingClientRect();
           const m = loadedMembers[0];
-          setPan({
-            x: rect.width / 2 - (m.x + CARD_W / 2),
-            y: rect.height / 2 - (m.y + CARD_H / 2),
-          });
+          reactFlow.setCenter(m.x + CARD_W / 2, m.y + CARD_H / 2, { zoom: 1, duration: 400 });
         });
       }
     };
@@ -319,225 +325,103 @@ const GenogramEditor: React.FC = () => {
     return set;
   }, [members]);
 
-  // ─── Space key tracking for Figma-like space+drag panning ───
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space' && !e.repeat) {
-        const tag = (e.target as HTMLElement)?.tagName;
-        if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement)?.isContentEditable) return;
-        e.preventDefault();
-        setIsSpaceDown(true);
-      }
-    };
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        setIsSpaceDown(false);
-        setIsPanning(false);
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
-    return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
-    };
+  // ─── React Flow event handlers ───
+  const onNodesChange = useCallback((changes: NodeChange<MemberFlowNode>[]) => {
+    setNodes(nds => applyNodeChanges(changes, nds));
   }, []);
 
-  // ─── Cursor-centered wheel zoom (Cmd/Ctrl + Scroll) ───
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+  const onNodeDragStart = useCallback((_: React.MouseEvent, node: MemberFlowNode) => {
+    if (node.data.member.locked || presentationMode) return;
+    recordSnapshot();
+  }, [recordSnapshot, presentationMode]);
 
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
+  const onNodeDrag = useCallback((_: React.MouseEvent, node: MemberFlowNode) => {
+    // Sync dragged position back to members in real-time for link lines
+    setMembers(prev => prev.map(m =>
+      m.id === node.id ? { ...m, x: node.position.x, y: node.position.y } : m
+    ));
+  }, []);
 
-      // Pinch-zoom or Cmd/Ctrl+Scroll → zoom centered on cursor
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+  const onNodeDragStop = useCallback((_: React.MouseEvent, node: MemberFlowNode) => {
+    let newX = node.position.x;
+    let newY = node.position.y;
 
-      // Point in world-space before zoom
-      const worldX = (mouseX - pan.x) / zoom;
-      const worldY = (mouseY - pan.y) / zoom;
-
-      const delta = -e.deltaY * ZOOM_SENSITIVITY;
-      const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * (1 + delta)));
-
-      // Adjust pan so the world point under cursor stays fixed
-      const newPanX = mouseX - worldX * newZoom;
-      const newPanY = mouseY - worldY * newZoom;
-
-      setZoom(newZoom);
-      setPan({ x: newPanX, y: newPanY });
-    };
-
-    canvas.addEventListener('wheel', onWheel, { passive: false });
-    return () => canvas.removeEventListener('wheel', onWheel);
-  }, [zoom, pan]);
-
-  // ─── Drag member ───
-  const handleDragStart = useCallback((id: string, e: React.MouseEvent) => {
-    if (isSpaceDown) return; // space+drag = pan, not member drag
-    const member = members.find(m => m.id === id);
-    if (!member) return;
-    recordSnapshot(); // Record before position change
-    setDragInfo({ id, startX: e.clientX, startY: e.clientY, memberX: member.x, memberY: member.y });
-  }, [members, isSpaceDown, recordSnapshot]);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    // Link drag in progress — update cursor position in world space + snap detection
-    if (linkDrag) {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      const cursorX = (e.clientX - rect.left - pan.x) / zoom;
-      const cursorY = (e.clientY - rect.top - pan.y) / zoom;
-
-      // Snap magnetism: find nearest corner of any target card within SNAP_RADIUS
-      const SNAP_RADIUS = 30; // world-space pixels
-      let snapX: number | undefined;
-      let snapY: number | undefined;
-      let snapTargetId: string | undefined;
-      let bestDist = SNAP_RADIUS;
-
+    if (snapToGrid) {
+      newX = Math.round(newX / SNAP_GRID_X) * SNAP_GRID_X;
+      // Snap Y to nearest occupied generation row
+      const occupiedYs = new Set<number>();
       for (const m of members) {
-        if (m.id === linkDrag.fromId) continue;
-        const corners = cardCorners(m);
-        for (const c of corners) {
-          const d = Math.hypot(cursorX - c.x, cursorY - c.y);
-          if (d < bestDist) {
-            bestDist = d;
-            snapX = c.x;
-            snapY = c.y;
-            snapTargetId = m.id;
-          }
+        if (m.id !== node.id) occupiedYs.add(m.y);
+      }
+      let bestSnapY = Math.round(newY / SNAP_GRID_Y) * SNAP_GRID_Y;
+      let bestDist = SNAP_LEVEL_THRESHOLD + 1;
+      for (const oy of occupiedYs) {
+        const dist = Math.abs(newY - oy);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestSnapY = oy;
         }
       }
-
-      setLinkDrag(prev => prev ? { ...prev, cursorX, cursorY, snapX, snapY, snapTargetId } : null);
-      return;
-    }
-    if (dragInfo) {
-      const dx = (e.clientX - dragInfo.startX) / zoom;
-      const dy = (e.clientY - dragInfo.startY) / zoom;
-      let newX = dragInfo.memberX + dx;
-      let newY = dragInfo.memberY + dy;
-      if (snapToGrid) {
-        newX = Math.round(newX / SNAP_GRID_X) * SNAP_GRID_X;
-        // Snap Y to nearest occupied generation row (other members' Y positions)
-        // This keeps manually-dragged cards aligned with auto-layout rows
-        const occupiedYs = new Set<number>();
-        for (const other of members) {
-          if (other.id !== dragInfo.id) occupiedYs.add(other.y);
-        }
-        let bestSnapY = Math.round(newY / SNAP_GRID_Y) * SNAP_GRID_Y;
-        let bestDist = SNAP_LEVEL_THRESHOLD + 1;
-        for (const oy of occupiedYs) {
-          const dist = Math.abs(newY - oy);
-          if (dist < bestDist) {
-            bestDist = dist;
-            bestSnapY = oy;
-          }
-        }
-        if (bestDist > SNAP_LEVEL_THRESHOLD) {
-          bestSnapY = Math.round(newY / SNAP_GRID_Y) * SNAP_GRID_Y;
-        }
-        newY = bestSnapY;
+      if (bestDist > SNAP_LEVEL_THRESHOLD) {
+        bestSnapY = Math.round(newY / SNAP_GRID_Y) * SNAP_GRID_Y;
       }
-      // Smart guides: detect alignment with other members on same generation
-      const GUIDE_THRESHOLD = 8;
-      const guides: typeof smartGuides = [];
-      for (const other of members) {
-        if (other.id === dragInfo.id) continue;
-        // Horizontal alignment (same Y → same generation row)
-        if (Math.abs(other.y - newY) < GUIDE_THRESHOLD) {
-          newY = other.y;
-          const minX = Math.min(newX + CARD_W / 2, other.x + CARD_W / 2);
-          const maxX = Math.max(newX + CARD_W / 2, other.x + CARD_W / 2);
-          guides.push({ type: 'horizontal', pos: other.y + CARD_H / 2, from: minX, to: maxX });
-        }
-        // Vertical alignment (same X center)
-        const otherCx = other.x + CARD_W / 2;
-        const newCx = newX + CARD_W / 2;
-        if (Math.abs(otherCx - newCx) < GUIDE_THRESHOLD) {
-          newX = other.x;
-          const minY = Math.min(newY + CARD_H / 2, other.y + CARD_H / 2);
-          const maxY = Math.max(newY + CARD_H / 2, other.y + CARD_H / 2);
-          guides.push({ type: 'vertical', pos: otherCx, from: minY, to: maxY });
+      newY = bestSnapY;
+    }
+
+    setMembers(prev => prev.map(m =>
+      m.id === node.id ? { ...m, x: newX, y: newY } : m
+    ));
+  }, [snapToGrid, members]);
+
+  // Track zoom from React Flow viewport
+  const onMoveEnd = useCallback((_: any, viewport: { x: number; y: number; zoom: number }) => {
+    setZoom(viewport.zoom);
+  }, []);
+
+  // Link drag mouse move (attached to wrapper)
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!linkDrag) return;
+    const pos = reactFlow.screenToFlowPosition({ x: e.clientX, y: e.clientY });
+
+    // Snap magnetism
+    const SNAP_RADIUS = 30;
+    let snapX: number | undefined;
+    let snapY: number | undefined;
+    let snapTargetId: string | undefined;
+    let bestDist = SNAP_RADIUS;
+
+    for (const m of members) {
+      if (m.id === linkDrag.fromId) continue;
+      const corners = cardCorners(m);
+      for (const c of corners) {
+        const d = Math.hypot(pos.x - c.x, pos.y - c.y);
+        if (d < bestDist) {
+          bestDist = d;
+          snapX = c.x;
+          snapY = c.y;
+          snapTargetId = m.id;
         }
       }
-      setSmartGuides(guides);
-      setMembers(prev => prev.map(m =>
-        m.id === dragInfo.id ? { ...m, x: newX, y: newY } : m
-      ));
-    } else if (isPanning) {
-      setPan(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }));
     }
-  }, [dragInfo, linkDrag, isPanning, zoom, pan, snapToGrid, members]);
 
-  const handleMouseUp = useCallback((e: React.MouseEvent) => {
-    // Link drag release — use snapped target or find card under cursor
-    if (linkDrag) {
-      let targetId: string | undefined;
+    setLinkDrag(prev => prev ? { ...prev, cursorX: pos.x, cursorY: pos.y, snapX, snapY, snapTargetId } : null);
+  }, [linkDrag, members, reactFlow]);
 
-      // Prefer snap target
-      if (linkDrag.snapTargetId) {
-        targetId = linkDrag.snapTargetId;
-      } else {
-        const canvas = canvasRef.current;
-        if (canvas) {
-          const rect = canvas.getBoundingClientRect();
-          const worldX = (e.clientX - rect.left - pan.x) / zoom;
-          const worldY = (e.clientY - rect.top - pan.y) / zoom;
-          const target = members.find(m =>
-            m.id !== linkDrag.fromId &&
-            worldX >= m.x && worldX <= m.x + CARD_W &&
-            worldY >= m.y && worldY <= m.y + CARD_H
-          );
-          targetId = target?.id;
-        }
-      }
+  // Link drag mouse up
+  const handleMouseUp = useCallback(() => {
+    if (!linkDrag) return;
+    const targetId = linkDrag.snapTargetId;
+    if (targetId) {
+      setLinkModalTarget({ fromId: linkDrag.fromId, toId: targetId });
+    }
+    setLinkDrag(null);
+  }, [linkDrag]);
 
-      if (targetId) {
-        setLinkModalTarget({ fromId: linkDrag.fromId, toId: targetId });
-      }
-      setLinkDrag(null);
-      return;
-    }
-    // Snap on release if enabled
-    if (dragInfo && snapToGrid) {
-      setMembers(prev => prev.map(m =>
-        m.id === dragInfo.id
-          ? { ...m, x: Math.round(m.x / SNAP_GRID_X) * SNAP_GRID_X, y: Math.round(m.y / SNAP_GRID_Y) * SNAP_GRID_Y }
-          : m
-      ));
-    }
-    setSmartGuides([]);
-    setDragInfo(null);
-    setIsPanning(false);
-  }, [dragInfo, linkDrag, snapToGrid, members, pan, zoom]);
-
-  // ─── Canvas mouse down: space+click or middle-click = pan, else deselect ───
-  const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
-    // Middle-click pan
-    if (e.button === 1) {
-      e.preventDefault();
-      setIsPanning(true);
-      return;
-    }
-    // Space+left-click pan
-    if (isSpaceDown && e.button === 0) {
-      setIsPanning(true);
-      return;
-    }
-    // Left-click on empty canvas → pan
-    if (e.button === 0 && (e.target === canvasRef.current || (e.target as HTMLElement).classList.contains('canvas-bg'))) {
-      setIsPanning(true);
-      setSelectedMember(null);
-      setAnchorActiveMember(null);
-      return;
-    }
-  }, [isSpaceDown]);
+  // Click on empty canvas → deselect
+  const onPaneClick = useCallback(() => {
+    setSelectedMember(null);
+    setAnchorActiveMember(null);
+  }, []);
 
   const handleSelect = useCallback((id: string) => {
     setSelectedMember(prev => prev === id ? null : id);
@@ -563,17 +447,10 @@ const GenogramEditor: React.FC = () => {
   const [pendingPerinatalType, setPendingPerinatalType] = useState<import('@/types/genogram').PerinatalType | null>(null);
   const [pendingStillbornGender, setPendingStillbornGender] = useState<'male' | 'female' | null>(null);
 
-  // (standalone links removed — all children go through unions now)
-
   /** Center canvas on a specific member with smooth animation */
   const centerOnMember = useCallback((member: FamilyMember) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const targetX = rect.width / 2 - (member.x + CARD_W / 2) * zoom;
-    const targetY = rect.height / 2 - (member.y + CARD_H / 2) * zoom;
-    setPan({ x: targetX, y: targetY });
-  }, [zoom]);
+    reactFlow.setCenter(member.x + CARD_W / 2, member.y + CARD_H / 2, { duration: 400 });
+  }, [reactFlow]);
 
   /** Focus on member: center + select + briefly highlight */
   const handleFocusMember = useCallback((member: FamilyMember) => {
@@ -589,20 +466,17 @@ const GenogramEditor: React.FC = () => {
   /** Compute disabled dropdown options for a member (guard clauses) */
   const getDisabledOptions = useCallback((memberId: string): DisabledOptions => {
     const disabled: DisabledOptions = {};
-    // Find all unions where this member is a child
     const parentUnions = unions.filter(u => u.children.includes(memberId));
     const bioUnion = parentUnions.find(u => !u.isAdoption);
     const adoptiveUnion = parentUnions.find(u => u.isAdoption);
 
     if (parentUnions.length === 0) {
-      // No parents at all — single 'parent' option is fine
+      // No parents at all
     } else if (bioUnion && adoptiveUnion) {
-      // Has both bio + adoptive parents — disable all parent options
       disabled.parent = 'Ce membre a déjà ses parents biologiques et adoptifs';
       disabled.parent_bio = 'Ce membre a déjà ses parents biologiques';
       disabled.parent_adoptive = 'Ce membre a déjà ses parents adoptifs';
     } else {
-      // Has one pair — disable the existing one, keep the other
       disabled.parent = 'Ce membre a déjà une paire de parents';
       if (bioUnion) {
         disabled.parent_bio = 'Ce membre a déjà ses parents biologiques';
@@ -617,7 +491,6 @@ const GenogramEditor: React.FC = () => {
   /** Should show split parent options (bio/adoptive) in dropdown */
   const shouldShowParentSplit = useCallback((memberId: string): boolean => {
     const parentUnions = unions.filter(u => u.children.includes(memberId));
-    // Show split when member already has one pair of parents (to add the other type)
     return parentUnions.length > 0;
   }, [unions]);
 
@@ -635,7 +508,7 @@ const GenogramEditor: React.FC = () => {
     if (!source) return { x: 200, y: 200 };
 
     const LEVEL_Y = 250;
-    const SPOUSE_GAP = CARD_W + 120; // card width + badge space
+    const SPOUSE_GAP = CARD_W + 120;
 
     switch (relationship) {
       case 'parent':
@@ -643,7 +516,6 @@ const GenogramEditor: React.FC = () => {
       case 'child':
         return { x: source.x, y: source.y + LEVEL_Y };
       case 'sibling': {
-        // Place to the right of rightmost sibling at same level
         const sameLevelMembers = members.filter(m => Math.abs(m.y - source.y) < 50);
         const maxX = Math.max(...sameLevelMembers.map(m => m.x + CARD_W));
         return { x: maxX + 80, y: source.y };
@@ -652,7 +524,6 @@ const GenogramEditor: React.FC = () => {
       case 'spouse_divorced':
       case 'spouse_separated':
       case 'spouse_widowed': {
-        // Place to the right, leaving space for badge
         const rightSpace = members.filter(m =>
           Math.abs(m.y - source.y) < 50 && m.x > source.x
         );
@@ -695,15 +566,12 @@ const GenogramEditor: React.FC = () => {
       ...(perinatal ? { perinatalType: perinatal } : {}),
     };
 
-    // Clear pending perinatal type
     setPendingPerinatalType(null);
     setPendingStillbornGender(null);
 
     if (targetUnionId) {
-      // Add child to an existing union
       const union = unions.find(u => u.id === targetUnionId);
       if (union) {
-        // Position child centered under the couple
         const p1 = members.find(m => m.id === union.partner1);
         const p2 = members.find(m => m.id === union.partner2);
         if (p1 && p2) {
@@ -719,7 +587,6 @@ const GenogramEditor: React.FC = () => {
         u.id === targetUnionId ? { ...u, children: [...u.children, newChild.id] } : u
       ));
     } else {
-      // No union → create placeholder partner + union + push colliders
       const SPOUSE_GAP = CARD_W + 120;
       const placeholderId = `m-ph-${Date.now()}`;
       const sourceX = source?.x ?? 200;
@@ -740,12 +607,10 @@ const GenogramEditor: React.FC = () => {
         isPlaceholder: true,
       };
 
-      // Center child under the couple
       const coupleCenterX = (sourceX + placeholderX + CARD_W) / 2 - CARD_W / 2;
       newChild.x = coupleCenterX;
       newChild.y = sourceY + LEVEL_Y;
 
-      // ── Dynamic Gap: push members that collide with new block ──
       const PUSH_MARGIN = 40;
       const blockRects = [
         { x: sourceX, y: sourceY, w: CARD_W, h: CARD_H },
@@ -790,7 +655,6 @@ const GenogramEditor: React.FC = () => {
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 600);
 
-      // Select and open drawer for new child (skip for perinatal)
       setSelectedMember(newChild.id);
       if (!perinatal) {
         setEditingNewMember(newChild);
@@ -801,7 +665,6 @@ const GenogramEditor: React.FC = () => {
       return;
     }
 
-    // Select and open drawer for new child (existing union path, skip for perinatal)
     setSelectedMember(newChild.id);
     if (!perinatal) {
       setEditingNewMember(newChild);
@@ -811,7 +674,7 @@ const GenogramEditor: React.FC = () => {
     setTimeout(() => centerOnMember(newChild), 100);
   }, [members, unions, centerOnMember, pendingPerinatalType, pendingStillbornGender]);
 
-  /** Create a child with an existing member as co-parent (creates a new union between them) */
+  /** Create a child with an existing member as co-parent */
   const executeChildCreationWithExisting = useCallback((sourceId: string, partnerId: string) => {
     const source = members.find(m => m.id === sourceId);
     const partner = members.find(m => m.id === partnerId);
@@ -857,7 +720,7 @@ const GenogramEditor: React.FC = () => {
   }, [members, centerOnMember]);
 
   const handleCreateRelated = useCallback((sourceId: string, relationship: RelationshipChoice) => {
-    // ── Perinatal events → same flow as child, but with perinatalType ──
+    // ── Perinatal events ──
     if (relationship.startsWith('perinatal_')) {
       const perinatalMap: Record<string, import('@/types/genogram').PerinatalType> = {
         perinatal_pregnancy: 'pregnancy',
@@ -875,14 +738,13 @@ const GenogramEditor: React.FC = () => {
       return;
     }
 
-    // ── Always show parent picker for child creation ──
     if (relationship === 'child') {
       setPendingPerinatalType(null);
       setParentPickerState({ sourceId, open: true });
       return;
     }
 
-    // ── Non-child relationships (spouse, parent, sibling) ──
+    // ── Non-child relationships ──
     const pos = computeNewPosition(sourceId, relationship);
     const source = members.find(m => m.id === sourceId);
     const currentYear = new Date().getFullYear();
@@ -900,7 +762,6 @@ const GenogramEditor: React.FC = () => {
       pathologies: [],
     };
 
-    // Determine union status for spouse types
     const statusMap: Record<string, UnionStatus> = {
       spouse_married: 'married',
       spouse_divorced: 'divorced',
@@ -911,7 +772,6 @@ const GenogramEditor: React.FC = () => {
     recordSnapshot();
     setMembers(prev => [...prev, newMember]);
 
-    // Create union for spouse relationships
     if (relationship.startsWith('spouse_')) {
       const status = statusMap[relationship] || 'married';
       const newUnion: Union = {
@@ -926,7 +786,6 @@ const GenogramEditor: React.FC = () => {
       setUnions(prev => [...prev, newUnion]);
     }
 
-    // For sibling: find union where source is a child, add new member as sibling
     if (relationship === 'sibling') {
       setUnions(prev => {
         const siblingUnion = prev.find(u => u.children.includes(sourceId));
@@ -939,7 +798,6 @@ const GenogramEditor: React.FC = () => {
       });
     }
 
-    // For parent / parent_bio / parent_adoptive: duo-parenting with guard clauses
     if (relationship === 'parent' || relationship === 'parent_bio' || relationship === 'parent_adoptive') {
       const isAdoption = relationship === 'parent_adoptive';
       const existingParentUnion = unions.find(u =>
@@ -949,56 +807,40 @@ const GenogramEditor: React.FC = () => {
       const LEVEL_Y = 250;
 
       if (existingParentUnion) {
-        // Already has a parent union of this type — check if one parent is placeholder/draft
         const p1 = members.find(m => m.id === existingParentUnion.partner1);
         const p2 = members.find(m => m.id === existingParentUnion.partner2);
         const placeholderParent = [p1, p2].find(p => p && (p.isPlaceholder || p.isDraft));
         const realParent = [p1, p2].find(p => p && !p.isPlaceholder && !p.isDraft);
 
         if (!placeholderParent) {
-          toast.error('Ce membre a déjà ses deux parents configurés');
+          toast.error('Ce membre a déjà deux parents de ce type');
           return;
         }
 
-        // Replace placeholder with a new editable member of opposite gender
-        const oppositeGender = realParent?.gender === 'male' ? 'female' : 'male';
-        newMember.gender = oppositeGender;
+        // Replace placeholder with new member
         newMember.x = placeholderParent.x;
         newMember.y = placeholderParent.y;
-        newMember.isDraft = true;
+        newMember.gender = placeholderParent.gender;
         if (isAdoption) newMember.isAdoptiveParent = true;
 
         recordSnapshot();
-        setMembers(prev => prev.map(m => m.id === placeholderParent.id ? newMember : m));
-        setUnions(prev => prev.map(u => {
-          if (u.id !== existingParentUnion.id) return u;
-          return {
-            ...u,
-            partner1: u.partner1 === placeholderParent.id ? newMember.id : u.partner1,
-            partner2: u.partner2 === placeholderParent.id ? newMember.id : u.partner2,
-          };
-        }));
-        setEmotionalLinks(prev => prev.map(l => ({
-          ...l,
-          from: l.from === placeholderParent.id ? newMember.id : l.from,
-          to: l.to === placeholderParent.id ? newMember.id : l.to,
-        })));
+        setMembers(prev => prev.map(m => m.id === placeholderParent.id ? { ...newMember, id: placeholderParent.id } : m));
+        setSelectedMember(placeholderParent.id);
+        setEditingNewMember({ ...newMember, id: placeholderParent.id });
+        setDrawerEditing(true);
+        setNewMemberDrawerOpen(true);
+        setTimeout(() => centerOnMember(newMember), 100);
+        return;
       } else {
-        // No parent union of this type — create both parents (duo-parenting)
-        const sourceM = members.find(m => m.id === sourceId);
-        const sourceX = sourceM?.x ?? 200;
-        const sourceY = sourceM?.y ?? 200;
+        // Create new parent pair (duo-parenting)
+        const sourceX = members.find(m => m.id === sourceId)?.x ?? 200;
+        const sourceY = members.find(m => m.id === sourceId)?.y ?? 200;
+        const yOffset = LEVEL_Y;
 
-        // If member already has a pair, position based on type:
-        // - Adoptive parents go HIGHER (further from child)
-        // - Bio parents go CLOSER to child (just above)
-        const existingOtherPairUnion = unions.find(u => u.children.includes(sourceId));
-        let yOffset = LEVEL_Y;
-        if (existingOtherPairUnion) {
-          // Adoptive pair goes higher up; bio pair stays closer to child
-          yOffset = isAdoption ? LEVEL_Y + 120 : LEVEL_Y - 40;
-        }
-        // Moderate horizontal offset — keep both pairs centered on the child
+        // Check for existing other-type parent union to offset horizontally
+        const existingOtherPairUnion = unions.find(u =>
+          u.children.includes(sourceId) && u.isAdoption !== isAdoption
+        );
         const xShift = existingOtherPairUnion ? (isAdoption ? SPOUSE_GAP + 40 : -(SPOUSE_GAP + 40)) : 0;
 
         newMember.x = sourceX - SPOUSE_GAP / 2 + xShift;
@@ -1037,7 +879,6 @@ const GenogramEditor: React.FC = () => {
         setTimeout(() => setIsAnimating(false), 600);
       }
 
-      // Select and open edit drawer
       setSelectedMember(newMember.id);
       setEditingNewMember(newMember);
       setDrawerEditing(true);
@@ -1046,7 +887,6 @@ const GenogramEditor: React.FC = () => {
       return;
     }
 
-    // Select and open edit drawer (non-parent relationships)
     setSelectedMember(newMember.id);
     setEditingNewMember(newMember);
     setDrawerEditing(true);
@@ -1081,7 +921,6 @@ const GenogramEditor: React.FC = () => {
   const handleSaveMember = useCallback((updated: FamilyMember) => {
     const currentYear = new Date().getFullYear();
     const age = updated.birthYear ? currentYear - updated.birthYear : updated.age;
-    // Clear placeholder flag when user fills in data
     recordSnapshot();
     setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false } : m));
     setEditingNewMember(null);
@@ -1092,17 +931,14 @@ const GenogramEditor: React.FC = () => {
   const handleDeleteMember = useCallback((id: string) => {
     recordSnapshot();
 
-    // ── Collect all descendants recursively ──
     const collectDescendants = (memberId: string, visited: Set<string>): void => {
       if (visited.has(memberId)) return;
       visited.add(memberId);
-      // Find unions where this member is a partner
       const parentUnions = unions.filter(u => u.partner1 === memberId || u.partner2 === memberId);
       for (const union of parentUnions) {
         for (const childId of union.children) {
           collectDescendants(childId, visited);
         }
-        // Also cascade the other partner if it's a placeholder
         const otherPartnerId = union.partner1 === memberId ? union.partner2 : union.partner1;
         const otherPartner = members.find(m => m.id === otherPartnerId);
         if (otherPartner?.isPlaceholder && !visited.has(otherPartnerId)) {
@@ -1114,7 +950,6 @@ const GenogramEditor: React.FC = () => {
     const toRemoveSet = new Set<string>();
     collectDescendants(id, toRemoveSet);
 
-    // Also clean up placeholder parents from unions where deleted member was a child
     const childUnions = unions.filter(u => u.children.includes(id));
     for (const union of childUnions) {
       const remainingChildren = union.children.filter(c => !toRemoveSet.has(c));
@@ -1127,7 +962,6 @@ const GenogramEditor: React.FC = () => {
     }
 
     if (toRemoveSet.size > 1) {
-      // Animate fade-out for cascading deletion
       setFadingOutIds(toRemoveSet);
       setTimeout(() => {
         setFadingOutIds(new Set());
@@ -1141,7 +975,6 @@ const GenogramEditor: React.FC = () => {
         setEditingNewMember(null);
       }, 350);
     } else {
-      // Single member delete
       setMembers(prev => prev.filter(m => !toRemoveSet.has(m.id)));
       setUnions(prev => prev
         .map(u => ({ ...u, children: u.children.filter(c => !toRemoveSet.has(c)) }))
@@ -1162,54 +995,20 @@ const GenogramEditor: React.FC = () => {
     setAnchorActiveMember(fromId);
     const member = members.find(m => m.id === fromId);
     if (!member) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    // Source anchor = center of card in world space
     const cx = member.x + CARD_W / 2;
     const cy = member.y + CARD_H / 2;
-    // Cursor in world space
-    const cursorWorldX = (e.clientX - rect.left - pan.x) / zoom;
-    const cursorWorldY = (e.clientY - rect.top - pan.y) / zoom;
-    setLinkDrag({ fromId, startX: cx, startY: cy, cursorX: cursorWorldX, cursorY: cursorWorldY });
-  }, [members, pan, zoom]);
+    const pos = reactFlow.screenToFlowPosition({ x: e.clientX, y: e.clientY });
+    setLinkDrag({ fromId, startX: cx, startY: cy, cursorX: pos.x, cursorY: pos.y });
+  }, [members, reactFlow]);
 
-
-  // ─── Fit to screen: compute bounding box of all members and center ───
-  // ─── Fit to screen: compute bounding box of all members and center ───
+  // ─── Fit to screen ───
   const handleFitToScreen = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || members.length === 0) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const padding = 80;
-
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    for (const m of members) {
-      minX = Math.min(minX, m.x);
-      minY = Math.min(minY, m.y);
-      maxX = Math.max(maxX, m.x + CARD_W);
-      maxY = Math.max(maxY, m.y + CARD_H);
-    }
-
-    const contentW = maxX - minX;
-    const contentH = maxY - minY;
-    const scaleX = (rect.width - padding * 2) / contentW;
-    const scaleY = (rect.height - padding * 2) / contentH;
-    const newZoom = Math.min(Math.max(Math.min(scaleX, scaleY), MIN_ZOOM), MAX_ZOOM);
-
-    const centerX = (minX + maxX) / 2;
-    const centerY = (minY + maxY) / 2;
-    const newPanX = rect.width / 2 - centerX * newZoom;
-    const newPanY = rect.height / 2 - centerY * newZoom;
-
-    setZoom(newZoom);
-    setPan({ x: newPanX, y: newPanY });
-  }, [members]);
+    if (members.length === 0) return;
+    reactFlow.fitView({ padding: 0.15, duration: 400 });
+  }, [members, reactFlow]);
 
   // ─── Auto-layout: reorganize tree ───
   const handleAutoLayout = useCallback(() => {
-    // Collect locked members' current positions
     const lockedPositions = new Map<string, { x: number; y: number }>();
     for (const m of members) {
       if (m.locked) lockedPositions.set(m.id, { x: m.x, y: m.y });
@@ -1224,10 +1023,10 @@ const GenogramEditor: React.FC = () => {
     setTimeout(() => {
       setIsAnimating(false);
       handleFitToScreen();
-    }, 900); // Match spring animation duration
+    }, 900);
   }, [members, unions, emotionalLinks, handleFitToScreen]);
 
-  // ─── Auto-layout on member/union count change (including initial load) ───
+  // ─── Auto-layout on member/union count change ───
   const prevMemberCountRef = React.useRef<number | null>(null);
   const prevUnionCountRef = React.useRef<number | null>(null);
   const initialLayoutDoneRef = React.useRef(false);
@@ -1244,52 +1043,68 @@ const GenogramEditor: React.FC = () => {
     prevUnionCountRef.current = unions.length;
   }, [members.length, unions.length, handleAutoLayout]);
 
-  // ─── Button zoom (centered on viewport center) ───
+  // ─── Button zoom ───
   const handleZoomIn = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const cx = rect.width / 2;
-    const cy = rect.height / 2;
-    const worldX = (cx - pan.x) / zoom;
-    const worldY = (cy - pan.y) / zoom;
-    const newZoom = Math.min(MAX_ZOOM, zoom * 1.2);
-    setPan({ x: cx - worldX * newZoom, y: cy - worldY * newZoom });
-    setZoom(newZoom);
-  }, [zoom, pan]);
+    reactFlow.zoomIn({ duration: 200 });
+  }, [reactFlow]);
 
   const handleZoomOut = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const cx = rect.width / 2;
-    const cy = rect.height / 2;
-    const worldX = (cx - pan.x) / zoom;
-    const worldY = (cy - pan.y) / zoom;
-    const newZoom = Math.max(MIN_ZOOM, zoom / 1.2);
-    setPan({ x: cx - worldX * newZoom, y: cy - worldY * newZoom });
-    setZoom(newZoom);
-  }, [zoom, pan]);
+    reactFlow.zoomOut({ duration: 200 });
+  }, [reactFlow]);
 
-  // ─── Dynamic cursor ───
-  const cursorClass = presentationMode
-    ? 'cursor-default'
-    : linkDrag
-      ? 'cursor-crosshair'
-      : isSpaceDown || isPanning
-        ? (isPanning ? 'cursor-grabbing' : 'cursor-grab')
-        : 'cursor-default';
+  // ─── Sync members → React Flow nodes ───
+  useEffect(() => {
+    setNodes(members.map(member => {
+      const isBioParentOfAdoptedChild = unions.some(bioUnion =>
+        !bioUnion.isAdoption &&
+        (bioUnion.partner1 === member.id || bioUnion.partner2 === member.id) &&
+        bioUnion.children.some(childId =>
+          unions.some(adoptUnion => adoptUnion.isAdoption && adoptUnion.children.includes(childId))
+        )
+      );
 
-  // ─── Dynamic dot grid background style ───
-  const dotSize = DOT_SPACING * zoom;
-  const dotGridStyle: React.CSSProperties = presentationMode
-    ? { backgroundColor: 'hsl(var(--canvas-bg))' }
-    : {
-        backgroundImage: `radial-gradient(circle, hsl(var(--canvas-dot)) ${Math.max(0.5, zoom * 1)}px, transparent ${Math.max(0.5, zoom * 1)}px)`,
-        backgroundSize: `${dotSize}px ${dotSize}px`,
-        backgroundPosition: `${pan.x % dotSize}px ${pan.y % dotSize}px`,
-        backgroundColor: 'hsl(var(--canvas-bg))',
+      return {
+        id: member.id,
+        type: 'member' as const,
+        position: { x: member.x, y: member.y },
+        draggable: !member.locked && !presentationMode,
+        selectable: false,
+        focusable: false,
+        data: {
+          member,
+          isSelected: selectedMember === member.id,
+          isAnimating,
+          isColliding: collisions.has(member.id),
+          state: getMemberState(member.id),
+          isLinkTarget: !!linkDrag && linkDrag.fromId !== member.id,
+          isFadingOut: fadingOutIds.has(member.id),
+          searchDimmed: search.isActive && !search.matchedMemberIds.has(member.id),
+          searchHighlighted: search.isActive && search.matchedMemberIds.has(member.id),
+          presentationMode,
+          compact: isBioParentOfAdoptedChild,
+          onSelect: handleSelect,
+          onCreateRelated: handleCreateRelated,
+          onEdit: handleEdit,
+          onToggleLock: handleToggleLock,
+          onView: handleView,
+          onHover: setHoveredMember,
+          onLinkDragStart: handleLinkDragStart,
+          onCancelAnchor: handleCancelAnchor,
+          disabledOptions: getDisabledOptions(member.id),
+          dynamicPathologies: pathologiesVisible ? dynamicPathologies : [],
+          showParentSplit: shouldShowParentSplit(member.id),
+          isAdopted: isMemberAdopted(member.id),
+        },
       };
+    }));
+  }, [
+    members, unions, selectedMember, hoveredMember, anchorActiveMember,
+    isAnimating, collisions, linkDrag, fadingOutIds, search.isActive,
+    search.matchedMemberIds, presentationMode, pathologiesVisible,
+    dynamicPathologies, getMemberState, handleSelect, handleCreateRelated,
+    handleEdit, handleToggleLock, handleView, handleLinkDragStart,
+    handleCancelAnchor, getDisabledOptions, shouldShowParentSplit, isMemberAdopted,
+  ]);
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -1349,206 +1164,198 @@ const GenogramEditor: React.FC = () => {
         {/* Canvas */}
         <div
           ref={canvasRef}
-          className={`flex-1 relative overflow-hidden canvas-bg ${cursorClass}`}
-          style={dotGridStyle}
-          onMouseDown={handleCanvasMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onContextMenu={e => e.preventDefault()}
+          className={`flex-1 relative overflow-hidden ${isAnimating ? 'rf-animating' : ''}`}
+          onMouseMove={linkDrag ? handleMouseMove : undefined}
+          onMouseUp={linkDrag ? handleMouseUp : undefined}
         >
-          <div
-            className="absolute"
-            style={{
-              transform: `translate3d(${pan.x}px, ${pan.y}px, 0) scale(${zoom})`,
-              transformOrigin: '0 0',
-              willChange: 'transform',
-            }}
+          <ReactFlow
+            nodes={nodes}
+            edges={[]}
+            nodeTypes={NODE_TYPES}
+            onNodesChange={onNodesChange}
+            onNodeDragStart={onNodeDragStart}
+            onNodeDrag={onNodeDrag}
+            onNodeDragStop={onNodeDragStop}
+            onMoveEnd={onMoveEnd}
+            onPaneClick={onPaneClick}
+            panOnScroll={false}
+            zoomOnScroll={true}
+            zoomOnPinch={true}
+            panOnDrag={!linkDrag}
+            selectionOnDrag={false}
+            selectNodesOnDrag={false}
+            nodesDraggable={!presentationMode}
+            nodesConnectable={false}
+            nodesFocusable={false}
+            edgesFocusable={false}
+            minZoom={0.15}
+            maxZoom={3}
+            fitView
+            fitViewOptions={{ padding: 0.15 }}
+            proOptions={{ hideAttribution: true }}
+            className="!bg-[hsl(var(--canvas-bg))]"
           >
-            {/* Smart alignment guides */}
-            {smartGuides.length > 0 && (
-              <svg className="absolute pointer-events-none" style={{ zIndex: 100, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
-                {smartGuides.map((guide, i) =>
-                  guide.type === 'horizontal' ? (
-                    <line key={`guide-${i}`} x1={guide.from} y1={guide.pos} x2={guide.to} y2={guide.pos}
-                      stroke="hsl(var(--primary))" strokeWidth={1} strokeDasharray="4 3" opacity={0.7} />
-                  ) : (
-                    <line key={`guide-${i}`} x1={guide.pos} y1={guide.from} x2={guide.pos} y2={guide.to}
-                      stroke="hsl(var(--primary))" strokeWidth={1} strokeDasharray="4 3" opacity={0.7} />
-                  )
-                )}
-              </svg>
+            {!presentationMode && (
+              <Background
+                variant={BackgroundVariant.Dots}
+                gap={20}
+                size={1}
+                className="!stroke-[hsl(var(--canvas-dot))]"
+                color="hsl(var(--canvas-dot))"
+              />
             )}
-            <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} searchMatchedUnionIds={search.matchedUnionIds} isSearchActive={search.isActive} highlightedUnionStatus={highlightedUnionStatus} />
-            {/* All children go through unions now */}
-            <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: presentationMode ? 1 : (search.isActive && search.matchedEmotionalLinkIds.size === 0) ? 0.1 : 1, transition: 'opacity 0.3s' }}>
-              {/* Over-card transparency mask: full opacity in void, reduced over cards & union badges */}
-              <defs>
-                <mask id="card-depth-mask">
-                  {/* White = full visibility everywhere */}
-                  <rect x="-99999" y="-99999" width="199998" height="199998" fill="white" />
-                  {/* Dark rects over cards = heavily reduced visibility (~0.2 opacity) */}
-                  {members.map(m => (
-                    <rect
-                      key={`mask-${m.id}`}
-                      x={m.x - 2} y={m.y - 2}
-                      width={CARD_W + 4} height={CARD_H + 4}
-                      rx={12}
-                      fill="rgba(255,255,255,0.2)"
-                    />
-                  ))}
-                  {/* Mask over union badge areas */}
-                  {unions.map(u => {
-                    const p1 = members.find(m => m.id === u.partner1);
-                    const p2 = members.find(m => m.id === u.partner2);
-                    if (!p1 || !p2) return null;
-                    const [left, right] = p1.x < p2.x ? [p1, p2] : [p2, p1];
-                    const midX = (left.x + CARD_W + right.x) / 2;
-                    const midY = (left.y + CARD_H / 2 + right.y + CARD_H / 2) / 2;
-                    // Badge area: ~120w × 60h centered on union midpoint
-                    return (
-                      <rect
-                        key={`mask-badge-${u.id}`}
-                        x={midX - 60} y={midY - 40}
-                        width={120} height={70}
-                        rx={14}
-                        fill="rgba(255,255,255,0.15)"
-                      />
-                    );
-                  })}
-                </mask>
-              </defs>
-              <g style={{ pointerEvents: 'auto' }} mask="url(#card-depth-mask)">
-                {(() => {
-                   // Build card rects for collision avoidance
-                    const cardRects = members.map(m => ({ id: m.id, x: m.x, y: m.y, w: CARD_W, h: CARD_H }));
-                  const pairMap = new Map<string, number[]>();
-                  emotionalLinks.forEach((link, i) => {
-                    const key = [link.from, link.to].sort().join('|');
-                    if (!pairMap.has(key)) pairMap.set(key, []);
-                    pairMap.get(key)!.push(i);
-                  });
+            <MiniMap
+              nodeColor={(node) => {
+                const data = (node as MemberFlowNode).data;
+                if (!data) return 'hsl(var(--muted))';
+                return data.member.gender === 'male'
+                  ? 'hsl(210, 70%, 60%)'
+                  : data.member.gender === 'female'
+                    ? 'hsl(340, 70%, 60%)'
+                    : 'hsl(var(--muted))';
+              }}
+              maskColor="hsl(var(--background) / 0.7)"
+              style={{ borderRadius: 12, border: '1px solid hsl(var(--border))' }}
+              pannable
+              zoomable
+            />
 
-                  return emotionalLinks.map((link, globalIdx) => {
-                    const from = members.find(m => m.id === link.from);
-                    const to = members.find(m => m.id === link.to);
-                    if (!from || !to) return null;
-                    const anchors = getEmotionalAnchors(from, to);
-                    const key = [link.from, link.to].sort().join('|');
-                    const group = pairMap.get(key)!;
-                    const linkIndex = group.indexOf(globalIdx);
-                    const isDimmed = !!hoveredMember && link.from !== hoveredMember && link.to !== hoveredMember;
-                    const isSearchHighlighted = search.isActive && search.matchedEmotionalLinkIds.has(link.id);
-                    const isSearchDimmed = search.isActive && !isSearchHighlighted;
-                    // Visibility toggle or solo mode
-                    if (!emotionalLinksVisible) return null;
-                    const isSoloHidden = soloEmotionalType !== null && link.type !== soloEmotionalType;
-                    if (isSoloHidden) return null;
-                    return (
-                      <EmotionalLinkLine
-                        key={link.id}
-                        x1={anchors.x1} y1={anchors.y1}
-                        x2={anchors.x2} y2={anchors.y2}
-                        type={link.type}
-                        linkIndex={linkIndex}
-                        linkCount={group.length}
-                        cardRects={cardRects}
-                        excludeIds={[link.from, link.to]}
-                        dimmed={isDimmed}
-                        searchHighlighted={isSearchHighlighted}
-                        searchDimmed={isSearchDimmed}
-                        onClick={() => setEditingLinkId(link.id)}
+            {/* Viewport-synced overlays for link lines */}
+            <ViewportOverlay>
+              <FamilyLinkLines
+                members={members}
+                unions={unions}
+                onEditUnion={(id) => setEditingUnionId(id)}
+                searchMatchedUnionIds={search.matchedUnionIds}
+                isSearchActive={search.isActive}
+                highlightedUnionStatus={highlightedUnionStatus}
+              />
+
+              {/* Emotional links SVG */}
+              <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: presentationMode ? 1 : (search.isActive && search.matchedEmotionalLinkIds.size === 0) ? 0.1 : 1, transition: 'opacity 0.3s' }}>
+                <defs>
+                  <mask id="card-depth-mask">
+                    <rect x="-99999" y="-99999" width="199998" height="199998" fill="white" />
+                    {members.map(m => (
+                      <rect
+                        key={`mask-${m.id}`}
+                        x={m.x - 2} y={m.y - 2}
+                        width={CARD_W + 4} height={CARD_H + 4}
+                        rx={12}
+                        fill="rgba(255,255,255,0.2)"
                       />
-                    );
-                  });
-                })()}
-              </g>
-            </svg>
-            {members.map(member => {
-              // Detect if this member is a bio parent of a child who also has adoptive parents
-              const isBioParentOfAdoptedChild = unions.some(bioUnion =>
-                !bioUnion.isAdoption &&
-                (bioUnion.partner1 === member.id || bioUnion.partner2 === member.id) &&
-                bioUnion.children.some(childId =>
-                  unions.some(adoptUnion => adoptUnion.isAdoption && adoptUnion.children.includes(childId))
-                )
-              );
-              return (
-              <MemberCard
-                key={member.id}
-                member={member}
-                isSelected={selectedMember === member.id}
-                isAnimating={isAnimating}
-                isColliding={collisions.has(member.id)}
-                state={getMemberState(member.id)}
-                isLinkTarget={!!linkDrag && linkDrag.fromId !== member.id}
-                isFadingOut={fadingOutIds.has(member.id)}
-                searchDimmed={search.isActive && !search.matchedMemberIds.has(member.id)}
-                searchHighlighted={search.isActive && search.matchedMemberIds.has(member.id)}
-                presentationMode={presentationMode}
-                compact={isBioParentOfAdoptedChild}
-                onSelect={handleSelect}
-                onDragStart={handleDragStart}
-                onCreateRelated={handleCreateRelated}
-                onEdit={handleEdit}
-                onToggleLock={handleToggleLock}
-                onView={handleView}
-                onHover={setHoveredMember}
-                onLinkDragStart={handleLinkDragStart}
-                onCancelAnchor={handleCancelAnchor}
-                disabledOptions={getDisabledOptions(member.id)}
-                dynamicPathologies={pathologiesVisible ? dynamicPathologies : []}
-                showParentSplit={shouldShowParentSplit(member.id)}
-                isAdopted={isMemberAdopted(member.id)}
-              />
-              );
-            })}
-            {/* Parent picker popover for multi-union child creation */}
-            {parentPickerState && (() => {
-              const pickerSource = members.find(m => m.id === parentPickerState.sourceId);
-              if (!pickerSource) return null;
-              const sourceUnions = unions.filter(u => u.partner1 === parentPickerState.sourceId || u.partner2 === parentPickerState.sourceId);
-              return (
-                <ParentPicker
-                  sourceMember={pickerSource}
-                  unions={sourceUnions}
-                  members={members}
-                  open={parentPickerState.open}
-                  onOpenChange={(open) => {
-                    if (!open) { setParentPickerState(null); setPendingPerinatalType(null); setPendingStillbornGender(null); }
-                  }}
-                  onSelectUnion={(unionId) => {
-                    executeChildCreation(parentPickerState.sourceId, unionId);
-                    setParentPickerState(null);
-                  }}
-                  onSelectNewPartner={() => {
-                    executeChildCreation(parentPickerState.sourceId);
-                    setParentPickerState(null);
-                  }}
-                
-                >
-                  <div
-                    className="absolute pointer-events-none"
-                    style={{
-                      left: pickerSource.x + CARD_W / 2,
-                      top: pickerSource.y + CARD_H + 40,
-                      width: 1,
-                      height: 1,
+                    ))}
+                    {unions.map(u => {
+                      const p1 = members.find(m => m.id === u.partner1);
+                      const p2 = members.find(m => m.id === u.partner2);
+                      if (!p1 || !p2) return null;
+                      const [left, right] = p1.x < p2.x ? [p1, p2] : [p2, p1];
+                      const midX = (left.x + CARD_W + right.x) / 2;
+                      const midY = (left.y + CARD_H / 2 + right.y + CARD_H / 2) / 2;
+                      return (
+                        <rect
+                          key={`mask-badge-${u.id}`}
+                          x={midX - 60} y={midY - 40}
+                          width={120} height={70}
+                          rx={14}
+                          fill="rgba(255,255,255,0.15)"
+                        />
+                      );
+                    })}
+                  </mask>
+                </defs>
+                <g style={{ pointerEvents: 'auto' }} mask="url(#card-depth-mask)">
+                  {(() => {
+                    const cardRects = members.map(m => ({ id: m.id, x: m.x, y: m.y, w: CARD_W, h: CARD_H }));
+                    const pairMap = new Map<string, number[]>();
+                    emotionalLinks.forEach((link, i) => {
+                      const key = [link.from, link.to].sort().join('|');
+                      if (!pairMap.has(key)) pairMap.set(key, []);
+                      pairMap.get(key)!.push(i);
+                    });
+
+                    return emotionalLinks.map((link, globalIdx) => {
+                      const from = members.find(m => m.id === link.from);
+                      const to = members.find(m => m.id === link.to);
+                      if (!from || !to) return null;
+                      const anchors = getEmotionalAnchors(from, to);
+                      const key = [link.from, link.to].sort().join('|');
+                      const group = pairMap.get(key)!;
+                      const linkIndex = group.indexOf(globalIdx);
+                      const isDimmed = !!hoveredMember && link.from !== hoveredMember && link.to !== hoveredMember;
+                      const isSearchHighlighted = search.isActive && search.matchedEmotionalLinkIds.has(link.id);
+                      const isSearchDimmed = search.isActive && !isSearchHighlighted;
+                      if (!emotionalLinksVisible) return null;
+                      const isSoloHidden = soloEmotionalType !== null && link.type !== soloEmotionalType;
+                      if (isSoloHidden) return null;
+                      return (
+                        <EmotionalLinkLine
+                          key={link.id}
+                          x1={anchors.x1} y1={anchors.y1}
+                          x2={anchors.x2} y2={anchors.y2}
+                          type={link.type}
+                          linkIndex={linkIndex}
+                          linkCount={group.length}
+                          cardRects={cardRects}
+                          excludeIds={[link.from, link.to]}
+                          dimmed={isDimmed}
+                          searchHighlighted={isSearchHighlighted}
+                          searchDimmed={isSearchDimmed}
+                          onClick={() => setEditingLinkId(link.id)}
+                        />
+                      );
+                    });
+                  })()}
+                </g>
+              </svg>
+
+              {/* Parent picker popover */}
+              {parentPickerState && (() => {
+                const pickerSource = members.find(m => m.id === parentPickerState.sourceId);
+                if (!pickerSource) return null;
+                const sourceUnions = unions.filter(u => u.partner1 === parentPickerState.sourceId || u.partner2 === parentPickerState.sourceId);
+                return (
+                  <ParentPicker
+                    sourceMember={pickerSource}
+                    unions={sourceUnions}
+                    members={members}
+                    open={parentPickerState.open}
+                    onOpenChange={(open) => {
+                      if (!open) { setParentPickerState(null); setPendingPerinatalType(null); setPendingStillbornGender(null); }
                     }}
-                  />
-                </ParentPicker>
-              );
-            })()}
-            {/* Elastic link line while dragging */}
-            {linkDrag && (
-              <ElasticLinkLine
-                x1={linkDrag.startX} y1={linkDrag.startY}
-                x2={linkDrag.cursorX} y2={linkDrag.cursorY}
-                snapX={linkDrag.snapX} snapY={linkDrag.snapY}
-                isSnapped={!!linkDrag.snapTargetId}
-              />
-            )}
-          </div>
+                    onSelectUnion={(unionId) => {
+                      executeChildCreation(parentPickerState.sourceId, unionId);
+                      setParentPickerState(null);
+                    }}
+                    onSelectNewPartner={() => {
+                      executeChildCreation(parentPickerState.sourceId);
+                      setParentPickerState(null);
+                    }}
+                  >
+                    <div
+                      className="absolute pointer-events-none"
+                      style={{
+                        left: pickerSource.x + CARD_W / 2,
+                        top: pickerSource.y + CARD_H + 40,
+                        width: 1,
+                        height: 1,
+                      }}
+                    />
+                  </ParentPicker>
+                );
+              })()}
+
+              {/* Elastic link line while dragging */}
+              {linkDrag && (
+                <ElasticLinkLine
+                  x1={linkDrag.startX} y1={linkDrag.startY}
+                  x2={linkDrag.cursorX} y2={linkDrag.cursorY}
+                  snapX={linkDrag.snapX} snapY={linkDrag.snapY}
+                  isSnapped={!!linkDrag.snapTargetId}
+                />
+              )}
+            </ViewportOverlay>
+          </ReactFlow>
 
           {/* Link type selection modal */}
           <LinkTypeModal
@@ -1695,5 +1502,11 @@ const GenogramEditor: React.FC = () => {
     </div>
   );
 };
+
+const GenogramEditor: React.FC = () => (
+  <ReactFlowProvider>
+    <GenogramEditorInner />
+  </ReactFlowProvider>
+);
 
 export default GenogramEditor;
