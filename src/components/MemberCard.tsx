@@ -141,7 +141,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       {/* Card body — hug contents with min-width, dots inside relative container */}
       <div
         className={`
-          relative overflow-visible flex items-center ${compact ? 'gap-2' : 'gap-3'} rounded-xl bg-card transition-all
+          relative overflow-visible flex items-center ${compact ? 'gap-2' : 'gap-3'} rounded-xl bg-card shadow-sm transition-all
           ${(isPlaceholder || isDraft) ? 'border-2 border-dashed' : 'border'}
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
           ${(isPlaceholder || isDraft) && !isHighlighted ? 'border-muted-foreground/30' : borderClasses}
