@@ -421,27 +421,23 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
               );
 
               twinAnchorsLocal.forEach((anchor, ti) => {
+                // Orthogonal L-shaped path: horizontal from fork to child X, then vertical down
+                const path = `M ${forkX} ${forkY} H ${anchor.x} V ${anchor.y}`;
                 elements.push(
-                  <line key={`twin-branch-${child.twinGroup}-${ti}`}
-                    x1={forkX} y1={forkY}
-                    x2={anchor.x} y2={anchor.y}
+                  <path key={`twin-branch-${child.twinGroup}-${ti}`}
+                    d={path}
+                    fill="none"
                     stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
                     strokeDasharray={isAdoption ? adoptionDash : undefined}
                   />
                 );
-                // Adoption tick on twin branch
+                // Adoption tick on twin branch (at midpoint of vertical segment)
                 if (isAdoption) {
-                  const mx = (forkX + anchor.x) / 2;
-                  const my = (forkY + anchor.y) / 2;
-                  const dx = anchor.x - forkX;
-                  const dy = anchor.y - forkY;
-                  const len = Math.hypot(dx, dy) || 1;
-                  const nx = -dy / len;
-                  const ny = dx / len;
+                  const midY = (forkY + anchor.y) / 2;
                   elements.push(
                     <line key={`twin-tick-${child.twinGroup}-${ti}`}
-                      x1={mx - nx * tickLen} y1={my - ny * tickLen}
-                      x2={mx + nx * tickLen} y2={my + ny * tickLen}
+                      x1={anchor.x - tickLen} y1={midY}
+                      x2={anchor.x + tickLen} y2={midY}
                       stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
                     />
                   );
