@@ -57,10 +57,6 @@ interface MemberCardProps {
   onLinkDragStart?: (id: string, e: React.MouseEvent) => void;
   /** Called when user wants to cancel anchor-active and go back to selected */
   onCancelAnchor?: (id: string) => void;
-  /** Click handler for the card body (used by MemberNode to separate card clicks from action button clicks) */
-  onCardClick?: () => void;
-  /** Double-click handler for the card body */
-  onCardDoubleClick?: () => void;
 }
 
 const CORNER_DOTS: { side: AnchorSide; style: React.CSSProperties }[] = [
@@ -92,8 +88,6 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onHover,
   onLinkDragStart,
   onCancelAnchor,
-  onCardClick,
-  onCardDoubleClick,
   disabledOptions,
   dynamicPathologies = [],
   showParentSplit = false,
@@ -146,10 +140,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
     <>
       {/* Card body — hug contents with min-width, dots inside relative container */}
       <div
-        onClick={onCardClick}
-        onDoubleClick={onCardDoubleClick}
         className={`
-          relative overflow-visible flex items-center ${compact ? 'gap-2' : 'gap-3'} rounded-xl bg-card shadow-sm transition-all
+          relative overflow-visible flex items-center ${compact ? 'gap-2' : 'gap-3'} rounded-xl bg-card transition-all
           ${(isPlaceholder || isDraft) ? 'border-2 border-dashed' : 'border'}
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
           ${(isPlaceholder || isDraft) && !isHighlighted ? 'border-muted-foreground/30' : borderClasses}
@@ -278,20 +270,15 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
       {activeState === 'selected' && !presentationMode && (
         <motion.div
-          className="flex items-center gap-2 justify-center mt-2 nopan nodrag"
+          className="flex items-center gap-2 justify-center mt-2"
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          onClick={(e) => e.stopPropagation()}
-          onPointerDown={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
         >
           <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)} disabledOptions={disabledOptions} showParentSplit={showParentSplit}>
             <button
-              type="button"
-              onPointerDown={(e) => e.stopPropagation()}
-              onMouseDown={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors nopan nodrag"
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors"
             >
               <UserPlus className="w-3.5 h-3.5" />
               Créer un membre
@@ -299,14 +286,12 @@ const MemberCard: React.FC<MemberCardProps> = ({
           </CreateMemberDropdown>
           <button
             onClick={(e) => { e.stopPropagation(); onView?.(member.id); }}
-            onPointerDown={(e) => e.stopPropagation()}
             className="w-8 h-8 min-w-[40px] min-h-[40px] rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
           >
             <Eye className="w-4 h-4 text-foreground" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onEdit?.(member.id); }}
-            onPointerDown={(e) => e.stopPropagation()}
             className="w-8 h-8 min-w-[40px] min-h-[40px] rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
           >
             <PencilLine className="w-4 h-4 text-foreground" />
@@ -316,13 +301,12 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
       {/* Action menu — State: Anchor-Active */}
       {activeState === 'anchor-active' && !presentationMode && (
-        <div className="flex items-center gap-2 justify-center mt-2 nopan nodrag" onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-2 justify-center mt-2">
           <button
             onMouseDown={(e) => {
               e.stopPropagation();
               onLinkDragStart?.(member.id, e);
             }}
-            onPointerDown={(e) => e.stopPropagation()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors cursor-crosshair"
             title="Maintenir et glisser vers une autre carte"
           >
@@ -331,7 +315,6 @@ const MemberCard: React.FC<MemberCardProps> = ({
           </button>
           <button
             onClick={handleCancelAnchor}
-            onPointerDown={(e) => e.stopPropagation()}
             className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-destructive/10 hover:border-destructive/30 transition-colors"
             title="Annuler"
           >
