@@ -92,6 +92,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onHover,
   onLinkDragStart,
   onCancelAnchor,
+  onCardClick,
+  onCardDoubleClick,
   disabledOptions,
   dynamicPathologies = [],
   showParentSplit = false,
