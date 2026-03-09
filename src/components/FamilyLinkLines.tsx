@@ -315,7 +315,6 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
     // For single-child unions, draw a straight vertical from union midpoint down to child
     if (effectiveDropCount === 1) {
       const singleChildAnchor = childAnchors[0];
-      const directX = unionMidX;
 
       return (
         <g key={union.id}>
@@ -324,17 +323,18 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
             x2={rightAnchor.x} y2={rightAnchor.y}
             status={union.status}
           />
-          {/* Straight vertical stem */}
-          <line x1={directX} y1={unionLineY} x2={directX} y2={singleChildAnchor.y}
-            stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
-            strokeDasharray={union.isAdoption ? '6 4' : undefined} />
-          {/* Horizontal connector from stem to child if not aligned */}
-          {Math.abs(unionMidX - singleChildAnchor.x) > 1 && (
-            <line
-              x1={unionMidX} y1={singleChildAnchor.y}
-              x2={singleChildAnchor.x} y2={singleChildAnchor.y}
+          {/* Orthogonal path: vertical from union midpoint, horizontal to child X, vertical to child */}
+          {Math.abs(unionMidX - singleChildAnchor.x) > 1 ? (
+            <path
+              d={`M ${unionMidX} ${unionLineY} V ${combY} H ${singleChildAnchor.x} V ${singleChildAnchor.y}`}
+              fill="none"
               stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+              strokeDasharray={union.isAdoption ? '6 4' : undefined}
             />
+          ) : (
+            <line x1={unionMidX} y1={unionLineY} x2={unionMidX} y2={singleChildAnchor.y}
+              stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+              strokeDasharray={union.isAdoption ? '6 4' : undefined} />
           )}
         </g>
       );
@@ -421,27 +421,23 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
               );
 
               twinAnchorsLocal.forEach((anchor, ti) => {
+                // Orthogonal L-shaped path: horizontal from fork to child X, then vertical down
+                const path = `M ${forkX} ${forkY} H ${anchor.x} V ${anchor.y}`;
                 elements.push(
-                  <line key={`twin-branch-${child.twinGroup}-${ti}`}
-                    x1={forkX} y1={forkY}
-                    x2={anchor.x} y2={anchor.y}
+                  <path key={`twin-branch-${child.twinGroup}-${ti}`}
+                    d={path}
+                    fill="none"
                     stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
                     strokeDasharray={isAdoption ? adoptionDash : undefined}
                   />
                 );
-                // Adoption tick on twin branch
+                // Adoption tick on twin branch (at midpoint of vertical segment)
                 if (isAdoption) {
-                  const mx = (forkX + anchor.x) / 2;
-                  const my = (forkY + anchor.y) / 2;
-                  const dx = anchor.x - forkX;
-                  const dy = anchor.y - forkY;
-                  const len = Math.hypot(dx, dy) || 1;
-                  const nx = -dy / len;
-                  const ny = dx / len;
+                  const midY = (forkY + anchor.y) / 2;
                   elements.push(
                     <line key={`twin-tick-${child.twinGroup}-${ti}`}
-                      x1={mx - nx * tickLen} y1={my - ny * tickLen}
-                      x2={mx + nx * tickLen} y2={my + ny * tickLen}
+                      x1={anchor.x - tickLen} y1={midY}
+                      x2={anchor.x + tickLen} y2={midY}
                       stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
                     />
                   );
