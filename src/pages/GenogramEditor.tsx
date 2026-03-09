@@ -803,7 +803,7 @@ const GenogramEditorInner: React.FC = () => {
       const existingParentUnion = unions.find(u =>
         u.children.includes(sourceId) && (relationship === 'parent' || u.isAdoption === isAdoption)
       );
-      const SPOUSE_GAP = 200;
+      const COUPLE_GAP = 20; // gap between the two parent cards
       const LEVEL_Y = 250;
 
       if (existingParentUnion) {
