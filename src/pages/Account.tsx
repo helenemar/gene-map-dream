@@ -52,12 +52,16 @@ const Account: React.FC = () => {
 
   const handleSave = async () => {
     if (!user) return;
+    if (!firstName.trim() || !lastName.trim()) {
+      toast.error('Le prénom et le nom sont obligatoires.');
+      return;
+    }
     setSaving(true);
     const { error } = await supabase
       .from('profiles')
       .update({
-        first_name: firstName,
-        last_name: lastName,
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
         profession,
         phone,
         siren,
