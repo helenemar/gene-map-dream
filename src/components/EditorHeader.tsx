@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode, FileText, LogOut, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
@@ -222,28 +223,17 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
             )}
           </Button>
         )}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2 rounded-full text-xs">
-              <Download className="w-3.5 h-3.5" />
-              Exporter
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-[160px]">
-            <DropdownMenuItem onClick={onExportPng} className="gap-2 cursor-pointer">
-              <Image className="w-4 h-4" />
-              Exporter en PNG
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={onExportSvg} className="gap-2 cursor-pointer">
-              <FileCode className="w-4 h-4" />
-              Exporter en SVG
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={onExportPdf} className="gap-2 cursor-pointer">
-              <FileText className="w-4 h-4" />
-              Exporter en PDF
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2 rounded-full text-xs"
+          onClick={() => {
+            toast('L\'export n\'est pas disponible dans la version bêta.', { duration: 3000 });
+          }}
+        >
+          <Download className="w-3.5 h-3.5" />
+          Exporter
+        </Button>
         <Button variant="brand" size="sm" className="gap-2 text-xs" onClick={onShare}>
           <Share2 className="w-3.5 h-3.5" />
           Partager
