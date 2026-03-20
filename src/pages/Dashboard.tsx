@@ -205,7 +205,7 @@ const Dashboard: React.FC = () => {
             Créer un nouveau génogramme
           </h1>
           <p className="text-[14px] text-muted-foreground mb-7 max-w-lg">
-            Commencez par créer votre premier patient et construisez son génogramme étape par étape.
+            Ajoutez un nouveau dossier pour commencer à construire un génogramme familial.
           </p>
           <Button onClick={handleCreate} className="gap-2 px-6 h-11 text-[14px] font-semibold">
             <Plus className="w-4 h-4" />
