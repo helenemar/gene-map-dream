@@ -266,11 +266,11 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 6 }}
             transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-            className="fixed z-[101] w-[360px] max-w-[90vw] pointer-events-auto"
+            className="fixed z-[101] w-[360px] max-w-[90vw] max-h-[calc(100vh-2rem)] pointer-events-auto"
             style={cardStyle}
             onClick={e => e.stopPropagation()}
           >
-            <div className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden max-h-full overflow-y-auto">
               {/* Close */}
               <button
                 onClick={onFinish}
