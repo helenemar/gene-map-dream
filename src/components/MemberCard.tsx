@@ -58,6 +58,8 @@ interface MemberCardProps {
   onLinkDragStart?: (id: string, e: React.MouseEvent) => void;
   /** Called when user wants to cancel anchor-active and go back to selected */
   onCancelAnchor?: (id: string) => void;
+  /** Show a pulsing ring around this card (onboarding hint) */
+  onboardingPulse?: boolean;
 }
 
 const CORNER_DOTS: { side: AnchorSide; style: React.CSSProperties }[] = [
