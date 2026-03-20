@@ -30,146 +30,10 @@ interface GenogramRow {
   updated_at: string;
   user_id: string;
   data: any;
-  /** Mock-only fields for fake creators */
-  _mockCreator?: { name: string; initials: string; color: string };
 }
 
 type SortKey = 'name' | 'updated_at' | 'created_at';
 type SortDir = 'asc' | 'desc';
-
-const MOCK_GENOGRAMS: GenogramRow[] = [
-  {
-    id: 'mock-1', name: 'Lefèvre – Julien', user_id: 'mock',
-    created_at: '2025-11-12T09:30:00Z', updated_at: '2026-02-28T14:22:00Z',
-    data: {
-      members: [
-        // Gen 0 — Grands-parents paternels
-        { id: 'gp1', firstName: 'Henri', lastName: 'Lefèvre', gender: 'male', x: -200, y: -400, birthYear: 1935, deathYear: 2010, age: 75, profession: '', pathologies: ['cardiovascular', 'diabetes'] },
-        { id: 'gp2', firstName: 'Madeleine', lastName: 'Roux', gender: 'female', x: 0, y: -400, birthYear: 1938, age: 88, profession: '', pathologies: ['cancer'] },
-        // Gen 0 — Grands-parents maternels
-        { id: 'gp3', firstName: 'Robert', lastName: 'Girard', gender: 'male', x: 400, y: -400, birthYear: 1940, deathYear: 2018, age: 78, profession: '', pathologies: ['addiction'] },
-        { id: 'gp4', firstName: 'Jeanne', lastName: 'Blanc', gender: 'female', x: 600, y: -400, birthYear: 1942, age: 84, profession: '', pathologies: ['neurodegeneration'] },
-        // Gen 1 — Parents + oncles/tantes
-        { id: 'p1', firstName: 'Philippe', lastName: 'Lefèvre', gender: 'male', x: -100, y: -200, birthYear: 1962, age: 64, profession: '', pathologies: ['addiction'] },
-        { id: 'p2', firstName: 'Nathalie', lastName: 'Girard', gender: 'female', x: 100, y: -200, birthYear: 1965, age: 61, profession: '', pathologies: ['depression'] },
-        { id: 'p3', firstName: 'Sylvie', lastName: 'Lefèvre', gender: 'female', x: -350, y: -200, birthYear: 1968, age: 58, profession: '', pathologies: [] },
-        { id: 'p4', firstName: 'Marc', lastName: 'Dupont', gender: 'male', x: -500, y: -200, birthYear: 1966, age: 60, profession: '', pathologies: ['cardiovascular'] },
-        { id: 'p5', firstName: 'Alain', lastName: 'Girard', gender: 'male', x: 500, y: -200, birthYear: 1970, deathYear: 2022, age: 52, profession: '', pathologies: ['bipolar'] },
-        // Gen 2 — Patient + fratrie + cousins
-        { id: 'c1', firstName: 'Julien', lastName: 'Lefèvre', gender: 'male', x: 0, y: 0, birthYear: 1990, age: 36, profession: '', pathologies: ['bipolar'] },
-        { id: 'c1w', firstName: 'Marie', lastName: 'Perret', gender: 'female', x: 200, y: 0, birthYear: 1992, age: 34, profession: '', pathologies: [] },
-        { id: 'c2', firstName: 'Camille', lastName: 'Lefèvre', gender: 'female', x: -100, y: 0, birthYear: 1993, age: 33, profession: '', pathologies: ['depression'], twinGroup: 'tw1', twinType: 'dizygotic' },
-        { id: 'c3', firstName: 'Clara', lastName: 'Lefèvre', gender: 'female', x: -250, y: 0, birthYear: 1993, age: 33, profession: '', pathologies: ['psychogenic'], twinGroup: 'tw1', twinType: 'dizygotic' },
-        { id: 'c4', firstName: 'Lucas', lastName: 'Dupont', gender: 'male', x: -450, y: 0, birthYear: 1995, age: 31, profession: '', pathologies: [] },
-        { id: 'c5', firstName: 'Emma', lastName: 'Dupont', gender: 'female', x: -600, y: 0, birthYear: 1998, age: 28, profession: '', pathologies: ['psychogenic'] },
-        // Gen 2 — Interruption spontanée de grossesse
-        { id: 'c6', firstName: 'FC', lastName: '', gender: 'female', x: 350, y: 0, birthYear: 1996, age: 0, profession: '', pathologies: [], perinatalType: 'miscarriage' },
-        // Gen 3 — Petits-enfants
-        { id: 'gc1', firstName: 'Théo', lastName: 'Lefèvre', gender: 'male', x: 50, y: 200, birthYear: 2020, age: 6, profession: '', pathologies: [] },
-        { id: 'gc2', firstName: 'Rose', lastName: 'Lefèvre', gender: 'female', x: 200, y: 200, birthYear: 2023, age: 3, profession: '', pathologies: [] },
-        { id: 'gc3', firstName: '', lastName: '', gender: 'female', x: 350, y: 200, birthYear: 2026, age: 0, profession: '', pathologies: [], perinatalType: 'pregnancy' },
-      ],
-      unions: [
-        { partner1: 'gp1', partner2: 'gp2', status: 'widowed', children: ['p1', 'p3'] },
-        { partner1: 'gp3', partner2: 'gp4', status: 'married', children: ['p2', 'p5'] },
-        { partner1: 'p1', partner2: 'p2', status: 'divorced', children: ['c1', 'c2', 'c3', 'c6'] },
-        { partner1: 'p4', partner2: 'p3', status: 'married', children: ['c4', 'c5'] },
-        { partner1: 'c1', partner2: 'c1w', status: 'married', children: ['gc1', 'gc2', 'gc3'] },
-      ],
-      emotionalLinks: [
-        { id: 'e1', from: 'p1', to: 'c1', type: 'fusional' },
-        { id: 'e2', from: 'c2', to: 'c3', type: 'conflictual' },
-        { id: 'e3', from: 'gp2', to: 'gc1', type: 'fusional' },
-      ],
-    },
-  },
-  {
-    id: 'mock-2', name: 'Dupont – Sophie', user_id: 'mock',
-    created_at: '2026-01-05T11:00:00Z', updated_at: '2026-02-25T10:45:00Z',
-    data: {
-      members: [
-        { id: 'a1', firstName: 'Sophie', lastName: 'Dupont', gender: 'female', x: 0, y: 0, birthYear: 1985, age: 41, profession: '', pathologies: ['cancer'] },
-        { id: 'a2', firstName: 'Marc', lastName: 'Dupont', gender: 'male', x: 200, y: 0, birthYear: 1983, age: 43, profession: '', pathologies: [] },
-        { id: 'a3', firstName: 'Clara', lastName: 'Dupont', gender: 'female', x: 100, y: 200, birthYear: 2012, age: 14, profession: '', pathologies: [] },
-      ],
-      unions: [{ partner1: 'a2', partner2: 'a1' }],
-    },
-  },
-  {
-    id: 'mock-3', name: 'Martin – Lucas', user_id: 'mock',
-    created_at: '2025-09-20T08:15:00Z', updated_at: '2026-01-10T16:30:00Z',
-    data: {
-      members: [
-        { id: 'b1', firstName: 'Lucas', lastName: 'Martin', gender: 'male', x: 0, y: 0, birthYear: 1978, age: 48, profession: '', pathologies: ['addiction', 'bipolar'] },
-        { id: 'b2', firstName: 'Isabelle', lastName: 'Martin', gender: 'female', x: 200, y: 0, birthYear: 1980, age: 46, profession: '', pathologies: ['depression'] },
-        { id: 'b3', firstName: 'Pierre', lastName: 'Martin', gender: 'male', x: -100, y: -200, birthYear: 1950, age: 76, profession: '', pathologies: [] },
-        { id: 'b4', firstName: 'Jeanne', lastName: 'Blanc', gender: 'female', x: 100, y: -200, birthYear: 1952, age: 74, profession: '', pathologies: ['neurodegeneration'] },
-        { id: 'b5', firstName: 'Théo', lastName: 'Martin', gender: 'male', x: 0, y: 200, birthYear: 2005, age: 21, profession: '', pathologies: [] },
-        { id: 'b6', firstName: 'Emma', lastName: 'Martin', gender: 'female', x: 200, y: 200, birthYear: 2008, age: 18, profession: '', pathologies: ['psychogenic'] },
-      ],
-      unions: [
-        { partner1: 'b3', partner2: 'b4' },
-        { partner1: 'b1', partner2: 'b2' },
-      ],
-    },
-  },
-  {
-    id: 'mock-4', name: 'Bernard – Camille', user_id: 'mock',
-    created_at: '2026-02-01T14:00:00Z', updated_at: '2026-02-27T09:10:00Z',
-    data: {
-      members: [
-        { id: 'c1', firstName: 'Camille', lastName: 'Bernard', gender: 'female', x: 0, y: 0, birthYear: 1995, age: 31, profession: '', pathologies: [] },
-        { id: 'c2', firstName: 'Antoine', lastName: 'Bernard', gender: 'male', x: -150, y: -200, birthYear: 1965, age: 61, profession: '', pathologies: ['diabetes'] },
-        { id: 'c3', firstName: 'Françoise', lastName: 'Morel', gender: 'female', x: 150, y: -200, birthYear: 1968, age: 58, profession: '', pathologies: [] },
-      ],
-      unions: [{ partner1: 'c2', partner2: 'c3' }],
-    },
-  },
-  {
-    id: 'mock-5', name: 'Petit – Alexandre', user_id: 'mock',
-    created_at: '2025-06-15T10:30:00Z', updated_at: '2025-12-20T11:00:00Z',
-    _mockCreator: { name: 'Nathalie Berteau', initials: 'NB', color: 'hsl(280 60% 55%)' },
-    data: {
-      members: [
-        { id: 'd1', firstName: 'Alexandre', lastName: 'Petit', gender: 'male', x: 0, y: 0, birthYear: 1988, age: 38, profession: '', pathologies: ['cardiovascular'] },
-        { id: 'd2', firstName: 'Laura', lastName: 'Petit', gender: 'female', x: 200, y: 0, birthYear: 1990, age: 36, profession: '', pathologies: [] },
-        { id: 'd3', firstName: 'Hugo', lastName: 'Petit', gender: 'male', x: 0, y: 200, birthYear: 2018, age: 8, profession: '', pathologies: [] },
-        { id: 'd4', firstName: 'Chloé', lastName: 'Petit', gender: 'female', x: 200, y: 200, birthYear: 2021, age: 5, profession: '', pathologies: [] },
-      ],
-      unions: [{ partner1: 'd1', partner2: 'd2' }],
-    },
-  },
-  {
-    id: 'mock-6', name: 'Garnier – Émilie', user_id: 'mock-other-1',
-    created_at: '2026-01-18T13:00:00Z', updated_at: '2026-02-28T18:00:00Z',
-    _mockCreator: { name: 'Léonie Nguyen', initials: 'LN', color: 'hsl(160 55% 42%)' },
-    data: {
-      members: [
-        { id: 'e1', firstName: 'Émilie', lastName: 'Garnier', gender: 'female', x: 0, y: 0, birthYear: 1993, age: 33, profession: '', pathologies: ['depression'] },
-        { id: 'e2', firstName: 'Thomas', lastName: 'Garnier', gender: 'male', x: 200, y: 0, birthYear: 1991, age: 35, profession: '', pathologies: [] },
-        { id: 'e3', firstName: 'Robert', lastName: 'Garnier', gender: 'male', x: -100, y: -200, birthYear: 1958, age: 68, profession: '', pathologies: ['cardiovascular'] },
-        { id: 'e4', firstName: 'Monique', lastName: 'Faure', gender: 'female', x: 100, y: -200, birthYear: 1961, age: 65, profession: '', pathologies: [] },
-      ],
-      unions: [
-        { partner1: 'e3', partner2: 'e4' },
-        { partner1: 'e2', partner2: 'e1' },
-      ],
-    },
-  },
-  {
-    id: 'mock-7', name: 'Rousseau – Victor', user_id: 'mock-other-2',
-    created_at: '2025-12-02T16:45:00Z', updated_at: '2026-02-15T12:00:00Z',
-    _mockCreator: { name: 'Alice Vanmerche', initials: 'AV', color: 'hsl(20 75% 55%)' },
-    data: {
-      members: [
-        { id: 'f1', firstName: 'Victor', lastName: 'Rousseau', gender: 'male', x: 0, y: 0, birthYear: 1982, age: 44, profession: '', pathologies: ['addiction'] },
-        { id: 'f2', firstName: 'Claire', lastName: 'Rousseau', gender: 'female', x: 200, y: 0, birthYear: 1984, age: 42, profession: '', pathologies: ['cancer'] },
-        { id: 'f3', firstName: 'Lina', lastName: 'Rousseau', gender: 'female', x: 100, y: 200, birthYear: 2010, age: 16, profession: '', pathologies: [] },
-      ],
-      unions: [{ partner1: 'f1', partner2: 'f2' }],
-    },
-  },
-];
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -183,10 +47,10 @@ const Dashboard: React.FC = () => {
   const [betaModalOpen, setBetaModalOpen] = useState(false);
   const [notesModal, setNotesModal] = useState<{ open: boolean; genogramId: string; genogramName: string }>({ open: false, genogramId: '', genogramName: '' });
   const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
+  const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
-  const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
 
   const { data: realGenograms, isLoading } = useQuery({
     queryKey: ['genograms', user?.id],
@@ -201,37 +65,21 @@ const Dashboard: React.FC = () => {
     enabled: !!user,
   });
 
-  const genograms = useMemo(() => [...(realGenograms || []), ...MOCK_GENOGRAMS], [realGenograms]);
-
-  // Fake note data for mock genograms
-  const MOCK_NOTE_COUNTS: Record<string, number> = {
-    'mock-1': 3, 'mock-3': 5, 'mock-5': 1, 'mock-6': 2, 'mock-7': 4,
-  };
-  const MOCK_LATEST_NOTE_DATES: Record<string, string> = {
-    'mock-1': '2026-03-01T10:00:00Z', // newer than updated_at → pulsing
-    'mock-3': '2026-02-28T18:00:00Z', // newer than updated_at → pulsing
-    'mock-5': '2025-12-21T09:00:00Z', // newer → pulsing
-    'mock-6': '2026-02-21T07:00:00Z', // newer → pulsing
-    'mock-7': '2025-11-01T10:00:00Z', // older than updated_at → no pulse
-  };
+  const genograms = useMemo(() => realGenograms || [], [realGenograms]);
 
   // Fetch note counts and latest note dates for all genograms
   useEffect(() => {
     if (!genograms?.length) return;
-    const ids = genograms.filter(g => !g.id.startsWith('mock')).map(g => g.id);
-    if (!ids.length) {
-      setNoteCounts(MOCK_NOTE_COUNTS);
-      setLatestNoteDates(MOCK_LATEST_NOTE_DATES);
-      return;
-    }
+    const ids = genograms.map(g => g.id);
+    if (!ids.length) return;
     supabase
       .from('genogram_notes')
       .select('genogram_id, created_at')
       .in('genogram_id', ids)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
-        const counts: Record<string, number> = { ...MOCK_NOTE_COUNTS };
-        const latest: Record<string, string> = { ...MOCK_LATEST_NOTE_DATES };
+        const counts: Record<string, number> = {};
+        const latest: Record<string, string> = {};
         if (data) {
           for (const row of data as { genogram_id: string; created_at: string }[]) {
             counts[row.genogram_id] = (counts[row.genogram_id] ?? 0) + 1;
@@ -460,26 +308,17 @@ const Dashboard: React.FC = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {(() => {
-                          const mock = file._mockCreator;
-                          const creatorName = mock ? mock.name : displayName.split('@')[0];
-                          const creatorInitials = mock ? mock.initials : userInitials;
-                          const isMe = !mock;
-                          return (
-                            <div className="flex items-center gap-2">
-                              <div
-                                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-                                style={{ backgroundColor: mock ? mock.color : 'hsl(var(--primary))' }}
-                              >
-                                <span className="text-white text-[10px] font-bold">{creatorInitials}</span>
-                              </div>
-                              <span className="text-[13px] text-foreground">
-                                {creatorName}{' '}
-                                {isMe && <span className="text-muted-foreground">(moi)</span>}
-                              </span>
-                            </div>
-                          );
-                        })()}
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: 'hsl(var(--primary))' }}
+                          >
+                            <span className="text-white text-[10px] font-bold">{userInitials}</span>
+                          </div>
+                          <span className="text-[13px] text-foreground">
+                            {displayName} <span className="text-muted-foreground">(moi)</span>
+                          </span>
+                        </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <span className="text-[13px] text-foreground">{formatDate(file.updated_at)}</span>
@@ -522,26 +361,22 @@ const Dashboard: React.FC = () => {
                               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/editor/${file.id}`); }}>
                                 Ouvrir
                               </DropdownMenuItem>
-                              {!file.id.startsWith('mock') && (
-                                <>
-                                  <DropdownMenuItem
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setRenamingId(file.id);
-                                      setRenameValue(file.name);
-                                    }}
-                                  >
-                                    Renommer
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem
-                                    onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: file.id, name: file.name }); }}
-                                    className="text-destructive focus:text-destructive"
-                                  >
-                                    Supprimer
-                                  </DropdownMenuItem>
-                                </>
-                              )}
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRenamingId(file.id);
+                                  setRenameValue(file.name);
+                                }}
+                              >
+                                Renommer
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: file.id, name: file.name }); }}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                Supprimer
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
