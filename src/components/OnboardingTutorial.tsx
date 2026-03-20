@@ -385,12 +385,20 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                     </span>
 
                     {isLastStep ? (
-                      <button
-                        onClick={onFinish}
-                        className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-                      >
-                        Terminer
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={onDismiss}
+                          className="px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          Ne plus afficher
+                        </button>
+                        <button
+                          onClick={onFinish}
+                          className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                        >
+                          Terminer
+                        </button>
+                      </div>
                     ) : (
                       <button
                         onClick={onNext}
