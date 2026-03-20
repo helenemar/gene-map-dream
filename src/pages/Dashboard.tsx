@@ -2,6 +2,10 @@ import React, { useState, useMemo, useEffect } from 'react';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText } from 'lucide-react';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import GenogramThumbnail from '@/components/GenogramThumbnail';
 import CreateGenogramModal from '@/components/CreateGenogramModal';
 import BetaShareModal from '@/components/BetaShareModal';
