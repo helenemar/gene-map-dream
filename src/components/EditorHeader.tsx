@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { toast } from 'sonner';
+import BetaExportModal from '@/components/BetaExportModal';
 import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode, FileText, LogOut, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
@@ -102,6 +102,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   onBack,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [betaExportOpen, setBetaExportOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -223,13 +224,12 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
             )}
           </Button>
         )}
+        <BetaExportModal open={betaExportOpen} onOpenChange={setBetaExportOpen} />
         <Button
           variant="outline"
           size="sm"
           className="gap-2 rounded-full text-xs"
-          onClick={() => {
-            toast('L\'export n\'est pas disponible dans la version bêta.', { duration: 3000 });
-          }}
+          onClick={() => setBetaExportOpen(true)}
         >
           <Download className="w-3.5 h-3.5" />
           Exporter
