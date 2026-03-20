@@ -198,7 +198,7 @@ const GenogramEditor: React.FC = () => {
   const noteCount = useGenogramNoteCount(genogramId);
 
   // ─── Auto-save ───
-  const { saveStatus, debouncedSave } = useAutoSave(genogramId ?? null);
+  const { saveStatus, debouncedSave, saveNow } = useAutoSave(genogramId ?? null);
 
   // ─── Load genogram from DB ───
   useEffect(() => {
