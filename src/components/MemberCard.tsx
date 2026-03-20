@@ -78,6 +78,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   isFadingOut = false,
   searchDimmed = false,
   searchHighlighted = false,
+  multiSelected = false,
   presentationMode = false,
   compact = false,
   onSelect,
