@@ -260,7 +260,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
                       </div>
                       <div className="space-y-1.5">
                         <Label htmlFor="signup-password">Mot de passe</Label>
-                        <Input id="signup-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="6 caractères minimum" required minLength={6} className="h-11 rounded-xl" />
+                        <div className="relative">
+                          <Input id="signup-password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="6 caractères minimum" required minLength={6} className="h-11 rounded-xl pr-10" />
+                          <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
                       </div>
 
                       {error && <p className="text-sm text-destructive">{error}</p>}
