@@ -49,7 +49,8 @@ const LINK_TYPE_CSS_VAR: Record<string, string> = {
 export function useFamilySearch(
   members: FamilyMember[],
   unions: Union[],
-  emotionalLinks: EmotionalLink[] = []
+  emotionalLinks: EmotionalLink[] = [],
+  dynamicPathologies: DynamicPathology[] = []
 ): FamilySearchResult {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
