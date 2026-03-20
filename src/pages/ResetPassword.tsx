@@ -128,8 +128,6 @@ const ResetPassword: React.FC = () => {
               </button>
             </div>
           </div>
-            />
-          </div>
           <Button type="submit" className="w-full" disabled={submitting}>
             {submitting ? 'Mise à jour…' : 'Mettre à jour le mot de passe'}
           </Button>
