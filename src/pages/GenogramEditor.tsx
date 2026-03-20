@@ -135,6 +135,7 @@ const GenogramEditor: React.FC = () => {
   const { id: genogramId } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [dbLoaded, setDbLoaded] = useState(false);
+  const onboarding = useOnboarding();
 
   // Initialize with empty state — will be populated from DB or sample data
   const [members, setMembers] = useState<FamilyMember[]>(() => {
