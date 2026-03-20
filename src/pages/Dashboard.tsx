@@ -185,6 +185,7 @@ const Dashboard: React.FC = () => {
   const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
 
   const { data: realGenograms, isLoading } = useQuery({
