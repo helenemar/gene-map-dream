@@ -525,11 +525,24 @@ const GenogramEditor: React.FC = () => {
     }
     // Snap on release if enabled
     if (dragInfo && snapToGrid) {
-      setMembers(prev => prev.map(m =>
-        m.id === dragInfo.id
-          ? { ...m, x: Math.round(m.x / SNAP_GRID_X) * SNAP_GRID_X, y: Math.round(m.y / SNAP_GRID_Y) * SNAP_GRID_Y }
-          : m
-      ));
+      if (dragInfo.groupOffsets && Object.keys(dragInfo.groupOffsets).length > 1) {
+        // Snap the primary member, then offset others accordingly
+        const snappedX = Math.round(members.find(m => m.id === dragInfo.id)!.x / SNAP_GRID_X) * SNAP_GRID_X;
+        const snappedY = Math.round(members.find(m => m.id === dragInfo.id)!.y / SNAP_GRID_Y) * SNAP_GRID_Y;
+        const currentMember = members.find(m => m.id === dragInfo.id)!;
+        const snapDx = snappedX - currentMember.x;
+        const snapDy = snappedY - currentMember.y;
+        setMembers(prev => prev.map(m => {
+          if (dragInfo.groupOffsets?.[m.id]) return { ...m, x: m.x + snapDx, y: m.y + snapDy };
+          return m;
+        }));
+      } else {
+        setMembers(prev => prev.map(m =>
+          m.id === dragInfo.id
+            ? { ...m, x: Math.round(m.x / SNAP_GRID_X) * SNAP_GRID_X, y: Math.round(m.y / SNAP_GRID_Y) * SNAP_GRID_Y }
+            : m
+        ));
+      }
     }
     setSmartGuides([]);
     setDragInfo(null);
