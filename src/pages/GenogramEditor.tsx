@@ -1022,7 +1022,7 @@ const GenogramEditor: React.FC = () => {
     setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
     setTimeout(() => centerOnMember(newMember), 100);
-  }, [members, unions, computeNewPosition, centerOnMember, recordSnapshot]);
+  }, [members, unions, getViewportCenter, centerOnMember, recordSnapshot]);
 
   const handleToggleLock = useCallback((id: string) => {
     setMembers(prev => prev.map(m => m.id === id ? { ...m, locked: !m.locked } : m));
