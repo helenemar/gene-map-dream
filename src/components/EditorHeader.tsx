@@ -128,7 +128,9 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
     <header className="h-14 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
       {/* Left: Logo + save status */}
       <div className="flex items-center gap-3">
-        <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
+        <button onClick={onBack} className="hover:opacity-70 transition-opacity active:scale-95" title="Retour au tableau de bord">
+          <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
+        </button>
         <SaveIndicator status={saveStatus} />
       </div>
 
