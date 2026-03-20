@@ -1754,6 +1754,15 @@ const GenogramEditor: React.FC = () => {
             onRedo={handleRedo}
             canUndo={history.canUndo}
             canRedo={history.canRedo}
+            onHelp={onboarding.restart}
+          />
+
+          <OnboardingTutorial
+            active={onboarding.active}
+            step={onboarding.step}
+            onNext={onboarding.next}
+            onPrev={onboarding.prev}
+            onFinish={onboarding.finish}
           />
 
           {/* Union action between 2 selected members */}
