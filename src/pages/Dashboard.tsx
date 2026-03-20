@@ -179,6 +179,8 @@ const Dashboard: React.FC = () => {
   const [betaModalOpen, setBetaModalOpen] = useState(false);
   const [notesModal, setNotesModal] = useState<{ open: boolean; genogramId: string; genogramName: string }>({ open: false, genogramId: '', genogramName: '' });
   const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
   const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
 
   const { data: realGenograms, isLoading } = useQuery({
