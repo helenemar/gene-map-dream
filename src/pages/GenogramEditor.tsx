@@ -1739,40 +1739,47 @@ const GenogramEditor: React.FC = () => {
             <LockPanel members={members} onToggleLock={handleToggleLock} />
           )}
 
-          {/* Fixed union action when exactly 2 members selected */}
+          {/* Union action between 2 selected members */}
           {!presentationMode && selectedMembers.size === 2 && (() => {
             const [idA, idB] = Array.from(selectedMembers);
+            const mA = members.find(m => m.id === idA);
+            const mB = members.find(m => m.id === idB);
+            if (!mA || !mB) return null;
             const existingUnion = unions.find(u =>
               (u.partner1 === idA && u.partner2 === idB) || (u.partner1 === idB && u.partner2 === idA)
             );
+            const midWorldX = ((mA.x + CARD_W / 2) + (mB.x + CARD_W / 2)) / 2;
+            const midWorldY = ((mA.y + CARD_H / 2) + (mB.y + CARD_H / 2)) / 2;
+            const canvasRect = canvasRef.current?.getBoundingClientRect();
+            if (!canvasRect) return null;
+            const screenX = midWorldX * zoom + pan.x + canvasRect.left;
+            const screenY = midWorldY * zoom + pan.y + canvasRect.top;
 
             return (
-              <div className="fixed bottom-24 left-1/2 z-[70] -translate-x-1/2">
-                <button
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border text-muted-foreground text-xs font-medium shadow-sm hover:bg-accent hover:text-foreground active:scale-95 transition-all"
-                  onClick={() => {
-                    if (existingUnion) {
-                      setEditingUnionId(existingUnion.id);
-                      return;
-                    }
-
-                    recordSnapshot();
-                    const newUnion: Union = {
-                      id: `u-${Date.now()}`,
-                      partner1: idA,
-                      partner2: idB,
-                      status: 'married' as UnionStatus,
-                      children: [],
-                    };
-                    setUnions(prev => [...prev, newUnion]);
-                    setSelectedMembers(new Set());
-                    toast('Union créée', { duration: 2000 });
-                  }}
-                >
-                  <Link className="w-3 h-3" />
-                  {existingUnion ? 'Modifier l’union' : 'Créer une union'}
-                </button>
-              </div>
+              <button
+                className="fixed z-[70] flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border text-muted-foreground text-xs font-medium shadow-sm hover:bg-accent hover:text-foreground active:scale-95 transition-all"
+                style={{ left: screenX, top: screenY, transform: 'translate(-50%, -50%)' }}
+                onClick={() => {
+                  if (existingUnion) {
+                    setEditingUnionId(existingUnion.id);
+                    return;
+                  }
+                  recordSnapshot();
+                  const newUnion: Union = {
+                    id: `u-${Date.now()}`,
+                    partner1: idA,
+                    partner2: idB,
+                    status: 'married' as UnionStatus,
+                    children: [],
+                  };
+                  setUnions(prev => [...prev, newUnion]);
+                  setSelectedMembers(new Set());
+                  toast('Union créée', { duration: 2000 });
+                }}
+              >
+                <Link className="w-3 h-3" />
+                {existingUnion ? "Modifier l'union" : "Créer une union"}
+              </button>
             );
           })()}
         </div>
