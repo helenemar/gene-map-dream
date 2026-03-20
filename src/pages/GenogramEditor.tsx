@@ -1752,11 +1752,11 @@ const GenogramEditor: React.FC = () => {
             const screenY = midY * zoom + pan.y;
             return (
               <button
-                className="absolute z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-lg hover:bg-primary/90 active:scale-95 transition-all"
+                className="absolute z-50 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-card border border-border text-muted-foreground text-xs font-medium shadow-sm hover:bg-accent hover:text-foreground active:scale-95 transition-all"
                 style={{ left: screenX, top: screenY, transform: 'translate(-50%, -50%)' }}
                 onClick={() => setLinkModalTarget({ fromId: idA, toId: idB })}
               >
-                <Link className="w-3.5 h-3.5" />
+                <Link className="w-3 h-3" />
                 Créer un lien
               </button>
             );
