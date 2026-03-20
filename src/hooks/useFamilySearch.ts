@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { FamilyMember, Union, EmotionalLink, PATHOLOGIES, EMOTIONAL_LINK_TYPES } from '@/types/genogram';
+import { FamilyMember, Union, EmotionalLink, EMOTIONAL_LINK_TYPES } from '@/types/genogram';
+import { DynamicPathology } from '@/hooks/usePathologies';
 
 export interface SearchSuggestion {
   category: 'name' | 'profession' | 'pathology' | 'relation';
