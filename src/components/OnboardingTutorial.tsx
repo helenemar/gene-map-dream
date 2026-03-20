@@ -203,8 +203,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[100] pointer-events-auto"
-            onClick={onFinish}
+            className={`fixed inset-0 z-[100] ${isIntro ? 'pointer-events-auto' : 'pointer-events-none'}`}
           >
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
