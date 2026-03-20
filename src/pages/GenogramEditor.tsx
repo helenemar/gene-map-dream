@@ -1361,19 +1361,19 @@ const GenogramEditor: React.FC = () => {
         matchCount={search.matchedMemberIds.size + search.matchedEmotionalLinkIds.size}
         onExportPng={() => {
           if (canvasRef.current) {
-            exportAsPng(canvasRef.current, fileName);
+            exportAsPng(canvasRef.current, fileName, members);
             toast('Export PNG en cours…', { duration: 2000 });
           }
         }}
         onExportSvg={() => {
           if (canvasRef.current) {
-            exportAsSvg(canvasRef.current, members, CARD_W, CARD_H, fileName);
+            exportAsSvg(canvasRef.current, members, CARD_W, CARD_H, fileName, members);
             toast('Export SVG téléchargé', { duration: 2000 });
           }
         }}
         onExportPdf={() => {
           if (canvasRef.current) {
-            exportAsPdf(canvasRef.current, fileName);
+            exportAsPdf(canvasRef.current, fileName, members);
             toast('Export PDF en cours…', { duration: 2000 });
           }
         }}
