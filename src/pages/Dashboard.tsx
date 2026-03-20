@@ -30,8 +30,6 @@ interface GenogramRow {
   updated_at: string;
   user_id: string;
   data: any;
-  /** Mock-only fields for fake creators */
-  _mockCreator?: { name: string; initials: string; color: string };
 }
 
 type SortKey = 'name' | 'updated_at' | 'created_at';
