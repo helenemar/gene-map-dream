@@ -1681,7 +1681,11 @@ const GenogramEditor: React.FC = () => {
                 <AlertDialogCancel onClick={() => navigate('/dashboard')}>
                   Non, quitter
                 </AlertDialogCancel>
-                <AlertDialogAction onClick={() => navigate('/dashboard')}>
+                <AlertDialogAction onClick={async () => {
+                  await saveNow({ members, unions, emotionalLinks });
+                  toast.success('Modifications enregistrées');
+                  navigate('/dashboard');
+                }}>
                   Oui, enregistrer
                 </AlertDialogAction>
               </AlertDialogFooter>
