@@ -1749,10 +1749,6 @@ const GenogramEditor: React.FC = () => {
             canRedo={history.canRedo}
           />
 
-          {!presentationMode && (
-            <LockPanel members={members} onToggleLock={handleToggleLock} />
-          )}
-
           {/* Union action between 2 selected members */}
           {!presentationMode && selectedMembers.size === 2 && (() => {
             const [idA, idB] = Array.from(selectedMembers);
