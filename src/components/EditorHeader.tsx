@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode, FileText, LogOut, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
