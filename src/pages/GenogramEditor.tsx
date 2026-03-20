@@ -173,6 +173,12 @@ const GenogramEditor: React.FC = () => {
     groupOffsets?: Record<string, { dx: number; dy: number }>;
   } | null>(null);
 
+  // Marquee (rectangle) selection state — screen coordinates
+  const [marquee, setMarquee] = useState<{
+    startClientX: number; startClientY: number;
+    currentClientX: number; currentClientY: number;
+  } | null>(null);
+
   // Link drag state
   const [linkDrag, setLinkDrag] = useState<{
     fromId: string;
@@ -489,10 +495,12 @@ const GenogramEditor: React.FC = () => {
           m.id === dragInfo.id ? { ...m, x: newX, y: newY } : m
         ));
       }
+    } else if (marquee) {
+      setMarquee(prev => prev ? { ...prev, currentClientX: e.clientX, currentClientY: e.clientY } : null);
     } else if (isPanning) {
       setPan(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }));
     }
-  }, [dragInfo, linkDrag, isPanning, zoom, pan, snapToGrid, members]);
+  }, [dragInfo, linkDrag, marquee, isPanning, zoom, pan, snapToGrid, members]);
 
   const handleMouseUp = useCallback((e: React.MouseEvent) => {
     // Link drag release — use snapped target or find card under cursor
@@ -544,10 +552,42 @@ const GenogramEditor: React.FC = () => {
         ));
       }
     }
+    // Marquee selection release
+    if (marquee) {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const dx = Math.abs(marquee.currentClientX - marquee.startClientX);
+        const dy = Math.abs(marquee.currentClientY - marquee.startClientY);
+        const DRAG_THRESHOLD = 5;
+        if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) {
+          // Convert screen coords to world coords
+          const x1 = (Math.min(marquee.startClientX, marquee.currentClientX) - rect.left - pan.x) / zoom;
+          const y1 = (Math.min(marquee.startClientY, marquee.currentClientY) - rect.top - pan.y) / zoom;
+          const x2 = (Math.max(marquee.startClientX, marquee.currentClientX) - rect.left - pan.x) / zoom;
+          const y2 = (Math.max(marquee.startClientY, marquee.currentClientY) - rect.top - pan.y) / zoom;
+          // Select members whose card intersects the marquee rect
+          const selected = new Set<string>();
+          for (const m of members) {
+            const mx2 = m.x + CARD_W;
+            const my2 = m.y + CARD_H;
+            if (m.x < x2 && mx2 > x1 && m.y < y2 && my2 > y1) {
+              selected.add(m.id);
+            }
+          }
+          setSelectedMembers(selected);
+        } else {
+          // Just a click on empty canvas — deselect
+          setSelectedMembers(new Set());
+        }
+      }
+      setMarquee(null);
+      return;
+    }
     setSmartGuides([]);
     setDragInfo(null);
     setIsPanning(false);
-  }, [dragInfo, linkDrag, snapToGrid, members, pan, zoom]);
+  }, [dragInfo, linkDrag, marquee, snapToGrid, members, pan, zoom]);
 
   // ─── Canvas mouse down: space+click or middle-click = pan, else deselect ───
   const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
@@ -562,10 +602,15 @@ const GenogramEditor: React.FC = () => {
       setIsPanning(true);
       return;
     }
-    // Left-click on empty canvas → pan
+    // Left-click on empty canvas → start marquee selection
     if (e.button === 0 && (e.target === canvasRef.current || (e.target as HTMLElement).classList.contains('canvas-bg'))) {
-      setIsPanning(true);
-      setSelectedMembers(new Set());
+      setMarquee({
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+        currentClientX: e.clientX,
+        currentClientY: e.clientY,
+      });
+      // Don't clear selection yet — will be cleared on mouseUp if no marquee drag happened
       setAnchorActiveMember(null);
       return;
     }
@@ -1274,9 +1319,11 @@ const GenogramEditor: React.FC = () => {
     ? 'cursor-default'
     : linkDrag
       ? 'cursor-crosshair'
-      : isSpaceDown || isPanning
-        ? (isPanning ? 'cursor-grabbing' : 'cursor-grab')
-        : 'cursor-default';
+      : marquee
+        ? 'cursor-crosshair'
+        : isSpaceDown || isPanning
+          ? (isPanning ? 'cursor-grabbing' : 'cursor-grab')
+          : 'cursor-default';
 
   // ─── Dynamic dot grid background style ───
   const dotSize = DOT_SPACING * zoom;
@@ -1549,7 +1596,23 @@ const GenogramEditor: React.FC = () => {
             )}
           </div>
 
-          {/* Link type selection modal */}
+          {/* Marquee selection rectangle */}
+          {marquee && (() => {
+            const canvas = canvasRef.current;
+            if (!canvas) return null;
+            const rect = canvas.getBoundingClientRect();
+            const left = Math.min(marquee.startClientX, marquee.currentClientX) - rect.left;
+            const top = Math.min(marquee.startClientY, marquee.currentClientY) - rect.top;
+            const width = Math.abs(marquee.currentClientX - marquee.startClientX);
+            const height = Math.abs(marquee.currentClientY - marquee.startClientY);
+            if (width < 3 && height < 3) return null;
+            return (
+              <div
+                className="absolute pointer-events-none border border-primary/60 bg-primary/8 rounded-sm"
+                style={{ left, top, width, height, zIndex: 9999 }}
+              />
+            );
+          })()}
           <LinkTypeModal
             open={!!linkModalTarget}
             onSelect={(type: EmotionalLinkType) => {
