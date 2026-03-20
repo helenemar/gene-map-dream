@@ -9,11 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 
-/** 16 vibrant pathology colors — first 10 for defaults, last 6 for custom */
+/** 16 pathology colors — first 10 for defaults, last 6 for custom */
 export const PATHOLOGY_COLORS: string[] = [
-  '#FF3D3D', '#FF823D', '#FFC73D', '#F2FF3D', '#ADFF3D', '#69FF3D',
-  '#3DFF60', '#3DFFA6', '#3DFFED', '#3DCCFF', '#3D87FF', '#3D42FF',
-  '#823DFF', '#C73DFF', '#FF3DF2', '#FF3DAD',
+  '#FF3333', '#801A1A', '#FF8C33', '#FFFF4D', '#B38F00', '#99FF4D',
+  '#1A803D', '#4DFFFF', '#1A7A80', '#4D4DFF', '#1A1A80', '#804DFF',
+  '#3D1A80', '#FF4DFF', '#801A4F', '#FF4D99',
 ];
 
 interface AddPathologyModalProps {
