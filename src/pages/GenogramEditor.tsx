@@ -1565,6 +1565,7 @@ const GenogramEditor: React.FC = () => {
                 dynamicPathologies={pathologiesVisible ? dynamicPathologies : []}
                 showParentSplit={shouldShowParentSplit(member.id)}
                 isAdopted={isMemberAdopted(member.id)}
+                onboardingPulse={onboarding.active && onboarding.step === 2 && member.id === members[0]?.id}
               />
               );
             })}

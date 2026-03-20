@@ -162,6 +162,14 @@ const MemberCard: React.FC<MemberCardProps> = ({
           ...(searchHighlighted ? { boxShadow: '0 0 20px hsl(var(--primary) / 0.35), 0 0 40px hsl(var(--primary) / 0.15)' } : {}),
         }}
       >
+        {/* Onboarding pulse ring */}
+        {onboardingPulse && (
+          <motion.div
+            className="absolute -inset-3 rounded-2xl border-2 border-primary pointer-events-none"
+            animate={{ scale: [1, 1.08, 1], opacity: [0.7, 0, 0.7] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
         {/* Lock indicator removed — managed via floating lock panel */}
         {/* Corner anchor dots — absolutely positioned at card corners with negative offset */}
         {showDots && CORNER_DOTS.map(({ side, style }) => (
