@@ -1,5 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode, FileText, LogOut } from 'lucide-react';
+import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode, FileText, LogOut, ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
