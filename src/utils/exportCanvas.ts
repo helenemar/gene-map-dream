@@ -1,5 +1,5 @@
 import { jsPDF } from 'jspdf';
-import { FamilyMember } from '@/types/genogram';
+import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
@@ -96,7 +96,34 @@ function resolveAllSvgColors(svgClone: SVGElement, svgOriginal: SVGElement) {
 
 // ─── Bounds ─────────────────────────────────────────────────────────
 
-function getMemberBounds(contentDiv: HTMLElement, padding = 80) {
+const EXPORT_CARD_W = 220;
+const EXPORT_CARD_H = 64;
+
+/**
+ * Compute bounds directly from member data (not DOM) to avoid
+ * framer-motion transform measurement issues.
+ */
+function getMemberBoundsFromData(members: FamilyMember[], padding = 80) {
+  if (!members.length) return { x: 0, y: 0, w: 800, h: 600 };
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  members.forEach(m => {
+    minX = Math.min(minX, m.x);
+    minY = Math.min(minY, m.y);
+    maxX = Math.max(maxX, m.x + EXPORT_CARD_W);
+    maxY = Math.max(maxY, m.y + EXPORT_CARD_H);
+  });
+
+  const extra = 150;
+  return {
+    x: minX - padding - extra,
+    y: minY - padding - extra,
+    w: maxX - minX + (padding + extra) * 2,
+    h: maxY - minY + (padding + extra) * 2,
+  };
+}
+
+function getMemberBoundsFromDOM(contentDiv: HTMLElement, padding = 80) {
   const cards = contentDiv.querySelectorAll('[data-member-card]');
   const contentRect = contentDiv.getBoundingClientRect();
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -302,7 +329,7 @@ function escapeXml(str: string): string {
 
 // ─── Build Export SVG ───────────────────────────────────────────────
 
-function buildExportSvg(canvasRef: HTMLDivElement): { svgString: string; width: number; height: number } | null {
+function buildExportSvg(canvasRef: HTMLDivElement, members?: FamilyMember[]): { svgString: string; width: number; height: number } | null {
   const contentDiv = canvasRef.querySelector('.absolute') as HTMLElement;
   if (!contentDiv) return null;
 
@@ -315,11 +342,15 @@ function buildExportSvg(canvasRef: HTMLDivElement): { svgString: string; width: 
   contentDiv.style.transform = 'none';
   contentDiv.style.transformOrigin = '0 0';
 
-  // Force layout recalc
+  // Force layout recalc — double reflow to ensure framer-motion settles
+  void contentDiv.offsetHeight;
   contentDiv.getBoundingClientRect();
 
   try {
-    const bounds = getMemberBounds(contentDiv);
+    // Use data-based bounds when members are available (much more reliable)
+    const bounds = members && members.length > 0
+      ? getMemberBoundsFromData(members)
+      : getMemberBoundsFromDOM(contentDiv);
     const contentRect = contentDiv.getBoundingClientRect();
 
     let svgInner = '';
@@ -356,10 +387,51 @@ function buildExportSvg(canvasRef: HTMLDivElement): { svgString: string; width: 
     });
 
     // 2. Render member cards as pure SVG
-    const cards = contentDiv.querySelectorAll('[data-member-card]');
-    cards.forEach(card => {
-      svgInner += renderCardAsSvg(card as HTMLElement, contentRect);
-    });
+    // When members data is available, use member coordinates directly
+    // instead of relying on getBoundingClientRect which can be offset by framer-motion
+    if (members && members.length > 0) {
+      const cards = contentDiv.querySelectorAll('[data-member-card]');
+      const cardArray = Array.from(cards) as HTMLElement[];
+      
+      // Match cards to members by reading their position or order
+      // Cards use framer-motion animate which sets transform, not left/top reliably
+      // So we render each card at its member's known x,y position
+      members.forEach(member => {
+        // Find the card element for this member by matching position or data
+        const matchingCard = cardArray.find(card => {
+          // Try to match by text content (member name)
+          const nameEl = card.querySelector('.font-semibold, .font-medium');
+          const cardName = nameEl?.textContent?.trim() || '';
+          const memberName = `${member.firstName} ${member.lastName}`.trim();
+          return cardName === memberName || cardName === member.firstName;
+        });
+        
+        if (matchingCard) {
+          // Use a synthetic contentRect at origin since we're using member coordinates directly
+          const syntheticRect = { left: 0, top: 0 } as DOMRect;
+          const origGetBCR = matchingCard.getBoundingClientRect;
+          // Override getBoundingClientRect temporarily to return member coordinates
+          matchingCard.getBoundingClientRect = () => ({
+            left: member.x,
+            top: member.y,
+            right: member.x + matchingCard.offsetWidth,
+            bottom: member.y + matchingCard.offsetHeight,
+            width: matchingCard.offsetWidth || EXPORT_CARD_W,
+            height: matchingCard.offsetHeight || EXPORT_CARD_H,
+            x: member.x,
+            y: member.y,
+            toJSON: () => ({}),
+          });
+          svgInner += renderCardAsSvg(matchingCard, syntheticRect);
+          matchingCard.getBoundingClientRect = origGetBCR;
+        }
+      });
+    } else {
+      const cards = contentDiv.querySelectorAll('[data-member-card]');
+      cards.forEach(card => {
+        svgInner += renderCardAsSvg(card as HTMLElement, contentRect);
+      });
+    }
 
     const svgString = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -410,8 +482,8 @@ function svgToCanvas(svgString: string, width: number, height: number, scale = 2
 
 // ─── Public API ─────────────────────────────────────────────────────
 
-export async function exportAsPng(canvasRef: HTMLDivElement, fileName: string) {
-  const result = buildExportSvg(canvasRef);
+export async function exportAsPng(canvasRef: HTMLDivElement, fileName: string, members?: FamilyMember[]) {
+  const result = buildExportSvg(canvasRef, members);
   if (!result) return;
 
   try {
@@ -426,8 +498,8 @@ export async function exportAsPng(canvasRef: HTMLDivElement, fileName: string) {
   }
 }
 
-export async function exportAsPdf(canvasRef: HTMLDivElement, fileName: string) {
-  const result = buildExportSvg(canvasRef);
+export async function exportAsPdf(canvasRef: HTMLDivElement, fileName: string, members?: FamilyMember[]) {
+  const result = buildExportSvg(canvasRef, members);
   if (!result) return;
 
   try {
@@ -491,8 +563,9 @@ export function exportAsSvg(
   _cardW: number,
   _cardH: number,
   fileName: string,
+  members?: FamilyMember[],
 ) {
-  const result = buildExportSvg(canvasRef);
+  const result = buildExportSvg(canvasRef, members);
   if (!result) return;
 
   const blob = new Blob([result.svgString], { type: 'image/svg+xml;charset=utf-8' });
