@@ -147,7 +147,7 @@ const GenogramEditor: React.FC = () => {
     } catch { /* ignore */ }
     return SAMPLE_MEMBERS;
   });
-  const [selectedMember, setSelectedMember] = useState<string | null>(null);
+  const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set());
   const [anchorActiveMember, setAnchorActiveMember] = useState<string | null>(null);
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
   const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(() => genogramId ? [] : SAMPLE_EMOTIONAL_LINKS);
