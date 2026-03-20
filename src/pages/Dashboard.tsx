@@ -518,6 +518,16 @@ const Dashboard: React.FC = () => {
                                 Ouvrir
                               </DropdownMenuItem>
                               <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRenamingId(file.id);
+                                  setRenameValue(file.name);
+                                }}
+                              >
+                                Renommer
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
                                 onClick={(e) => handleDelete(file.id, e as any)}
                                 className="text-destructive focus:text-destructive"
                               >
