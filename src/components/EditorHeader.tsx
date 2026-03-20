@@ -102,6 +102,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   onBack,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [betaExportOpen, setBetaExportOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
