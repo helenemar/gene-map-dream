@@ -91,7 +91,7 @@ const AddPathologyModal: React.FC<AddPathologyModalProps> = ({
           {/* Color grid */}
           <div>
             <p className="text-xs text-muted-foreground mb-2">Choisir une couleur</p>
-            <div className="grid grid-cols-8 gap-2">
+            <div className="grid grid-cols-6 gap-2">
               {PATHOLOGY_COLORS.map((color) => {
                 const isUsed = usedColors.includes(color);
                 const isSelected = selectedColor === color;
