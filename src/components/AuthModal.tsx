@@ -26,6 +26,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
   const [fullName, setFullName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Reset state when modal opens with a new default view
   React.useEffect(() => {
