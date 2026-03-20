@@ -853,7 +853,7 @@ const GenogramEditor: React.FC = () => {
     }
 
     // ── Non-child relationships (spouse, parent, sibling) ──
-    const pos = computeNewPosition(sourceId, relationship);
+    const pos = getViewportCenter();
     const source = members.find(m => m.id === sourceId);
     const currentYear = new Date().getFullYear();
 
