@@ -1412,6 +1412,7 @@ const GenogramEditor: React.FC = () => {
         {/* Canvas */}
         <div
           ref={canvasRef}
+          data-onboarding="canvas"
           className={`flex-1 relative overflow-hidden canvas-bg ${cursorClass}`}
           style={dotGridStyle}
           onMouseDown={handleCanvasMouseDown}
