@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import gogyIcon from '@/assets/genogy-icon.svg';
-import { Mail, ArrowLeft, X, Check } from 'lucide-react';
+import { Mail, ArrowLeft, X, Check, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type AuthView = 'login' | 'signup' | 'forgot-password' | 'success';
