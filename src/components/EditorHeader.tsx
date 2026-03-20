@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+
 import { SearchSuggestion } from '@/hooks/useFamilySearch';
 import SaveIndicator from '@/components/SaveIndicator';
 import { SaveStatus } from '@/hooks/useAutoSave';
