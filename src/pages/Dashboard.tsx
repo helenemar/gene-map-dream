@@ -284,6 +284,19 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleRename = async (id: string) => {
+    const name = renameValue.trim();
+    if (!name) return;
+    const { error } = await supabase.from('genograms').update({ name }).eq('id', id);
+    if (error) {
+      toast.error('Erreur lors du renommage');
+    } else {
+      toast.success('Génogramme renommé');
+      queryClient.invalidateQueries({ queryKey: ['genograms'] });
+    }
+    setRenamingId(null);
+  };
+
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
