@@ -381,8 +381,17 @@ const GenogramEditor: React.FC = () => {
     const member = members.find(m => m.id === id);
     if (!member) return;
     recordSnapshot(); // Record before position change
-    setDragInfo({ id, startX: e.clientX, startY: e.clientY, memberX: member.x, memberY: member.y });
-  }, [members, isSpaceDown, recordSnapshot]);
+    // If dragging a selected member, store offsets for all selected members
+    const draggingSelected = selectedMembers.has(id);
+    const groupOffsets: Record<string, { dx: number; dy: number }> = {};
+    if (draggingSelected && selectedMembers.size > 1) {
+      for (const mid of selectedMembers) {
+        const m = members.find(mm => mm.id === mid);
+        if (m) groupOffsets[mid] = { dx: m.x - member.x, dy: m.y - member.y };
+      }
+    }
+    setDragInfo({ id, startX: e.clientX, startY: e.clientY, memberX: member.x, memberY: member.y, groupOffsets });
+  }, [members, isSpaceDown, recordSnapshot, selectedMembers]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     // Link drag in progress — update cursor position in world space + snap detection
