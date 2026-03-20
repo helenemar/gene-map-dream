@@ -70,6 +70,10 @@ const UserAvatar: React.FC = () => {
             <p className="text-xs text-muted-foreground truncate">{user.email}</p>
           )}
         </div>
+        <DropdownMenuItem onClick={() => window.location.href = '/account'} className="cursor-pointer">
+          <User className="w-3.5 h-3.5 mr-2" />
+          Mon compte
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut()} className="text-destructive focus:text-destructive cursor-pointer">
           <LogOut className="w-3.5 h-3.5 mr-2" />
