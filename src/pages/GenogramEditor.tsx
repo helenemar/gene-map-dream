@@ -1571,6 +1571,7 @@ const GenogramEditor: React.FC = () => {
               const sourceUnions = unions.filter(u => u.partner1 === parentPickerState.sourceId || u.partner2 === parentPickerState.sourceId);
               return (
                 <ParentPicker
+                  isPerinatal={!!pendingPerinatalType}
                   sourceMember={pickerSource}
                   unions={sourceUnions}
                   members={members}
