@@ -98,3 +98,8 @@
   background-size: 24px 24px;
   background-color: hsl(var(--canvas-bg));
 }
+
+/* Prevent macOS two-finger swipe back/forward navigation on the editor */
+html, body {
+  overscroll-behavior-x: none;
+}
