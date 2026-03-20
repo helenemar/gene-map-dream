@@ -382,7 +382,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Prénoms</Label>
-                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Marie, Jeanne" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus />
+                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Marie, Jeanne" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus disabled={member.isIndexPatient} />
                   <span className="text-[9px] text-muted-foreground/60">Séparez les prénoms par une virgule</span>
                 </div>
                 <div className="flex flex-col gap-1">
