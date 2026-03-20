@@ -173,6 +173,12 @@ const GenogramEditor: React.FC = () => {
     groupOffsets?: Record<string, { dx: number; dy: number }>;
   } | null>(null);
 
+  // Marquee (rectangle) selection state — screen coordinates
+  const [marquee, setMarquee] = useState<{
+    startClientX: number; startClientY: number;
+    currentClientX: number; currentClientY: number;
+  } | null>(null);
+
   // Link drag state
   const [linkDrag, setLinkDrag] = useState<{
     fromId: string;
