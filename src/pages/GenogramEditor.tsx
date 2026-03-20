@@ -147,7 +147,7 @@ const GenogramEditor: React.FC = () => {
     } catch { /* ignore */ }
     return SAMPLE_MEMBERS;
   });
-  const [selectedMember, setSelectedMember] = useState<string | null>(null);
+  const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set());
   const [anchorActiveMember, setAnchorActiveMember] = useState<string | null>(null);
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
   const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(() => genogramId ? [] : SAMPLE_EMOTIONAL_LINKS);
@@ -170,6 +170,7 @@ const GenogramEditor: React.FC = () => {
   const [isSpaceDown, setIsSpaceDown] = useState(false);
   const [dragInfo, setDragInfo] = useState<{
     id: string; startX: number; startY: number; memberX: number; memberY: number;
+    groupOffsets?: Record<string, { dx: number; dy: number }>;
   } | null>(null);
 
   // Link drag state
@@ -381,8 +382,17 @@ const GenogramEditor: React.FC = () => {
     const member = members.find(m => m.id === id);
     if (!member) return;
     recordSnapshot(); // Record before position change
-    setDragInfo({ id, startX: e.clientX, startY: e.clientY, memberX: member.x, memberY: member.y });
-  }, [members, isSpaceDown, recordSnapshot]);
+    // If dragging a selected member, store offsets for all selected members
+    const draggingSelected = selectedMembers.has(id);
+    const groupOffsets: Record<string, { dx: number; dy: number }> = {};
+    if (draggingSelected && selectedMembers.size > 1) {
+      for (const mid of selectedMembers) {
+        const m = members.find(mm => mm.id === mid);
+        if (m) groupOffsets[mid] = { dx: m.x - member.x, dy: m.y - member.y };
+      }
+    }
+    setDragInfo({ id, startX: e.clientX, startY: e.clientY, memberX: member.x, memberY: member.y, groupOffsets });
+  }, [members, isSpaceDown, recordSnapshot, selectedMembers]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     // Link drag in progress — update cursor position in world space + snap detection
@@ -467,9 +477,18 @@ const GenogramEditor: React.FC = () => {
         }
       }
       setSmartGuides(guides);
-      setMembers(prev => prev.map(m =>
-        m.id === dragInfo.id ? { ...m, x: newX, y: newY } : m
-      ));
+      // Move all selected members together if multi-dragging
+      if (dragInfo.groupOffsets && Object.keys(dragInfo.groupOffsets).length > 1) {
+        setMembers(prev => prev.map(m => {
+          const offset = dragInfo.groupOffsets?.[m.id];
+          if (offset) return { ...m, x: newX + offset.dx, y: newY + offset.dy };
+          return m;
+        }));
+      } else {
+        setMembers(prev => prev.map(m =>
+          m.id === dragInfo.id ? { ...m, x: newX, y: newY } : m
+        ));
+      }
     } else if (isPanning) {
       setPan(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }));
     }
@@ -506,11 +525,24 @@ const GenogramEditor: React.FC = () => {
     }
     // Snap on release if enabled
     if (dragInfo && snapToGrid) {
-      setMembers(prev => prev.map(m =>
-        m.id === dragInfo.id
-          ? { ...m, x: Math.round(m.x / SNAP_GRID_X) * SNAP_GRID_X, y: Math.round(m.y / SNAP_GRID_Y) * SNAP_GRID_Y }
-          : m
-      ));
+      if (dragInfo.groupOffsets && Object.keys(dragInfo.groupOffsets).length > 1) {
+        // Snap the primary member, then offset others accordingly
+        const snappedX = Math.round(members.find(m => m.id === dragInfo.id)!.x / SNAP_GRID_X) * SNAP_GRID_X;
+        const snappedY = Math.round(members.find(m => m.id === dragInfo.id)!.y / SNAP_GRID_Y) * SNAP_GRID_Y;
+        const currentMember = members.find(m => m.id === dragInfo.id)!;
+        const snapDx = snappedX - currentMember.x;
+        const snapDy = snappedY - currentMember.y;
+        setMembers(prev => prev.map(m => {
+          if (dragInfo.groupOffsets?.[m.id]) return { ...m, x: m.x + snapDx, y: m.y + snapDy };
+          return m;
+        }));
+      } else {
+        setMembers(prev => prev.map(m =>
+          m.id === dragInfo.id
+            ? { ...m, x: Math.round(m.x / SNAP_GRID_X) * SNAP_GRID_X, y: Math.round(m.y / SNAP_GRID_Y) * SNAP_GRID_Y }
+            : m
+        ));
+      }
     }
     setSmartGuides([]);
     setDragInfo(null);
@@ -533,23 +565,33 @@ const GenogramEditor: React.FC = () => {
     // Left-click on empty canvas → pan
     if (e.button === 0 && (e.target === canvasRef.current || (e.target as HTMLElement).classList.contains('canvas-bg'))) {
       setIsPanning(true);
-      setSelectedMember(null);
+      setSelectedMembers(new Set());
       setAnchorActiveMember(null);
       return;
     }
   }, [isSpaceDown]);
 
-  const handleSelect = useCallback((id: string) => {
-    setSelectedMember(prev => prev === id ? null : id);
+  const handleSelect = useCallback((id: string, e?: React.MouseEvent) => {
+    const isMulti = e ? (e.shiftKey || e.metaKey || e.ctrlKey) : false;
+    setSelectedMembers(prev => {
+      if (isMulti) {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id); else next.add(id);
+        return next;
+      }
+      // Single click: toggle or replace
+      if (prev.size === 1 && prev.has(id)) return new Set();
+      return new Set([id]);
+    });
     setAnchorActiveMember(null);
   }, []);
 
   const getMemberState = useCallback((memberId: string) => {
     if (anchorActiveMember === memberId) return 'anchor-active' as const;
-    if (selectedMember === memberId) return 'selected' as const;
+    if (selectedMembers.has(memberId)) return 'selected' as const;
     if (hoveredMember === memberId) return 'hover' as const;
     return 'default' as const;
-  }, [selectedMember, hoveredMember, anchorActiveMember]);
+  }, [selectedMembers, hoveredMember, anchorActiveMember]);
 
   // ─── New member state ───
   const [editingNewMember, setEditingNewMember] = useState<FamilyMember | null>(null);
@@ -578,7 +620,7 @@ const GenogramEditor: React.FC = () => {
   /** Focus on member: center + select + briefly highlight */
   const handleFocusMember = useCallback((member: FamilyMember) => {
     centerOnMember(member);
-    setSelectedMember(member.id);
+    setSelectedMembers(new Set([member.id]));
   }, [centerOnMember]);
 
   /** Toggle solo emotional type: same type = off, different type = switch */
@@ -761,7 +803,7 @@ const GenogramEditor: React.FC = () => {
       setTimeout(() => setIsAnimating(false), 600);
 
       // Select and open drawer for new child (skip for perinatal)
-      setSelectedMember(newChild.id);
+      setSelectedMembers(new Set([newChild.id]));
       if (!perinatal) {
         setEditingNewMember(newChild);
         setDrawerEditing(true);
@@ -772,7 +814,7 @@ const GenogramEditor: React.FC = () => {
     }
 
     // Select and open drawer for new child (existing union path, skip for perinatal)
-    setSelectedMember(newChild.id);
+    setSelectedMembers(new Set([newChild.id]));
     if (!perinatal) {
       setEditingNewMember(newChild);
       setDrawerEditing(true);
@@ -819,7 +861,7 @@ const GenogramEditor: React.FC = () => {
     recordSnapshot();
     setMembers(prev => [...prev, newChild]);
     setUnions(prev => [...prev, newUnion]);
-    setSelectedMember(newChild.id);
+    setSelectedMembers(new Set([newChild.id]));
     setEditingNewMember(newChild);
     setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
@@ -1008,7 +1050,7 @@ const GenogramEditor: React.FC = () => {
       }
 
       // Select and open edit drawer
-      setSelectedMember(newMember.id);
+      setSelectedMembers(new Set([newMember.id]));
       setEditingNewMember(newMember);
       setDrawerEditing(true);
       setNewMemberDrawerOpen(true);
@@ -1017,7 +1059,7 @@ const GenogramEditor: React.FC = () => {
     }
 
     // Select and open edit drawer (non-parent relationships)
-    setSelectedMember(newMember.id);
+    setSelectedMembers(new Set([newMember.id]));
     setEditingNewMember(newMember);
     setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
@@ -1107,7 +1149,7 @@ const GenogramEditor: React.FC = () => {
           .filter(u => !toRemoveSet.has(u.partner1) && !toRemoveSet.has(u.partner2))
         );
         setEmotionalLinks(prev => prev.filter(l => !toRemoveSet.has(l.from) && !toRemoveSet.has(l.to)));
-        setSelectedMember(null);
+        setSelectedMembers(new Set());
         setEditingNewMember(null);
       }, 350);
     } else {
@@ -1118,7 +1160,7 @@ const GenogramEditor: React.FC = () => {
         .filter(u => u.partner1 !== id && u.partner2 !== id)
       );
       setEmotionalLinks(prev => prev.filter(l => !toRemoveSet.has(l.from) && !toRemoveSet.has(l.to)));
-      setSelectedMember(null);
+      setSelectedMembers(new Set());
       setEditingNewMember(null);
     }
   }, [members, unions]);
@@ -1433,7 +1475,7 @@ const GenogramEditor: React.FC = () => {
               <MemberCard
                 key={member.id}
                 member={member}
-                isSelected={selectedMember === member.id}
+                isSelected={selectedMembers.has(member.id)}
                 isAnimating={isAnimating}
                 isColliding={collisions.has(member.id)}
                 state={getMemberState(member.id)}
@@ -1442,6 +1484,7 @@ const GenogramEditor: React.FC = () => {
                 searchDimmed={search.isActive && !search.matchedMemberIds.has(member.id)}
                 searchHighlighted={search.isActive && search.matchedMemberIds.has(member.id)}
                 presentationMode={presentationMode}
+                multiSelected={selectedMembers.size > 1}
                 compact={isBioParentOfAdoptedChild}
                 onSelect={handleSelect}
                 onDragStart={handleDragStart}
@@ -1618,7 +1661,7 @@ const GenogramEditor: React.FC = () => {
             presentationMode={presentationMode}
             onTogglePresentation={() => {
               setPresentationMode(prev => !prev);
-              setSelectedMember(null);
+              setSelectedMembers(new Set());
               setAnchorActiveMember(null);
             }}
             onUndo={handleUndo}

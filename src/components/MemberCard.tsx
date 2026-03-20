@@ -37,11 +37,12 @@ interface MemberCardProps {
   searchDimmed?: boolean;
   /** Search: glowing when this card matches search */
   searchHighlighted?: boolean;
-  /** Presentation mode: hide controls, disable drag, click opens view */
+  /** When true, multiple members are selected — hide action menus */
+  multiSelected?: boolean;
   presentationMode?: boolean;
   /** Compact mode: smaller card for bio parents when adoptive parents exist */
   compact?: boolean;
-  onSelect?: (id: string) => void;
+  onSelect?: (id: string, e?: React.MouseEvent) => void;
   onDragStart?: (id: string, e: React.MouseEvent) => void;
   onCreateRelated?: (id: string, relationship: RelationshipChoice) => void;
   onEdit?: (id: string) => void;
@@ -77,6 +78,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   isFadingOut = false,
   searchDimmed = false,
   searchHighlighted = false,
+  multiSelected = false,
   presentationMode = false,
   compact = false,
   onSelect,
@@ -268,7 +270,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         </div>
       </div>
 
-      {activeState === 'selected' && !presentationMode && (
+      {activeState === 'selected' && !presentationMode && !multiSelected && (
         <motion.div
           className="flex items-center gap-2 justify-center mt-2"
           initial={{ opacity: 0, y: -4 }}
@@ -350,13 +352,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
         e.stopPropagation();
         if (!presentationMode) onDragStart?.(member.id, e);
       }}
-      onClick={() => {
+      onClick={(e) => {
         if (presentationMode) {
           if (!isPlaceholder && !isDraft) onView?.(member.id);
         } else if (isPlaceholder || isDraft) {
           onEdit?.(member.id);
         } else {
-          onSelect?.(member.id);
+          onSelect?.(member.id, e);
         }
       }}
       onDoubleClick={() => {
