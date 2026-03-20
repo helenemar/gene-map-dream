@@ -179,6 +179,8 @@ const Dashboard: React.FC = () => {
   const [betaModalOpen, setBetaModalOpen] = useState(false);
   const [notesModal, setNotesModal] = useState<{ open: boolean; genogramId: string; genogramName: string }>({ open: false, genogramId: '', genogramName: '' });
   const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
   const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
 
   const { data: realGenograms, isLoading } = useQuery({
@@ -280,6 +282,19 @@ const Dashboard: React.FC = () => {
       toast.success('Génogramme supprimé');
       queryClient.invalidateQueries({ queryKey: ['genograms'] });
     }
+  };
+
+  const handleRename = async (id: string) => {
+    const trimmed = renameValue.trim();
+    if (!trimmed) { setRenamingId(null); return; }
+    const { error } = await supabase.from('genograms').update({ name: trimmed }).eq('id', id);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('Génogramme renommé');
+      queryClient.invalidateQueries({ queryKey: ['genograms'] });
+    }
+    setRenamingId(null);
   };
 
   const formatDate = (iso: string) =>
@@ -419,9 +434,24 @@ const Dashboard: React.FC = () => {
                       <TableCell className="pl-6">
                         <div className="flex items-center gap-3">
                           <GenogramThumbnail data={file.data || {}} width={56} height={40} />
-                          <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
-                            {file.name}
-                          </span>
+                          {renamingId === file.id ? (
+                            <input
+                              autoFocus
+                              value={renameValue}
+                              onChange={(e) => setRenameValue(e.target.value)}
+                              onBlur={() => handleRename(file.id)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleRename(file.id);
+                                if (e.key === 'Escape') setRenamingId(null);
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              className="text-[13px] font-medium text-foreground bg-transparent border border-ring rounded px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-ring w-48"
+                            />
+                          ) : (
+                            <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
+                              {file.name}
+                            </span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -487,6 +517,16 @@ const Dashboard: React.FC = () => {
                               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/editor/${file.id}`); }}>
                                 Ouvrir
                               </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRenamingId(file.id);
+                                  setRenameValue(file.name);
+                                }}
+                              >
+                                Renommer
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 onClick={(e) => handleDelete(file.id, e as any)}
                                 className="text-destructive focus:text-destructive"
