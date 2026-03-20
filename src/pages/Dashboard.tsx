@@ -519,6 +519,10 @@ const Dashboard: React.FC = () => {
                               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/editor/${file.id}`); }}>
                                 Ouvrir
                               </DropdownMenuItem>
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setRenameValue(file.name); setRenamingId(file.id); }}>
+                                <Pencil className="w-3.5 h-3.5 mr-2" />
+                                Renommer
+                              </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={(e) => handleDelete(file.id, e as any)}
                                 className="text-destructive focus:text-destructive"
