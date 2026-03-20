@@ -110,42 +110,91 @@ export const DragAnimation: React.FC = () => (
 );
 
 /* ── 4. Create link: drag from anchor to another card ── */
-export const LinkAnimation: React.FC = () => (
-  <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
-    <svg width="160" height="60" viewBox="0 0 160 60">
-      {/* Card A */}
-      <MiniCard x={20} y={18} w={44} h={24} label="Marie" />
-      {/* Card B */}
-      <MiniCard x={96} y={18} w={44} h={24} label="Paul" />
-      {/* Anchor dot on Card A */}
-      <motion.circle
-        cx={64} cy={30} r={3.5}
-        fill="hsl(var(--primary))"
-        animate={{ scale: [1, 1.3, 1] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      {/* Elastic line growing */}
-      <motion.line
-        x1={64} y1={30}
-        x2={64} y2={30}
-        stroke="hsl(var(--primary))"
-        strokeWidth={2}
-        strokeLinecap="round"
-        animate={{ x2: [64, 96, 96, 64] }}
-        transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.6, 1] }}
-      />
-      {/* Snap pulse on Card B anchor */}
-      <motion.circle
-        cx={96} cy={30} r={3.5}
-        fill="hsl(var(--primary) / 0.3)"
-        stroke="hsl(var(--primary))"
-        strokeWidth={1.5}
-        animate={{ scale: [0, 0, 1.4, 1, 0], opacity: [0, 0, 1, 1, 0] }}
-        transition={{ duration: 2.8, repeat: Infinity, times: [0, 0.3, 0.45, 0.6, 0.7] }}
-      />
-    </svg>
-  </div>
-);
+export const LinkAnimation: React.FC = () => {
+  const cardAX = 16, cardAY = 14, cardBX = 100, cardBY = 14;
+  const cardW = 48, cardH = 28;
+
+  // Anchor positions on all 4 sides of each card (midpoints)
+  const anchorsA = [
+    { cx: cardAX + cardW / 2, cy: cardAY, label: 'top' },           // top
+    { cx: cardAX + cardW, cy: cardAY + cardH / 2, label: 'right' }, // right ← active
+    { cx: cardAX + cardW / 2, cy: cardAY + cardH, label: 'bottom' },// bottom
+    { cx: cardAX, cy: cardAY + cardH / 2, label: 'left' },          // left
+  ];
+  const anchorsB = [
+    { cx: cardBX + cardW / 2, cy: cardBY, label: 'top' },
+    { cx: cardBX + cardW, cy: cardBY + cardH / 2, label: 'right' },
+    { cx: cardBX + cardW / 2, cy: cardBY + cardH, label: 'bottom' },
+    { cx: cardBX, cy: cardBY + cardH / 2, label: 'left' },          // left ← active
+  ];
+
+  const fromAnchor = anchorsA[1]; // right side of A
+  const toAnchor = anchorsB[3];   // left side of B
+
+  return (
+    <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
+      <svg width="164" height="56" viewBox="0 0 164 56">
+        {/* Card A */}
+        <MiniCard x={cardAX} y={cardAY} w={cardW} h={cardH} label="Marie" />
+        {/* Card B */}
+        <MiniCard x={cardBX} y={cardBY} w={cardW} h={cardH} label="Paul" />
+
+        {/* All 4 anchor dots on Card A */}
+        {anchorsA.map((a, i) => (
+          <motion.circle
+            key={`a-${i}`}
+            cx={a.cx} cy={a.cy} r={2.5}
+            fill={i === 1 ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.35)'}
+            stroke={i === 1 ? 'hsl(var(--primary))' : 'hsl(var(--border))'}
+            strokeWidth={0.8}
+            animate={i === 1 ? { scale: [1, 1.5, 1], r: [2.5, 3.5, 2.5] } : { scale: [0.8, 1, 0.8] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: i === 1 ? 0 : 0.3 }}
+          />
+        ))}
+
+        {/* All 4 anchor dots on Card B */}
+        {anchorsB.map((a, i) => (
+          <motion.circle
+            key={`b-${i}`}
+            cx={a.cx} cy={a.cy} r={2.5}
+            fill={i === 3 ? 'hsl(var(--primary) / 0.3)' : 'hsl(var(--muted-foreground) / 0.35)'}
+            stroke={i === 3 ? 'hsl(var(--primary))' : 'hsl(var(--border))'}
+            strokeWidth={0.8}
+            animate={i === 3 ? { scale: [0, 0, 1.4, 1, 0], opacity: [0, 0, 1, 1, 0] } : { scale: [0.8, 1, 0.8] }}
+            transition={i === 3
+              ? { duration: 2.8, repeat: Infinity, times: [0, 0.3, 0.45, 0.6, 0.7] }
+              : { duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }
+            }
+          />
+        ))}
+
+        {/* Elastic line from right side of A → left side of B */}
+        <motion.line
+          x1={fromAnchor.cx} y1={fromAnchor.cy}
+          x2={fromAnchor.cx} y2={fromAnchor.cy}
+          stroke="hsl(var(--primary))"
+          strokeWidth={2}
+          strokeLinecap="round"
+          animate={{ x2: [fromAnchor.cx, toAnchor.cx, toAnchor.cx, fromAnchor.cx] }}
+          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.6, 1] }}
+        />
+
+        {/* Cursor following the line */}
+        <motion.g
+          animate={{
+            x: [0, toAnchor.cx - fromAnchor.cx - 6, toAnchor.cx - fromAnchor.cx - 6, 0],
+            opacity: [1, 1, 0.4, 1],
+          }}
+          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.6, 1] }}
+        >
+          <g transform={`translate(${fromAnchor.cx + 2}, ${fromAnchor.cy + 2})`}>
+            {CURSOR}
+          </g>
+        </motion.g>
+      </svg>
+    </div>
+  );
+};
 
 /* ── 5. Undo/Redo: keyboard keys animation ── */
 export const UndoAnimation: React.FC = () => (
