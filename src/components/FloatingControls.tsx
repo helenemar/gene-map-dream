@@ -1,5 +1,5 @@
 import React from 'react';
-import { ZoomIn, ZoomOut, Maximize, Presentation, Undo2, Redo2 } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize, Presentation, Undo2, Redo2, HelpCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface FloatingControlsProps {
@@ -14,11 +14,12 @@ interface FloatingControlsProps {
   onRedo?: () => void;
   canUndo?: boolean;
   canRedo?: boolean;
+  onHelp?: () => void;
 }
 
 const FloatingControls: React.FC<FloatingControlsProps> = ({
   onZoomIn, onZoomOut, onFitToScreen, onAutoLayout, zoom = 1, presentationMode = false, onTogglePresentation,
-  onUndo, onRedo, canUndo = false, canRedo = false,
+  onUndo, onRedo, canUndo = false, canRedo = false, onHelp,
 }) => {
   const zoomPercent = Math.round(zoom * 100);
 
@@ -56,7 +57,7 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
         </div>
       )}
 
-      {/* Bottom bar — zoom, presentation */}
+      {/* Bottom bar — zoom, presentation, help */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
 
         <div className="flex items-center gap-1 bg-card rounded-full shadow-float border border-border p-1.5">
@@ -109,6 +110,20 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
           </TooltipTrigger>
           <TooltipContent side="top">{presentationMode ? 'Quitter la présentation' : 'Mode présentation'}</TooltipContent>
         </Tooltip>
+
+        {onHelp && !presentationMode && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={onHelp}
+                className="h-10 w-10 rounded-full shadow-float border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors"
+              >
+                <HelpCircle className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">Aide & raccourcis</TooltipContent>
+          </Tooltip>
+        )}
       </div>
     </TooltipProvider>
   );
