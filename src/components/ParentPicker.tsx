@@ -56,7 +56,7 @@ const ParentPicker: React.FC<ParentPickerProps> = ({
             <span className="text-sm font-semibold text-foreground">Choisir le couple parent</span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            De quelle union est issu cet enfant ?
+            {isPerinatal ? 'De quelle union est issue cette grossesse ?' : 'De quelle union est issu cet enfant ?'}
           </p>
         </div>
 
