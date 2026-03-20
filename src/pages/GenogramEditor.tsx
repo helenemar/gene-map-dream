@@ -1319,9 +1319,11 @@ const GenogramEditor: React.FC = () => {
     ? 'cursor-default'
     : linkDrag
       ? 'cursor-crosshair'
-      : isSpaceDown || isPanning
-        ? (isPanning ? 'cursor-grabbing' : 'cursor-grab')
-        : 'cursor-default';
+      : marquee
+        ? 'cursor-crosshair'
+        : isSpaceDown || isPanning
+          ? (isPanning ? 'cursor-grabbing' : 'cursor-grab')
+          : 'cursor-default';
 
   // ─── Dynamic dot grid background style ───
   const dotSize = DOT_SPACING * zoom;
