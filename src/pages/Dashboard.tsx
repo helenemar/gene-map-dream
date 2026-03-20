@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText, Pencil } from 'lucide-react';
+import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText } from 'lucide-react';
 import GenogramThumbnail from '@/components/GenogramThumbnail';
 import CreateGenogramModal from '@/components/CreateGenogramModal';
 import BetaShareModal from '@/components/BetaShareModal';
@@ -178,8 +178,6 @@ const Dashboard: React.FC = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [betaModalOpen, setBetaModalOpen] = useState(false);
   const [notesModal, setNotesModal] = useState<{ open: boolean; genogramId: string; genogramName: string }>({ open: false, genogramId: '', genogramName: '' });
-  const [renamingId, setRenamingId] = useState<string | null>(null);
-  const [renameValue, setRenameValue] = useState('');
   const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
   const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
 
@@ -282,19 +280,6 @@ const Dashboard: React.FC = () => {
       toast.success('Génogramme supprimé');
       queryClient.invalidateQueries({ queryKey: ['genograms'] });
     }
-  };
-
-  const handleRename = async (id: string) => {
-    const name = renameValue.trim();
-    if (!name) return;
-    const { error } = await supabase.from('genograms').update({ name }).eq('id', id);
-    if (error) {
-      toast.error('Erreur lors du renommage');
-    } else {
-      toast.success('Génogramme renommé');
-      queryClient.invalidateQueries({ queryKey: ['genograms'] });
-    }
-    setRenamingId(null);
   };
 
   const formatDate = (iso: string) =>
@@ -434,26 +419,9 @@ const Dashboard: React.FC = () => {
                       <TableCell className="pl-6">
                         <div className="flex items-center gap-3">
                           <GenogramThumbnail data={file.data || {}} width={56} height={40} />
-                          {renamingId === file.id ? (
-                            <form
-                              onSubmit={(e) => { e.preventDefault(); e.stopPropagation(); handleRename(file.id); }}
-                              onClick={(e) => e.stopPropagation()}
-                              className="flex items-center gap-1.5"
-                            >
-                              <input
-                                autoFocus
-                                className="text-[13px] font-medium text-foreground border border-border rounded px-2 py-0.5 bg-background outline-none focus:ring-1 focus:ring-primary/30 w-48"
-                                value={renameValue}
-                                onChange={(e) => setRenameValue(e.target.value)}
-                                onBlur={() => handleRename(file.id)}
-                                onKeyDown={(e) => { if (e.key === 'Escape') setRenamingId(null); }}
-                              />
-                            </form>
-                          ) : (
-                            <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
-                              {file.name}
-                            </span>
-                          )}
+                          <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
+                            {file.name}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -518,10 +486,6 @@ const Dashboard: React.FC = () => {
                             <DropdownMenuContent align="end" className="w-40">
                               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/editor/${file.id}`); }}>
                                 Ouvrir
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setRenameValue(file.name); setRenamingId(file.id); }}>
-                                <Pencil className="w-3.5 h-3.5 mr-2" />
-                                Renommer
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={(e) => handleDelete(file.id, e as any)}
