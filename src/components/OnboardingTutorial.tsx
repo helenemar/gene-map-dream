@@ -123,7 +123,7 @@ interface OnboardingTutorialProps {
 }
 
 const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
-  active, step, onNext, onPrev, onFinish,
+  active, step, onNext, onPrev, onFinish, onDismiss,
 }) => {
   const [spotlight, setSpotlight] = useState<SpotlightRect | null>(null);
   const rafRef = useRef<number>(0);
