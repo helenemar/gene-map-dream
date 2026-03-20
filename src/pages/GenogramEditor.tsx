@@ -1735,7 +1735,7 @@ const GenogramEditor: React.FC = () => {
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
             onFitToScreen={handleFitToScreen}
-            onAutoLayout={presentationMode ? undefined : handleAutoLayout}
+            onAutoLayout={undefined}
             zoom={zoom}
             presentationMode={presentationMode}
             onTogglePresentation={() => {
