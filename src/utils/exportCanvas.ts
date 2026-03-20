@@ -329,7 +329,7 @@ function escapeXml(str: string): string {
 
 // ─── Build Export SVG ───────────────────────────────────────────────
 
-function buildExportSvg(canvasRef: HTMLDivElement): { svgString: string; width: number; height: number } | null {
+function buildExportSvg(canvasRef: HTMLDivElement, members?: FamilyMember[]): { svgString: string; width: number; height: number } | null {
   const contentDiv = canvasRef.querySelector('.absolute') as HTMLElement;
   if (!contentDiv) return null;
 
@@ -342,11 +342,15 @@ function buildExportSvg(canvasRef: HTMLDivElement): { svgString: string; width: 
   contentDiv.style.transform = 'none';
   contentDiv.style.transformOrigin = '0 0';
 
-  // Force layout recalc
+  // Force layout recalc — double reflow to ensure framer-motion settles
+  void contentDiv.offsetHeight;
   contentDiv.getBoundingClientRect();
 
   try {
-    const bounds = getMemberBounds(contentDiv);
+    // Use data-based bounds when members are available (much more reliable)
+    const bounds = members && members.length > 0
+      ? getMemberBoundsFromData(members)
+      : getMemberBoundsFromDOM(contentDiv);
     const contentRect = contentDiv.getBoundingClientRect();
 
     let svgInner = '';
@@ -383,10 +387,51 @@ function buildExportSvg(canvasRef: HTMLDivElement): { svgString: string; width: 
     });
 
     // 2. Render member cards as pure SVG
-    const cards = contentDiv.querySelectorAll('[data-member-card]');
-    cards.forEach(card => {
-      svgInner += renderCardAsSvg(card as HTMLElement, contentRect);
-    });
+    // When members data is available, use member coordinates directly
+    // instead of relying on getBoundingClientRect which can be offset by framer-motion
+    if (members && members.length > 0) {
+      const cards = contentDiv.querySelectorAll('[data-member-card]');
+      const cardArray = Array.from(cards) as HTMLElement[];
+      
+      // Match cards to members by reading their position or order
+      // Cards use framer-motion animate which sets transform, not left/top reliably
+      // So we render each card at its member's known x,y position
+      members.forEach(member => {
+        // Find the card element for this member by matching position or data
+        const matchingCard = cardArray.find(card => {
+          // Try to match by text content (member name)
+          const nameEl = card.querySelector('.font-semibold, .font-medium');
+          const cardName = nameEl?.textContent?.trim() || '';
+          const memberName = `${member.firstName} ${member.lastName}`.trim();
+          return cardName === memberName || cardName === member.firstName;
+        });
+        
+        if (matchingCard) {
+          // Use a synthetic contentRect at origin since we're using member coordinates directly
+          const syntheticRect = { left: 0, top: 0 } as DOMRect;
+          const origGetBCR = matchingCard.getBoundingClientRect;
+          // Override getBoundingClientRect temporarily to return member coordinates
+          matchingCard.getBoundingClientRect = () => ({
+            left: member.x,
+            top: member.y,
+            right: member.x + matchingCard.offsetWidth,
+            bottom: member.y + matchingCard.offsetHeight,
+            width: matchingCard.offsetWidth || EXPORT_CARD_W,
+            height: matchingCard.offsetHeight || EXPORT_CARD_H,
+            x: member.x,
+            y: member.y,
+            toJSON: () => ({}),
+          });
+          svgInner += renderCardAsSvg(matchingCard, syntheticRect);
+          matchingCard.getBoundingClientRect = origGetBCR;
+        }
+      });
+    } else {
+      const cards = contentDiv.querySelectorAll('[data-member-card]');
+      cards.forEach(card => {
+        svgInner += renderCardAsSvg(card as HTMLElement, contentRect);
+      });
+    }
 
     const svgString = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
