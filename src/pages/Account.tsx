@@ -26,6 +26,8 @@ const Account: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [siren, setSiren] = useState('');
   const [billingAddress, setBillingAddress] = useState('');
+  const [sendingPassword, setSendingPassword] = useState(false);
+  const [passwordSent, setPasswordSent] = useState(false);
 
   const email = user?.email ?? '';
 
