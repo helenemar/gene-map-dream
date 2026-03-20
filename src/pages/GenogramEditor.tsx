@@ -1750,31 +1750,28 @@ const GenogramEditor: React.FC = () => {
               (u.partner1 === idA && u.partner2 === idB) || (u.partner1 === idB && u.partner2 === idA)
             );
             if (existingUnion) return null;
-            const midX = ((mA.x + CARD_W / 2) + (mB.x + CARD_W / 2)) / 2;
-            const midY = Math.min(mA.y, mB.y) - 50;
-            const screenX = midX * zoom + pan.x;
-            const screenY = midY * zoom + pan.y;
             return (
-              <button
-                className="absolute z-50 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-card border border-border text-muted-foreground text-xs font-medium shadow-sm hover:bg-accent hover:text-foreground active:scale-95 transition-all"
-                style={{ left: screenX, top: screenY, transform: 'translate(-50%, -50%)' }}
-                onClick={() => {
-                  recordSnapshot();
-                  const newUnion: Union = {
-                    id: `u-${Date.now()}`,
-                    partner1: idA,
-                    partner2: idB,
-                    status: 'married' as UnionStatus,
-                    children: [],
-                  };
-                  setUnions(prev => [...prev, newUnion]);
-                  setSelectedMembers(new Set());
-                  toast('Lien créé', { duration: 2000 });
-                }}
-              >
-                <Link className="w-3 h-3" />
-                Créer un lien
-              </button>
+              <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50">
+                <button
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border text-muted-foreground text-xs font-medium shadow-sm hover:bg-accent hover:text-foreground active:scale-95 transition-all"
+                  onClick={() => {
+                    recordSnapshot();
+                    const newUnion: Union = {
+                      id: `u-${Date.now()}`,
+                      partner1: idA,
+                      partner2: idB,
+                      status: 'married' as UnionStatus,
+                      children: [],
+                    };
+                    setUnions(prev => [...prev, newUnion]);
+                    setSelectedMembers(new Set());
+                    toast('Lien créé', { duration: 2000 });
+                  }}
+                >
+                  <Link className="w-3 h-3" />
+                  Créer un lien
+                </button>
+              </div>
             );
           })()}
         </div>
