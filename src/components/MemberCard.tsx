@@ -96,6 +96,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   dynamicPathologies = [],
   showParentSplit = false,
   isAdopted = false,
+  onboardingPulse = false,
 }) => {
   const isDeceased = !!member.deathYear;
   const isPlaceholder = !!member.isPlaceholder;
