@@ -552,10 +552,42 @@ const GenogramEditor: React.FC = () => {
         ));
       }
     }
+    // Marquee selection release
+    if (marquee) {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const dx = Math.abs(marquee.currentClientX - marquee.startClientX);
+        const dy = Math.abs(marquee.currentClientY - marquee.startClientY);
+        const DRAG_THRESHOLD = 5;
+        if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) {
+          // Convert screen coords to world coords
+          const x1 = (Math.min(marquee.startClientX, marquee.currentClientX) - rect.left - pan.x) / zoom;
+          const y1 = (Math.min(marquee.startClientY, marquee.currentClientY) - rect.top - pan.y) / zoom;
+          const x2 = (Math.max(marquee.startClientX, marquee.currentClientX) - rect.left - pan.x) / zoom;
+          const y2 = (Math.max(marquee.startClientY, marquee.currentClientY) - rect.top - pan.y) / zoom;
+          // Select members whose card intersects the marquee rect
+          const selected = new Set<string>();
+          for (const m of members) {
+            const mx2 = m.x + CARD_W;
+            const my2 = m.y + CARD_H;
+            if (m.x < x2 && mx2 > x1 && m.y < y2 && my2 > y1) {
+              selected.add(m.id);
+            }
+          }
+          setSelectedMembers(selected);
+        } else {
+          // Just a click on empty canvas — deselect
+          setSelectedMembers(new Set());
+        }
+      }
+      setMarquee(null);
+      return;
+    }
     setSmartGuides([]);
     setDragInfo(null);
     setIsPanning(false);
-  }, [dragInfo, linkDrag, snapToGrid, members, pan, zoom]);
+  }, [dragInfo, linkDrag, marquee, snapToGrid, members, pan, zoom]);
 
   // ─── Canvas mouse down: space+click or middle-click = pan, else deselect ───
   const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
