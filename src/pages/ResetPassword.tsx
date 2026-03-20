@@ -21,6 +21,13 @@ const ResetPassword: React.FC = () => {
       setIsRecovery(true);
     }
 
+    // Check if already authenticated via recovery (race condition: event fired before mount)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setIsRecovery(true);
+      }
+    });
+
     // Listen for PASSWORD_RECOVERY event
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
