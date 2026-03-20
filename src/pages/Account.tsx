@@ -80,10 +80,22 @@ const Account: React.FC = () => {
   };
 
   const handleDeleteAccount = async () => {
-    // Sign out — actual account deletion requires admin action
     toast.success('Votre demande de suppression a été prise en compte.');
     await signOut();
     navigate('/');
+  };
+
+  const handlePasswordReset = async () => {
+    setSendingPassword(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      toast.error('Erreur lors de l\'envoi de l\'e-mail.');
+    } else {
+      setPasswordSent(true);
+    }
+    setSendingPassword(false);
   };
 
   if (loading) {
