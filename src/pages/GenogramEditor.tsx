@@ -495,10 +495,12 @@ const GenogramEditor: React.FC = () => {
           m.id === dragInfo.id ? { ...m, x: newX, y: newY } : m
         ));
       }
+    } else if (marquee) {
+      setMarquee(prev => prev ? { ...prev, currentClientX: e.clientX, currentClientY: e.clientY } : null);
     } else if (isPanning) {
       setPan(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }));
     }
-  }, [dragInfo, linkDrag, isPanning, zoom, pan, snapToGrid, members]);
+  }, [dragInfo, linkDrag, marquee, isPanning, zoom, pan, snapToGrid, members]);
 
   const handleMouseUp = useCallback((e: React.MouseEvent) => {
     // Link drag release — use snapped target or find card under cursor
