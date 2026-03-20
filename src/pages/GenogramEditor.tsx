@@ -565,23 +565,33 @@ const GenogramEditor: React.FC = () => {
     // Left-click on empty canvas → pan
     if (e.button === 0 && (e.target === canvasRef.current || (e.target as HTMLElement).classList.contains('canvas-bg'))) {
       setIsPanning(true);
-      setSelectedMember(null);
+      setSelectedMembers(new Set());
       setAnchorActiveMember(null);
       return;
     }
   }, [isSpaceDown]);
 
-  const handleSelect = useCallback((id: string) => {
-    setSelectedMember(prev => prev === id ? null : id);
+  const handleSelect = useCallback((id: string, e?: React.MouseEvent) => {
+    const isMulti = e ? (e.shiftKey || e.metaKey || e.ctrlKey) : false;
+    setSelectedMembers(prev => {
+      if (isMulti) {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id); else next.add(id);
+        return next;
+      }
+      // Single click: toggle or replace
+      if (prev.size === 1 && prev.has(id)) return new Set();
+      return new Set([id]);
+    });
     setAnchorActiveMember(null);
   }, []);
 
   const getMemberState = useCallback((memberId: string) => {
     if (anchorActiveMember === memberId) return 'anchor-active' as const;
-    if (selectedMember === memberId) return 'selected' as const;
+    if (selectedMembers.has(memberId)) return 'selected' as const;
     if (hoveredMember === memberId) return 'hover' as const;
     return 'default' as const;
-  }, [selectedMember, hoveredMember, anchorActiveMember]);
+  }, [selectedMembers, hoveredMember, anchorActiveMember]);
 
   // ─── New member state ───
   const [editingNewMember, setEditingNewMember] = useState<FamilyMember | null>(null);
