@@ -482,8 +482,8 @@ function svgToCanvas(svgString: string, width: number, height: number, scale = 2
 
 // ─── Public API ─────────────────────────────────────────────────────
 
-export async function exportAsPng(canvasRef: HTMLDivElement, fileName: string) {
-  const result = buildExportSvg(canvasRef);
+export async function exportAsPng(canvasRef: HTMLDivElement, fileName: string, members?: FamilyMember[]) {
+  const result = buildExportSvg(canvasRef, members);
   if (!result) return;
 
   try {
@@ -498,8 +498,8 @@ export async function exportAsPng(canvasRef: HTMLDivElement, fileName: string) {
   }
 }
 
-export async function exportAsPdf(canvasRef: HTMLDivElement, fileName: string) {
-  const result = buildExportSvg(canvasRef);
+export async function exportAsPdf(canvasRef: HTMLDivElement, fileName: string, members?: FamilyMember[]) {
+  const result = buildExportSvg(canvasRef, members);
   if (!result) return;
 
   try {
@@ -563,8 +563,9 @@ export function exportAsSvg(
   _cardW: number,
   _cardH: number,
   fileName: string,
+  members?: FamilyMember[],
 ) {
-  const result = buildExportSvg(canvasRef);
+  const result = buildExportSvg(canvasRef, members);
   if (!result) return;
 
   const blob = new Blob([result.svgString], { type: 'image/svg+xml;charset=utf-8' });
