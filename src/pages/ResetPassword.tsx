@@ -14,6 +14,8 @@ const ResetPassword: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [isRecovery, setIsRecovery] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     // Check for recovery token in URL hash
