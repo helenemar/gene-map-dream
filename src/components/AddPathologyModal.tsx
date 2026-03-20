@@ -11,9 +11,9 @@ import { Check } from 'lucide-react';
 
 /** 16 pathology colors — first 10 for defaults, last 6 for custom */
 export const PATHOLOGY_COLORS: string[] = [
-  '#FF3333', '#801A1A', '#FF8C33', '#FFFF4D', '#B38F00', '#99FF4D',
-  '#1A803D', '#4DFFFF', '#1A7A80', '#4D4DFF', '#1A1A80', '#804DFF',
-  '#3D1A80', '#FF4DFF', '#801A4F', '#FF4D99',
+  '#7C4FDD', '#FF9BF7', '#71F87A', '#FF9A51', '#FFE851', '#51FFC8',
+  '#FF519F', '#5168FF', '#15E951', '#FF5151', '#D651FF', '#AA7A46',
+  '#28C6E2', '#E27928', '#E2D628', '#E2282B',
 ];
 
 interface AddPathologyModalProps {
