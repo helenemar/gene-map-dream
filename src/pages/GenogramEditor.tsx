@@ -477,9 +477,18 @@ const GenogramEditor: React.FC = () => {
         }
       }
       setSmartGuides(guides);
-      setMembers(prev => prev.map(m =>
-        m.id === dragInfo.id ? { ...m, x: newX, y: newY } : m
-      ));
+      // Move all selected members together if multi-dragging
+      if (dragInfo.groupOffsets && Object.keys(dragInfo.groupOffsets).length > 1) {
+        setMembers(prev => prev.map(m => {
+          const offset = dragInfo.groupOffsets?.[m.id];
+          if (offset) return { ...m, x: newX + offset.dx, y: newY + offset.dy };
+          return m;
+        }));
+      } else {
+        setMembers(prev => prev.map(m =>
+          m.id === dragInfo.id ? { ...m, x: newX, y: newY } : m
+        ));
+      }
     } else if (isPanning) {
       setPan(prev => ({ x: prev.x + e.movementX, y: prev.y + e.movementY }));
     }
