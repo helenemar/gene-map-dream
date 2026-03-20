@@ -1484,6 +1484,7 @@ const GenogramEditor: React.FC = () => {
                 searchDimmed={search.isActive && !search.matchedMemberIds.has(member.id)}
                 searchHighlighted={search.isActive && search.matchedMemberIds.has(member.id)}
                 presentationMode={presentationMode}
+                multiSelected={selectedMembers.size > 1}
                 compact={isBioParentOfAdoptedChild}
                 onSelect={handleSelect}
                 onDragStart={handleDragStart}
