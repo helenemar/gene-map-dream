@@ -41,7 +41,7 @@ interface MemberCardProps {
   presentationMode?: boolean;
   /** Compact mode: smaller card for bio parents when adoptive parents exist */
   compact?: boolean;
-  onSelect?: (id: string) => void;
+  onSelect?: (id: string, e?: React.MouseEvent) => void;
   onDragStart?: (id: string, e: React.MouseEvent) => void;
   onCreateRelated?: (id: string, relationship: RelationshipChoice) => void;
   onEdit?: (id: string) => void;
