@@ -120,7 +120,6 @@ interface OnboardingTutorialProps {
   onFinish: () => void;
   onDismiss: () => void;
 }
-}
 
 const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
   active, step, onNext, onPrev, onFinish, onDismiss,
