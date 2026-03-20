@@ -260,7 +260,13 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const MAX_GENOGRAMS = 2;
+
   const handleCreate = () => {
+    if (genograms && genograms.length >= MAX_GENOGRAMS) {
+      toast.error(`Vous avez atteint la limite de ${MAX_GENOGRAMS} génogrammes.`, { duration: 3000 });
+      return;
+    }
     setCreateModalOpen(true);
   };
 
