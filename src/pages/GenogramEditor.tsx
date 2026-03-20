@@ -170,6 +170,7 @@ const GenogramEditor: React.FC = () => {
   const [isSpaceDown, setIsSpaceDown] = useState(false);
   const [dragInfo, setDragInfo] = useState<{
     id: string; startX: number; startY: number; memberX: number; memberY: number;
+    groupOffsets?: Record<string, { dx: number; dy: number }>;
   } | null>(null);
 
   // Link drag state
