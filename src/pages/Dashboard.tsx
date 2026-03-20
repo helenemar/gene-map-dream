@@ -533,7 +533,7 @@ const Dashboard: React.FC = () => {
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
-                                onClick={(e) => handleDelete(file.id, e as any)}
+                                onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: file.id, name: file.name }); }}
                                 className="text-destructive focus:text-destructive"
                               >
                                 Supprimer
