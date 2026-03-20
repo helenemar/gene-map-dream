@@ -9,20 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 
-/** 12 harmonious pastel pathology colors */
+/** 18 vibrant pathology colors */
 export const PATHOLOGY_COLORS: string[] = [
-  '#E69191', // rose pâle
-  '#E6B891', // pêche douce
-  '#E6DF91', // jaune vanille pâle
-  '#CBE691', // vert chartreuse doux
-  '#91E691', // vert menthe doux
-  '#91E6BC', // vert d'eau pâle
-  '#91E6E6', // cyan doux
-  '#91BCE6', // bleu ciel pâle
-  '#9191E6', // bleu lavande
-  '#BC91E6', // violet pâle
-  '#E691E6', // rose orchidée pâle
-  '#E691BC', // rose poudré
+  '#F25959', '#F28C59', '#F2BF59', '#F2F259', '#BFF259', '#8CF259',
+  '#59F259', '#59F28C', '#59F2BF', '#59F2F2', '#59BFF2', '#598CF2',
+  '#5959F2', '#8C59F2', '#BF59F2', '#F259F2', '#F259BF', '#F2598C',
 ];
 
 interface AddPathologyModalProps {
