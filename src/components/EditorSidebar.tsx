@@ -124,7 +124,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                   key={m.id}
                   className="flex items-center justify-between group py-1.5 text-sm text-foreground/80 hover:text-foreground transition-colors rounded-md hover:bg-accent/30 px-1.5 -mx-1.5"
                 >
-                  <span className="truncate">{m.firstName} {m.lastName}</span>
+                  <span className="truncate">{m.firstName || m.lastName ? `${m.firstName || '?'} ${m.lastName}`.trim() : 'Membre inconnu'}</span>
                   <button
                     onClick={() => onFocusMember(m)}
                     className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-primary"

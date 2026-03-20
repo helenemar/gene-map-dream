@@ -245,7 +245,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
                <div className="flex items-center justify-between gap-2">
                 <div className="flex items-baseline gap-1 min-w-0">
                   <span className="font-semibold text-sm text-foreground whitespace-nowrap">
-                    {member.firstName.split(',')[0].trim()}
+                    {member.firstName.split(',')[0].trim() || '?'}
                   </span>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
