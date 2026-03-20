@@ -1739,22 +1739,23 @@ const GenogramEditor: React.FC = () => {
             <LockPanel members={members} onToggleLock={handleToggleLock} />
           )}
 
-          {/* Floating "Créer un lien" when exactly 2 members selected */}
+          {/* Fixed union action when exactly 2 members selected */}
           {!presentationMode && selectedMembers.size === 2 && (() => {
             const [idA, idB] = Array.from(selectedMembers);
-            const mA = members.find(m => m.id === idA);
-            const mB = members.find(m => m.id === idB);
-            if (!mA || !mB) return null;
-            // Hide if union already exists between these two
             const existingUnion = unions.find(u =>
               (u.partner1 === idA && u.partner2 === idB) || (u.partner1 === idB && u.partner2 === idA)
             );
-            if (existingUnion) return null;
+
             return (
-              <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50">
+              <div className="fixed bottom-24 left-1/2 z-[70] -translate-x-1/2">
                 <button
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border text-muted-foreground text-xs font-medium shadow-sm hover:bg-accent hover:text-foreground active:scale-95 transition-all"
                   onClick={() => {
+                    if (existingUnion) {
+                      setEditingUnionId(existingUnion.id);
+                      return;
+                    }
+
                     recordSnapshot();
                     const newUnion: Union = {
                       id: `u-${Date.now()}`,
@@ -1765,11 +1766,11 @@ const GenogramEditor: React.FC = () => {
                     };
                     setUnions(prev => [...prev, newUnion]);
                     setSelectedMembers(new Set());
-                    toast('Lien créé', { duration: 2000 });
+                    toast('Union créée', { duration: 2000 });
                   }}
                 >
                   <Link className="w-3 h-3" />
-                  Créer un lien
+                  {existingUnion ? 'Modifier l’union' : 'Créer une union'}
                 </button>
               </div>
             );
