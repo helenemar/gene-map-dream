@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText } from 'lucide-react';
+import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText, Pencil } from 'lucide-react';
 import GenogramThumbnail from '@/components/GenogramThumbnail';
 import CreateGenogramModal from '@/components/CreateGenogramModal';
 import BetaShareModal from '@/components/BetaShareModal';
