@@ -52,12 +52,16 @@ const Account: React.FC = () => {
 
   const handleSave = async () => {
     if (!user) return;
+    if (!firstName.trim() || !lastName.trim()) {
+      toast.error('Le prénom et le nom sont obligatoires.');
+      return;
+    }
     setSaving(true);
     const { error } = await supabase
       .from('profiles')
       .update({
-        first_name: firstName,
-        last_name: lastName,
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
         profession,
         phone,
         siren,
@@ -143,9 +147,7 @@ const Account: React.FC = () => {
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-sm">
-                  Profession <span className="text-destructive">*</span>
-                </Label>
+                <Label className="text-sm">Profession</Label>
                 <Input value={profession} onChange={(e) => setProfession(e.target.value)} placeholder="ex: Psychologue" />
               </div>
 
@@ -157,24 +159,18 @@ const Account: React.FC = () => {
                   <Input value={email} disabled className="bg-muted/50" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-sm">
-                    Numéro de téléphone <span className="text-destructive">*</span>
-                  </Label>
+                  <Label className="text-sm">Numéro de téléphone</Label>
                   <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+33..." />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-sm">
-                    Numéro de SIREN <span className="text-destructive">*</span>
-                  </Label>
+                  <Label className="text-sm">Numéro de SIREN</Label>
                   <Input value={siren} onChange={(e) => setSiren(e.target.value)} placeholder="123 456 789" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-sm">
-                    Adresse de facturation <span className="text-destructive">*</span>
-                  </Label>
+                  <Label className="text-sm">Adresse de facturation</Label>
                   <Input value={billingAddress} onChange={(e) => setBillingAddress(e.target.value)} placeholder="Adresse complète" />
                 </div>
               </div>
