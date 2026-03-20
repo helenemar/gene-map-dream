@@ -620,7 +620,7 @@ const GenogramEditor: React.FC = () => {
   /** Focus on member: center + select + briefly highlight */
   const handleFocusMember = useCallback((member: FamilyMember) => {
     centerOnMember(member);
-    setSelectedMember(member.id);
+    setSelectedMembers(new Set([member.id]));
   }, [centerOnMember]);
 
   /** Toggle solo emotional type: same type = off, different type = switch */
@@ -803,7 +803,7 @@ const GenogramEditor: React.FC = () => {
       setTimeout(() => setIsAnimating(false), 600);
 
       // Select and open drawer for new child (skip for perinatal)
-      setSelectedMember(newChild.id);
+      setSelectedMembers(new Set([newChild.id]));
       if (!perinatal) {
         setEditingNewMember(newChild);
         setDrawerEditing(true);
@@ -814,7 +814,7 @@ const GenogramEditor: React.FC = () => {
     }
 
     // Select and open drawer for new child (existing union path, skip for perinatal)
-    setSelectedMember(newChild.id);
+    setSelectedMembers(new Set([newChild.id]));
     if (!perinatal) {
       setEditingNewMember(newChild);
       setDrawerEditing(true);
@@ -861,7 +861,7 @@ const GenogramEditor: React.FC = () => {
     recordSnapshot();
     setMembers(prev => [...prev, newChild]);
     setUnions(prev => [...prev, newUnion]);
-    setSelectedMember(newChild.id);
+    setSelectedMembers(new Set([newChild.id]));
     setEditingNewMember(newChild);
     setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
@@ -1050,7 +1050,7 @@ const GenogramEditor: React.FC = () => {
       }
 
       // Select and open edit drawer
-      setSelectedMember(newMember.id);
+      setSelectedMembers(new Set([newMember.id]));
       setEditingNewMember(newMember);
       setDrawerEditing(true);
       setNewMemberDrawerOpen(true);
@@ -1059,7 +1059,7 @@ const GenogramEditor: React.FC = () => {
     }
 
     // Select and open edit drawer (non-parent relationships)
-    setSelectedMember(newMember.id);
+    setSelectedMembers(new Set([newMember.id]));
     setEditingNewMember(newMember);
     setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
@@ -1149,7 +1149,7 @@ const GenogramEditor: React.FC = () => {
           .filter(u => !toRemoveSet.has(u.partner1) && !toRemoveSet.has(u.partner2))
         );
         setEmotionalLinks(prev => prev.filter(l => !toRemoveSet.has(l.from) && !toRemoveSet.has(l.to)));
-        setSelectedMember(null);
+        setSelectedMembers(new Set());
         setEditingNewMember(null);
       }, 350);
     } else {
@@ -1160,7 +1160,7 @@ const GenogramEditor: React.FC = () => {
         .filter(u => u.partner1 !== id && u.partner2 !== id)
       );
       setEmotionalLinks(prev => prev.filter(l => !toRemoveSet.has(l.from) && !toRemoveSet.has(l.to)));
-      setSelectedMember(null);
+      setSelectedMembers(new Set());
       setEditingNewMember(null);
     }
   }, [members, unions]);
@@ -1475,7 +1475,7 @@ const GenogramEditor: React.FC = () => {
               <MemberCard
                 key={member.id}
                 member={member}
-                isSelected={selectedMember === member.id}
+                isSelected={selectedMembers.has(member.id)}
                 isAnimating={isAnimating}
                 isColliding={collisions.has(member.id)}
                 state={getMemberState(member.id)}
@@ -1660,7 +1660,7 @@ const GenogramEditor: React.FC = () => {
             presentationMode={presentationMode}
             onTogglePresentation={() => {
               setPresentationMode(prev => !prev);
-              setSelectedMember(null);
+              setSelectedMembers(new Set());
               setAnchorActiveMember(null);
             }}
             onUndo={handleUndo}
