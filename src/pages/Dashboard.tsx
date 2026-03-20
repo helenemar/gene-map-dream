@@ -310,26 +310,17 @@ const Dashboard: React.FC = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {(() => {
-                          const mock = file._mockCreator;
-                          const creatorName = mock ? mock.name : displayName.split('@')[0];
-                          const creatorInitials = mock ? mock.initials : userInitials;
-                          const isMe = !mock;
-                          return (
-                            <div className="flex items-center gap-2">
-                              <div
-                                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-                                style={{ backgroundColor: mock ? mock.color : 'hsl(var(--primary))' }}
-                              >
-                                <span className="text-white text-[10px] font-bold">{creatorInitials}</span>
-                              </div>
-                              <span className="text-[13px] text-foreground">
-                                {creatorName}{' '}
-                                {isMe && <span className="text-muted-foreground">(moi)</span>}
-                              </span>
-                            </div>
-                          );
-                        })()}
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: 'hsl(var(--primary))' }}
+                          >
+                            <span className="text-white text-[10px] font-bold">{userInitials}</span>
+                          </div>
+                          <span className="text-[13px] text-foreground">
+                            {displayName} <span className="text-muted-foreground">(moi)</span>
+                          </span>
+                        </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <span className="text-[13px] text-foreground">{formatDate(file.updated_at)}</span>
