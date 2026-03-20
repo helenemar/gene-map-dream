@@ -82,7 +82,7 @@ const AddPathologyModal: React.FC<AddPathologyModalProps> = ({
           {/* Color grid — only show available (unused) colors */}
           <div>
             <p className="text-xs text-muted-foreground mb-2">Choisir une couleur</p>
-            <div className="grid grid-cols-6 gap-2">
+            <div className="flex flex-wrap gap-2">
               {PATHOLOGY_COLORS.filter(c => !usedColors.includes(c)).map((color) => {
                 const isSelected = selectedColor === color;
                 return (
