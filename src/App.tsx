@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import SharedGenogram from "./pages/SharedGenogram";
 import NotFound from "./pages/NotFound";
+import Account from "./pages/Account";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
