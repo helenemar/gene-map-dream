@@ -350,7 +350,7 @@ const GenogramEditor: React.FC = () => {
     };
   }, []);
 
-  // ─── Cursor-centered wheel zoom (Cmd/Ctrl + Scroll) ───
+  // ─── Wheel: two-finger scroll = pan, pinch (ctrlKey) = zoom ───
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -358,24 +358,26 @@ const GenogramEditor: React.FC = () => {
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
 
-      // Pinch-zoom or Cmd/Ctrl+Scroll → zoom centered on cursor
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+      // Pinch-to-zoom: browsers set ctrlKey=true for trackpad pinch gestures
+      if (e.ctrlKey || e.metaKey) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const worldX = (mouseX - pan.x) / zoom;
+        const worldY = (mouseY - pan.y) / zoom;
 
-      // Point in world-space before zoom
-      const worldX = (mouseX - pan.x) / zoom;
-      const worldY = (mouseY - pan.y) / zoom;
+        const delta = -e.deltaY * ZOOM_SENSITIVITY;
+        const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * (1 + delta)));
 
-      const delta = -e.deltaY * ZOOM_SENSITIVITY;
-      const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * (1 + delta)));
+        const newPanX = mouseX - worldX * newZoom;
+        const newPanY = mouseY - worldY * newZoom;
 
-      // Adjust pan so the world point under cursor stays fixed
-      const newPanX = mouseX - worldX * newZoom;
-      const newPanY = mouseY - worldY * newZoom;
-
-      setZoom(newZoom);
-      setPan({ x: newPanX, y: newPanY });
+        setZoom(newZoom);
+        setPan({ x: newPanX, y: newPanY });
+      } else {
+        // Two-finger scroll → pan the canvas
+        setPan(prev => ({ x: prev.x - e.deltaX, y: prev.y - e.deltaY }));
+      }
     };
 
     canvas.addEventListener('wheel', onWheel, { passive: false });
