@@ -37,7 +37,8 @@ interface MemberCardProps {
   searchDimmed?: boolean;
   /** Search: glowing when this card matches search */
   searchHighlighted?: boolean;
-  /** Presentation mode: hide controls, disable drag, click opens view */
+  /** When true, multiple members are selected — hide action menus */
+  multiSelected?: boolean;
   presentationMode?: boolean;
   /** Compact mode: smaller card for bio parents when adoptive parents exist */
   compact?: boolean;
