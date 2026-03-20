@@ -17,6 +17,7 @@ interface ParentPickerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
+  isPerinatal?: boolean;
 }
 
 function getStatusLabel(status: UnionStatus): string {
