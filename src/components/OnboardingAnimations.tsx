@@ -84,8 +84,32 @@ export const ZoomAnimation: React.FC = () => (
 export const DragAnimation: React.FC = () => (
   <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
     <svg width="160" height="60" viewBox="0 0 160 60">
-      {/* Dashed origin */}
+      {/* Pulsing ring around the card to draw attention */}
+      <motion.rect
+        x={28} y={16} width={52} height={28} rx={6}
+        fill="none"
+        stroke="hsl(var(--primary))"
+        strokeWidth={1.5}
+        animate={{ scale: [1, 1.08, 1], opacity: [0.6, 0, 0.6] }}
+        transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ transformOrigin: '54px 30px' }}
+      />
+      {/* Dashed origin ghost */}
       <rect x={30} y={18} width={48} height={24} rx={4} fill="none" stroke="hsl(var(--border))" strokeWidth={1} strokeDasharray="3 2" />
+      {/* Animated arrow hint: "drag this way" */}
+      <motion.g
+        animate={{ opacity: [0, 1, 1, 0], x: [0, 8, 8, 0] }}
+        transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', times: [0, 0.15, 0.25, 0.35] }}
+      >
+        <path
+          d="M86 30 L96 30 M93 26 L97 30 L93 34"
+          stroke="hsl(var(--primary))"
+          strokeWidth={1.8}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </motion.g>
       {/* Moving card */}
       <motion.g animate={{ x: [0, 50, 50, 0], y: [0, 0, 0, 0] }} transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.6, 1] }}>
         <MiniCard x={30} y={18} w={48} h={24} label="Jean" />
