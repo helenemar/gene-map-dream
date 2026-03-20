@@ -431,7 +431,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} />
                 <label className="flex items-center gap-2 mt-1 cursor-pointer">
                   <Checkbox checked={isRetired} onCheckedChange={(v) => setIsRetired(v === true)} />
-                  <span className="text-xs text-muted-foreground">Retraité(e)</span>
+                  <span className="text-xs text-muted-foreground">{gender === 'female' ? 'Retraitée' : 'Retraité'}</span>
                 </label>
               </div>
 
