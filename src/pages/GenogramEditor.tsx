@@ -11,7 +11,6 @@ import EmotionalLinkLine from '@/components/EmotionalLinkLine';
 import ElasticLinkLine from '@/components/ElasticLinkLine';
 import LinkTypeModal from '@/components/LinkTypeModal';
 import FloatingControls from '@/components/FloatingControls';
-import LockPanel from '@/components/LockPanel';
 import UnionEditDrawer from '@/components/UnionEditDrawer';
 import MemberEditDrawer from '@/components/MemberEditDrawer';
 import { RelationshipChoice } from '@/components/CreateMemberDropdown';

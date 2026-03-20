@@ -1,5 +1,5 @@
 import React from 'react';
-import { ZoomIn, ZoomOut, Maximize, Wand2, Presentation, Undo2, Redo2 } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize, Presentation, Undo2, Redo2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface FloatingControlsProps {
