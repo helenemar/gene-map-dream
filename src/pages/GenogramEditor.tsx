@@ -32,7 +32,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { usePathologies } from '@/hooks/usePathologies';
 import { toast } from 'sonner';
-import { Undo2, Redo2 } from 'lucide-react';
+import { Undo2, Redo2, Link } from 'lucide-react';
 
 // Card bounding box
 const CARD_W = MEMBER_CARD_W;
