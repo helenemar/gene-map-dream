@@ -248,17 +248,21 @@ const MemberCard: React.FC<MemberCardProps> = ({
                     {member.firstName.split(',')[0].trim() || '?'}
                   </span>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                    {isDeceased && member.deathYear ? `${member.deathYear - member.birthYear} ans` : `${member.age} ans`}
+                {(member.birthYear > 0 || member.age > 0) && (
+                  <div className="flex items-center gap-1 shrink-0">
+                    <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+                      {isDeceased && member.deathYear ? `${member.deathYear - member.birthYear} ans` : `${member.age} ans`}
+                    </span>
+                  </div>
+                )}
+              </div>
+              {member.birthYear > 0 && (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span className="whitespace-nowrap">
+                    {member.birthYearUnsure ? '~' : ''}{member.birthYear}{member.deathYear ? ` - ${member.deathYearUnsure ? '~' : ''}${member.deathYear}` : ' -'}
                   </span>
                 </div>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <span className="whitespace-nowrap">
-                  {member.birthYearUnsure ? '~' : ''}{member.birthYear}{member.deathYear ? ` - ${member.deathYearUnsure ? '~' : ''}${member.deathYear}` : ' -'}
-                </span>
-              </div>
+              )}
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span className="whitespace-nowrap">{member.isRetired ? (member.gender === 'female' ? 'Retraitée' : 'Retraité') : member.profession}</span>
                 {member.notes && (
