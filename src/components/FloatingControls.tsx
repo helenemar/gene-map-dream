@@ -1,5 +1,5 @@
 import React from 'react';
-import { ZoomIn, ZoomOut, Maximize, Wand2, Presentation, Undo2, Redo2 } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize, Presentation, Undo2, Redo2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface FloatingControlsProps {
@@ -56,22 +56,8 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
         </div>
       )}
 
-      {/* Bottom bar — auto layout, zoom, presentation */}
+      {/* Bottom bar — zoom, presentation */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-        {!presentationMode && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={onAutoLayout}
-                className="h-[44px] px-4 rounded-full bg-card shadow-float border border-border flex items-center justify-center gap-2 hover:bg-accent transition-colors"
-              >
-                <Wand2 className="w-4 h-4 text-foreground" />
-                <span className="text-xs font-medium text-foreground">Réorganiser</span>
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="top">Réorganiser l'arbre automatiquement</TooltipContent>
-          </Tooltip>
-        )}
 
         <div className="flex items-center gap-1 bg-card rounded-full shadow-float border border-border p-1.5">
           <Tooltip>

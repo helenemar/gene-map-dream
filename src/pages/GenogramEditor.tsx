@@ -11,7 +11,6 @@ import EmotionalLinkLine from '@/components/EmotionalLinkLine';
 import ElasticLinkLine from '@/components/ElasticLinkLine';
 import LinkTypeModal from '@/components/LinkTypeModal';
 import FloatingControls from '@/components/FloatingControls';
-import LockPanel from '@/components/LockPanel';
 import UnionEditDrawer from '@/components/UnionEditDrawer';
 import MemberEditDrawer from '@/components/MemberEditDrawer';
 import { RelationshipChoice } from '@/components/CreateMemberDropdown';
@@ -1735,7 +1734,7 @@ const GenogramEditor: React.FC = () => {
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
             onFitToScreen={handleFitToScreen}
-            onAutoLayout={presentationMode ? undefined : handleAutoLayout}
+            onAutoLayout={undefined}
             zoom={zoom}
             presentationMode={presentationMode}
             onTogglePresentation={() => {
@@ -1748,10 +1747,6 @@ const GenogramEditor: React.FC = () => {
             canUndo={history.canUndo}
             canRedo={history.canRedo}
           />
-
-          {!presentationMode && (
-            <LockPanel members={members} onToggleLock={handleToggleLock} />
-          )}
 
           {/* Union action between 2 selected members */}
           {!presentationMode && selectedMembers.size === 2 && (() => {
