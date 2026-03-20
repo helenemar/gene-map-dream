@@ -286,6 +286,12 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                     >
                       Passer le tutoriel
                     </button>
+                    <button
+                      onClick={onDismiss}
+                      className="w-full mt-1 py-1.5 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                    >
+                      Ne plus afficher
+                    </button>
                   </motion.div>
                 </div>
               ) : (
