@@ -1594,7 +1594,23 @@ const GenogramEditor: React.FC = () => {
             )}
           </div>
 
-          {/* Link type selection modal */}
+          {/* Marquee selection rectangle */}
+          {marquee && (() => {
+            const canvas = canvasRef.current;
+            if (!canvas) return null;
+            const rect = canvas.getBoundingClientRect();
+            const left = Math.min(marquee.startClientX, marquee.currentClientX) - rect.left;
+            const top = Math.min(marquee.startClientY, marquee.currentClientY) - rect.top;
+            const width = Math.abs(marquee.currentClientX - marquee.startClientX);
+            const height = Math.abs(marquee.currentClientY - marquee.startClientY);
+            if (width < 3 && height < 3) return null;
+            return (
+              <div
+                className="absolute pointer-events-none border border-primary/60 bg-primary/8 rounded-sm"
+                style={{ left, top, width, height, zIndex: 9999 }}
+              />
+            );
+          })()}
           <LinkTypeModal
             open={!!linkModalTarget}
             onSelect={(type: EmotionalLinkType) => {
