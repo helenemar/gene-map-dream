@@ -1764,6 +1764,7 @@ const GenogramEditor: React.FC = () => {
             onNext={onboarding.next}
             onPrev={onboarding.prev}
             onFinish={onboarding.finish}
+            onDismiss={onboarding.dismiss}
           />
 
           {/* Union action between 2 selected members */}

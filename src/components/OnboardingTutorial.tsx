@@ -118,10 +118,11 @@ interface OnboardingTutorialProps {
   onNext: () => void;
   onPrev: () => void;
   onFinish: () => void;
+  onDismiss: () => void;
 }
 
 const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
-  active, step, onNext, onPrev, onFinish,
+  active, step, onNext, onPrev, onFinish, onDismiss,
 }) => {
   const [spotlight, setSpotlight] = useState<SpotlightRect | null>(null);
   const rafRef = useRef<number>(0);
@@ -285,6 +286,12 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                     >
                       Passer le tutoriel
                     </button>
+                    <button
+                      onClick={onDismiss}
+                      className="w-full mt-1 py-1.5 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                    >
+                      Ne plus afficher
+                    </button>
                   </motion.div>
                 </div>
               ) : (
@@ -378,12 +385,20 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                     </span>
 
                     {isLastStep ? (
-                      <button
-                        onClick={onFinish}
-                        className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-                      >
-                        Terminer
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={onDismiss}
+                          className="px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          Ne plus afficher
+                        </button>
+                        <button
+                          onClick={onFinish}
+                          className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                        >
+                          Terminer
+                        </button>
+                      </div>
                     ) : (
                       <button
                         onClick={onNext}
