@@ -60,7 +60,7 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
       {/* Bottom bar — zoom, presentation, help */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
 
-        <div className="flex items-center gap-1 bg-card rounded-full shadow-float border border-border p-1.5">
+        <div data-onboarding="zoom-controls" className="flex items-center gap-1 bg-card rounded-full shadow-float border border-border p-1.5">
           <Tooltip>
             <TooltipTrigger asChild>
               <button onClick={onZoomOut} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-accent transition-colors">
