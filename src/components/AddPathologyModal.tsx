@@ -9,11 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 
-/** 18 vibrant pathology colors */
+/** 16 vibrant pathology colors — first 10 for defaults, last 6 for custom */
 export const PATHOLOGY_COLORS: string[] = [
-  '#F25959', '#F28C59', '#F2BF59', '#F2F259', '#BFF259', '#8CF259',
-  '#59F259', '#59F28C', '#59F2BF', '#59F2F2', '#59BFF2', '#598CF2',
-  '#5959F2', '#8C59F2', '#BF59F2', '#F259F2', '#F259BF', '#F2598C',
+  '#FF3D3D', '#FF823D', '#FFC73D', '#F2FF3D', '#ADFF3D', '#69FF3D',
+  '#3DFF60', '#3DFFA6', '#3DFFED', '#3DCCFF', '#3D87FF', '#3D42FF',
+  '#823DFF', '#C73DFF', '#FF3DF2', '#FF3DAD',
 ];
 
 interface AddPathologyModalProps {
@@ -82,7 +82,7 @@ const AddPathologyModal: React.FC<AddPathologyModalProps> = ({
           {/* Color grid */}
           <div>
             <p className="text-xs text-muted-foreground mb-2">Choisir une couleur</p>
-            <div className="grid grid-cols-9 gap-2">
+            <div className="grid grid-cols-8 gap-2">
               {PATHOLOGY_COLORS.map((color) => {
                 const isUsed = usedColors.includes(color);
                 const isSelected = selectedColor === color;
