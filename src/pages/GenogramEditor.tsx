@@ -11,6 +11,8 @@ import EmotionalLinkLine from '@/components/EmotionalLinkLine';
 import ElasticLinkLine from '@/components/ElasticLinkLine';
 import LinkTypeModal from '@/components/LinkTypeModal';
 import FloatingControls from '@/components/FloatingControls';
+import OnboardingTutorial from '@/components/OnboardingTutorial';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import UnionEditDrawer from '@/components/UnionEditDrawer';
 import MemberEditDrawer from '@/components/MemberEditDrawer';
 import { RelationshipChoice } from '@/components/CreateMemberDropdown';
@@ -133,6 +135,7 @@ const GenogramEditor: React.FC = () => {
   const { id: genogramId } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [dbLoaded, setDbLoaded] = useState(false);
+  const onboarding = useOnboarding();
 
   // Initialize with empty state — will be populated from DB or sample data
   const [members, setMembers] = useState<FamilyMember[]>(() => {
@@ -1751,6 +1754,15 @@ const GenogramEditor: React.FC = () => {
             onRedo={handleRedo}
             canUndo={history.canUndo}
             canRedo={history.canRedo}
+            onHelp={onboarding.restart}
+          />
+
+          <OnboardingTutorial
+            active={onboarding.active}
+            step={onboarding.step}
+            onNext={onboarding.next}
+            onPrev={onboarding.prev}
+            onFinish={onboarding.finish}
           />
 
           {/* Union action between 2 selected members */}
