@@ -1,5 +1,5 @@
 import { jsPDF } from 'jspdf';
-import { FamilyMember } from '@/types/genogram';
+import { FamilyMember, Union, EmotionalLink } from '@/types/genogram';
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
