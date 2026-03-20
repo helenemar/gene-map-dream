@@ -277,16 +277,16 @@ const Dashboard: React.FC = () => {
     setCreateModalOpen(true);
   };
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!confirm('Supprimer ce génogramme ?')) return;
-    const { error } = await supabase.from('genograms').delete().eq('id', id);
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    const { error } = await supabase.from('genograms').delete().eq('id', deleteTarget.id);
     if (error) {
       toast.error(error.message);
     } else {
       toast.success('Génogramme supprimé');
       queryClient.invalidateQueries({ queryKey: ['genograms'] });
     }
+    setDeleteTarget(null);
   };
 
   const handleRename = async (id: string) => {
