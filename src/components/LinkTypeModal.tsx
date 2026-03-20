@@ -13,6 +13,10 @@ interface LinkTypeModalProps {
 }
 
 const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, currentType, onDelete }) => {
+  React.useEffect(() => {
+    if (open) window.getSelection()?.removeAllRanges();
+  }, [open]);
+
   if (!open) return null;
 
   const isEditing = !!currentType;
