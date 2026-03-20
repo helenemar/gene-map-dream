@@ -317,6 +317,10 @@ const Dashboard: React.FC = () => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem onClick={() => navigate('/account')}>
+                Mon compte
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut()} className="text-destructive focus:text-destructive">
                 Se déconnecter
               </DropdownMenuItem>
