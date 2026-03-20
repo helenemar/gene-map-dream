@@ -1738,6 +1738,29 @@ const GenogramEditor: React.FC = () => {
           {!presentationMode && (
             <LockPanel members={members} onToggleLock={handleToggleLock} />
           )}
+
+          {/* Floating "Créer un lien" when exactly 2 members selected */}
+          {!presentationMode && selectedMembers.size === 2 && (() => {
+            const [idA, idB] = Array.from(selectedMembers);
+            const mA = members.find(m => m.id === idA);
+            const mB = members.find(m => m.id === idB);
+            if (!mA || !mB) return null;
+            // Position above the midpoint between the two cards
+            const midX = ((mA.x + CARD_W / 2) + (mB.x + CARD_W / 2)) / 2;
+            const midY = Math.min(mA.y, mB.y) - 50;
+            const screenX = midX * zoom + pan.x;
+            const screenY = midY * zoom + pan.y;
+            return (
+              <button
+                className="absolute z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-lg hover:bg-primary/90 active:scale-95 transition-all"
+                style={{ left: screenX, top: screenY, transform: 'translate(-50%, -50%)' }}
+                onClick={() => setLinkModalTarget({ fromId: idA, toId: idB })}
+              >
+                <Link className="w-3.5 h-3.5" />
+                Créer un lien
+              </button>
+            );
+          })()}
         </div>
       </div>
       {genogramId && (
