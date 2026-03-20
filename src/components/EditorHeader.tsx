@@ -223,13 +223,12 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
             )}
           </Button>
         )}
+        <BetaExportModal open={betaExportOpen} onOpenChange={setBetaExportOpen} />
         <Button
           variant="outline"
           size="sm"
           className="gap-2 rounded-full text-xs"
-          onClick={() => {
-            toast('L\'export n\'est pas disponible dans la version bêta.', { duration: 3000 });
-          }}
+          onClick={() => setBetaExportOpen(true)}
         >
           <Download className="w-3.5 h-3.5" />
           Exporter
