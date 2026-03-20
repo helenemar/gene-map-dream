@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, Move, ZoomIn, MousePointer2, Link, RotateCcw } from 'lucide-react';
+import STEP_ANIMATIONS from '@/components/OnboardingAnimations';
 
 interface OnboardingStep {
   icon: React.ReactNode;
@@ -331,6 +332,17 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                       )}
                     </div>
                   </div>
+
+                  {/* Animated illustration */}
+                  <motion.div
+                    key={`anim-${step}`}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15, duration: 0.3 }}
+                    className="mb-4"
+                  >
+                    {(() => { const Anim = STEP_ANIMATIONS[tipIndex]; return Anim ? <Anim /> : null; })()}
+                  </motion.div>
 
                   {/* Progress dots */}
                   <div className="flex items-center justify-center gap-1.5 mb-3.5">
