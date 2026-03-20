@@ -79,26 +79,23 @@ const AddPathologyModal: React.FC<AddPathologyModalProps> = ({
             </Button>
           </div>
 
-          {/* Color grid */}
+          {/* Color grid — only show available (unused) colors */}
           <div>
             <p className="text-xs text-muted-foreground mb-2">Choisir une couleur</p>
-            <div className="grid grid-cols-8 gap-2">
-              {PATHOLOGY_COLORS.map((color) => {
-                const isUsed = usedColors.includes(color);
+            <div className="grid grid-cols-6 gap-2">
+              {PATHOLOGY_COLORS.filter(c => !usedColors.includes(c)).map((color) => {
                 const isSelected = selectedColor === color;
                 return (
                   <button
                     key={color}
                     type="button"
-                    disabled={isUsed}
                     onClick={() => setSelectedColor(color)}
                     className={`
-                      w-8 h-8 rounded-lg transition-all border-2
+                      w-8 h-8 rounded-lg transition-all border-2 cursor-pointer
                       ${isSelected ? 'ring-2 ring-primary ring-offset-2 border-primary scale-110' : 'border-transparent hover:scale-110'}
-                      ${isUsed ? 'opacity-25 cursor-not-allowed' : 'cursor-pointer'}
                     `}
                     style={{ backgroundColor: color }}
-                    title={isUsed ? 'Couleur déjà utilisée' : color}
+                    title={color}
                   >
                     {isSelected && (
                       <Check className="w-4 h-4 text-white mx-auto" />
