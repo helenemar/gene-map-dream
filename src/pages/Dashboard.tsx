@@ -434,9 +434,26 @@ const Dashboard: React.FC = () => {
                       <TableCell className="pl-6">
                         <div className="flex items-center gap-3">
                           <GenogramThumbnail data={file.data || {}} width={56} height={40} />
-                          <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
-                            {file.name}
-                          </span>
+                          {renamingId === file.id ? (
+                            <form
+                              onSubmit={(e) => { e.preventDefault(); e.stopPropagation(); handleRename(file.id); }}
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-1.5"
+                            >
+                              <input
+                                autoFocus
+                                className="text-[13px] font-medium text-foreground border border-border rounded px-2 py-0.5 bg-background outline-none focus:ring-1 focus:ring-primary/30 w-48"
+                                value={renameValue}
+                                onChange={(e) => setRenameValue(e.target.value)}
+                                onBlur={() => handleRename(file.id)}
+                                onKeyDown={(e) => { if (e.key === 'Escape') setRenamingId(null); }}
+                              />
+                            </form>
+                          ) : (
+                            <span className="text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
+                              {file.name}
+                            </span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
