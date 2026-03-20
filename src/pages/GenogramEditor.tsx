@@ -626,46 +626,16 @@ const GenogramEditor: React.FC = () => {
     return unions.some(u => u.isAdoption && u.children.includes(memberId));
   }, [unions]);
 
-  /** Smart placement: compute position for new member based on relationship */
-  const computeNewPosition = useCallback((
-    sourceId: string,
-    relationship: RelationshipChoice
-  ): { x: number; y: number } => {
-    const source = members.find(m => m.id === sourceId);
-    if (!source) return { x: 200, y: 200 };
-
-    const LEVEL_Y = 250;
-    const SPOUSE_GAP = CARD_W + 120; // card width + badge space
-
-    switch (relationship) {
-      case 'parent':
-        return { x: source.x, y: source.y - LEVEL_Y };
-      case 'child':
-        return { x: source.x, y: source.y + LEVEL_Y };
-      case 'sibling': {
-        // Place to the right of rightmost sibling at same level
-        const sameLevelMembers = members.filter(m => Math.abs(m.y - source.y) < 50);
-        const maxX = Math.max(...sameLevelMembers.map(m => m.x + CARD_W));
-        return { x: maxX + 80, y: source.y };
-      }
-      case 'spouse_married':
-      case 'spouse_divorced':
-      case 'spouse_separated':
-      case 'spouse_widowed': {
-        // Place to the right, leaving space for badge
-        const rightSpace = members.filter(m =>
-          Math.abs(m.y - source.y) < 50 && m.x > source.x
-        );
-        const placeRight = rightSpace.length === 0;
-        return {
-          x: placeRight ? source.x + SPOUSE_GAP : source.x - SPOUSE_GAP,
-          y: source.y,
-        };
-      }
-      default:
-        return { x: source.x + 300, y: source.y };
-    }
-  }, [members]);
+  /** Place new member at the center of the current viewport */
+  const getViewportCenter = useCallback((): { x: number; y: number } => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 200, y: 200 };
+    const rect = canvas.getBoundingClientRect();
+    // Convert viewport center to world coordinates
+    const worldX = (rect.width / 2 - pan.x) / zoom;
+    const worldY = (rect.height / 2 - pan.y) / zoom;
+    return { x: Math.round(worldX - CARD_W / 2), y: Math.round(worldY - CARD_H / 2) };
+  }, [pan, zoom]);
 
   /** Create a child and attach it to a specific union, create a new placeholder union, or create standalone */
   const executeChildCreation = useCallback((sourceId: string, targetUnionId?: string) => {
@@ -883,7 +853,7 @@ const GenogramEditor: React.FC = () => {
     }
 
     // ── Non-child relationships (spouse, parent, sibling) ──
-    const pos = computeNewPosition(sourceId, relationship);
+    const pos = getViewportCenter();
     const source = members.find(m => m.id === sourceId);
     const currentYear = new Date().getFullYear();
 
@@ -1052,7 +1022,7 @@ const GenogramEditor: React.FC = () => {
     setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
     setTimeout(() => centerOnMember(newMember), 100);
-  }, [members, unions, computeNewPosition, centerOnMember, recordSnapshot]);
+  }, [members, unions, getViewportCenter, centerOnMember, recordSnapshot]);
 
   const handleToggleLock = useCallback((id: string) => {
     setMembers(prev => prev.map(m => m.id === id ? { ...m, locked: !m.locked } : m));
@@ -1227,22 +1197,8 @@ const GenogramEditor: React.FC = () => {
     }, 900); // Match spring animation duration
   }, [members, unions, emotionalLinks, handleFitToScreen]);
 
-  // ─── Auto-layout on member/union count change (including initial load) ───
-  const prevMemberCountRef = React.useRef<number | null>(null);
-  const prevUnionCountRef = React.useRef<number | null>(null);
-  const initialLayoutDoneRef = React.useRef(false);
-  useEffect(() => {
-    const membersChanged = prevMemberCountRef.current !== null && members.length > prevMemberCountRef.current;
-    const unionsChanged = prevUnionCountRef.current !== null && unions.length > prevUnionCountRef.current;
-    const isInitialLoad = !initialLayoutDoneRef.current && members.length > 0;
-
-    if (membersChanged || unionsChanged || isInitialLoad) {
-      handleAutoLayout();
-      initialLayoutDoneRef.current = true;
-    }
-    prevMemberCountRef.current = members.length;
-    prevUnionCountRef.current = unions.length;
-  }, [members.length, unions.length, handleAutoLayout]);
+  // Auto-layout removed — members are placed at viewport center, user drags them manually.
+  // The "Réorganiser" button (handleAutoLayout) is still available for manual re-layout.
 
   // ─── Button zoom (centered on viewport center) ───
   const handleZoomIn = useCallback(() => {
