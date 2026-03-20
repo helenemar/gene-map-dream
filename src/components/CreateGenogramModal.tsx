@@ -216,16 +216,6 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
             />
           </div>
 
-          <div className="flex items-center gap-2.5 py-1">
-            <Checkbox
-              id="cg-adopted"
-              checked={isAdopted}
-              onCheckedChange={(checked) => setIsAdopted(checked === true)}
-            />
-            <Label htmlFor="cg-adopted" className="text-sm font-normal cursor-pointer">
-              Patient adopté
-            </Label>
-          </div>
         </div>
 
         <DialogFooter>
