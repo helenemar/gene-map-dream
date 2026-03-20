@@ -9,24 +9,20 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 
-/** 16 professional, distinct colors (pastels & mediums) */
+/** 12 harmonious, distinct pathology colors */
 export const PATHOLOGY_COLORS: string[] = [
-  '#EF4444', // red-500
-  '#F97316', // orange-500
-  '#F59E0B', // amber-500
-  '#EAB308', // yellow-500
-  '#84CC16', // lime-500
-  '#22C55E', // green-500
-  '#14B8A6', // teal-500
-  '#06B6D4', // cyan-500
-  '#3B82F6', // blue-500
-  '#6366F1', // indigo-500
-  '#8B5CF6', // violet-500
-  '#A855F7', // purple-500
-  '#D946EF', // fuchsia-500
-  '#EC4899', // pink-500
-  '#78716C', // stone-500
-  '#64748B', // slate-500
+  '#E63946', // vermillon
+  '#E89005', // ambre
+  '#D4A373', // sable
+  '#C1666B', // vieux rose
+  '#9B5DE5', // améthyste
+  '#457B9D', // bleu tempête
+  '#48BFE3', // azur
+  '#264653', // pétrole
+  '#2A9D8F', // émeraude
+  '#7FB069', // sauge
+  '#5E6472', // ardoise
+  '#A8763E', // bronze
 ];
 
 interface AddPathologyModalProps {
