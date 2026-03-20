@@ -26,6 +26,8 @@ const Account: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [siren, setSiren] = useState('');
   const [billingAddress, setBillingAddress] = useState('');
+  const [sendingPassword, setSendingPassword] = useState(false);
+  const [passwordSent, setPasswordSent] = useState(false);
 
   const email = user?.email ?? '';
 
@@ -78,10 +80,22 @@ const Account: React.FC = () => {
   };
 
   const handleDeleteAccount = async () => {
-    // Sign out — actual account deletion requires admin action
     toast.success('Votre demande de suppression a été prise en compte.');
     await signOut();
     navigate('/');
+  };
+
+  const handlePasswordReset = async () => {
+    setSendingPassword(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      toast.error('Erreur lors de l\'envoi de l\'e-mail.');
+    } else {
+      setPasswordSent(true);
+    }
+    setSendingPassword(false);
   };
 
   if (loading) {
@@ -186,8 +200,30 @@ const Account: React.FC = () => {
             </div>
           </TabsContent>
 
-          {/* Paramètres (danger zone) */}
-          <TabsContent value="danger" className="mt-8">
+          {/* Paramètres */}
+          <TabsContent value="danger" className="mt-8 space-y-6">
+            {/* Modifier mot de passe */}
+            <div className="border border-border rounded-xl p-6">
+              <h3 className="text-base font-semibold text-foreground mb-1">Modifier le mot de passe</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Un e-mail de réinitialisation sera envoyé à votre adresse.
+              </p>
+              <div className="flex flex-col gap-3">
+                {passwordSent ? (
+                  <p className="text-sm text-primary font-medium">✓ E-mail envoyé — vérifiez votre boîte de réception.</p>
+                ) : (
+                  <Button
+                    variant="outline"
+                    disabled={sendingPassword}
+                    onClick={handlePasswordReset}
+                  >
+                    {sendingPassword ? 'Envoi…' : 'Envoyer le lien de réinitialisation'}
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Supprimer compte */}
             <div className="border border-destructive/30 rounded-xl p-6">
               <h3 className="text-base font-semibold text-foreground mb-1">Supprimer mon compte</h3>
               <p className="text-sm text-muted-foreground mb-4">
