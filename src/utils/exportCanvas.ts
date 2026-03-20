@@ -96,7 +96,34 @@ function resolveAllSvgColors(svgClone: SVGElement, svgOriginal: SVGElement) {
 
 // ─── Bounds ─────────────────────────────────────────────────────────
 
-function getMemberBounds(contentDiv: HTMLElement, padding = 80) {
+const EXPORT_CARD_W = 220;
+const EXPORT_CARD_H = 64;
+
+/**
+ * Compute bounds directly from member data (not DOM) to avoid
+ * framer-motion transform measurement issues.
+ */
+function getMemberBoundsFromData(members: FamilyMember[], padding = 80) {
+  if (!members.length) return { x: 0, y: 0, w: 800, h: 600 };
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  members.forEach(m => {
+    minX = Math.min(minX, m.x);
+    minY = Math.min(minY, m.y);
+    maxX = Math.max(maxX, m.x + EXPORT_CARD_W);
+    maxY = Math.max(maxY, m.y + EXPORT_CARD_H);
+  });
+
+  const extra = 150;
+  return {
+    x: minX - padding - extra,
+    y: minY - padding - extra,
+    w: maxX - minX + (padding + extra) * 2,
+    h: maxY - minY + (padding + extra) * 2,
+  };
+}
+
+function getMemberBoundsFromDOM(contentDiv: HTMLElement, padding = 80) {
   const cards = contentDiv.querySelectorAll('[data-member-card]');
   const contentRect = contentDiv.getBoundingClientRect();
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
