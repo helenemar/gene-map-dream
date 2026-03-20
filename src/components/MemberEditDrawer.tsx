@@ -387,7 +387,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 </div>
                 <div className="flex flex-col gap-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Nom</Label>
-                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                  <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={member.isIndexPatient} />
                 </div>
               </div>
 
