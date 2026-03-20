@@ -2,6 +2,10 @@ import React, { useState, useMemo, useEffect } from 'react';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText } from 'lucide-react';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import GenogramThumbnail from '@/components/GenogramThumbnail';
 import CreateGenogramModal from '@/components/CreateGenogramModal';
 import BetaShareModal from '@/components/BetaShareModal';
@@ -181,6 +185,7 @@ const Dashboard: React.FC = () => {
   const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
 
   const { data: realGenograms, isLoading } = useQuery({
@@ -272,16 +277,16 @@ const Dashboard: React.FC = () => {
     setCreateModalOpen(true);
   };
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!confirm('Supprimer ce génogramme ?')) return;
-    const { error } = await supabase.from('genograms').delete().eq('id', id);
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    const { error } = await supabase.from('genograms').delete().eq('id', deleteTarget.id);
     if (error) {
       toast.error(error.message);
     } else {
       toast.success('Génogramme supprimé');
       queryClient.invalidateQueries({ queryKey: ['genograms'] });
     }
+    setDeleteTarget(null);
   };
 
   const handleRename = async (id: string) => {
@@ -528,7 +533,7 @@ const Dashboard: React.FC = () => {
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
-                                onClick={(e) => handleDelete(file.id, e as any)}
+                                onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: file.id, name: file.name }); }}
                                 className="text-destructive focus:text-destructive"
                               >
                                 Supprimer
@@ -577,6 +582,23 @@ const Dashboard: React.FC = () => {
           genogramId={notesModal.genogramId}
           genogramName={notesModal.genogramName}
         />
+
+        <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Supprimer ce génogramme ?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Êtes-vous sûr de vouloir supprimer <span className="font-semibold text-foreground">{deleteTarget?.name}</span> ? Cette action est irréversible.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annuler</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Supprimer
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </div>
   );
