@@ -350,13 +350,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
         e.stopPropagation();
         if (!presentationMode) onDragStart?.(member.id, e);
       }}
-      onClick={() => {
+      onClick={(e) => {
         if (presentationMode) {
           if (!isPlaceholder && !isDraft) onView?.(member.id);
         } else if (isPlaceholder || isDraft) {
           onEdit?.(member.id);
         } else {
-          onSelect?.(member.id);
+          onSelect?.(member.id, e);
         }
       }}
       onDoubleClick={() => {
