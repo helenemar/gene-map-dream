@@ -15,7 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import DossierNotesModal from '@/components/DossierNotesModal';
 
@@ -317,6 +317,10 @@ const Dashboard: React.FC = () => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem onClick={() => navigate('/account')}>
+                Mon compte
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut()} className="text-destructive focus:text-destructive">
                 Se déconnecter
               </DropdownMenuItem>

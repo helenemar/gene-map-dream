@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import SharedGenogram from "./pages/SharedGenogram";
 import NotFound from "./pages/NotFound";
+import Account from "./pages/Account";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/shared/:token" element={<SharedGenogram />} />
             <Route path="/design-system" element={<DesignSystemPage />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
