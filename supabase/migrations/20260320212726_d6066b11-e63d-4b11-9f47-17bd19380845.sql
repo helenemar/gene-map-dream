@@ -1,0 +1,10 @@
+UPDATE pathologies SET color_hex = '#F25959' WHERE id = '1bccbda9-7f35-4538-bac2-fc7311a34e85';
+UPDATE pathologies SET color_hex = '#F2BF59' WHERE id = '6a1bdd76-1b23-4a29-9aee-e883cfab249e';
+UPDATE pathologies SET color_hex = '#598CF2' WHERE id = '8286cfdc-959d-4257-b06d-24db9cd32198';
+UPDATE pathologies SET color_hex = '#59F2BF' WHERE id = 'e4929801-c7b9-4b66-8afc-cc4cc13a03e6';
+UPDATE pathologies SET color_hex = '#5959F2' WHERE id = '7039d656-5bc6-4ff1-b281-08b14c7da4c3';
+UPDATE pathologies SET color_hex = '#8C59F2' WHERE id = '0b843bd5-aa3e-4585-9062-4ad0e4055260';
+UPDATE pathologies SET color_hex = '#59F2F2' WHERE id = '0ec72025-29e5-48ad-8b99-f010ea3337f1';
+UPDATE pathologies SET color_hex = '#8CF259' WHERE id = '2587526b-a179-42ff-9f10-629a05090aca';
+UPDATE pathologies SET color_hex = '#F28C59' WHERE id = '507e836f-eaf0-41bc-bca4-9e9f07869b5a';
+UPDATE pathologies SET color_hex = '#BF59F2' WHERE id = '6136f86c-afea-4f4a-8492-6613d7aadec4';
