@@ -201,7 +201,7 @@ const Dashboard: React.FC = () => {
     enabled: !!user,
   });
 
-  const genograms = [...(realGenograms || []), ...MOCK_GENOGRAMS];
+  const genograms = useMemo(() => [...(realGenograms || []), ...MOCK_GENOGRAMS], [realGenograms]);
 
   // Fake note data for mock genograms
   const MOCK_NOTE_COUNTS: Record<string, number> = {
