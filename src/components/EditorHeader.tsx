@@ -29,6 +29,7 @@ interface EditorHeaderProps {
   onOpenNotes?: () => void;
   noteCount?: number;
   onShare?: () => void;
+  onBack?: () => void;
 }
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
