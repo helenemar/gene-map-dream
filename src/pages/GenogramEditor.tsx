@@ -897,17 +897,30 @@ const GenogramEditor: React.FC = () => {
       pathologies: [],
     };
 
-    const newUnion: Union = {
-      id: `u-${Date.now()}`,
-      partner1: sourceId,
-      partner2: partnerId,
-      status: 'love_affair',
-      children: [newChild.id],
-    };
-
     recordSnapshot();
     setMembers(prev => [...prev, newChild]);
-    setUnions(prev => [...prev, newUnion]);
+
+    const existingUnion = unions.find(u =>
+      (u.partner1 === sourceId && u.partner2 === partnerId) ||
+      (u.partner1 === partnerId && u.partner2 === sourceId)
+    );
+
+    if (existingUnion) {
+      setUnions(prev => prev.map(u =>
+        u.id === existingUnion.id
+          ? { ...u, children: [...u.children, newChild.id] }
+          : u
+      ));
+    } else {
+      const newUnion: Union = {
+        id: `u-${Date.now()}`,
+        partner1: sourceId,
+        partner2: partnerId,
+        status: 'love_affair',
+        children: [newChild.id],
+      };
+      setUnions(prev => [...prev, newUnion]);
+    }
     setSelectedMembers(new Set([newChild.id]));
     setEditingNewMember(newChild);
     setDrawerEditing(true);
