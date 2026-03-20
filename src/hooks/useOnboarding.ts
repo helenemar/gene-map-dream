@@ -32,6 +32,8 @@ export function useOnboarding() {
   const restart = useCallback(() => {
     setStep(0);
     setActive(true);
+    setDismissed(false);
+    localStorage.removeItem(ONBOARDING_DISMISSED_KEY);
   }, []);
 
   return { active, step, next, prev, finish, dismiss, restart };
