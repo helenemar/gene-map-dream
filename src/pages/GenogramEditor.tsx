@@ -568,10 +568,15 @@ const GenogramEditor: React.FC = () => {
       setIsPanning(true);
       return;
     }
-    // Left-click on empty canvas → pan
+    // Left-click on empty canvas → start marquee selection
     if (e.button === 0 && (e.target === canvasRef.current || (e.target as HTMLElement).classList.contains('canvas-bg'))) {
-      setIsPanning(true);
-      setSelectedMembers(new Set());
+      setMarquee({
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+        currentClientX: e.clientX,
+        currentClientY: e.clientY,
+      });
+      // Don't clear selection yet — will be cleared on mouseUp if no marquee drag happened
       setAnchorActiveMember(null);
       return;
     }
