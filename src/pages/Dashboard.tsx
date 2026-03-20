@@ -37,37 +37,51 @@ interface GenogramRow {
 type SortKey = 'name' | 'updated_at' | 'created_at';
 type SortDir = 'asc' | 'desc';
 
-  const genograms = useMemo(() => realGenograms || [], [realGenograms]);
+const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { user, signOut } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Fake note data for mock genograms
-  const MOCK_NOTE_COUNTS: Record<string, number> = {
-    'mock-1': 3, 'mock-3': 5, 'mock-5': 1, 'mock-6': 2, 'mock-7': 4,
-  };
-  const MOCK_LATEST_NOTE_DATES: Record<string, string> = {
-    'mock-1': '2026-03-01T10:00:00Z', // newer than updated_at → pulsing
-    'mock-3': '2026-02-28T18:00:00Z', // newer than updated_at → pulsing
-    'mock-5': '2025-12-21T09:00:00Z', // newer → pulsing
-    'mock-6': '2026-02-21T07:00:00Z', // newer → pulsing
-    'mock-7': '2025-11-01T10:00:00Z', // older than updated_at → no pulse
-  };
+  const [sortKey, setSortKey] = useState<SortKey>('updated_at');
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [betaModalOpen, setBetaModalOpen] = useState(false);
+  const [notesModal, setNotesModal] = useState<{ open: boolean; genogramId: string; genogramName: string }>({ open: false, genogramId: '', genogramName: '' });
+  const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
+  const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+
+  const { data: realGenograms, isLoading } = useQuery({
+    queryKey: ['genograms', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('genograms')
+        .select('*')
+        .order('updated_at', { ascending: false });
+      if (error) throw error;
+      return data as GenogramRow[];
+    },
+    enabled: !!user,
+  });
+
+  const genograms = useMemo(() => realGenograms || [], [realGenograms]);
 
   // Fetch note counts and latest note dates for all genograms
   useEffect(() => {
     if (!genograms?.length) return;
-    const ids = genograms.filter(g => !g.id.startsWith('mock')).map(g => g.id);
-    if (!ids.length) {
-      setNoteCounts(MOCK_NOTE_COUNTS);
-      setLatestNoteDates(MOCK_LATEST_NOTE_DATES);
-      return;
-    }
+    const ids = genograms.map(g => g.id);
+    if (!ids.length) return;
     supabase
       .from('genogram_notes')
       .select('genogram_id, created_at')
       .in('genogram_id', ids)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
-        const counts: Record<string, number> = { ...MOCK_NOTE_COUNTS };
-        const latest: Record<string, string> = { ...MOCK_LATEST_NOTE_DATES };
+        const counts: Record<string, number> = {};
+        const latest: Record<string, string> = {};
         if (data) {
           for (const row of data as { genogram_id: string; created_at: string }[]) {
             counts[row.genogram_id] = (counts[row.genogram_id] ?? 0) + 1;
