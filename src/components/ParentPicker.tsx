@@ -37,6 +37,7 @@ const ParentPicker: React.FC<ParentPickerProps> = ({
   open,
   onOpenChange,
   children,
+  isPerinatal,
 }) => {
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
