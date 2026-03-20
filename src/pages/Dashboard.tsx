@@ -363,26 +363,22 @@ const Dashboard: React.FC = () => {
                               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/editor/${file.id}`); }}>
                                 Ouvrir
                               </DropdownMenuItem>
-                              {!file.id.startsWith('mock') && (
-                                <>
-                                  <DropdownMenuItem
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setRenamingId(file.id);
-                                      setRenameValue(file.name);
-                                    }}
-                                  >
-                                    Renommer
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem
-                                    onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: file.id, name: file.name }); }}
-                                    className="text-destructive focus:text-destructive"
-                                  >
-                                    Supprimer
-                                  </DropdownMenuItem>
-                                </>
-                              )}
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRenamingId(file.id);
+                                  setRenameValue(file.name);
+                                }}
+                              >
+                                Renommer
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: file.id, name: file.name }); }}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                Supprimer
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
