@@ -826,7 +826,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <Button onClick={handleSave} className="w-full">
                   Enregistrer
                 </Button>
-                {onDelete && (
+                {onDelete && !member.isIndexPatient && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <button className="flex items-center gap-2 text-sm text-destructive hover:text-destructive/80 transition-colors">
