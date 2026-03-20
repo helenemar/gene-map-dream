@@ -107,18 +107,20 @@ export function useFamilySearch(
     const set = new Set<string>();
     for (const m of members) {
       if (m.isPlaceholder) continue;
+      // Resolve pathology names from dynamic DB pathologies
+      const pathologyNames = m.pathologies.map(pid => {
+        const found = dynamicPathologies.find(dp => dp.id === pid);
+        return found ? found.name : pid;
+      });
       const haystack = normalize(
-        [m.firstName, m.lastName, m.birthName || '', m.profession, ...m.pathologies.map(p => {
-          const found = PATHOLOGIES.find(pp => pp.id === p);
-          return found ? found.name : p;
-        })].join(' ')
+        [m.firstName, m.lastName, m.birthName || '', m.profession, ...pathologyNames].join(' ')
       );
       if (haystack.includes(needle)) {
         set.add(m.id);
       }
     }
     return set;
-  }, [members, needle, isActive]);
+  }, [members, dynamicPathologies, needle, isActive]);
 
   // Combined: members matched by text OR by emotional link connection
   const matchedMemberIds = useMemo(() => {
