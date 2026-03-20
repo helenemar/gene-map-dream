@@ -198,7 +198,7 @@ const GenogramEditor: React.FC = () => {
   const noteCount = useGenogramNoteCount(genogramId);
 
   // ─── Auto-save ───
-  const { saveStatus, debouncedSave } = useAutoSave(genogramId ?? null);
+  const { saveStatus, debouncedSave, saveNow } = useAutoSave(genogramId ?? null);
 
   // ─── Load genogram from DB ───
   useEffect(() => {
@@ -1681,7 +1681,11 @@ const GenogramEditor: React.FC = () => {
                 <AlertDialogCancel onClick={() => navigate('/dashboard')}>
                   Non, quitter
                 </AlertDialogCancel>
-                <AlertDialogAction onClick={() => navigate('/dashboard')}>
+                <AlertDialogAction onClick={async () => {
+                  await saveNow({ members, unions, emotionalLinks });
+                  toast.success('Modifications enregistrées');
+                  navigate('/dashboard');
+                }}>
                   Oui, enregistrer
                 </AlertDialogAction>
               </AlertDialogFooter>
