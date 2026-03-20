@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { FamilyMember, Union, EmotionalLink, PATHOLOGIES, EMOTIONAL_LINK_TYPES } from '@/types/genogram';
+import { FamilyMember, Union, EmotionalLink, EMOTIONAL_LINK_TYPES } from '@/types/genogram';
+import { DynamicPathology } from '@/hooks/usePathologies';
 
 export interface SearchSuggestion {
   category: 'name' | 'profession' | 'pathology' | 'relation';
@@ -48,7 +49,8 @@ const LINK_TYPE_CSS_VAR: Record<string, string> = {
 export function useFamilySearch(
   members: FamilyMember[],
   unions: Union[],
-  emotionalLinks: EmotionalLink[] = []
+  emotionalLinks: EmotionalLink[] = [],
+  dynamicPathologies: DynamicPathology[] = []
 ): FamilySearchResult {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
@@ -105,18 +107,20 @@ export function useFamilySearch(
     const set = new Set<string>();
     for (const m of members) {
       if (m.isPlaceholder) continue;
+      // Resolve pathology names from dynamic DB pathologies
+      const pathologyNames = m.pathologies.map(pid => {
+        const found = dynamicPathologies.find(dp => dp.id === pid);
+        return found ? found.name : pid;
+      });
       const haystack = normalize(
-        [m.firstName, m.lastName, m.birthName || '', m.profession, ...m.pathologies.map(p => {
-          const found = PATHOLOGIES.find(pp => pp.id === p);
-          return found ? found.name : p;
-        })].join(' ')
+        [m.firstName, m.lastName, m.birthName || '', m.profession, ...pathologyNames].join(' ')
       );
       if (haystack.includes(needle)) {
         set.add(m.id);
       }
     }
     return set;
-  }, [members, needle, isActive]);
+  }, [members, dynamicPathologies, needle, isActive]);
 
   // Combined: members matched by text OR by emotional link connection
   const matchedMemberIds = useMemo(() => {
@@ -176,12 +180,12 @@ export function useFamilySearch(
       });
     }
 
-    // Pathology matches
-    const matchingPathologies = PATHOLOGIES.filter(p => normalize(p.name).includes(needle));
-    for (const p of matchingPathologies) {
+    // Pathology matches (from dynamic DB pathologies)
+    const matchingDynPathologies = dynamicPathologies.filter(p => normalize(p.name).includes(needle));
+    for (const p of matchingDynPathologies) {
       const count = members.filter(m => m.pathologies.includes(p.id)).length;
       if (count > 0) {
-        results.push({ category: 'pathology', label: p.name, value: p.name, count });
+        results.push({ category: 'pathology', label: p.name, value: p.name, count, color: p.color_hex });
       }
     }
 

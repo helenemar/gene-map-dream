@@ -151,8 +151,8 @@ const GenogramEditor: React.FC = () => {
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
   const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(() => genogramId ? [] : SAMPLE_EMOTIONAL_LINKS);
   const [unions, setUnions] = useState<Union[]>(() => genogramId ? [] : SAMPLE_UNIONS);
-  const search = useFamilySearch(members, unions, emotionalLinks);
   const { pathologies: dynamicPathologies, addPathology, deletePathology } = usePathologies(genogramId);
+  const search = useFamilySearch(members, unions, emotionalLinks, dynamicPathologies);
   const [editingUnionId, setEditingUnionId] = useState<string | null>(null);
   const [fileName, setFileName] = useState('Sans titre');
   const [isAnimating, setIsAnimating] = useState(false);
