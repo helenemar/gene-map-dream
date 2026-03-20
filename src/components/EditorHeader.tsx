@@ -94,6 +94,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   onOpenNotes,
   noteCount = 0,
   onShare,
+  onBack,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
