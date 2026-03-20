@@ -180,12 +180,12 @@ export function useFamilySearch(
       });
     }
 
-    // Pathology matches
-    const matchingPathologies = PATHOLOGIES.filter(p => normalize(p.name).includes(needle));
-    for (const p of matchingPathologies) {
+    // Pathology matches (from dynamic DB pathologies)
+    const matchingDynPathologies = dynamicPathologies.filter(p => normalize(p.name).includes(needle));
+    for (const p of matchingDynPathologies) {
       const count = members.filter(m => m.pathologies.includes(p.id)).length;
       if (count > 0) {
-        results.push({ category: 'pathology', label: p.name, value: p.name, count });
+        results.push({ category: 'pathology', label: p.name, value: p.name, count, color: p.color_hex });
       }
     }
 
