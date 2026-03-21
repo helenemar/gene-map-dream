@@ -111,20 +111,25 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
           <TooltipContent side="top">{presentationMode ? 'Quitter la présentation' : 'Mode présentation'}</TooltipContent>
         </Tooltip>
 
-        {onHelp && !presentationMode && (
+      </div>
+
+      {/* Help button — bottom-right corner, more visible */}
+      {onHelp && !presentationMode && (
+        <div className="absolute bottom-6 right-6 z-20">
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 onClick={onHelp}
-                className="h-10 w-10 rounded-full shadow-float border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors"
+                className="h-11 gap-2 px-4 rounded-full shadow-float border border-primary/30 bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
               >
-                <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                <HelpCircle className="w-4.5 h-4.5 text-primary" />
+                <span className="text-xs font-semibold text-primary">Aide</span>
               </button>
             </TooltipTrigger>
             <TooltipContent side="top">Aide & raccourcis</TooltipContent>
           </Tooltip>
-        )}
-      </div>
+        </div>
+      )}
     </TooltipProvider>
   );
 };
