@@ -124,12 +124,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
         ? 'border-primary ring-2 ring-primary/30'
         : 'border-border';
 
-  const handleDotClick = useCallback((side: AnchorSide, e: React.MouseEvent) => {
+  const handleDotMouseDown = useCallback((side: AnchorSide, e: React.MouseEvent) => {
     e.stopPropagation();
     if (isStatic) {
       setInternalAnchorActive(true);
       return;
     }
+    // Direct drag start from any visible dot state (hover, selected, or anchor-active)
     onLinkDragStart?.(member.id, e);
   }, [isStatic, member.id, onLinkDragStart]);
 
