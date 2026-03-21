@@ -75,73 +75,14 @@ function getSpotlightRect(selector?: string): SpotlightRect | null {
 }
 
 /** Compute card position relative to spotlight */
-function getCardStyle(spot: SpotlightRect | null, position: string = 'bottom'): React.CSSProperties {
-  if (!spot) {
-    return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
-  }
-
-  const padding = 16;
-  const gap = 16;
-  const cardW = Math.min(360, window.innerWidth - padding * 2);
-  const cardH = 300;
-  const cx = spot.left + spot.width / 2;
-  const cy = spot.top + spot.height / 2;
-  const isHugeTarget = spot.width > window.innerWidth * 0.75 || spot.height > window.innerHeight * 0.65;
-
-  if (isHugeTarget) {
-    return {
-      left: '50%',
-      top: '50%',
-      transform: 'translate(-50%, -50%)',
-    };
-  }
-
-  const clampX = (value: number) => Math.max(padding, Math.min(value, window.innerWidth - cardW - padding));
-  const clampY = (value: number) => Math.max(padding, Math.min(value, window.innerHeight - cardH - padding));
-
-  const positions = {
-    top: {
-      left: clampX(cx - cardW / 2),
-      top: clampY(spot.top - cardH - gap),
-      transform: 'none',
-    },
-    right: {
-      left: clampX(spot.left + spot.width + gap),
-      top: clampY(cy - cardH / 2),
-      transform: 'none',
-    },
-    left: {
-      left: clampX(spot.left - cardW - gap),
-      top: clampY(cy - cardH / 2),
-      transform: 'none',
-    },
-    bottom: {
-      left: clampX(cx - cardW / 2),
-      top: clampY(spot.top + spot.height + gap),
-      transform: 'none',
-    },
-  } as const;
-
-  const preferredOrder = {
-    top: ['top', 'bottom', 'right', 'left'],
-    right: ['right', 'left', 'top', 'bottom'],
-    left: ['left', 'right', 'top', 'bottom'],
-    bottom: ['bottom', 'top', 'right', 'left'],
-  } as const;
-
-  const order = preferredOrder[position as keyof typeof preferredOrder] ?? preferredOrder.bottom;
-
-  for (const candidate of order) {
-    const style = positions[candidate];
-    const fitsHorizontally = style.left >= padding && style.left + cardW <= window.innerWidth - padding;
-    const fitsVertically = style.top >= padding && style.top + cardH <= window.innerHeight - padding;
-
-    if (fitsHorizontally && fitsVertically) {
-      return style;
-    }
-  }
-
-  return positions[order[0]];
+function getCardStyle(): React.CSSProperties {
+  return {
+    right: 16,
+    bottom: 16,
+    left: 'auto',
+    top: 'auto',
+    transform: 'none',
+  };
 }
 
 interface OnboardingTutorialProps {
@@ -189,9 +130,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
 
   if (!active) return null;
 
-  const cardStyle = isIntro
-    ? { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }
-    : getCardStyle(spotlight, currentTip?.cardPosition);
+  const cardStyle = getCardStyle();
 
   return (
     <AnimatePresence mode="wait">
