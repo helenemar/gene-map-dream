@@ -227,7 +227,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         </div>
 
         {/* Info block */}
-        <div className={`min-w-0 flex-1 ${member.avatar && !isPlaceholder && !isDraft && !isPerinatal ? 'text-center w-full' : ''}`}>
+        <div className="min-w-0 flex-1">
           {isPlaceholder ? (
             <div className="flex flex-col gap-0.5">
               <span className="font-medium text-sm text-muted-foreground/50 italic whitespace-nowrap">Ajouter le parent</span>
