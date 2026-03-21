@@ -145,10 +145,10 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
   const cardContent = (
     <>
-      {/* Card body — hug contents with min-width, dots inside relative container */}
+      {/* Card body */}
       <div
         className={`group
-          relative overflow-visible flex items-center ${compact ? 'gap-2' : 'gap-3'} rounded-xl bg-card transition-all
+          relative overflow-visible flex ${member.avatar && !isPlaceholder && !isDraft && !isPerinatal ? 'flex-col items-center' : 'items-center'} ${compact ? 'gap-2' : 'gap-3'} rounded-xl bg-card transition-all
           ${(isPlaceholder || isDraft) ? 'border-2 border-dashed' : 'border'}
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
           ${(isPlaceholder || isDraft) && !isHighlighted ? 'border-muted-foreground/30' : borderClasses}
@@ -158,7 +158,9 @@ const MemberCard: React.FC<MemberCardProps> = ({
         style={{
           minWidth: compact ? 160 : MEMBER_CARD_W,
           width: 'fit-content',
-          padding: compact ? '8px 12px' : '12px 16px',
+          padding: member.avatar && !isPlaceholder && !isDraft && !isPerinatal && !compact
+            ? '8px 16px 12px'
+            : compact ? '8px 12px' : '12px 16px',
           transform: compact ? 'scale(0.85)' : undefined,
           transformOrigin: 'center center',
           ...(searchHighlighted ? { boxShadow: '0 0 20px hsl(var(--primary) / 0.35), 0 0 40px hsl(var(--primary) / 0.15)' } : {}),
@@ -172,8 +174,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}
-        {/* Lock indicator removed — managed via floating lock panel */}
-        {/* Corner anchor dots — absolutely positioned at card corners with negative offset */}
+        {/* Corner anchor dots */}
         {showDots && CORNER_DOTS.map(({ side, style }) => (
           <div
             key={side}
@@ -191,48 +192,72 @@ const MemberCard: React.FC<MemberCardProps> = ({
           />
         ))}
 
-        {/* Icon with pathology fills, placeholder, or draft */}
-        <div className={`relative ${compact ? 'w-9 h-9' : 'w-12 h-12'} shrink-0 flex items-center justify-center`}>
-          {isPlaceholder ? (
-            <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
-              member.gender === 'female' ? 'rounded-full' : 'rounded'
-            } bg-muted/30`}>
-              <Plus className={`${compact ? 'w-4 h-4' : 'w-5 h-5'} text-muted-foreground/40`} />
-            </div>
-          ) : isDraft ? (
-            <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
-              member.gender === 'female' ? 'rounded-full' : 'rounded'
-            } bg-muted/20 border border-dashed border-muted-foreground/20`}>
-              <PencilLine className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} text-muted-foreground/30`} />
-            </div>
-          ) : member.avatar ? (
-            <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} rounded-xl overflow-hidden border border-border/50`}>
-              <img src={member.avatar} alt="" className="w-full h-full object-cover" />
-            </div>
-          ) : isPerinatal ? (
-            <MemberIcon
-              gender={member.gender}
-              perinatalType={member.perinatalType}
-              size={compact ? 36 : 48}
-              className="text-foreground"
-            />
-          ) : (
-            <MemberIcon
-              gender={member.gender}
-              isGay={member.isGay}
-              isBisexual={member.isBisexual}
-              isTransgender={member.isTransgender}
-              isDead={isDeceased}
-              pathologyColors={memberPathologies.map(p => p.color_hex)}
-              size={compact ? 36 : 48}
-              className="text-foreground"
-              isIndexPatient={member.isIndexPatient}
-            />
-          )}
-        </div>
+        {/* Avatar photo — above name when present */}
+        {member.avatar && !isPlaceholder && !isDraft && !isPerinatal && (
+          <div className={`${compact ? 'w-14 h-14' : 'w-20 h-20'} rounded-xl overflow-hidden border border-border/50 shrink-0`}>
+            <img src={member.avatar} alt="" className="w-full h-full object-cover" />
+          </div>
+        )}
+
+        {/* Icon (no avatar) or placeholder/draft */}
+        {!member.avatar && (
+          <div className={`relative ${compact ? 'w-9 h-9' : 'w-12 h-12'} shrink-0 flex items-center justify-center`}>
+            {isPlaceholder ? (
+              <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
+                member.gender === 'female' ? 'rounded-full' : 'rounded'
+              } bg-muted/30`}>
+                <Plus className={`${compact ? 'w-4 h-4' : 'w-5 h-5'} text-muted-foreground/40`} />
+              </div>
+            ) : isDraft ? (
+              <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
+                member.gender === 'female' ? 'rounded-full' : 'rounded'
+              } bg-muted/20 border border-dashed border-muted-foreground/20`}>
+                <PencilLine className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} text-muted-foreground/30`} />
+              </div>
+            ) : isPerinatal ? (
+              <MemberIcon
+                gender={member.gender}
+                perinatalType={member.perinatalType}
+                size={compact ? 36 : 48}
+                className="text-foreground"
+              />
+            ) : (
+              <MemberIcon
+                gender={member.gender}
+                isGay={member.isGay}
+                isBisexual={member.isBisexual}
+                isTransgender={member.isTransgender}
+                isDead={isDeceased}
+                pathologyColors={memberPathologies.map(p => p.color_hex)}
+                size={compact ? 36 : 48}
+                className="text-foreground"
+                isIndexPatient={member.isIndexPatient}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Also show icon for placeholder/draft even if avatar field exists */}
+        {member.avatar && (isPlaceholder || isDraft) && (
+          <div className={`relative ${compact ? 'w-9 h-9' : 'w-12 h-12'} shrink-0 flex items-center justify-center`}>
+            {isPlaceholder ? (
+              <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
+                member.gender === 'female' ? 'rounded-full' : 'rounded'
+              } bg-muted/30`}>
+                <Plus className={`${compact ? 'w-4 h-4' : 'w-5 h-5'} text-muted-foreground/40`} />
+              </div>
+            ) : (
+              <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
+                member.gender === 'female' ? 'rounded-full' : 'rounded'
+              } bg-muted/20 border border-dashed border-muted-foreground/20`}>
+                <PencilLine className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} text-muted-foreground/30`} />
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Info block */}
-        <div className="min-w-0 flex-1">
+        <div className={`min-w-0 flex-1 ${member.avatar && !isPlaceholder && !isDraft && !isPerinatal ? 'text-center w-full' : ''}`}>
           {isPlaceholder ? (
             <div className="flex flex-col gap-0.5">
               <span className="font-medium text-sm text-muted-foreground/50 italic whitespace-nowrap">Ajouter le parent</span>
@@ -260,8 +285,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
             </div>
           ) : (
             <>
-              {/* Header: Prénom left, badges right — space-between */}
-               <div className="flex items-center justify-between gap-2">
+              <div className={`flex items-center ${member.avatar ? 'justify-center' : 'justify-between'} gap-2`}>
                 <div className="flex items-baseline gap-1 min-w-0">
                   <span className="font-semibold text-sm text-foreground whitespace-nowrap">
                     {member.firstName.split(',')[0].trim() || '?'}
@@ -276,13 +300,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
                 )}
               </div>
               {member.birthYear > 0 && (
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <div className={`flex items-center gap-1.5 text-xs text-muted-foreground ${member.avatar ? 'justify-center' : ''}`}>
                   <span className="whitespace-nowrap">
                     {member.birthYearUnsure ? '~' : ''}{member.birthYear}{member.deathYear ? ` - ${member.deathYearUnsure ? '~' : ''}${member.deathYear}` : ' -'}
                   </span>
                 </div>
               )}
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div className={`flex items-center text-xs text-muted-foreground ${member.avatar ? 'justify-center gap-2' : 'justify-between'}`}>
                 <span className="whitespace-nowrap">{member.isRetired ? (member.gender === 'female' ? 'Retraitée' : 'Retraité') : member.profession}</span>
                 {member.notes && (
                   <FileText className="w-3 h-3 text-primary/60 shrink-0" />
