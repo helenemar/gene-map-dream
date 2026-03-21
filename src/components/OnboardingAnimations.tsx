@@ -24,7 +24,7 @@ const MiniCard: React.FC<{ x?: number; y?: number; w?: number; h?: number; label
 
 /* ── 1. Pan gesture: two dots slide together ── */
 export const PanAnimation: React.FC = () => (
-  <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
+  <div className="relative w-full h-[56px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
     <svg width="140" height="60" viewBox="0 0 140 60">
       {/* Grid dots (background) */}
       {Array.from({ length: 7 }).map((_, i) =>
