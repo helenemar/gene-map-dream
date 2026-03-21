@@ -113,22 +113,24 @@ const MemberCard: React.FC<MemberCardProps> = ({
     isSelected && state === 'default' ? 'selected' : state;
 
   const isHighlighted = activeState === 'hover' || activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget;
-  const showDots = !presentationMode && (activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget);
+  const showDots = !presentationMode && (activeState === 'hover' || activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget);
   const dotsFilled = activeState === 'anchor-active';
+  const dotsSubtle = activeState === 'hover';
 
   // Border & ring logic (no collision outline)
   const borderClasses = isLinkTarget
-      ? 'border-primary ring-2 ring-primary/40'
+      ? 'border-primary ring-2 ring-primary/40 shadow-[0_0_16px_hsl(var(--primary)/0.2)]'
       : isHighlighted
         ? 'border-primary ring-2 ring-primary/30'
         : 'border-border';
 
-  const handleDotClick = useCallback((side: AnchorSide, e: React.MouseEvent) => {
+  const handleDotMouseDown = useCallback((side: AnchorSide, e: React.MouseEvent) => {
     e.stopPropagation();
     if (isStatic) {
       setInternalAnchorActive(true);
       return;
     }
+    // Direct drag start from any visible dot state (hover, selected, or anchor-active)
     onLinkDragStart?.(member.id, e);
   }, [isStatic, member.id, onLinkDragStart]);
 
@@ -145,7 +147,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
     <>
       {/* Card body — hug contents with min-width, dots inside relative container */}
       <div
-        className={`
+        className={`group
           relative overflow-visible flex items-center ${compact ? 'gap-2' : 'gap-3'} rounded-xl bg-card transition-all
           ${(isPlaceholder || isDraft) ? 'border-2 border-dashed' : 'border'}
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
@@ -180,10 +182,12 @@ const MemberCard: React.FC<MemberCardProps> = ({
                 ? 'bg-primary scale-125 shadow-[0_0_8px_hsl(var(--primary)/0.5)]'
                 : isLinkTarget
                   ? 'bg-primary/20 opacity-50 hover:opacity-100 hover:bg-primary/40 hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
-                  : 'bg-card hover:bg-primary/30 hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
+                  : dotsSubtle
+                    ? 'bg-card/80 border-primary/40 opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-primary/30 hover:border-primary hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
+                    : 'bg-card hover:bg-primary/30 hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
             }`}
             style={style}
-            onMouseDown={(e) => handleDotClick(side, e)}
+            onMouseDown={(e) => handleDotMouseDown(side, e)}
           />
         ))}
 

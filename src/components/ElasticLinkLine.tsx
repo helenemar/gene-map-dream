@@ -31,18 +31,29 @@ const ElasticLinkLine: React.FC<ElasticLinkLineProps> = ({ x1, y1, x2, y2, snapX
   const dx = endX - x1;
   const dy = endY - y1;
   const dist = Math.sqrt(dx * dx + dy * dy);
-  const curvature = Math.min(dist * 0.3, 80);
+  const curvature = Math.min(dist * 0.25, 60);
 
-  const cx1 = x1 + dx * 0.25;
-  const cy1 = y1 + dy * 0.25 - curvature * 0.3;
-  const cx2 = x1 + dx * 0.75;
-  const cy2 = y1 + dy * 0.75 + curvature * 0.3;
+  // Smoother bezier with asymmetric control points
+  const cx1 = x1 + dx * 0.3;
+  const cy1 = y1 - curvature * 0.2;
+  const cx2 = x1 + dx * 0.7;
+  const cy2 = endY + curvature * 0.2;
 
   return (
     <svg
       className="absolute pointer-events-none"
       style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}
     >
+      {/* Glow under the line */}
+      <path
+        d={`M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${endX} ${endY}`}
+        fill="none"
+        stroke="hsl(var(--primary))"
+        strokeWidth={isSnapped ? 6 : 4}
+        opacity={0.1}
+        strokeLinecap="round"
+      />
+      {/* Main line */}
       <path
         d={`M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${endX} ${endY}`}
         fill="none"
@@ -50,7 +61,8 @@ const ElasticLinkLine: React.FC<ElasticLinkLineProps> = ({ x1, y1, x2, y2, snapX
         strokeWidth={isSnapped ? 2.5 : 2}
         strokeDasharray={isSnapped ? undefined : '6 4'}
         opacity={isSnapped ? 0.9 : 0.7}
-        className="transition-all duration-100"
+        strokeLinecap="round"
+        className="transition-all duration-75"
       />
       {/* Origin dot */}
       <circle cx={x1} cy={y1} r={4} fill="hsl(var(--primary))" opacity={0.8} />
@@ -61,7 +73,7 @@ const ElasticLinkLine: React.FC<ElasticLinkLineProps> = ({ x1, y1, x2, y2, snapX
         r={isSnapped ? 7 : 5}
         fill="hsl(var(--primary))"
         opacity={isSnapped ? 0.9 : 0.5}
-        className={`transition-all duration-100 ${isSnapped ? 'animate-snap-haptic' : ''}`}
+        className={`transition-all duration-75 ${isSnapped ? 'animate-snap-haptic' : ''}`}
       />
       {/* Snap glow ring */}
       {isSnapped && (
