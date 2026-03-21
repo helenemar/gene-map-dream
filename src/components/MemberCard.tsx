@@ -158,9 +158,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         style={{
           minWidth: compact ? 160 : MEMBER_CARD_W,
           width: 'fit-content',
-          padding: member.avatar && !isPlaceholder && !isDraft && !isPerinatal && !compact
-            ? '8px 16px 12px'
-            : compact ? '8px 12px' : '12px 16px',
+          padding: compact ? '8px 12px' : '12px 16px',
           transform: compact ? 'scale(0.85)' : undefined,
           transformOrigin: 'center center',
           ...(searchHighlighted ? { boxShadow: '0 0 20px hsl(var(--primary) / 0.35), 0 0 40px hsl(var(--primary) / 0.15)' } : {}),
