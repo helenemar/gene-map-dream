@@ -887,6 +887,15 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                VIEW MODE — Read-only display
                ═══════════════════════════════════════════════ */
             <div className="flex flex-col gap-3 py-3 px-3">
+              {/* Photo */}
+              {avatar && (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-28 h-28 rounded-2xl overflow-hidden border border-border/50 shadow-sm">
+                    <img src={avatar} alt={`${firstName} ${lastName}`} className="w-full h-full object-cover" />
+                  </div>
+                </div>
+              )}
+
               {/* Identity */}
               <div className="flex flex-col gap-1">
                 <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité</span>
