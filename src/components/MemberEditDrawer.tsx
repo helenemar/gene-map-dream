@@ -410,6 +410,24 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Martin" value={birthName} onChange={(e) => setBirthName(e.target.value)} />
               </div>
 
+              {/* ── Photo du membre ── */}
+              <div className="flex flex-col gap-1">
+                <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Photo
+                </Label>
+                {genogramId ? (
+                  <MemberAvatarUpload
+                    memberId={member.id}
+                    genogramId={genogramId}
+                    currentAvatar={avatar}
+                    onAvatarChange={setAvatar}
+                    size={56}
+                  />
+                ) : (
+                  <p className="text-[10px] text-muted-foreground/50 italic">Enregistrez le génogramme pour ajouter une photo</p>
+                )}
+              </div>
+
               <div className="flex flex-col gap-1">
                 <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Genre</Label>
                 <div className="flex h-8 rounded-lg border border-border/50 overflow-hidden">
