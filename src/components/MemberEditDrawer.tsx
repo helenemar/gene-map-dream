@@ -35,6 +35,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { Trash2, Heart, Pencil, FileText, Check, HelpCircle, Plus } from 'lucide-react';
+import MemberAvatarUpload from '@/components/MemberAvatarUpload';
 import {
   Tooltip,
   TooltipContent,
@@ -62,6 +63,8 @@ interface MemberEditDrawerProps {
   onLiveUpdate?: (updated: FamilyMember) => void;
   /** Start in read-only mode when false */
   initialEditing?: boolean;
+  /** Genogram ID for avatar storage */
+  genogramId?: string;
 }
 
 const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
@@ -69,7 +72,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   emotionalLinks = [], members: allMembers = [], unions = [],
   dynamicPathologies = [], onAddPathology, onDeletePathology,
   onUpdateEmotionalLink, onDeleteEmotionalLink, onUpdateUnion, onLiveUpdate,
-  initialEditing = true,
+  initialEditing = true, genogramId,
 }) => {
   const [isEditing, setIsEditing] = useState(initialEditing);
   const [firstName, setFirstName] = useState('');
@@ -92,6 +95,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [twinGroup, setTwinGroup] = useState('');
   const [twinType, setTwinType] = useState<TwinType | ''>('');
   const [notes, setNotes] = useState('');
+  const [avatar, setAvatar] = useState<string | undefined>(undefined);
 
   const [birthYearUnsure, setBirthYearUnsure] = useState(false);
   const [deathYearUnsure, setDeathYearUnsure] = useState(false);
@@ -122,6 +126,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setTwinGroup(member.twinGroup || '');
       setTwinType(member.twinType || '');
       setNotes(member.notes || '');
+      setAvatar(member.avatar);
     }
   }, [member]);
 
@@ -162,9 +167,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       twinGroup: twinGroup || undefined,
       twinType: (twinType as TwinType) || undefined,
       notes: notes || undefined,
+      avatar: avatar || undefined,
       isDraft: false,
     };
-  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, currentYear]);
+  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, avatar, currentYear]);
 
   /** Fire live update to canvas */
   useEffect(() => {
@@ -172,7 +178,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes]);
+  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, avatar]);
 
   if (!member) return null;
 
@@ -343,20 +349,26 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
           {/* ── Live icon preview ── */}
           <div className="flex items-center gap-3 mt-3 px-3 py-2.5 rounded-xl bg-accent/20 border border-border/50">
             <div className="shrink-0">
-              <MemberIcon
-                gender={gender}
-                isGay={isGay}
-                isBisexual={isBisexual}
-                isTransgender={isTransgender}
-                isDead={isDeceased}
-                pathologyColors={
-                  dynamicPathologies
-                    .filter(p => selectedPathologies.includes(p.id))
-                    .map(p => p.color_hex)
-                }
-                size={44}
-                className="text-foreground"
-              />
+              {avatar ? (
+                <div className="w-11 h-11 rounded-xl overflow-hidden border border-border/50">
+                  <img src={avatar} alt="" className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <MemberIcon
+                  gender={gender}
+                  isGay={isGay}
+                  isBisexual={isBisexual}
+                  isTransgender={isTransgender}
+                  isDead={isDeceased}
+                  pathologyColors={
+                    dynamicPathologies
+                      .filter(p => selectedPathologies.includes(p.id))
+                      .map(p => p.color_hex)
+                  }
+                  size={44}
+                  className="text-foreground"
+                />
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-foreground truncate">
@@ -396,6 +408,24 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   Nom de naissance
                 </Label>
                 <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Martin" value={birthName} onChange={(e) => setBirthName(e.target.value)} />
+              </div>
+
+              {/* ── Photo du membre ── */}
+              <div className="flex flex-col gap-1">
+                <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Photo
+                </Label>
+                {genogramId ? (
+                  <MemberAvatarUpload
+                    memberId={member.id}
+                    genogramId={genogramId}
+                    currentAvatar={avatar}
+                    onAvatarChange={setAvatar}
+                    size={56}
+                  />
+                ) : (
+                  <p className="text-[10px] text-muted-foreground/50 italic">Enregistrez le génogramme pour ajouter une photo</p>
+                )}
               </div>
 
               <div className="flex flex-col gap-1">
