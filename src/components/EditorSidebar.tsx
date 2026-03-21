@@ -100,7 +100,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
   }
 
   return (
-    <div className="w-[260px] bg-card border-r border-border h-full overflow-y-auto shrink-0">
+    <div className="w-[260px] bg-card border-r border-border h-full overflow-y-auto shrink-0" data-onboarding="sidebar">
       {/* Header */}
       <div className="px-4 py-4 border-b border-border">
         <button onClick={onBack} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-1">
