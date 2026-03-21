@@ -67,6 +67,13 @@ const STEPS: OnboardingStep[] = [
     cardPosition: 'bottom',
   },
   {
+    icon: <Search className="w-6 h-6" />,
+    title: 'Rechercher & filtrer',
+    description: 'Utilisez la barre de recherche pour trouver un membre, un lien ou une pathologie. La sidebar à gauche permet de filtrer par type de lien ou de masquer des éléments.',
+    spotlightSelector: '[data-onboarding="search-bar"]',
+    cardPosition: 'bottom',
+  },
+  {
     icon: <RotateCcw className="w-6 h-6" />,
     title: 'Annuler / Rétablir',
     description: 'Utilisez Ctrl+Z pour annuler et Ctrl+Shift+Z pour rétablir vos actions.',
