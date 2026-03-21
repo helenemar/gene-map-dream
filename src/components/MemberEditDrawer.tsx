@@ -72,7 +72,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   emotionalLinks = [], members: allMembers = [], unions = [],
   dynamicPathologies = [], onAddPathology, onDeletePathology,
   onUpdateEmotionalLink, onDeleteEmotionalLink, onUpdateUnion, onLiveUpdate,
-  initialEditing = true,
+  initialEditing = true, genogramId,
 }) => {
   const [isEditing, setIsEditing] = useState(initialEditing);
   const [firstName, setFirstName] = useState('');
