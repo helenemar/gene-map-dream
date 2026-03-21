@@ -883,8 +883,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
             <div className="flex flex-col gap-3 py-3 px-3">
               {/* Photo */}
               {avatar && (
-                <div className="flex flex-col items-center gap-2">
-                  <div className="w-28 h-28 rounded-2xl overflow-hidden border border-border/50 shadow-sm">
+                <div className="flex flex-col items-start gap-2">
+                  <div className="w-36 h-36 rounded-2xl overflow-hidden border border-border/50 shadow-sm">
                     <img src={avatar} alt={`${firstName} ${lastName}`} className="w-full h-full object-cover" />
                   </div>
                 </div>
