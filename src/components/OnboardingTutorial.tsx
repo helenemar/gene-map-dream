@@ -189,9 +189,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
 
   if (!active) return null;
 
-  const cardStyle = isIntro
-    ? { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }
-    : getCardStyle(spotlight, currentTip?.cardPosition);
+  const cardStyle = getCardStyle();
 
   return (
     <AnimatePresence mode="wait">
