@@ -24,7 +24,7 @@ const MiniCard: React.FC<{ x?: number; y?: number; w?: number; h?: number; label
 
 /* ── 1. Pan gesture: two dots slide together ── */
 export const PanAnimation: React.FC = () => (
-  <div className="relative w-full h-[56px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
+  <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
     <svg width="140" height="60" viewBox="0 0 140 60">
       {/* Grid dots (background) */}
       {Array.from({ length: 7 }).map((_, i) =>
@@ -51,7 +51,7 @@ export const PanAnimation: React.FC = () => (
 
 /* ── 2. Zoom gesture: pinch in/out ── */
 export const ZoomAnimation: React.FC = () => (
-  <div className="relative w-full h-[56px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
+  <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
     <svg width="140" height="60" viewBox="0 0 140 60">
       {/* Card that scales */}
       <motion.g
@@ -82,7 +82,7 @@ export const ZoomAnimation: React.FC = () => (
 
 /* ── 3. Drag member: card moves with cursor ── */
 export const DragAnimation: React.FC = () => (
-  <div className="relative w-full h-[56px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
+  <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
     <svg width="160" height="60" viewBox="0 0 160 60">
       {/* Pulsing ring around the card to draw attention */}
       <motion.rect
@@ -156,7 +156,7 @@ export const LinkAnimation: React.FC = () => {
   const toAnchor = anchorsB[3];   // left side of B
 
   return (
-    <div className="relative w-full h-[56px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
+    <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
       <svg width="164" height="56" viewBox="0 0 164 56">
         {/* Card A */}
         <MiniCard x={cardAX} y={cardAY} w={cardW} h={cardH} label="Marie" />
@@ -222,7 +222,7 @@ export const LinkAnimation: React.FC = () => {
 
 /* ── 5. Undo/Redo: keyboard keys animation ── */
 export const UndoAnimation: React.FC = () => (
-  <div className="relative w-full h-[56px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
+  <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
     <div className="flex items-center gap-3">
       {/* Ctrl key */}
       <motion.div
