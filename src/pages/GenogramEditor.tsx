@@ -1769,6 +1769,7 @@ const GenogramEditor: React.FC = () => {
               const age = updated.birthYear ? currentYear - updated.birthYear : updated.age;
               setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age } : m));
             }}
+            genogramId={genogramId}
           />
 
           <FloatingControls

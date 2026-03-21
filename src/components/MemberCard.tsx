@@ -205,6 +205,10 @@ const MemberCard: React.FC<MemberCardProps> = ({
             } bg-muted/20 border border-dashed border-muted-foreground/20`}>
               <PencilLine className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} text-muted-foreground/30`} />
             </div>
+          ) : member.avatar ? (
+            <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} rounded-xl overflow-hidden border border-border/50`}>
+              <img src={member.avatar} alt="" className="w-full h-full object-cover" />
+            </div>
           ) : isPerinatal ? (
             <MemberIcon
               gender={member.gender}
