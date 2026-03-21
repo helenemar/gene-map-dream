@@ -113,8 +113,9 @@ const MemberCard: React.FC<MemberCardProps> = ({
     isSelected && state === 'default' ? 'selected' : state;
 
   const isHighlighted = activeState === 'hover' || activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget;
-  const showDots = !presentationMode && (activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget);
+  const showDots = !presentationMode && (activeState === 'hover' || activeState === 'selected' || activeState === 'anchor-active' || isLinkTarget);
   const dotsFilled = activeState === 'anchor-active';
+  const dotsSubtle = activeState === 'hover';
 
   // Border & ring logic (no collision outline)
   const borderClasses = isLinkTarget
