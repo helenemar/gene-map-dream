@@ -271,6 +271,101 @@ export const UndoAnimation: React.FC = () => (
   </div>
 );
 
-const STEP_ANIMATIONS = [PanAnimation, ZoomAnimation, DragAnimation, LinkAnimation, UndoAnimation];
+/* ── 6. Create member: hover card → click + button ── */
+export const CreateMemberAnimation: React.FC = () => (
+  <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
+    <svg width="160" height="60" viewBox="0 0 160 60">
+      <MiniCard x={40} y={14} w={52} h={28} label="Marie" />
+      {/* + button appearing on hover */}
+      <motion.g
+        animate={{ opacity: [0, 0, 1, 1, 1, 0], scale: [0.5, 0.5, 1, 1, 1.2, 0.5] }}
+        transition={{ duration: 3, repeat: Infinity, times: [0, 0.2, 0.3, 0.5, 0.65, 0.8] }}
+        style={{ transformOrigin: '100px 28px' }}
+      >
+        <circle cx={100} cy={28} r={9} fill="hsl(var(--primary))" />
+        <text x={100} y={32} textAnchor="middle" fontSize={14} fill="hsl(var(--primary-foreground))" fontFamily="sans-serif" fontWeight="bold">+</text>
+      </motion.g>
+      {/* Cursor moving to the + button */}
+      <motion.g
+        animate={{ x: [0, 20, 20, 20], y: [8, 0, 0, 0], opacity: [0, 1, 1, 0] }}
+        transition={{ duration: 3, repeat: Infinity, times: [0, 0.3, 0.6, 0.8] }}
+      >
+        <g transform="translate(72, 28)">{CURSOR}</g>
+      </motion.g>
+      {/* New card appearing */}
+      <motion.g
+        animate={{ opacity: [0, 0, 0, 1], y: [10, 10, 10, 0] }}
+        transition={{ duration: 3, repeat: Infinity, times: [0, 0.5, 0.65, 0.85] }}
+      >
+        <MiniCard x={110} y={14} w={40} h={28} label="?" />
+      </motion.g>
+    </svg>
+  </div>
+);
+
+/* ── 7. Edit member: click card → pencil icon → drawer opens ── */
+export const EditMemberAnimation: React.FC = () => (
+  <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
+    <div className="flex items-center gap-3">
+      {/* Card with click effect */}
+      <motion.div
+        className="relative px-4 py-2 rounded-lg border text-[11px] font-medium"
+        style={{ borderColor: 'hsl(var(--border))', color: 'hsl(var(--foreground))', backgroundColor: 'hsl(var(--card))' }}
+        animate={{
+          borderColor: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--primary))'],
+          boxShadow: ['0 0 0 0px transparent', '0 0 0 2px hsl(var(--primary) / 0.2)', '0 0 0 2px hsl(var(--primary) / 0.2)'],
+        }}
+        transition={{ duration: 2.5, repeat: Infinity, times: [0, 0.25, 1] }}
+      >
+        Jean
+      </motion.div>
+      {/* Arrow */}
+      <motion.div
+        animate={{ opacity: [0, 1, 1], x: [-4, 0, 0] }}
+        transition={{ duration: 2.5, repeat: Infinity, times: [0, 0.3, 1] }}
+      >
+        <svg width="16" height="12" viewBox="0 0 16 12"><path d="M1 6h12M10 2l4 4-4 4" stroke="hsl(var(--primary))" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </motion.div>
+      {/* Pencil icon + drawer mock */}
+      <motion.div
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg border"
+        style={{ borderColor: 'hsl(var(--border))', backgroundColor: 'hsl(var(--card))' }}
+        animate={{ opacity: [0, 0, 1], x: [8, 8, 0] }}
+        transition={{ duration: 2.5, repeat: Infinity, times: [0, 0.35, 0.55] }}
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+        <span className="text-[10px] text-muted-foreground">Éditer</span>
+      </motion.div>
+    </div>
+  </div>
+);
+
+/* ── 8. Create union: two cards joined by a line ── */
+export const CreateUnionAnimation: React.FC = () => (
+  <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
+    <svg width="160" height="60" viewBox="0 0 160 60">
+      <MiniCard x={16} y={18} w={48} h={24} label="Marie" />
+      <MiniCard x={96} y={18} w={48} h={24} label="Jean" />
+      {/* Union line appearing */}
+      <motion.line
+        x1={64} y1={30} x2={64} y2={30}
+        stroke="hsl(var(--foreground))"
+        strokeWidth={2}
+        animate={{ x2: [64, 96, 96] }}
+        transition={{ duration: 2.5, repeat: Infinity, times: [0, 0.4, 1], ease: 'easeInOut' }}
+      />
+      {/* Heart icon at center of line */}
+      <motion.g
+        animate={{ opacity: [0, 0, 1], scale: [0.3, 0.3, 1] }}
+        transition={{ duration: 2.5, repeat: Infinity, times: [0, 0.4, 0.6] }}
+        style={{ transformOrigin: '80px 22px' }}
+      >
+        <text x={80} y={14} textAnchor="middle" fontSize={10} fill="hsl(var(--primary))">♥</text>
+      </motion.g>
+    </svg>
+  </div>
+);
+
+const STEP_ANIMATIONS = [PanAnimation, ZoomAnimation, CreateMemberAnimation, EditMemberAnimation, DragAnimation, LinkAnimation, CreateUnionAnimation, UndoAnimation];
 
 export default STEP_ANIMATIONS;

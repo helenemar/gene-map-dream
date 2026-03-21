@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight, ChevronLeft, Move, ZoomIn, MousePointer2, Link, RotateCcw } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, Move, ZoomIn, MousePointer2, Link, RotateCcw, UserPlus, Pencil, Heart } from 'lucide-react';
 import STEP_ANIMATIONS from '@/components/OnboardingAnimations';
 
 interface OnboardingStep {
@@ -32,6 +32,20 @@ const STEPS: OnboardingStep[] = [
     cardPosition: 'top',
   },
   {
+    icon: <UserPlus className="w-6 h-6" />,
+    title: 'Créer un membre',
+    description: 'Survolez une carte existante et cliquez sur le bouton + pour ajouter un conjoint, enfant ou parent.',
+    spotlightSelector: '[data-onboarding="canvas"]',
+    cardPosition: 'bottom',
+  },
+  {
+    icon: <Pencil className="w-6 h-6" />,
+    title: 'Éditer un membre',
+    description: 'Cliquez sur une carte pour la sélectionner, puis cliquez sur l\'icône crayon pour ouvrir le panneau d\'édition (nom, dates, pathologies…).',
+    spotlightSelector: '[data-onboarding="canvas"]',
+    cardPosition: 'bottom',
+  },
+  {
     icon: <MousePointer2 className="w-6 h-6" />,
     title: 'Déplacer un membre',
     description: 'Cliquez et faites glisser une carte pour la repositionner. Les guides intelligents vous aident à aligner les membres.',
@@ -40,8 +54,15 @@ const STEPS: OnboardingStep[] = [
   },
   {
     icon: <Link className="w-6 h-6" />,
-    title: 'Créer un lien',
-    description: 'Survolez une carte et glissez depuis un point d\'ancrage (●) vers un autre membre pour créer un lien émotionnel.',
+    title: 'Créer un lien émotionnel',
+    description: 'Survolez une carte et glissez depuis un point d\'ancrage (●) sur le côté vers un autre membre.',
+    spotlightSelector: '[data-onboarding="canvas"]',
+    cardPosition: 'bottom',
+  },
+  {
+    icon: <Heart className="w-6 h-6" />,
+    title: 'Créer une union',
+    description: 'Utilisez le bouton + sur une carte et choisissez "Conjoint(e)" pour créer une union entre deux membres.',
     spotlightSelector: '[data-onboarding="canvas"]',
     cardPosition: 'bottom',
   },
