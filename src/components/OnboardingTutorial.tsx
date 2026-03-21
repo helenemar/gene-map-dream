@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight, ChevronLeft, Move, ZoomIn, MousePointer2, Link, RotateCcw, UserPlus, Pencil, Heart } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, Move, ZoomIn, MousePointer2, Link, RotateCcw, UserPlus, Pencil, Heart, Search } from 'lucide-react';
 import STEP_ANIMATIONS from '@/components/OnboardingAnimations';
 
 interface OnboardingStep {
@@ -64,6 +64,13 @@ const STEPS: OnboardingStep[] = [
     title: 'Créer une union',
     description: 'Utilisez le bouton + sur une carte et choisissez "Conjoint(e)" pour créer une union entre deux membres.',
     spotlightSelector: '[data-onboarding="canvas"]',
+    cardPosition: 'bottom',
+  },
+  {
+    icon: <Search className="w-6 h-6" />,
+    title: 'Rechercher & filtrer',
+    description: 'Utilisez la barre de recherche pour trouver un membre, un lien ou une pathologie. La sidebar à gauche permet de filtrer par type de lien ou de masquer des éléments.',
+    spotlightSelector: '[data-onboarding="search-bar"]',
     cardPosition: 'bottom',
   },
   {
