@@ -352,6 +352,37 @@ const GenogramEditor: React.FC = () => {
     };
   }, []);
 
+  // ─── Zoom out when onboarding tutorial starts ───
+  const prevOnboardingActive = useRef(false);
+  useEffect(() => {
+    if (onboarding.active && !prevOnboardingActive.current && members.length > 0) {
+      // Fit all members in view with padding
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const xs = members.map(m => m.x);
+      const ys = members.map(m => m.y);
+      const minX = Math.min(...xs);
+      const minY = Math.min(...ys);
+      const maxX = Math.max(...xs) + CARD_W;
+      const maxY = Math.max(...ys) + CARD_H;
+      const contentW = maxX - minX || 200;
+      const contentH = maxY - minY || 200;
+      const padding = 120;
+      const fitZoom = Math.min(
+        (rect.width - padding * 2) / contentW,
+        (rect.height - padding * 2) / contentH,
+        0.85
+      );
+      const clampedZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, fitZoom));
+      const panX = (rect.width - contentW * clampedZoom) / 2 - minX * clampedZoom;
+      const panY = (rect.height - contentH * clampedZoom) / 2 - minY * clampedZoom;
+      setZoom(clampedZoom);
+      setPan({ x: panX, y: panY });
+    }
+    prevOnboardingActive.current = onboarding.active;
+  }, [onboarding.active, members]);
+
   // ─── Wheel: two-finger scroll = pan, pinch (ctrlKey) = zoom ───
   useEffect(() => {
     const canvas = canvasRef.current;
