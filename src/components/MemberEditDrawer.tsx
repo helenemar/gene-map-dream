@@ -63,6 +63,8 @@ interface MemberEditDrawerProps {
   onLiveUpdate?: (updated: FamilyMember) => void;
   /** Start in read-only mode when false */
   initialEditing?: boolean;
+  /** Genogram ID for avatar storage */
+  genogramId?: string;
 }
 
 const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
