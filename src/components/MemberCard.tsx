@@ -276,7 +276,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
                   </span>
                 </div>
               )}
-              <div className={`flex items-center text-xs text-muted-foreground ${member.avatar ? 'justify-center gap-2' : 'justify-between'}`}>
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span className="whitespace-nowrap">{member.isRetired ? (member.gender === 'female' ? 'Retraitée' : 'Retraité') : member.profession}</span>
                 {member.notes && (
                   <FileText className="w-3 h-3 text-primary/60 shrink-0" />
