@@ -95,6 +95,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [twinGroup, setTwinGroup] = useState('');
   const [twinType, setTwinType] = useState<TwinType | ''>('');
   const [notes, setNotes] = useState('');
+  const [avatar, setAvatar] = useState<string | undefined>(undefined);
 
   const [birthYearUnsure, setBirthYearUnsure] = useState(false);
   const [deathYearUnsure, setDeathYearUnsure] = useState(false);
