@@ -366,6 +366,46 @@ export const CreateUnionAnimation: React.FC = () => (
   </div>
 );
 
-const STEP_ANIMATIONS = [PanAnimation, ZoomAnimation, CreateMemberAnimation, EditMemberAnimation, DragAnimation, LinkAnimation, CreateUnionAnimation, UndoAnimation];
+/* ── 9. Search & filter: search bar + sidebar eye toggles ── */
+export const SearchFilterAnimation: React.FC = () => (
+  <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
+    <div className="flex items-center gap-3">
+      {/* Search bar mock */}
+      <motion.div
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border"
+        style={{ borderColor: 'hsl(var(--border))', backgroundColor: 'hsl(var(--card))' }}
+        animate={{
+          borderColor: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--primary))', 'hsl(var(--border))'],
+        }}
+        transition={{ duration: 3, repeat: Infinity, times: [0, 0.2, 0.6, 0.8] }}
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <motion.span
+          className="text-[10px] font-mono"
+          style={{ color: 'hsl(var(--foreground))' }}
+          animate={{ opacity: [0, 0, 1, 1] }}
+          transition={{ duration: 3, repeat: Infinity, times: [0, 0.2, 0.4, 1] }}
+        >
+          Marie
+        </motion.span>
+      </motion.div>
+      {/* Eye toggle mock */}
+      <motion.div
+        className="flex items-center gap-1 px-2 py-1.5 rounded-lg border"
+        style={{ borderColor: 'hsl(var(--border))', backgroundColor: 'hsl(var(--card))' }}
+      >
+        <motion.div
+          animate={{ opacity: [1, 1, 0.3, 0.3, 1] }}
+          transition={{ duration: 3, repeat: Infinity, times: [0, 0.5, 0.6, 0.85, 0.95] }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+        </motion.div>
+        <span className="text-[9px] text-muted-foreground">Filtres</span>
+      </motion.div>
+    </div>
+  </div>
+);
+
+const STEP_ANIMATIONS = [PanAnimation, ZoomAnimation, CreateMemberAnimation, EditMemberAnimation, DragAnimation, LinkAnimation, CreateUnionAnimation, SearchFilterAnimation, UndoAnimation];
 
 export default STEP_ANIMATIONS;
