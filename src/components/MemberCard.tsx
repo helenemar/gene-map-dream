@@ -270,7 +270,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
                 )}
               </div>
               {member.birthYear > 0 && (
-                <div className={`flex items-center gap-1.5 text-xs text-muted-foreground ${member.avatar ? 'justify-center' : ''}`}>
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <span className="whitespace-nowrap">
                     {member.birthYearUnsure ? '~' : ''}{member.birthYear}{member.deathYear ? ` - ${member.deathYearUnsure ? '~' : ''}${member.deathYear}` : ' -'}
                   </span>
