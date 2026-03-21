@@ -82,8 +82,8 @@ function getCardStyle(spot: SpotlightRect | null, position: string = 'bottom'): 
 
   const padding = 16;
   const gap = 16;
-  const cardW = Math.min(300, window.innerWidth - padding * 2);
-  const cardH = 260;
+  const cardW = Math.min(360, window.innerWidth - padding * 2);
+  const cardH = 300;
   const cx = spot.left + spot.width / 2;
   const cy = spot.top + spot.height / 2;
   const isHugeTarget = spot.width > window.innerWidth * 0.75 || spot.height > window.innerHeight * 0.65;
@@ -265,7 +265,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 6 }}
             transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-            className="fixed z-[101] w-[300px] max-w-[85vw] max-h-[calc(100vh-2rem)] pointer-events-auto"
+            className="fixed z-[101] w-[360px] max-w-[90vw] max-h-[calc(100vh-2rem)] pointer-events-auto"
             style={cardStyle}
             onClick={e => e.stopPropagation()}
           >
