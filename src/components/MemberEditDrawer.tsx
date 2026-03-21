@@ -35,6 +35,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { Trash2, Heart, Pencil, FileText, Check, HelpCircle, Plus } from 'lucide-react';
+import MemberAvatarUpload from '@/components/MemberAvatarUpload';
 import {
   Tooltip,
   TooltipContent,
