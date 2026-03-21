@@ -190,69 +190,41 @@ const MemberCard: React.FC<MemberCardProps> = ({
           />
         ))}
 
-        {/* Avatar photo — above name when present */}
-        {member.avatar && !isPlaceholder && !isDraft && !isPerinatal && (
-          <div className={`${compact ? 'w-14 h-14' : 'w-20 h-20'} rounded-xl overflow-hidden border border-border/50 shrink-0`}>
-            <img src={member.avatar} alt="" className="w-full h-full object-cover" />
-          </div>
-        )}
-
-        {/* Icon (no avatar) or placeholder/draft */}
-        {!member.avatar && (
-          <div className={`relative ${compact ? 'w-9 h-9' : 'w-12 h-12'} shrink-0 flex items-center justify-center`}>
-            {isPlaceholder ? (
-              <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
-                member.gender === 'female' ? 'rounded-full' : 'rounded'
-              } bg-muted/30`}>
-                <Plus className={`${compact ? 'w-4 h-4' : 'w-5 h-5'} text-muted-foreground/40`} />
-              </div>
-            ) : isDraft ? (
-              <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
-                member.gender === 'female' ? 'rounded-full' : 'rounded'
-              } bg-muted/20 border border-dashed border-muted-foreground/20`}>
-                <PencilLine className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} text-muted-foreground/30`} />
-              </div>
-            ) : isPerinatal ? (
-              <MemberIcon
-                gender={member.gender}
-                perinatalType={member.perinatalType}
-                size={compact ? 36 : 48}
-                className="text-foreground"
-              />
-            ) : (
-              <MemberIcon
-                gender={member.gender}
-                isGay={member.isGay}
-                isBisexual={member.isBisexual}
-                isTransgender={member.isTransgender}
-                isDead={isDeceased}
-                pathologyColors={memberPathologies.map(p => p.color_hex)}
-                size={compact ? 36 : 48}
-                className="text-foreground"
-                isIndexPatient={member.isIndexPatient}
-              />
-            )}
-          </div>
-        )}
-
-        {/* Also show icon for placeholder/draft even if avatar field exists */}
-        {member.avatar && (isPlaceholder || isDraft) && (
-          <div className={`relative ${compact ? 'w-9 h-9' : 'w-12 h-12'} shrink-0 flex items-center justify-center`}>
-            {isPlaceholder ? (
-              <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
-                member.gender === 'female' ? 'rounded-full' : 'rounded'
-              } bg-muted/30`}>
-                <Plus className={`${compact ? 'w-4 h-4' : 'w-5 h-5'} text-muted-foreground/40`} />
-              </div>
-            ) : (
-              <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
-                member.gender === 'female' ? 'rounded-full' : 'rounded'
-              } bg-muted/20 border border-dashed border-muted-foreground/20`}>
-                <PencilLine className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} text-muted-foreground/30`} />
-              </div>
-            )}
-          </div>
-        )}
+        {/* Icon with pathology fills, placeholder, or draft */}
+        <div className={`relative ${compact ? 'w-9 h-9' : 'w-12 h-12'} shrink-0 flex items-center justify-center`}>
+          {isPlaceholder ? (
+            <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
+              member.gender === 'female' ? 'rounded-full' : 'rounded'
+            } bg-muted/30`}>
+              <Plus className={`${compact ? 'w-4 h-4' : 'w-5 h-5'} text-muted-foreground/40`} />
+            </div>
+          ) : isDraft ? (
+            <div className={`${compact ? 'w-9 h-9' : 'w-12 h-12'} flex items-center justify-center ${
+              member.gender === 'female' ? 'rounded-full' : 'rounded'
+            } bg-muted/20 border border-dashed border-muted-foreground/20`}>
+              <PencilLine className={`${compact ? 'w-3 h-3' : 'w-4 h-4'} text-muted-foreground/30`} />
+            </div>
+          ) : isPerinatal ? (
+            <MemberIcon
+              gender={member.gender}
+              perinatalType={member.perinatalType}
+              size={compact ? 36 : 48}
+              className="text-foreground"
+            />
+          ) : (
+            <MemberIcon
+              gender={member.gender}
+              isGay={member.isGay}
+              isBisexual={member.isBisexual}
+              isTransgender={member.isTransgender}
+              isDead={isDeceased}
+              pathologyColors={memberPathologies.map(p => p.color_hex)}
+              size={compact ? 36 : 48}
+              className="text-foreground"
+              isIndexPatient={member.isIndexPatient}
+            />
+          )}
+        </div>
 
         {/* Info block */}
         <div className={`min-w-0 flex-1 ${member.avatar && !isPlaceholder && !isDraft && !isPerinatal ? 'text-center w-full' : ''}`}>
