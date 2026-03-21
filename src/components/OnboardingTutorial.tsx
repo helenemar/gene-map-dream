@@ -82,8 +82,8 @@ function getCardStyle(spot: SpotlightRect | null, position: string = 'bottom'): 
 
   const padding = 16;
   const gap = 16;
-  const cardW = Math.min(300, window.innerWidth - padding * 2);
-  const cardH = 260;
+  const cardW = Math.min(360, window.innerWidth - padding * 2);
+  const cardH = 300;
   const cx = spot.left + spot.width / 2;
   const cy = spot.top + spot.height / 2;
   const isHugeTarget = spot.width > window.innerWidth * 0.75 || spot.height > window.innerHeight * 0.65;
