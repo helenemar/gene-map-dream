@@ -82,7 +82,7 @@ function getCardStyle(spot: SpotlightRect | null, position: string = 'bottom'): 
 
   const padding = 16;
   const gap = 16;
-  const cardW = Math.min(360, window.innerWidth - padding * 2);
+  const cardW = Math.min(300, window.innerWidth - padding * 2);
   const cardH = 300;
   const cx = spot.left + spot.width / 2;
   const cy = spot.top + spot.height / 2;
