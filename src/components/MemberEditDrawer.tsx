@@ -126,6 +126,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setTwinGroup(member.twinGroup || '');
       setTwinType(member.twinType || '');
       setNotes(member.notes || '');
+      setAvatar(member.avatar);
     }
   }, [member]);
 
