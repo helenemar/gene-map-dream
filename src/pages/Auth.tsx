@@ -66,7 +66,7 @@ const Auth: React.FC = () => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: window.location.origin },
+        options: { emailRedirectTo: getRedirectOrigin() },
       });
       if (error) throw error;
       toast.success('Lien de connexion envoyé ! Vérifiez votre boîte mail.');
