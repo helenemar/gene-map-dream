@@ -145,6 +145,8 @@ interface GenogramEditorProps {
 
 const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedInitialData }) => {
   const isSharedMode = !!shareToken;
+  const isMobile = useIsMobile();
+  const isMobileReadOnly = isMobile && !isSharedMode;
   const { id: genogramId } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [dbLoaded, setDbLoaded] = useState(false);
