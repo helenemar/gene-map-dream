@@ -456,7 +456,68 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     return () => canvas.removeEventListener('wheel', onWheel);
   }, [zoom, pan]);
 
-  // ─── Drag member ───
+  // ─── Touch: pan & pinch-zoom for mobile ───
+  const touchRef = useRef<{ lastTouches: Touch[]; lastDist: number | null }>({ lastTouches: [], lastDist: null });
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (isMobileReadOnly) e.preventDefault();
+      touchRef.current.lastTouches = Array.from(e.touches);
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        touchRef.current.lastDist = Math.hypot(dx, dy);
+      } else {
+        touchRef.current.lastDist = null;
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const prev = touchRef.current.lastTouches;
+      if (e.touches.length === 1 && prev.length >= 1) {
+        const dx = e.touches[0].clientX - prev[0].clientX;
+        const dy = e.touches[0].clientY - prev[0].clientY;
+        setPan(p => ({ x: p.x + dx, y: p.y + dy }));
+      } else if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.hypot(dx, dy);
+        if (touchRef.current.lastDist) {
+          const scale = dist / touchRef.current.lastDist;
+          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          const rect = canvas.getBoundingClientRect();
+          const cx = midX - rect.left;
+          const cy = midY - rect.top;
+          const worldX = (cx - pan.x) / zoom;
+          const worldY = (cy - pan.y) / zoom;
+          const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * scale));
+          setPan({ x: cx - worldX * newZoom, y: cy - worldY * newZoom });
+          setZoom(newZoom);
+        }
+        touchRef.current.lastDist = dist;
+      }
+      touchRef.current.lastTouches = Array.from(e.touches);
+    };
+
+    const onTouchEnd = () => {
+      touchRef.current.lastDist = null;
+      touchRef.current.lastTouches = [];
+    };
+
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd);
+    return () => {
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [zoom, pan, isMobileReadOnly]);
+
   const handleDragStart = useCallback((id: string, e: React.MouseEvent) => {
     if (isSpaceDown) return; // space+drag = pan, not member drag
     const member = members.find(m => m.id === id);
