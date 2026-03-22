@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useNavigate, useParams } from 'react-router-dom';
 import DossierNotesModal, { useGenogramNoteCount } from '@/components/DossierNotesModal';
 import ShareModal from '@/components/ShareModal';
@@ -34,7 +35,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { usePathologies } from '@/hooks/usePathologies';
 import { useSharedAutoSave } from '@/hooks/useSharedAutoSave';
 import { toast } from 'sonner';
-import { Undo2, Redo2, Link } from 'lucide-react';
+import { Undo2, Redo2, Link, Eye } from 'lucide-react';
 
 // Card bounding box
 const CARD_W = MEMBER_CARD_W;
@@ -144,6 +145,8 @@ interface GenogramEditorProps {
 
 const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedInitialData }) => {
   const isSharedMode = !!shareToken;
+  const isMobile = useIsMobile();
+  const isMobileReadOnly = isMobile && !isSharedMode;
   const { id: genogramId } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [dbLoaded, setDbLoaded] = useState(false);
@@ -453,7 +456,68 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     return () => canvas.removeEventListener('wheel', onWheel);
   }, [zoom, pan]);
 
-  // ─── Drag member ───
+  // ─── Touch: pan & pinch-zoom for mobile ───
+  const touchRef = useRef<{ lastTouches: Touch[]; lastDist: number | null }>({ lastTouches: [], lastDist: null });
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (isMobileReadOnly) e.preventDefault();
+      touchRef.current.lastTouches = Array.from(e.touches);
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        touchRef.current.lastDist = Math.hypot(dx, dy);
+      } else {
+        touchRef.current.lastDist = null;
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const prev = touchRef.current.lastTouches;
+      if (e.touches.length === 1 && prev.length >= 1) {
+        const dx = e.touches[0].clientX - prev[0].clientX;
+        const dy = e.touches[0].clientY - prev[0].clientY;
+        setPan(p => ({ x: p.x + dx, y: p.y + dy }));
+      } else if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.hypot(dx, dy);
+        if (touchRef.current.lastDist) {
+          const scale = dist / touchRef.current.lastDist;
+          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          const rect = canvas.getBoundingClientRect();
+          const cx = midX - rect.left;
+          const cy = midY - rect.top;
+          const worldX = (cx - pan.x) / zoom;
+          const worldY = (cy - pan.y) / zoom;
+          const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom * scale));
+          setPan({ x: cx - worldX * newZoom, y: cy - worldY * newZoom });
+          setZoom(newZoom);
+        }
+        touchRef.current.lastDist = dist;
+      }
+      touchRef.current.lastTouches = Array.from(e.touches);
+    };
+
+    const onTouchEnd = () => {
+      touchRef.current.lastDist = null;
+      touchRef.current.lastTouches = [];
+    };
+
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd);
+    return () => {
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [zoom, pan, isMobileReadOnly]);
+
   const handleDragStart = useCallback((id: string, e: React.MouseEvent) => {
     if (isSpaceDown) return; // space+drag = pan, not member drag
     const member = members.find(m => m.id === id);
@@ -1454,7 +1518,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
         onBack={() => isSharedMode ? navigate('/') : setShowLeaveDialog(true)}
       />
       <div className="flex flex-1 overflow-hidden">
-        {!presentationMode && (
+        {!presentationMode && !isMobileReadOnly && (
           <EditorSidebar
             members={members}
             unions={unions}
@@ -1480,14 +1544,21 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
         <div
           ref={canvasRef}
           data-onboarding="canvas"
-          className={`flex-1 relative overflow-hidden canvas-bg ${cursorClass}`}
+          className={`flex-1 relative overflow-hidden canvas-bg ${isMobileReadOnly ? 'cursor-grab' : cursorClass}`}
           style={{ ...dotGridStyle, overscrollBehavior: 'none', touchAction: 'none' }}
-          onMouseDown={handleCanvasMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
+          onMouseDown={isMobileReadOnly ? undefined : handleCanvasMouseDown}
+          onMouseMove={isMobileReadOnly ? undefined : handleMouseMove}
+          onMouseUp={isMobileReadOnly ? undefined : handleMouseUp}
+          onMouseLeave={isMobileReadOnly ? undefined : handleMouseUp}
           onContextMenu={e => e.preventDefault()}
         >
+          {/* Mobile read-only banner */}
+          {isMobileReadOnly && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 px-4 py-2 rounded-full bg-card/90 backdrop-blur border border-border shadow-sm">
+              <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-[11px] font-medium text-muted-foreground">Lecture seule</span>
+            </div>
+          )}
           <div
             className="absolute"
             style={{
@@ -1608,31 +1679,31 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
               <MemberCard
                 key={member.id}
                 member={member}
-                isSelected={selectedMembers.has(member.id)}
+                isSelected={isMobileReadOnly ? false : selectedMembers.has(member.id)}
                 isAnimating={isAnimating}
-                isColliding={collisions.has(member.id)}
-                state={getMemberState(member.id)}
-                isLinkTarget={!!linkDrag && linkDrag.fromId !== member.id}
+                isColliding={isMobileReadOnly ? false : collisions.has(member.id)}
+                state={isMobileReadOnly ? 'default' : getMemberState(member.id)}
+                isLinkTarget={isMobileReadOnly ? false : (!!linkDrag && linkDrag.fromId !== member.id)}
                 isFadingOut={fadingOutIds.has(member.id)}
                 searchDimmed={search.isActive && !search.matchedMemberIds.has(member.id)}
                 searchHighlighted={search.isActive && search.matchedMemberIds.has(member.id)}
-                presentationMode={presentationMode}
-                multiSelected={selectedMembers.size > 1}
+                presentationMode={isMobileReadOnly || presentationMode}
+                multiSelected={isMobileReadOnly ? false : selectedMembers.size > 1}
                 compact={isBioParentOfAdoptedChild}
-                onSelect={handleSelect}
-                onDragStart={handleDragStart}
-                onCreateRelated={handleCreateRelated}
-                onEdit={handleEdit}
-                onToggleLock={handleToggleLock}
-                onView={handleView}
-                onHover={setHoveredMember}
-                onLinkDragStart={handleLinkDragStart}
-                onCancelAnchor={handleCancelAnchor}
+                onSelect={isMobileReadOnly ? (() => {}) : handleSelect}
+                onDragStart={isMobileReadOnly ? (() => {}) : handleDragStart}
+                onCreateRelated={isMobileReadOnly ? (() => {}) : handleCreateRelated}
+                onEdit={isMobileReadOnly ? (() => {}) : handleEdit}
+                onToggleLock={isMobileReadOnly ? (() => {}) : handleToggleLock}
+                onView={isMobileReadOnly ? (() => {}) : handleView}
+                onHover={isMobileReadOnly ? (() => {}) : setHoveredMember}
+                onLinkDragStart={isMobileReadOnly ? (() => {}) : handleLinkDragStart}
+                onCancelAnchor={isMobileReadOnly ? (() => {}) : handleCancelAnchor}
                 disabledOptions={getDisabledOptions(member.id)}
                 dynamicPathologies={pathologiesVisible ? dynamicPathologies : []}
                 showParentSplit={shouldShowParentSplit(member.id)}
                 isAdopted={isMemberAdopted(member.id)}
-                onboardingPulse={onboarding.active && onboarding.step === 5 && member.id === members[0]?.id}
+                onboardingPulse={false}
               />
               );
             })}
@@ -1813,30 +1884,32 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
             onFitToScreen={handleFitToScreen}
             onAutoLayout={undefined}
             zoom={zoom}
-            presentationMode={presentationMode}
-            onTogglePresentation={() => {
+            presentationMode={isMobileReadOnly || presentationMode}
+            onTogglePresentation={isMobileReadOnly ? undefined : () => {
               setPresentationMode(prev => !prev);
               setSelectedMembers(new Set());
               setAnchorActiveMember(null);
             }}
-            onUndo={handleUndo}
-            onRedo={handleRedo}
-            canUndo={history.canUndo}
-            canRedo={history.canRedo}
-            onHelp={onboarding.restart}
+            onUndo={isMobileReadOnly ? undefined : handleUndo}
+            onRedo={isMobileReadOnly ? undefined : handleRedo}
+            canUndo={isMobileReadOnly ? false : history.canUndo}
+            canRedo={isMobileReadOnly ? false : history.canRedo}
+            onHelp={isMobileReadOnly ? undefined : onboarding.restart}
           />
 
-          <OnboardingTutorial
-            active={onboarding.active}
-            step={onboarding.step}
-            onNext={onboarding.next}
-            onPrev={onboarding.prev}
-            onFinish={onboarding.finish}
-            onDismiss={onboarding.dismiss}
-          />
+          {!isMobileReadOnly && (
+            <OnboardingTutorial
+              active={onboarding.active}
+              step={onboarding.step}
+              onNext={onboarding.next}
+              onPrev={onboarding.prev}
+              onFinish={onboarding.finish}
+              onDismiss={onboarding.dismiss}
+            />
+          )}
 
           {/* Union action between 2 selected members */}
-          {!presentationMode && selectedMembers.size === 2 && (() => {
+          {!isMobileReadOnly && !presentationMode && selectedMembers.size === 2 && (() => {
             const [idA, idB] = Array.from(selectedMembers);
             const mA = members.find(m => m.id === idA);
             const mB = members.find(m => m.id === idB);
