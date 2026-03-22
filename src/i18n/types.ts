@@ -107,6 +107,10 @@ export interface Translations {
     perinatalEvents: string; pregnancyLabel: string; miscarriageLabel: string;
     abortionLabel: string; stillbornMale: string; stillbornFemale: string;
   };
+  memberCard: {
+    yearsOld: string; createMember: string; createLink: string;
+    dragHint: string; cancelLabel: string; retiredF: string; retiredM: string;
+  };
   shareModal: {
     title: string; linkSharing: string; reader: string; editorAccess: string;
     generate: string; inviteByEmail: string; invite: string; linkCreated: string;
