@@ -2,85 +2,34 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, Move, ZoomIn, MousePointer2, Link, RotateCcw, UserPlus, Pencil, Heart, Search } from 'lucide-react';
 import STEP_ANIMATIONS from '@/components/OnboardingAnimations';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-interface OnboardingStep {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  shortcut?: string;
-  /** CSS selector to spotlight an element on-screen */
-  spotlightSelector?: string;
-  /** Where to position the tooltip card relative to the spotlight */
-  cardPosition?: 'bottom' | 'top' | 'right' | 'left';
-}
+const STEP_ICONS = [
+  <Move className="w-6 h-6" />,
+  <ZoomIn className="w-6 h-6" />,
+  <UserPlus className="w-6 h-6" />,
+  <Pencil className="w-6 h-6" />,
+  <MousePointer2 className="w-6 h-6" />,
+  <Link className="w-6 h-6" />,
+  <Heart className="w-6 h-6" />,
+  <Search className="w-6 h-6" />,
+  <RotateCcw className="w-6 h-6" />,
+];
 
-const STEPS: OnboardingStep[] = [
-  {
-    icon: <Move className="w-6 h-6" />,
-    title: 'Se déplacer',
-    description: 'Faites glisser avec deux doigts sur le trackpad, ou maintenez Espace + clic gauche pour naviguer sur le canevas.',
-    shortcut: 'Espace + Glisser',
-    spotlightSelector: '[data-onboarding="canvas"]',
-    cardPosition: 'bottom',
-  },
-  {
-    icon: <ZoomIn className="w-6 h-6" />,
-    title: 'Zoomer / Dézoomer',
-    description: 'Pincez avec deux doigts sur le trackpad, ou utilisez les boutons +/− en bas de l\'écran.',
-    shortcut: 'Pincer / Ctrl + Molette',
-    spotlightSelector: '[data-onboarding="zoom-controls"]',
-    cardPosition: 'top',
-  },
-  {
-    icon: <UserPlus className="w-6 h-6" />,
-    title: 'Créer un membre',
-    description: 'Survolez une carte existante et cliquez sur le bouton + pour ajouter un conjoint, enfant ou parent.',
-    spotlightSelector: '[data-onboarding="canvas"]',
-    cardPosition: 'bottom',
-  },
-  {
-    icon: <Pencil className="w-6 h-6" />,
-    title: 'Éditer un membre',
-    description: 'Cliquez sur une carte pour la sélectionner, puis cliquez sur l\'icône crayon pour ouvrir le panneau d\'édition (nom, dates, pathologies…).',
-    spotlightSelector: '[data-onboarding="canvas"]',
-    cardPosition: 'bottom',
-  },
-  {
-    icon: <MousePointer2 className="w-6 h-6" />,
-    title: 'Déplacer un membre',
-    description: 'Cliquez et faites glisser une carte pour la repositionner. Les guides intelligents vous aident à aligner les membres.',
-    spotlightSelector: '[data-onboarding="canvas"]',
-    cardPosition: 'bottom',
-  },
-  {
-    icon: <Link className="w-6 h-6" />,
-    title: 'Créer un lien émotionnel',
-    description: 'Survolez une carte et glissez depuis un point d\'ancrage (●) sur le côté vers un autre membre.',
-    spotlightSelector: '[data-onboarding="canvas"]',
-    cardPosition: 'bottom',
-  },
-  {
-    icon: <Heart className="w-6 h-6" />,
-    title: 'Créer une union',
-    description: 'Utilisez le bouton + sur une carte et choisissez "Conjoint(e)" pour créer une union entre deux membres.',
-    spotlightSelector: '[data-onboarding="canvas"]',
-    cardPosition: 'bottom',
-  },
-  {
-    icon: <Search className="w-6 h-6" />,
-    title: 'Rechercher & filtrer',
-    description: 'Utilisez la barre de recherche pour trouver un membre, un lien ou une pathologie. La sidebar à gauche permet de filtrer par type de lien ou de masquer des éléments.',
-    spotlightSelector: '[data-onboarding="search-bar"]',
-    cardPosition: 'bottom',
-  },
-  {
-    icon: <RotateCcw className="w-6 h-6" />,
-    title: 'Annuler / Rétablir',
-    description: 'Utilisez Ctrl+Z pour annuler et Ctrl+Shift+Z pour rétablir vos actions.',
-    shortcut: 'Ctrl+Z / Ctrl+Shift+Z',
-    spotlightSelector: '[data-onboarding="undo-redo"]',
-    cardPosition: 'bottom',
-  },
+const SPOTLIGHT_SELECTORS = [
+  '[data-onboarding="canvas"]',
+  '[data-onboarding="zoom-controls"]',
+  '[data-onboarding="canvas"]',
+  '[data-onboarding="canvas"]',
+  '[data-onboarding="canvas"]',
+  '[data-onboarding="canvas"]',
+  '[data-onboarding="canvas"]',
+  '[data-onboarding="search-bar"]',
+  '[data-onboarding="undo-redo"]',
+];
+
+const CARD_POSITIONS = [
+  'bottom', 'top', 'bottom', 'bottom', 'bottom', 'bottom', 'bottom', 'bottom', 'bottom',
 ];
 
 interface SpotlightRect {
@@ -125,28 +74,29 @@ interface OnboardingTutorialProps {
 const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
   active, step, onNext, onPrev, onFinish, onDismiss,
 }) => {
+  const { t } = useLanguage();
+  const steps = t.onboarding.steps;
   const [spotlight, setSpotlight] = useState<SpotlightRect | null>(null);
   const rafRef = useRef<number>(0);
 
   const isIntro = step === 0;
   const tipIndex = step - 1;
-  const isLastStep = step === STEPS.length;
-  const currentTip = STEPS[tipIndex];
+  const isLastStep = step === steps.length;
+  const currentStep = steps[tipIndex];
 
   // Update spotlight rect on step changes & window resize
   useEffect(() => {
     if (!active || isIntro) { setSpotlight(null); return; }
+    const selector = SPOTLIGHT_SELECTORS[tipIndex];
 
     const update = () => {
-      setSpotlight(getSpotlightRect(currentTip?.spotlightSelector));
+      setSpotlight(getSpotlightRect(selector));
       rafRef.current = requestAnimationFrame(update);
     };
-    // Initial + continuous tracking for smooth following
     update();
-    // Stop after a short while to save CPU
     const timeout = setTimeout(() => cancelAnimationFrame(rafRef.current), 600);
 
-    const onResize = () => setSpotlight(getSpotlightRect(currentTip?.spotlightSelector));
+    const onResize = () => setSpotlight(getSpotlightRect(selector));
     window.addEventListener('resize', onResize);
 
     return () => {
@@ -154,7 +104,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
       clearTimeout(timeout);
       window.removeEventListener('resize', onResize);
     };
-  }, [active, step, isIntro, currentTip]);
+  }, [active, step, isIntro, tipIndex]);
 
   if (!active) return null;
 
@@ -261,7 +211,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                     transition={{ delay: 0.15 }}
                     className="text-lg font-semibold text-foreground mb-2"
                   >
-                    Bienvenue dans l'éditeur
+                    {t.onboarding.welcomeTitle}
                   </motion.h2>
                   <motion.p
                     initial={{ opacity: 0, y: 8 }}
@@ -269,26 +219,26 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                     transition={{ delay: 0.25 }}
                     className="text-sm text-muted-foreground mb-6 leading-relaxed"
                   >
-                    Découvrez les contrôles essentiels pour naviguer et construire votre génogramme.
+                    {t.onboarding.welcomeDesc}
                   </motion.p>
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}>
                     <button
                       onClick={onNext}
                       className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
                     >
-                      C'est parti
+                      {t.onboarding.letsGo}
                     </button>
                     <button
                       onClick={onFinish}
                       className="w-full mt-2 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      Passer le tutoriel
+                      {t.onboarding.skipTutorial}
                     </button>
                     <button
                       onClick={onDismiss}
                       className="w-full mt-1 py-1.5 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
                     >
-                      Ne plus afficher
+                      {t.onboarding.neverShow}
                     </button>
                   </motion.div>
                 </div>
@@ -302,7 +252,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                       transition={{ type: 'spring', stiffness: 350, damping: 18 }}
                       className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 text-primary"
                     >
-                      {currentTip.icon}
+                      {STEP_ICONS[tipIndex]}
                     </motion.div>
                     <div className="flex-1 min-w-0">
                       <motion.h3
@@ -312,7 +262,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                         transition={{ delay: 0.05 }}
                         className="text-sm font-semibold text-foreground mb-1"
                       >
-                        {currentTip.title}
+                        {currentStep?.title}
                       </motion.h3>
                       <motion.p
                         key={`desc-${step}`}
@@ -321,9 +271,9 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                         transition={{ delay: 0.1 }}
                         className="text-[13px] text-muted-foreground leading-relaxed"
                       >
-                        {currentTip.description}
+                        {currentStep?.description}
                       </motion.p>
-                      {currentTip.shortcut && (
+                      {currentStep?.shortcut && (
                         <motion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -331,7 +281,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                           className="mt-2"
                         >
                           <span className="inline-block text-xs font-mono px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border">
-                            {currentTip.shortcut}
+                            {currentStep.shortcut}
                           </span>
                         </motion.div>
                       )}
@@ -351,7 +301,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
 
                   {/* Progress dots */}
                   <div className="flex items-center justify-center gap-1.5 mb-3.5">
-                    {STEPS.map((_, i) => (
+                    {steps.map((_, i) => (
                       <motion.div
                         key={i}
                         animate={{
@@ -375,11 +325,11 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                       className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4" />
-                      Précédent
+                      {t.onboarding.previous}
                     </button>
 
                     <span className="text-xs text-muted-foreground tabular-nums">
-                      {tipIndex + 1} / {STEPS.length}
+                      {tipIndex + 1} / {steps.length}
                     </span>
 
                     {isLastStep ? (
@@ -388,13 +338,13 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                           onClick={onDismiss}
                           className="px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground transition-colors"
                         >
-                          Ne plus afficher
+                          {t.onboarding.neverShow}
                         </button>
                         <button
                           onClick={onFinish}
                           className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
                         >
-                          Terminer
+                          {t.onboarding.finish}
                         </button>
                       </div>
                     ) : (
@@ -402,7 +352,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                         onClick={onNext}
                         className="flex items-center gap-1 text-sm text-primary font-medium hover:text-primary/80 transition-colors"
                       >
-                        Suivant
+                        {t.onboarding.next}
                         <ChevronRight className="w-4 h-4" />
                       </button>
                     )}
