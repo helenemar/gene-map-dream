@@ -31,6 +31,10 @@ interface GenogramRow {
   updated_at: string;
   user_id: string;
   data: any;
+  isShared?: boolean;
+  ownerName?: string;
+  ownerInitials?: string;
+  accessLevel?: string;
 }
 
 type SortKey = 'name' | 'updated_at' | 'created_at';
