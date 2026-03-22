@@ -31,8 +31,6 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
   const [shares, setShares] = useState<Share[]>([]);
   const [loading, setLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteAccess, setInviteAccess] = useState<AccessLevel>('reader');
   const [linkAccess, setLinkAccess] = useState<AccessLevel>('reader');
 
   const fetchShares = async () => {
