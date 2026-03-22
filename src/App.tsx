@@ -12,6 +12,7 @@ import DesignSystemPage from "./pages/DesignSystem";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import SharedGenogram from "./pages/SharedGenogram";
+import SharedEditor from "./pages/SharedEditor";
 import NotFound from "./pages/NotFound";
 import Account from "./pages/Account";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
