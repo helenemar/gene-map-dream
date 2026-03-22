@@ -8,6 +8,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 /** 16 pathology colors — first 10 for defaults, last 6 for custom */
 export const PATHOLOGY_COLORS: string[] = [
@@ -29,6 +30,7 @@ const AddPathologyModal: React.FC<AddPathologyModalProps> = ({
   onAdd,
   usedColors = [],
 }) => {
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
 
@@ -40,7 +42,6 @@ const AddPathologyModal: React.FC<AddPathologyModalProps> = ({
     onClose();
   };
 
-  // Suggest first unused color
   const suggestColor = () => {
     if (selectedColor) return;
     const unused = PATHOLOGY_COLORS.find(c => !usedColors.includes(c));
@@ -51,11 +52,10 @@ const AddPathologyModal: React.FC<AddPathologyModalProps> = ({
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-[420px]">
         <DialogHeader>
-          <DialogTitle className="text-base">Ajouter une pathologie</DialogTitle>
+          <DialogTitle className="text-base">{t.addPathology.title}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 pt-2">
-          {/* Name input with color preview */}
           <div className="flex items-center gap-3">
             <div
               className="w-10 h-10 rounded-lg border-2 border-border shrink-0 transition-colors"
@@ -75,13 +75,12 @@ const AddPathologyModal: React.FC<AddPathologyModalProps> = ({
               disabled={!name.trim() || !selectedColor}
               className="h-10 px-5 font-semibold"
             >
-              Ajouter
+              {t.addPathology.add}
             </Button>
           </div>
 
-          {/* Color grid — only show available (unused) colors */}
           <div>
-            <p className="text-xs text-muted-foreground mb-2">Choisir une couleur</p>
+            <p className="text-xs text-muted-foreground mb-2">{t.addPathology.chooseColor}</p>
             <div className="flex flex-wrap gap-2">
               {PATHOLOGY_COLORS.filter(c => !usedColors.includes(c)).map((color) => {
                 const isSelected = selectedColor === color;

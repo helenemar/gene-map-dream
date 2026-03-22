@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 import { SearchSuggestion } from '@/hooks/useFamilySearch';
 import SaveIndicator from '@/components/SaveIndicator';
@@ -40,15 +41,9 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   relation: <Link2 className="w-3.5 h-3.5" />,
 };
 
-const CATEGORY_LABELS: Record<string, string> = {
-  name: 'Nom',
-  profession: 'Profession',
-  pathology: 'Pathologie',
-  relation: 'Relations',
-};
-
 const UserAvatar: React.FC = () => {
   const { user, signOut } = useAuth();
+  const { t } = useLanguage();
   const initials = user?.user_metadata?.full_name
     ? user.user_metadata.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : user?.email?.slice(0, 2).toUpperCase() ?? '??';
@@ -73,12 +68,12 @@ const UserAvatar: React.FC = () => {
         </div>
         <DropdownMenuItem onClick={() => window.location.href = '/account'} className="cursor-pointer">
           <User className="w-3.5 h-3.5 mr-2" />
-          Mon compte
+          {t.dashboard.myAccount}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut()} className="text-destructive focus:text-destructive cursor-pointer">
           <LogOut className="w-3.5 h-3.5 mr-2" />
-          Se déconnecter
+          {t.dashboard.signOut}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -101,12 +96,19 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
   onShare,
   onBack,
 }) => {
+  const { t } = useLanguage();
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [betaExportOpen, setBetaExportOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Close suggestions on outside click
+  const CATEGORY_LABELS: Record<string, string> = {
+    name: t.editor.catName,
+    profession: t.editor.catProfession,
+    pathology: t.editor.catPathology,
+    relation: t.editor.catRelation,
+  };
+
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -123,7 +125,6 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
     inputRef.current?.blur();
   };
 
-  // Group suggestions by category
   const grouped = suggestions.reduce<Record<string, SearchSuggestion[]>>((acc, s) => {
     if (!acc[s.category]) acc[s.category] = [];
     acc[s.category].push(s);
@@ -132,15 +133,13 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
 
   return (
     <header className="h-14 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
-      {/* Left: Logo + save status */}
       <div className="flex items-center gap-3">
-        <button onClick={onBack} className="hover:opacity-70 transition-opacity active:scale-95" title="Retour au tableau de bord">
+        <button onClick={onBack} className="hover:opacity-70 transition-opacity active:scale-95" title={t.editor.backToDashboard}>
           <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
         </button>
         <SaveIndicator status={saveStatus} />
       </div>
 
-      {/* Center: Search */}
       <div className="flex-1 max-w-md mx-4" ref={containerRef} data-onboarding="search-bar">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -153,7 +152,7 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
               setShowSuggestions(true);
             }}
             onFocus={() => setShowSuggestions(true)}
-            placeholder="Rechercher un membre, une pathologie, un lien, etc..."
+            placeholder={t.editor.searchPlaceholder}
             className="w-full pl-9 pr-10 py-2 text-sm bg-card border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-ring/20 placeholder:text-muted-foreground/50"
           />
           {isSearchActive && (
@@ -161,16 +160,12 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
               <span className="text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
                 {matchCount}
               </span>
-              <button
-                onClick={onSearchClear}
-                className="p-1 rounded-full hover:bg-accent transition-colors"
-              >
+              <button onClick={onSearchClear} className="p-1 rounded-full hover:bg-accent transition-colors">
                 <X className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
             </div>
           )}
 
-          {/* Suggestions dropdown */}
           {showSuggestions && suggestions.length > 0 && searchQuery.length > 0 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-popover border border-border rounded-xl shadow-lg overflow-hidden z-[200]">
               {Object.entries(grouped).map(([category, items]) => (
@@ -190,17 +185,13 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
                       className="flex items-center justify-between w-full px-3 py-2 hover:bg-accent/50 transition-colors text-left"
                     >
                       <div className="flex items-center gap-2">
-                        {/* Color dot for relation category */}
                         {item.color && (
-                          <span
-                            className="w-2.5 h-2.5 rounded-full shrink-0"
-                            style={{ backgroundColor: item.color }}
-                          />
+                          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
                         )}
                         <span className="text-sm text-foreground">{item.label}</span>
                       </div>
                       <span className="text-[10px] text-muted-foreground/60">
-                        {item.count} {category === 'relation' ? 'lien' : 'membre'}{item.count !== 1 ? 's' : ''}
+                        {item.count} {category === 'relation' ? t.editor.link : t.editor.member}{item.count !== 1 ? 's' : ''}
                       </span>
                     </button>
                   ))}
@@ -211,12 +202,11 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
         </div>
       </div>
 
-      {/* Right: Actions */}
       <div className="flex items-center gap-2">
         {onOpenNotes && (
           <Button variant="outline" size="sm" className="gap-2 rounded-full text-xs relative" onClick={onOpenNotes}>
             <FileText className="w-3.5 h-3.5" />
-            Notes
+            {t.editor.notes}
             {noteCount > 0 && (
               <span className="min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center">
                 {noteCount}
@@ -225,24 +215,18 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
           </Button>
         )}
         <BetaExportModal open={betaExportOpen} onOpenChange={setBetaExportOpen} />
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-2 rounded-full text-xs"
-          onClick={() => setBetaExportOpen(true)}
-        >
+        <Button variant="outline" size="sm" className="gap-2 rounded-full text-xs" onClick={() => setBetaExportOpen(true)}>
           <Download className="w-3.5 h-3.5" />
-          Exporter
+          {t.editor.export}
         </Button>
         {onShare && (
           <Button variant="brand" size="sm" className="gap-2 text-xs" onClick={onShare}>
             <Share2 className="w-3.5 h-3.5" />
-            Partager
+            {t.editor.share}
           </Button>
         )}
         <UserAvatar />
       </div>
-
     </header>
   );
 };
