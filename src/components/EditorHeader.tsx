@@ -145,16 +145,90 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
     return acc;
   }, {});
 
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
   return (
-    <header className="h-14 bg-card border-b border-border flex items-center justify-between px-4 shrink-0">
-      <div className="flex items-center gap-3">
-        <button onClick={onBack} className="hover:opacity-70 transition-opacity active:scale-95" title={t.editor.backToDashboard}>
-          <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
+    <header className="h-12 sm:h-14 bg-card border-b border-border flex items-center justify-between px-2 sm:px-4 shrink-0 gap-1 sm:gap-0">
+      {/* Left: back + save */}
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <button onClick={onBack} className="hover:opacity-70 transition-opacity active:scale-95 p-1" title={t.editor.backToDashboard}>
+          <img src={gogyIcon} alt="Genogy" className="w-7 h-7 sm:w-8 sm:h-8" />
         </button>
         <SaveIndicator status={saveStatus} />
       </div>
 
-      <div className="flex-1 max-w-md mx-4" ref={containerRef} data-onboarding="search-bar">
+      {/* Center: search — full on desktop, icon toggle on mobile */}
+      {/* Mobile search overlay */}
+      {mobileSearchOpen && (
+        <div className="sm:hidden fixed inset-x-0 top-0 z-[100] h-12 bg-card border-b border-border flex items-center px-2 gap-2">
+          <button onClick={() => { setMobileSearchOpen(false); onSearchClear(); }} className="p-1.5 rounded-full hover:bg-muted">
+            <ArrowLeft className="w-4 h-4 text-muted-foreground" />
+          </button>
+          <div className="flex-1 relative" ref={containerRef}>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              ref={inputRef}
+              autoFocus
+              type="text"
+              value={searchQuery}
+              onChange={(e) => { onSearchChange(e.target.value); setShowSuggestions(true); }}
+              onFocus={() => setShowSuggestions(true)}
+              placeholder={t.editor.searchPlaceholder}
+              className="w-full pl-9 pr-10 py-2 text-sm bg-card border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-ring/20 placeholder:text-muted-foreground/50"
+            />
+            {isSearchActive && (
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                <span className="text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">{matchCount}</span>
+                <button onClick={onSearchClear} className="p-1 rounded-full hover:bg-accent transition-colors">
+                  <X className="w-3.5 h-3.5 text-muted-foreground" />
+                </button>
+              </div>
+            )}
+            {showSuggestions && suggestions.length > 0 && searchQuery.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-popover border border-border rounded-xl shadow-lg overflow-hidden z-[200]">
+                {Object.entries(grouped).map(([category, items]) => (
+                  <div key={category}>
+                    <div className="px-3 py-1.5 bg-accent/30">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground">{CATEGORY_ICONS[category]}</span>
+                        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+                          {CATEGORY_LABELS[category] || category}
+                        </span>
+                      </div>
+                    </div>
+                    {items.map((item, i) => (
+                      <button
+                        key={`${category}-${i}`}
+                        onClick={() => { handleSelect(item.value); setMobileSearchOpen(false); }}
+                        className="flex items-center justify-between w-full px-3 py-2 hover:bg-accent/50 transition-colors text-left"
+                      >
+                        <div className="flex items-center gap-2">
+                          {item.color && <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />}
+                          <span className="text-sm text-foreground">{item.label}</span>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground/60">
+                          {item.count} {category === 'relation' ? t.editor.link : t.editor.member}{item.count !== 1 ? 's' : ''}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile: search icon button */}
+      <button
+        onClick={() => setMobileSearchOpen(true)}
+        className="sm:hidden w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
+      >
+        <Search className="w-4 h-4 text-muted-foreground" />
+      </button>
+
+      {/* Desktop: inline search */}
+      <div className="hidden sm:block flex-1 max-w-md mx-4" ref={containerRef} data-onboarding="search-bar">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
@@ -216,11 +290,12 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      {/* Right: actions */}
+      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
         {onOpenNotes && (
-          <Button variant="outline" size="sm" className="gap-2 rounded-full text-xs relative" onClick={onOpenNotes}>
+          <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 rounded-full text-xs relative h-8 px-2 sm:px-3" onClick={onOpenNotes}>
             <FileText className="w-3.5 h-3.5" />
-            {t.editor.notes}
+            <span className="hidden sm:inline">{t.editor.notes}</span>
             {noteCount > 0 && (
               <span className="min-w-[16px] h-4 px-1 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center">
                 {noteCount}
@@ -229,17 +304,19 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
           </Button>
         )}
         <BetaExportModal open={betaExportOpen} onOpenChange={setBetaExportOpen} />
-        <Button variant="outline" size="sm" className="gap-2 rounded-full text-xs" onClick={() => setBetaExportOpen(true)}>
+        <Button variant="outline" size="sm" className="gap-1.5 sm:gap-2 rounded-full text-xs h-8 px-2 sm:px-3" onClick={() => setBetaExportOpen(true)}>
           <Download className="w-3.5 h-3.5" />
-          {t.editor.export}
+          <span className="hidden sm:inline">{t.editor.export}</span>
         </Button>
         {onShare && (
-          <Button variant="brand" size="sm" className="gap-2 text-xs" onClick={onShare}>
+          <Button variant="brand" size="sm" className="gap-1.5 sm:gap-2 text-xs h-8 px-2 sm:px-3" onClick={onShare}>
             <Share2 className="w-3.5 h-3.5" />
-            {t.editor.share}
+            <span className="hidden sm:inline">{t.editor.share}</span>
           </Button>
         )}
-        <UserAvatar />
+        <div className="hidden sm:block">
+          <UserAvatar />
+        </div>
       </div>
     </header>
   );
