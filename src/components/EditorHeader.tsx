@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 import { SearchSuggestion } from '@/hooks/useFamilySearch';
 import SaveIndicator from '@/components/SaveIndicator';
