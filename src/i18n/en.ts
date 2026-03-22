@@ -328,6 +328,17 @@ export const en: Translations = {
     stillbornFemale: 'Stillbirth (Girl)',
   },
 
+  // ── Member Card ──
+  memberCard: {
+    yearsOld: 'yo',
+    createMember: 'Create member',
+    createLink: 'Create link',
+    dragHint: 'Hold and drag to another card',
+    cancelLabel: 'Cancel',
+    retiredF: 'Retired',
+    retiredM: 'Retired',
+  },
+
   // ── Share Modal ──
   shareModal: {
     title: 'Share',

@@ -5,6 +5,7 @@ import type { DynamicPathology } from '@/hooks/usePathologies';
 import MemberIcon from '@/components/MemberIcon';
 import CreateMemberDropdown, { RelationshipChoice, DisabledOptions } from '@/components/CreateMemberDropdown';
 import { Plus, PencilLine, Link, X, Eye, UserPlus, FileText, HeartHandshake, HelpCircle, Lock, Unlock } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 
 /**
@@ -98,6 +99,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   isAdopted = false,
   onboardingPulse = false,
 }) => {
+  const { t } = useLanguage();
   const isDeceased = !!member.deathYear;
   const isPlaceholder = !!member.isPlaceholder;
   const isDraft = !!member.isDraft;
@@ -264,7 +266,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
                 {(member.birthYear > 0 || member.age > 0) && (
                   <div className="flex items-center gap-1 shrink-0">
                     <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                      {isDeceased && member.deathYear ? `${member.deathYear - member.birthYear} ans` : `${member.age} ans`}
+                      {isDeceased && member.deathYear ? `${member.deathYear - member.birthYear} ${t.memberCard.yearsOld}` : `${member.age} ${t.memberCard.yearsOld}`}
                     </span>
                   </div>
                 )}
@@ -277,7 +279,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
                 </div>
               )}
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span className="whitespace-nowrap">{member.isRetired ? (member.gender === 'female' ? 'Retraitée' : 'Retraité') : member.profession}</span>
+                <span className="whitespace-nowrap">{member.isRetired ? (member.gender === 'female' ? t.memberCard.retiredF : t.memberCard.retiredM) : member.profession}</span>
                 {member.notes && (
                   <FileText className="w-3 h-3 text-primary/60 shrink-0" />
                 )}
@@ -300,7 +302,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors"
             >
               <UserPlus className="w-3.5 h-3.5" />
-              Créer un membre
+              {t.memberCard.createMember}
             </button>
           </CreateMemberDropdown>
           <button
@@ -327,15 +329,15 @@ const MemberCard: React.FC<MemberCardProps> = ({
               onLinkDragStart?.(member.id, e);
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors cursor-crosshair"
-            title="Maintenir et glisser vers une autre carte"
+            title={t.memberCard.dragHint}
           >
             <Link className="w-3.5 h-3.5" />
-            Créer un lien
+            {t.memberCard.createLink}
           </button>
           <button
             onClick={handleCancelAnchor}
             className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-destructive/10 hover:border-destructive/30 transition-colors"
-            title="Annuler"
+            title={t.memberCard.cancelLabel}
           >
             <X className="w-3.5 h-3.5 text-foreground" />
           </button>
