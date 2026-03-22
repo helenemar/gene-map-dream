@@ -2,6 +2,7 @@ import React from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { X, Atom, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Props {
   open: boolean;
@@ -9,6 +10,8 @@ interface Props {
 }
 
 const BetaExportModal: React.FC<Props> = ({ open, onOpenChange }) => {
+  const { t } = useLanguage();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[520px] p-0 gap-0 border-none [&>button]:hidden">
@@ -26,7 +29,7 @@ const BetaExportModal: React.FC<Props> = ({ open, onOpenChange }) => {
           </Button>
 
           <h2 className="text-lg font-semibold text-foreground text-center mb-6 max-w-sm">
-            La fonctionnalité d'Export n'est pas disponible pour la version BETA
+            {t.beta.exportNotAvailable}
           </h2>
 
           <div className="w-20 h-20 rounded-2xl bg-muted flex items-center justify-center rotate-[-3deg]">

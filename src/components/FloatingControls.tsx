@@ -1,6 +1,7 @@
 import React from 'react';
 import { ZoomIn, ZoomOut, Maximize, Presentation, Undo2, Redo2, HelpCircle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FloatingControlsProps {
   onZoomIn?: () => void;
@@ -21,11 +22,11 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
   onZoomIn, onZoomOut, onFitToScreen, onAutoLayout, zoom = 1, presentationMode = false, onTogglePresentation,
   onUndo, onRedo, canUndo = false, canRedo = false, onHelp,
 }) => {
+  const { t } = useLanguage();
   const zoomPercent = Math.round(zoom * 100);
 
   return (
     <TooltipProvider delayDuration={300}>
-      {/* Undo/Redo — top-left of canvas */}
       {!presentationMode && (
         <div className="absolute top-4 left-4 z-20">
           <div data-onboarding="undo-redo" className="flex items-center gap-1 bg-card rounded-full shadow-float border border-border p-1.5">
@@ -39,7 +40,7 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
                   <Undo2 className="w-3.5 h-3.5 text-muted-foreground" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom">Annuler (Ctrl+Z)</TooltipContent>
+              <TooltipContent side="bottom">{t.controls.undo}</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -51,15 +52,13 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
                   <Redo2 className="w-3.5 h-3.5 text-muted-foreground" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom">Rétablir (Ctrl+Shift+Z)</TooltipContent>
+              <TooltipContent side="bottom">{t.controls.redo}</TooltipContent>
             </Tooltip>
           </div>
         </div>
       )}
 
-      {/* Bottom bar — zoom, presentation, help */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-
         <div data-onboarding="zoom-controls" className="flex items-center gap-1 bg-card rounded-full shadow-float border border-border p-1.5">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -67,7 +66,7 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
                 <ZoomOut className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="top">Dézoomer</TooltipContent>
+            <TooltipContent side="top">{t.controls.zoomOut}</TooltipContent>
           </Tooltip>
 
           <span className="text-xs font-semibold text-foreground min-w-[40px] text-center tabular-nums select-none">
@@ -80,7 +79,7 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
                 <ZoomIn className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="top">Zoomer</TooltipContent>
+            <TooltipContent side="top">{t.controls.zoomIn}</TooltipContent>
           </Tooltip>
 
           <div className="w-px h-5 bg-border mx-0.5" />
@@ -91,7 +90,7 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
                 <Maximize className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="top">Recentrer la vue</TooltipContent>
+            <TooltipContent side="top">{t.controls.recenter}</TooltipContent>
           </Tooltip>
         </div>
 
@@ -108,12 +107,10 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
               <Presentation className="w-4 h-4" />
             </button>
           </TooltipTrigger>
-          <TooltipContent side="top">{presentationMode ? 'Quitter la présentation' : 'Mode présentation'}</TooltipContent>
+          <TooltipContent side="top">{presentationMode ? t.controls.exitPresentation : t.controls.presentationMode}</TooltipContent>
         </Tooltip>
-
       </div>
 
-      {/* Help button — bottom-right corner, more visible */}
       {onHelp && !presentationMode && (
         <div className="absolute bottom-6 right-6 z-20">
           <Tooltip>
@@ -123,10 +120,10 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
                 className="h-11 gap-2 px-4 rounded-full shadow-float border border-primary/30 bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
               >
                 <HelpCircle className="w-4.5 h-4.5 text-primary" />
-                <span className="text-xs font-semibold text-primary">Aide</span>
+                <span className="text-xs font-semibold text-primary">{t.controls.help}</span>
               </button>
             </TooltipTrigger>
-            <TooltipContent side="top">Aide & raccourcis</TooltipContent>
+            <TooltipContent side="top">{t.controls.helpShortcuts}</TooltipContent>
           </Tooltip>
         </div>
       )}

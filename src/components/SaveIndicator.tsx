@@ -1,17 +1,20 @@
 import React from 'react';
 import { Cloud, CloudOff, Loader2, Check } from 'lucide-react';
 import { SaveStatus } from '@/hooks/useAutoSave';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SaveIndicatorProps {
   status: SaveStatus;
 }
 
 const SaveIndicator: React.FC<SaveIndicatorProps> = ({ status }) => {
+  const { t } = useLanguage();
+
   const config = {
     idle: { icon: Cloud, label: '', className: 'text-muted-foreground/40' },
-    saving: { icon: Loader2, label: 'Enregistrement…', className: 'text-muted-foreground animate-spin' },
-    saved: { icon: Check, label: 'Enregistré', className: 'text-emerald-500' },
-    error: { icon: CloudOff, label: 'Erreur', className: 'text-destructive' },
+    saving: { icon: Loader2, label: t.saveIndicator.saving, className: 'text-muted-foreground animate-spin' },
+    saved: { icon: Check, label: t.saveIndicator.saved, className: 'text-emerald-500' },
+    error: { icon: CloudOff, label: t.saveIndicator.error, className: 'text-destructive' },
   }[status];
 
   if (status === 'idle') return null;
