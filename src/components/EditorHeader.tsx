@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import BetaExportModal from '@/components/BetaExportModal';
 import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode, FileText, LogOut, ChevronDown } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,10 +46,22 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 const UserAvatar: React.FC = () => {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
-  const initials = user?.user_metadata?.full_name
-    ? user.user_metadata.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
-    : user?.email?.slice(0, 2).toUpperCase() ?? '??';
-  const displayName = user?.user_metadata?.full_name || user?.email || '';
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from('profiles').select('first_name, last_name, display_name').eq('user_id', user!.id).maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+  });
+  const firstName = profile?.first_name || '';
+  const lastName = profile?.last_name || '';
+  const initials = firstName && lastName
+    ? (firstName[0] + lastName[0]).toUpperCase()
+    : profile?.display_name
+      ? profile.display_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+      : user?.email?.slice(0, 2).toUpperCase() ?? '??';
+  const displayName = profile?.display_name || (firstName && lastName ? `${firstName} ${lastName}` : '') || user?.email || '';
 
   return (
     <DropdownMenu>
