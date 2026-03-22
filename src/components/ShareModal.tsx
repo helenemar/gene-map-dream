@@ -68,26 +68,6 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
     setLoading(false);
   };
 
-  const inviteByEmail = async () => {
-    if (!user || !inviteEmail.trim()) return;
-    setLoading(true);
-    const { error } = await supabase
-      .from('genogram_shares')
-      .insert({
-        genogram_id: genogramId,
-        access_level: inviteAccess,
-        shared_with_email: inviteEmail.trim().toLowerCase(),
-        created_by: user.id,
-      } as any);
-    if (error) {
-      toast.error(t.shareModal.inviteError);
-    } else {
-      toast.success(`${t.shareModal.inviteSent} ${inviteEmail.trim()}`);
-      setInviteEmail('');
-      await fetchShares();
-    }
-    setLoading(false);
-  };
 
   const deleteShare = async (shareId: string) => {
     await supabase
