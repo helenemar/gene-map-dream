@@ -27,12 +27,12 @@ jobs:
           npm run build
           echo "Ce fichier prouve que le déploiement arrive ici" > dist/OU_SONT_MES_FICHIERS.txt
 
-      - name: 🚀 Déploiement de Test
+      - name: 🚀 Déploiement de la dernière chance
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          server-dir: ./
-          dangerous-clean-slate: false
+          server-dir: /
+          state-name: sync-state-final.json
