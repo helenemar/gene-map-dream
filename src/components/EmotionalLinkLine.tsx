@@ -381,7 +381,7 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
               : dimmed
                 ? 0.1
                 : (hovered ? 0.9 : 0.55),
-          strokeWidth: searchHighlighted ? 2 : (hovered ? 1.2 : undefined),
+          strokeWidth: searchHighlighted ? 2 : (hovered ? 1.8 : undefined),
           filter: (hovered || searchHighlighted) ? `url(#glow-${type})` : 'none',
         }}
         className="transition-all duration-150"
