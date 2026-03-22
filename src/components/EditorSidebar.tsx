@@ -283,7 +283,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                       <span className={`text-foreground/80 ${isSolo ? 'text-primary font-medium' : ''}`}>
                         {emotionalLinkLabels[id]}
                       </span>
-                      <EmotionalLinkPreview type={id} width={60} height={16} />
+                      <EmotionalLinkPreview type={id} width={60} height={16} strokeScale={0.65} />
                     </div>
                   </div>
                 );
