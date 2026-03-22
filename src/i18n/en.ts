@@ -130,6 +130,8 @@ export const en: Translations = {
     googleError: 'Google sign-in error',
     minCharsPlaceholder: '6 characters minimum',
     welcomeToast: 'Welcome to Genogy,',
+    acceptPrivacy: 'I accept the privacy policy',
+    acceptPrivacyRequired: 'You must accept the privacy policy to create an account.',
   },
 
   // ── Dashboard ──
