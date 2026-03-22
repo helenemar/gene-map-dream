@@ -40,6 +40,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
       setPassword('');
       setFullName('');
       setShowPassword(false);
+      setAcceptPrivacy(false);
     }
   }, [open, defaultView]);
 
