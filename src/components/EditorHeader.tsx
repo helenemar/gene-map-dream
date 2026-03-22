@@ -49,7 +49,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const UserAvatar: React.FC = () => {
   const { user, signOut } = useAuth();
-  const { resolvedTheme, setTheme } = useTheme();
   const initials = user?.user_metadata?.full_name
     ? user.user_metadata.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : user?.email?.slice(0, 2).toUpperCase() ?? '??';
@@ -75,13 +74,6 @@ const UserAvatar: React.FC = () => {
         <DropdownMenuItem onClick={() => window.location.href = '/account'} className="cursor-pointer">
           <User className="w-3.5 h-3.5 mr-2" />
           Mon compte
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-          className="cursor-pointer"
-        >
-          {resolvedTheme === 'dark' ? <Sun className="w-3.5 h-3.5 mr-2" /> : <Moon className="w-3.5 h-3.5 mr-2" />}
-          {resolvedTheme === 'dark' ? 'Mode clair' : 'Mode sombre'}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut()} className="text-destructive focus:text-destructive cursor-pointer">
