@@ -36,7 +36,7 @@ const App = () => {
           <MobileBlocker>
             <BrowserRouter>
               <Routes>
-                {isCustomDomainHost && <Route path="/~oauth/*" element={<OAuthProxy />} />}
+                
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/auth" element={<Navigate to="/" replace />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
