@@ -509,4 +509,9 @@ export const fr: Translations = {
     neglect: 'Négligence',
     controlling: 'Contrôlant',
   },
+  cookieBanner: {
+    message: 'Ce site utilise des cookies strictement nécessaires au fonctionnement du service (authentification, session).',
+    accept: 'Compris',
+    learnMore: 'En savoir plus',
+  },
 };
