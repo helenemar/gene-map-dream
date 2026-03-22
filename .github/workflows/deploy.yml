@@ -25,14 +25,16 @@ jobs:
       - name: 🏗️ Build du projet
         run: |
           npm run build
-          echo "Ce fichier prouve que le déploiement arrive ici" > dist/OU_SONT_MES_FICHIERS.txt
+          echo "Vérification du dossier dist :"
+          ls -R dist
 
-      - name: 🚀 Déploiement de la dernière chance
+      - name: 🚀 Déploiement Direct
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          server-dir: /
-          state-name: sync-state-final.json
+          # ON LAISSE VIDE car ton FTP pointe déjà sur public_html
+          server-dir: ./
+          dangerous-clean-slate: true
