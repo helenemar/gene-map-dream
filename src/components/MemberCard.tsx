@@ -302,7 +302,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors"
             >
               <UserPlus className="w-3.5 h-3.5" />
-              Créer un membre
+              {t.memberCard.createMember}
             </button>
           </CreateMemberDropdown>
           <button
