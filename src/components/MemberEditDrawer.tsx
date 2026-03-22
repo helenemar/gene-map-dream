@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { FamilyMember, TwinType, EmotionalLink, EmotionalLinkType, EMOTIONAL_LINK_TYPES, Union, UnionStatus, FAMILY_LINK_TYPES, GenderIdentity, SexualOrientation, GENDER_IDENTITY_OPTIONS, SEXUAL_ORIENTATION_OPTIONS } from '@/types/genogram';
 import type { DynamicPathology } from '@/hooks/usePathologies';
 import AddPathologyModal from '@/components/AddPathologyModal';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Sheet,
   SheetContent,
@@ -59,11 +60,8 @@ interface MemberEditDrawerProps {
   onUpdateEmotionalLink?: (linkId: string, newType: EmotionalLinkType) => void;
   onDeleteEmotionalLink?: (linkId: string) => void;
   onUpdateUnion?: (unionId: string, updates: Partial<Union>) => void;
-  /** Called on every field change for live canvas updates */
   onLiveUpdate?: (updated: FamilyMember) => void;
-  /** Start in read-only mode when false */
   initialEditing?: boolean;
-  /** Genogram ID for avatar storage */
   genogramId?: string;
 }
 
@@ -74,6 +72,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   onUpdateEmotionalLink, onDeleteEmotionalLink, onUpdateUnion, onLiveUpdate,
   initialEditing = true, genogramId,
 }) => {
+  const { t } = useLanguage();
   const [isEditing, setIsEditing] = useState(initialEditing);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -87,7 +86,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [genderIdentityCustom, setGenderIdentityCustom] = useState('');
   const [sexualOrientation, setSexualOrientation] = useState<SexualOrientation>('heterosexual');
   const [sexualOrientationCustom, setSexualOrientationCustom] = useState('');
-  // Legacy compat
   const isGay = sexualOrientation === 'homosexual';
   const isBisexual = sexualOrientation === 'bisexual';
   const isTransgender = genderIdentity === 'transgender';
@@ -100,6 +98,31 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [birthYearUnsure, setBirthYearUnsure] = useState(false);
   const [deathYearUnsure, setDeathYearUnsure] = useState(false);
   const [addPathologyModalOpen, setAddPathologyModalOpen] = useState(false);
+
+  // Translated labels for family link types
+  const familyLinkLabel = (id: UnionStatus): string => {
+    const key = id as keyof typeof t.familyLinks;
+    return t.familyLinks[key] || id;
+  };
+
+  // Translated labels for emotional link types
+  const emotionalLinkLabel = (id: EmotionalLinkType): string => {
+    const key = id as keyof typeof t.emotionalLinkTypes;
+    return t.emotionalLinkTypes[key] || id;
+  };
+
+  // Translated gender identity label
+  const genderIdentityLabel = (id: GenderIdentity): string => {
+    if (id === 'transgender') return t.memberEdit.transgender;
+    return id;
+  };
+
+  // Translated sexual orientation label
+  const sexualOrientationLabel = (id: SexualOrientation, g: 'male' | 'female' | 'non-binary'): string => {
+    if (id === 'homosexual') return g === 'female' ? t.memberEdit.homosexualF : t.memberEdit.homosexualM;
+    if (id === 'bisexual') return g === 'female' ? t.memberEdit.bisexualF : t.memberEdit.bisexualM;
+    return id;
+  };
 
   useEffect(() => {
     if (member) {
@@ -114,7 +137,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setProfession(member.profession);
       setIsRetired(!!member.isRetired);
       setGender(member.gender);
-      // Migrate legacy fields to new model
       setGenderIdentity(member.genderIdentity ?? (member.isTransgender ? 'transgender' : 'cisgender'));
       setGenderIdentityCustom(member.genderIdentityCustom ?? '');
       setSexualOrientation(
@@ -140,7 +162,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const isDeceased = !!deathYear;
   const isExisting = member ? (member.firstName !== 'Nouveau' && member.firstName !== '') : false;
 
-  /** Build the current member state from form fields */
   const buildMember = useCallback((): FamilyMember | null => {
     if (!member) return null;
     return {
@@ -172,7 +193,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
     };
   }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, avatar, currentYear]);
 
-  /** Fire live update to canvas */
   useEffect(() => {
     if (open && member && onLiveUpdate) {
       const updated = buildMember();
@@ -194,16 +214,15 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
     onClose();
   };
 
-  // Find unions involving this member
   const memberUnions = unions.filter(u => u.partner1 === member.id || u.partner2 === member.id);
 
   const isPerinatal = !!member.perinatalType;
 
   const perinatalLabel =
-    member.perinatalType === 'pregnancy' ? 'Grossesse' :
-    member.perinatalType === 'miscarriage' ? 'Interruption spontanée de grossesse' :
-    member.perinatalType === 'abortion' ? 'IVG' :
-    member.perinatalType === 'stillborn' ? 'Mortinaissance' : '';
+    member.perinatalType === 'pregnancy' ? t.memberEdit.pregnancy :
+    member.perinatalType === 'miscarriage' ? t.memberEdit.miscarriage :
+    member.perinatalType === 'abortion' ? t.memberEdit.abortion :
+    member.perinatalType === 'stillborn' ? t.memberEdit.stillborn : '';
 
   // ── Perinatal-specific drawer ──
   if (isPerinatal) {
@@ -227,7 +246,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               <SheetTitle className="text-sm font-semibold">{perinatalLabel}</SheetTitle>
             </SheetHeader>
 
-            {/* Icon preview */}
             <div className="flex items-center gap-3 mt-3 px-3 py-2.5 rounded-xl bg-accent/20 border border-border/50">
               <div className="shrink-0">
                 <MemberIcon
@@ -251,7 +269,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
           <div className="flex flex-col gap-4 p-6">
             <div className="flex flex-col gap-1">
               <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-                Année de l'événement
+                {t.memberEdit.eventYear}
               </Label>
               <div className="flex items-center gap-1">
                 <Input
@@ -280,7 +298,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="top" className="text-xs">
-                      {birthYearUnsure ? 'Date marquée incertaine' : 'Marquer comme incertain'}
+                      {birthYearUnsure ? t.memberEdit.dateMarkedUncertain : t.memberEdit.markUncertain}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -290,7 +308,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
             <div className="flex items-center gap-2 pt-2">
               <Button onClick={handlePerinatalSave} size="sm" className="flex-1">
                 <Check className="w-3.5 h-3.5 mr-1.5" />
-                Enregistrer
+                {t.common.save}
               </Button>
               {onDelete && (
                 <AlertDialog>
@@ -301,15 +319,15 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Supprimer cet événement ?</AlertDialogTitle>
+                      <AlertDialogTitle>{t.memberEdit.deleteEvent}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Cette action est irréversible.
+                        {t.memberEdit.irreversible}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
                       <AlertDialogAction onClick={() => { onDelete(member.id); onClose(); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                        Supprimer
+                        {t.common.delete}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -330,7 +348,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
           <SheetHeader>
             <div className="flex items-center justify-between">
               <SheetTitle className="text-sm font-semibold">
-                {!isEditing ? 'Fiche membre' : isExisting ? 'Modifier le membre' : 'Nouveau membre'}
+                {!isEditing ? t.memberEdit.memberSheet : isExisting ? t.memberEdit.editMember : t.memberEdit.newMember}
               </SheetTitle>
               {!isEditing && isExisting && (
                 <Button
@@ -340,7 +358,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   onClick={() => setIsEditing(true)}
                 >
                   <Pencil className="w-3 h-3" />
-                  Modifier
+                  {t.memberEdit.edit}
                 </Button>
               )}
             </div>
@@ -366,10 +384,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-foreground truncate">
-                {firstName || 'Nouveau'} {lastName}
+                {firstName || t.memberEdit.newMember} {lastName}
               </p>
               <p className="text-xs text-muted-foreground">
-                {birthYear || '?'}{isDeceased ? ` - ${deathYear}` : ' -'} · {age > 0 ? `${age} ans` : ''}
+                {birthYear || '?'}{isDeceased ? ` - ${deathYear}` : ' -'} · {age > 0 ? `${age} ${t.memberEdit.yearsOld}` : ''}
               </p>
               <p className="text-xs text-muted-foreground truncate">{profession}</p>
             </div>
@@ -380,34 +398,31 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
         <ScrollArea className="flex-1 px-3">
           {isEditing ? (
-            /* ═══════════════════════════════════════════════
-               EDIT MODE — Inputs & Selects
-               ═══════════════════════════════════════════════ */
             <div className="flex flex-col gap-3 py-3 px-3">
-              {/* ── Identité – grille 2 colonnes ── */}
+              {/* ── Identity ── */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
-                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Prénoms</Label>
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{t.memberEdit.firstNames}</Label>
                   <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Marie, Jeanne" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus disabled={member.isIndexPatient} />
-                  <span className="text-[9px] text-muted-foreground/60">Séparez les prénoms par une virgule</span>
+                  <span className="text-[9px] text-muted-foreground/60">{t.memberEdit.firstNameHint}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Nom</Label>
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{t.memberEdit.lastNameLabel}</Label>
                   <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={member.isIndexPatient} />
                 </div>
               </div>
 
               <div className="flex flex-col gap-1">
                 <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Nom de naissance
+                  {t.memberEdit.birthName}
                 </Label>
                 <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Martin" value={birthName} onChange={(e) => setBirthName(e.target.value)} />
               </div>
 
-              {/* ── Photo du membre ── */}
+              {/* ── Photo ── */}
               <div className="flex flex-col gap-1">
                 <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Photo
+                  {t.memberEdit.photo}
                 </Label>
                 {genogramId ? (
                   <MemberAvatarUpload
@@ -418,12 +433,12 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     size={56}
                   />
                 ) : (
-                  <p className="text-[10px] text-muted-foreground/50 italic">Enregistrez le génogramme pour ajouter une photo</p>
+                  <p className="text-[10px] text-muted-foreground/50 italic">{t.memberEdit.saveForPhoto}</p>
                 )}
               </div>
 
               <div className="flex flex-col gap-1">
-                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Genre</Label>
+                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{t.memberEdit.genderLabel}</Label>
                 <div className="flex h-8 rounded-lg border border-border/50 overflow-hidden">
                   <button
                     type="button"
@@ -434,7 +449,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                         : 'bg-card text-muted-foreground hover:bg-accent'
                     }`}
                   >
-                    Femme
+                    {t.memberEdit.female}
                   </button>
                   <button
                     type="button"
@@ -445,26 +460,26 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                         : 'bg-card text-muted-foreground hover:bg-accent'
                     }`}
                   >
-                    Homme
+                    {t.memberEdit.male}
                   </button>
                 </div>
               </div>
 
               <div className="flex flex-col gap-1">
-                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Profession</Label>
+                <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{t.memberEdit.profession}</Label>
                 <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Médecin" value={profession} onChange={(e) => setProfession(e.target.value)} />
                 <label className="flex items-center gap-2 mt-1 cursor-pointer">
                   <Checkbox checked={isRetired} onCheckedChange={(v) => setIsRetired(v === true)} />
-                  <span className="text-xs text-muted-foreground">{gender === 'female' ? 'Retraitée' : 'Retraité'}</span>
+                  <span className="text-xs text-muted-foreground">{gender === 'female' ? t.memberEdit.retiredF : t.memberEdit.retiredM}</span>
                 </label>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-                    Naissance
+                    {t.memberEdit.birth}
                     {age > 0 && !isDeceased && (
-                      <span className="ml-1 text-[9px] font-normal text-primary/70">({age} ans)</span>
+                      <span className="ml-1 text-[9px] font-normal text-primary/70">({age} {t.memberEdit.yearsOld})</span>
                     )}
                   </Label>
                   <div className="flex items-center gap-1">
@@ -485,16 +500,16 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="text-xs">
-                          {birthYearUnsure ? 'Date marquée incertaine' : 'Marquer comme incertain'}
+                          {birthYearUnsure ? t.memberEdit.dateMarkedUncertain : t.memberEdit.markUncertain}
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   </div>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Décès</Label>
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{t.memberEdit.death}</Label>
                   <div className="flex items-center gap-1">
-                    <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30 flex-1" type="number" placeholder="Vivant" min={1900} max={2100} value={deathYear} onChange={(e) => setDeathYear(e.target.value)} />
+                    <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30 flex-1" type="number" placeholder={t.memberEdit.alive} min={1900} max={2100} value={deathYear} onChange={(e) => setDeathYear(e.target.value)} />
                     <TooltipProvider delayDuration={200}>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -511,7 +526,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="text-xs">
-                          {deathYearUnsure ? 'Date marquée incertaine' : 'Marquer comme incertain'}
+                          {deathYearUnsure ? t.memberEdit.dateMarkedUncertain : t.memberEdit.markUncertain}
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -520,15 +535,15 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               </div>
               {isDeceased && (
                 <p className="text-xs text-muted-foreground -mt-1 ml-1">
-                  Décédé(e) à {parsedDeathYear && parsedBirthYear ? parsedDeathYear - parsedBirthYear : '?'} ans
+                  {t.memberEdit.deceasedAt} {parsedDeathYear && parsedBirthYear ? parsedDeathYear - parsedBirthYear : '?'} {t.memberEdit.yearsOld}
                 </p>
               )}
 
               <Separator className="opacity-50" />
 
-              {/* ── Identité de genre ── */}
+              {/* ── Gender Identity ── */}
               <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité de genre</span>
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.genderIdentity}</span>
                 <div className="flex flex-wrap gap-1.5">
                   {GENDER_IDENTITY_OPTIONS.map(opt => (
                     <button
@@ -541,15 +556,15 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
                       }`}
                     >
-                      {opt.label}
+                      {genderIdentityLabel(opt.id)}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* ── Orientation sexuelle ── */}
+              {/* ── Sexual Orientation ── */}
               <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Orientation sexuelle</span>
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.sexualOrientation}</span>
                 <div className="flex flex-wrap gap-1.5">
                   {SEXUAL_ORIENTATION_OPTIONS.map(opt => (
                     <button
@@ -562,7 +577,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
                       }`}
                     >
-                      {gender === 'female' ? opt.labelF : opt.labelM}
+                      {sexualOrientationLabel(opt.id, gender)}
                     </button>
                   ))}
                 </div>
@@ -573,10 +588,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               {/* ── Pathologies ── */}
               <div className="flex flex-col gap-2">
                 <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
-                  Pathologies ({selectedPathologies.length})
+                  {t.memberEdit.pathologiesLabel} ({selectedPathologies.length})
                 </span>
                 {dynamicPathologies.length === 0 ? (
-                  <p className="text-xs text-muted-foreground/50 italic">Aucune pathologie définie</p>
+                  <p className="text-xs text-muted-foreground/50 italic">{t.memberEdit.noPathologyDefined}</p>
                 ) : (
                   <div className="flex flex-col gap-1">
                     {dynamicPathologies.map(p => (
@@ -604,7 +619,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-dashed border-border/60 text-sm text-muted-foreground hover:border-border hover:text-foreground transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    Ajouter une pathologie
+                    {t.memberEdit.addPathology}
                   </button>
                 )}
               </div>
@@ -624,18 +639,18 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               <Separator className="opacity-50" />
 
-              {/* ── Jumeaux / Triplés ── */}
+              {/* ── Twins ── */}
               <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Jumeaux / Triplés</span>
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.twins}</span>
                 <div className="flex flex-col gap-1">
-                  <Label className="text-xs text-muted-foreground">Groupe de jumeaux</Label>
+                  <Label className="text-xs text-muted-foreground">{t.memberEdit.twinGroup}</Label>
                   <Input
                     className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30"
-                    placeholder="ex: twin-1 (vide si pas jumeau)"
+                    placeholder={t.memberEdit.twinGroupPlaceholder}
                     value={twinGroup}
                     onChange={(e) => setTwinGroup(e.target.value)}
                   />
-                  <span className="text-[9px] text-muted-foreground/60">Les membres partageant le même identifiant seront affichés comme jumeaux/triplés.</span>
+                  <span className="text-[9px] text-muted-foreground/60">{t.memberEdit.twinGroupHint}</span>
                 </div>
               </div>
 
@@ -645,11 +660,11 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               <div className="flex flex-col gap-1">
                 <Label className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider flex items-center gap-1">
                   <FileText className="w-3 h-3" />
-                  Notes cliniques
+                  {t.memberEdit.clinicalNotes}
                 </Label>
                 <Textarea
                   className="text-sm border-border/50 bg-card focus-visible:ring-primary/30 min-h-[100px] resize-y"
-                  placeholder="Observations, antécédents, contexte familial particulier..."
+                  placeholder={t.memberEdit.notesPlaceholder}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                 />
@@ -662,7 +677,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <div className="flex flex-col gap-2">
                   <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider flex items-center gap-1">
                     <Heart className="w-3 h-3" />
-                    Relations ({memberUnions.length})
+                    {t.memberEdit.relations} ({memberUnions.length})
                   </span>
                   {memberUnions.map(union => {
                     const partnerId = union.partner1 === member.id ? union.partner2 : union.partner1;
@@ -681,7 +696,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           <span className="text-sm font-medium text-foreground truncate flex-1">{partnerName}</span>
                           {childCount > 0 && (
                             <span className="text-[10px] text-muted-foreground bg-accent/30 border border-border/40 rounded-full px-2 py-0.5 shrink-0">
-                              {childCount} enfant{childCount > 1 ? 's' : ''}
+                              {childCount} {childCount > 1 ? t.memberEdit.childrenPlural : t.memberEdit.children}
                             </span>
                           )}
                         </div>
@@ -693,22 +708,22 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {FAMILY_LINK_TYPES.map(t => (
-                              <SelectItem key={t.id} value={t.id} className="text-xs">
-                                {t.icon} {t.label}
+                            {FAMILY_LINK_TYPES.map(flt => (
+                              <SelectItem key={flt.id} value={flt.id} className="text-xs">
+                                {flt.icon} {familyLinkLabel(flt.id)}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        {/* Year fields with unsure buttons */}
+                        {/* Year fields */}
                         {(() => {
-                          const eventLabel: Record<UnionStatus, string> = {
-                            married: 'Année de mariage',
-                            common_law: "Année d'union libre",
-                            separated: 'Année de séparation',
-                            divorced: 'Année de divorce',
-                            widowed: 'Année de veuvage',
-                            love_affair: 'Année de la liaison',
+                          const eventLabelMap: Record<UnionStatus, string> = {
+                            married: t.memberEdit.marriageYear,
+                            common_law: t.memberEdit.commonLawYear,
+                            separated: t.memberEdit.separationYear,
+                            divorced: t.memberEdit.divorceYear,
+                            widowed: t.memberEdit.widowYear,
+                            love_affair: t.memberEdit.loveAffairYear,
                           };
                           const hideEnd = ['separated', 'divorced', 'widowed'].includes(union.status);
 
@@ -729,7 +744,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                   </button>
                                 </TooltipTrigger>
                                 <TooltipContent side="top" className="text-xs">
-                                  {active ? 'Date marquée incertaine' : 'Marquer comme incertain'}
+                                  {active ? t.memberEdit.dateMarkedUncertain : t.memberEdit.markUncertain}
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -737,9 +752,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
                           return (
                             <div className="flex flex-col gap-2">
-                              {/* Meeting year */}
                               <div className="flex flex-col gap-0.5">
-                                <Label className="text-[9px] text-muted-foreground uppercase">Année de rencontre</Label>
+                                <Label className="text-[9px] text-muted-foreground uppercase">{t.memberEdit.meetingYear}</Label>
                                 <div className="flex items-center gap-1">
                                   <Input
                                     className="h-7 text-xs border-border/50 bg-card flex-1"
@@ -754,9 +768,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                   />
                                 </div>
                               </div>
-                              {/* Event year */}
                               <div className="flex flex-col gap-0.5">
-                                <Label className="text-[9px] text-muted-foreground uppercase">{eventLabel[union.status]}</Label>
+                                <Label className="text-[9px] text-muted-foreground uppercase">{eventLabelMap[union.status]}</Label>
                                 <div className="flex items-center gap-1">
                                   <Input
                                     className="h-7 text-xs border-border/50 bg-card flex-1"
@@ -771,10 +784,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                   />
                                 </div>
                               </div>
-                              {/* End year — hidden for statuses where event = end */}
                               {!hideEnd && (
                                 <div className="flex flex-col gap-0.5">
-                                  <Label className="text-[9px] text-muted-foreground uppercase">Fin</Label>
+                                  <Label className="text-[9px] text-muted-foreground uppercase">{t.memberEdit.endYear}</Label>
                                   <div className="flex items-center gap-1">
                                     <Input
                                       className="h-7 text-xs border-border/50 bg-card flex-1"
@@ -801,9 +813,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               {/* ── Emotional links (editing) ── */}
               <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Liens émotionnels</span>
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.emotionalLinksLabel}</span>
                 {emotionalLinks.filter(l => l.from === member.id || l.to === member.id).length === 0 ? (
-                  <p className="text-xs text-muted-foreground/50">Aucun lien émotionnel.</p>
+                  <p className="text-xs text-muted-foreground/50">{t.memberEdit.noEmotionalLink}</p>
                 ) : (
                   emotionalLinks
                     .filter(l => l.from === member.id || l.to === member.id)
@@ -822,14 +834,14 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {EMOTIONAL_LINK_TYPES.map(t => (
-                                  <SelectItem key={t.id} value={t.id} className="text-xs">
-                                    {t.label}
+                                {EMOTIONAL_LINK_TYPES.map(elt => (
+                                  <SelectItem key={elt.id} value={elt.id} className="text-xs">
+                                    {emotionalLinkLabel(elt.id)}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
-                            <span className="text-[10px] text-muted-foreground mt-0.5 block truncate">avec {otherName}</span>
+                            <span className="text-[10px] text-muted-foreground mt-0.5 block truncate">{t.common.with} {otherName}</span>
                           </div>
                           <button
                             onClick={() => onDeleteEmotionalLink?.(link.id)}
@@ -848,27 +860,27 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               {/* ── Action buttons ── */}
               <div className="flex flex-col items-center gap-3 pb-4 pt-1">
                 <Button onClick={handleSave} className="w-full">
-                  Enregistrer
+                  {t.common.save}
                 </Button>
                 {onDelete && !member.isIndexPatient && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <button className="flex items-center gap-2 text-sm text-destructive hover:text-destructive/80 transition-colors">
                         <Trash2 className="w-4 h-4" />
-                        Supprimer ce membre
+                        {t.memberEdit.deleteMember}
                       </button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Supprimer ce membre ?</AlertDialogTitle>
+                        <AlertDialogTitle>{t.memberEdit.deleteMemberTitle}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Cette action est irréversible. Tous les liens associés seront également supprimés.
+                          {t.memberEdit.deleteMemberDesc}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                        <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
                         <AlertDialogAction onClick={() => { onDelete(member.id); onClose(); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                          Supprimer
+                          {t.common.delete}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -892,25 +904,25 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               {/* Identity */}
               <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité</span>
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.identity}</span>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                  <span className="text-xs text-muted-foreground">Prénoms</span>
+                  <span className="text-xs text-muted-foreground">{t.memberEdit.firstNames}</span>
                   <span className="text-xs text-foreground font-medium">{firstName || '—'}</span>
-                  <span className="text-xs text-muted-foreground">Nom</span>
+                  <span className="text-xs text-muted-foreground">{t.memberEdit.lastNameLabel}</span>
                   <span className="text-xs text-foreground font-medium">{lastName || '—'}</span>
                   {birthName && (
                     <>
-                      <span className="text-xs text-muted-foreground">Nom de naissance</span>
+                      <span className="text-xs text-muted-foreground">{t.memberEdit.birthName}</span>
                       <span className="text-xs text-foreground font-medium">{birthName}</span>
                     </>
                   )}
-                  <span className="text-xs text-muted-foreground">Genre</span>
+                  <span className="text-xs text-muted-foreground">{t.memberEdit.genderLabel}</span>
                   <span className="text-xs text-foreground font-medium">
-                    {gender === 'female' ? 'Femme' : gender === 'male' ? 'Homme' : 'Non-binaire'}
+                    {gender === 'female' ? t.memberEdit.female : gender === 'male' ? t.memberEdit.male : t.memberEdit.nonBinary}
                   </span>
-                  <span className="text-xs text-muted-foreground">Profession</span>
+                  <span className="text-xs text-muted-foreground">{t.memberEdit.profession}</span>
                   <span className="text-xs text-foreground font-medium">
-                    {isRetired ? (gender === 'female' ? 'Retraitée' : 'Retraité') : profession || '—'}
+                    {isRetired ? (gender === 'female' ? t.memberEdit.retiredF : t.memberEdit.retiredM) : profession || '—'}
                   </span>
                 </div>
               </div>
@@ -919,24 +931,24 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               {/* Dates */}
               <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Dates</span>
+                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.dates}</span>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                  <span className="text-xs text-muted-foreground">Naissance</span>
+                  <span className="text-xs text-muted-foreground">{t.memberEdit.birth}</span>
                   <span className="text-xs text-foreground font-medium">{birthYearUnsure ? '~' : ''}{birthYear || '—'}</span>
                   {isDeceased && (
                     <>
-                      <span className="text-xs text-muted-foreground">Décès</span>
+                      <span className="text-xs text-muted-foreground">{t.memberEdit.death}</span>
                       <span className="text-xs text-foreground font-medium">{deathYearUnsure ? '~' : ''}{deathYear}</span>
-                      <span className="text-xs text-muted-foreground">Âge au décès</span>
+                      <span className="text-xs text-muted-foreground">{t.memberEdit.ageAtDeath}</span>
                       <span className="text-xs text-foreground font-medium">
-                        {parsedDeathYear && parsedBirthYear ? `${parsedDeathYear - parsedBirthYear} ans` : '—'}
+                        {parsedDeathYear && parsedBirthYear ? `${parsedDeathYear - parsedBirthYear} ${t.memberEdit.yearsOld}` : '—'}
                       </span>
                     </>
                   )}
                   {!isDeceased && age > 0 && (
                     <>
-                      <span className="text-xs text-muted-foreground">Âge</span>
-                      <span className="text-xs text-foreground font-medium">{age} ans</span>
+                      <span className="text-xs text-muted-foreground">{t.memberEdit.age}</span>
+                      <span className="text-xs text-foreground font-medium">{age} {t.memberEdit.yearsOld}</span>
                     </>
                   )}
                 </div>
@@ -947,16 +959,16 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <>
                   <Separator className="opacity-50" />
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Identité de genre et orientation sexuelle</span>
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.genderAndOrientation}</span>
                     <div className="flex flex-wrap gap-1.5">
                       {isTransgender && (
-                        <span className="px-2 py-0.5 rounded-full text-xs bg-accent/30 border border-border/50 text-foreground">Transgenre</span>
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-accent/30 border border-border/50 text-foreground">{t.memberEdit.transgender}</span>
                       )}
                       {isGay && (
-                        <span className="px-2 py-0.5 rounded-full text-xs bg-accent/30 border border-border/50 text-foreground">{member.gender === 'female' ? 'Homosexuelle' : 'Homosexuel'}</span>
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-accent/30 border border-border/50 text-foreground">{member.gender === 'female' ? t.memberEdit.homosexualF : t.memberEdit.homosexualM}</span>
                       )}
                       {isBisexual && (
-                        <span className="px-2 py-0.5 rounded-full text-xs bg-accent/30 border border-border/50 text-foreground">{member.gender === 'female' ? 'Bisexuelle' : 'Bisexuel'}</span>
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-accent/30 border border-border/50 text-foreground">{member.gender === 'female' ? t.memberEdit.bisexualF : t.memberEdit.bisexualM}</span>
                       )}
                     </div>
                   </div>
@@ -968,7 +980,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <>
                   <Separator className="opacity-50" />
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Pathologies</span>
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.pathologiesLabel}</span>
                     <div className="flex flex-wrap gap-1.5">
                       {dynamicPathologies
                         .filter(p => selectedPathologies.includes(p.id))
@@ -988,15 +1000,15 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <>
                   <Separator className="opacity-50" />
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Jumeaux</span>
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.twins}</span>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                      <span className="text-xs text-muted-foreground">Groupe</span>
+                      <span className="text-xs text-muted-foreground">{t.memberEdit.group}</span>
                       <span className="text-xs text-foreground font-medium">{twinGroup}</span>
                       {twinType && (
                         <>
-                          <span className="text-xs text-muted-foreground">Type</span>
+                          <span className="text-xs text-muted-foreground">{t.memberEdit.type}</span>
                           <span className="text-xs text-foreground font-medium">
-                            {twinType === 'monozygotic' ? 'Monozygote' : 'Dizygote'}
+                            {twinType === 'monozygotic' ? t.memberEdit.monozygotic : t.memberEdit.dizygotic}
                           </span>
                         </>
                       )}
@@ -1010,17 +1022,16 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <>
                   <Separator className="opacity-50" />
                   <div className="flex flex-col gap-1.5">
-                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Relations de couple</span>
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.coupleRelations}</span>
                     {memberUnions.map(union => {
                       const partnerId = union.partner1 === member.id ? union.partner2 : union.partner1;
                       const partner = allMembers.find(m => m.id === partnerId);
                       const partnerName = partner ? `${partner.firstName} ${partner.lastName}` : partnerId;
-                      const linkType = FAMILY_LINK_TYPES.find(t => t.id === union.status);
                       return (
                         <div key={union.id} className="flex items-center gap-2 py-1 px-2 rounded-lg bg-accent/10">
                           <Heart className="w-3 h-3 text-primary/60 shrink-0" />
-                          <span className="text-sm text-foreground">{linkType?.label || union.status}</span>
-                          <span className="text-sm text-muted-foreground">avec</span>
+                          <span className="text-sm text-foreground">{familyLinkLabel(union.status)}</span>
+                          <span className="text-sm text-muted-foreground">{t.common.with}</span>
                           <span className="text-sm font-medium text-foreground truncate">{partnerName}</span>
                           {(union.eventYear ?? union.marriageYear) && (
                             <span className="text-[10px] text-muted-foreground ml-auto shrink-0">({union.eventYear ?? union.marriageYear})</span>
@@ -1039,7 +1050,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   <div className="flex flex-col gap-1">
                     <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider flex items-center gap-1">
                       <FileText className="w-3 h-3" />
-                      Notes cliniques
+                      {t.memberEdit.clinicalNotes}
                     </span>
                     <div className="rounded-xl bg-accent/20 border border-border/40 px-3 py-2.5">
                       <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed"
@@ -1055,7 +1066,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 </>
               )}
 
-              {/* ── Liens émotionnels (read-only) ── */}
+              {/* ── Emotional links (read-only) ── */}
               {member && (() => {
                 const memberLinks = emotionalLinks.filter(l => l.from === member.id || l.to === member.id);
                 if (memberLinks.length === 0) return null;
@@ -1063,17 +1074,16 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   <>
                     <Separator className="opacity-50" />
                     <div className="flex flex-col gap-1.5">
-                      <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Liens émotionnels</span>
+                      <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.emotionalLinksLabel}</span>
                       <div className="flex flex-col gap-1">
                         {memberLinks.map(link => {
                           const otherId = link.from === member.id ? link.to : link.from;
                           const other = allMembers.find(m => m.id === otherId);
                           const otherName = other ? `${other.firstName} ${other.lastName}` : otherId;
-                          const linkType = EMOTIONAL_LINK_TYPES.find(t => t.id === link.type);
                           return (
                             <div key={link.id} className="flex items-center gap-2 py-1 px-2 rounded-lg bg-accent/10">
-                              <span className="text-sm text-foreground">{linkType?.label || link.type}</span>
-                              <span className="text-sm text-muted-foreground">avec</span>
+                              <span className="text-sm text-foreground">{emotionalLinkLabel(link.type)}</span>
+                              <span className="text-sm text-muted-foreground">{t.common.with}</span>
                               <span className="text-sm font-medium text-foreground truncate">{otherName}</span>
                             </div>
                           );
