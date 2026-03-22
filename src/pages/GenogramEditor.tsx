@@ -75,12 +75,12 @@ function cardAnchors(m: FamilyMember): AnchorPoint[] {
 }
 
 /**
- * Corner-based anchor selection for emotional links.
- * Picks the pair of corners (one per card) that minimises distance.
+ * Side-center anchor selection for emotional links.
+ * Picks the pair of side midpoints (one per card) that minimises distance.
  */
 function getEmotionalAnchors(from: FamilyMember, to: FamilyMember) {
-  const fc = cardCorners(from);
-  const tc = cardCorners(to);
+  const fc = cardAnchors(from);
+  const tc = cardAnchors(to);
   let best = { x1: fc[0].x, y1: fc[0].y, x2: tc[0].x, y2: tc[0].y };
   let bestDist = Infinity;
   for (const f of fc) {
