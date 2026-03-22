@@ -24,6 +24,19 @@ import {
 } from '@/components/ui/dropdown-menu';
 import DossierNotesModal from '@/components/DossierNotesModal';
 
+const SHARED_AVATAR_COLORS = [
+  '#E85D75', '#6366F1', '#0EA5E9', '#F97316', '#8B5CF6',
+  '#10B981', '#EC4899', '#14B8A6', '#F59E0B', '#3B82F6',
+];
+
+function getSharedAvatarColor(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return SHARED_AVATAR_COLORS[Math.abs(hash) % SHARED_AVATAR_COLORS.length];
+}
+
 interface GenogramRow {
   id: string;
   name: string;
@@ -470,8 +483,8 @@ const Dashboard: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: file.isShared ? 'hsl(var(--muted-foreground))' : 'hsl(var(--primary))' }}>
-                            <span className="text-[10px] font-bold text-primary-foreground">
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: file.isShared ? getSharedAvatarColor(file.ownerName || '') : 'hsl(var(--primary))' }}>
+                            <span className="text-[10px] font-bold text-white">
                               {file.isShared ? file.ownerInitials : userInitials}
                             </span>
                           </div>
