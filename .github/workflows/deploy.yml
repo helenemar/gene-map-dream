@@ -25,7 +25,7 @@ jobs:
       - name: 🏗️ Build du projet
         run: |
           npm run build
-          echo "Vérification du dossier dist :"
+          echo "Contenu généré dans dist :"
           ls -R dist
 
       - name: 🚀 Déploiement via FTP
@@ -36,4 +36,5 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
           server-dir: ./public_html/
-          delete-destination: false
+          # FORCE LE RENVOI DE TOUT
+          dangerous-clean-slate: true
