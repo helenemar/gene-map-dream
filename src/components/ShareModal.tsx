@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { X, Copy, Check, Link2, Mail, Eye, Pencil, Trash2, Globe, Users } from 'lucide-react';
+import { X, Copy, Check, Link2, Eye, Pencil, Trash2, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,8 +31,6 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
   const [shares, setShares] = useState<Share[]>([]);
   const [loading, setLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteAccess, setInviteAccess] = useState<AccessLevel>('reader');
   const [linkAccess, setLinkAccess] = useState<AccessLevel>('reader');
 
   const fetchShares = async () => {
@@ -50,7 +48,6 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
   }, [open, genogramId]);
 
   const linkShares = shares.filter(s => !s.shared_with_email);
-  const emailShares = shares.filter(s => !!s.shared_with_email);
 
   const createLinkShare = async () => {
     if (!user) return;
@@ -71,26 +68,6 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
     setLoading(false);
   };
 
-  const inviteByEmail = async () => {
-    if (!user || !inviteEmail.trim()) return;
-    setLoading(true);
-    const { error } = await supabase
-      .from('genogram_shares')
-      .insert({
-        genogram_id: genogramId,
-        access_level: inviteAccess,
-        shared_with_email: inviteEmail.trim().toLowerCase(),
-        created_by: user.id,
-      } as any);
-    if (error) {
-      toast.error(t.shareModal.inviteError);
-    } else {
-      toast.success(`${t.shareModal.inviteSent} ${inviteEmail.trim()}`);
-      setInviteEmail('');
-      await fetchShares();
-    }
-    setLoading(false);
-  };
 
   const deleteShare = async (shareId: string) => {
     await supabase
@@ -195,66 +172,6 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
             )}
           </div>
 
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Users className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-foreground">{t.shareModal.inviteByEmail}</span>
-            </div>
-
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex items-center gap-1 bg-muted rounded-full p-0.5">
-                <button
-                  onClick={() => setInviteAccess('reader')}
-                  className={`flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${
-                    inviteAccess === 'reader' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
-                  }`}
-                >
-                  <Eye className="w-3 h-3" /> {t.shareModal.reader}
-                </button>
-                <button
-                  onClick={() => setInviteAccess('editor')}
-                  className={`flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${
-                    inviteAccess === 'editor' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
-                  }`}
-                >
-                  <Pencil className="w-3 h-3" /> {t.shareModal.editorAccess}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="email"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                placeholder="adresse@email.com"
-                className="flex-1 px-3 py-2 text-sm bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring/20 placeholder:text-muted-foreground/50"
-                onKeyDown={(e) => e.key === 'Enter' && inviteByEmail()}
-              />
-              <Button size="sm" onClick={inviteByEmail} disabled={loading || !inviteEmail.trim()} className="rounded-full gap-1.5">
-                <Mail className="w-3.5 h-3.5" />
-                {t.shareModal.invite}
-              </Button>
-            </div>
-
-            {emailShares.length > 0 && (
-              <div className="space-y-2 mt-3">
-                {emailShares.map(share => (
-                  <div key={share.id} className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2">
-                    <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    <span className="text-xs text-foreground flex-1 truncate">{share.shared_with_email}</span>
-                    <AccessBadge level={share.access_level as AccessLevel} />
-                    <button
-                      onClick={() => deleteShare(share.id)}
-                      className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-destructive/10 transition-colors"
-                    >
-                      <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </DialogContent>
     </Dialog>
