@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 const SECTIONS = [
   {
     title: '1. Responsable du traitement',
-    content: `Le responsable du traitement des données personnelles collectées via Genogy est la société éditrice de l'application. Pour toute question relative à la protection de vos données, vous pouvez nous contacter à l'adresse suivante : contact@genogy.app.`,
+    content: `Le responsable du traitement des données personnelles collectées via Genogy est la société éditrice de l'application. Pour toute question relative à la protection de vos données, vous pouvez nous contacter à l'adresse suivante : contact.genogy@gmail.com.`,
   },
   {
     title: '2. Données collectées',
