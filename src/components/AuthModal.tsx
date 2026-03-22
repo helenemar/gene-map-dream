@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { Mail, ArrowLeft, X, Check, Eye, EyeOff } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
