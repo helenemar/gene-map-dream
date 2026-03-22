@@ -234,10 +234,12 @@ const EditorHeader: React.FC<EditorHeaderProps> = ({
           <Download className="w-3.5 h-3.5" />
           Exporter
         </Button>
-        <Button variant="brand" size="sm" className="gap-2 text-xs" onClick={onShare}>
-          <Share2 className="w-3.5 h-3.5" />
-          Partager
-        </Button>
+        {onShare && (
+          <Button variant="brand" size="sm" className="gap-2 text-xs" onClick={onShare}>
+            <Share2 className="w-3.5 h-3.5" />
+            Partager
+          </Button>
+        )}
         <UserAvatar />
       </div>
 
