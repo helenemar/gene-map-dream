@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ThemeToggle from '@/components/ThemeToggle';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
