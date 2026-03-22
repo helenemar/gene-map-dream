@@ -87,17 +87,16 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
   // Update spotlight rect on step changes & window resize
   useEffect(() => {
     if (!active || isIntro) { setSpotlight(null); return; }
+    const selector = SPOTLIGHT_SELECTORS[tipIndex];
 
     const update = () => {
-      setSpotlight(getSpotlightRect(currentTip?.spotlightSelector));
+      setSpotlight(getSpotlightRect(selector));
       rafRef.current = requestAnimationFrame(update);
     };
-    // Initial + continuous tracking for smooth following
     update();
-    // Stop after a short while to save CPU
     const timeout = setTimeout(() => cancelAnimationFrame(rafRef.current), 600);
 
-    const onResize = () => setSpotlight(getSpotlightRect(currentTip?.spotlightSelector));
+    const onResize = () => setSpotlight(getSpotlightRect(selector));
     window.addEventListener('resize', onResize);
 
     return () => {
@@ -105,7 +104,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
       clearTimeout(timeout);
       window.removeEventListener('resize', onResize);
     };
-  }, [active, step, isIntro, currentTip]);
+  }, [active, step, isIntro, tipIndex]);
 
   if (!active) return null;
 
