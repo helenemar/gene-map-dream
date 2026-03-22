@@ -66,15 +66,15 @@ const LandingPage: React.FC = () => {
 
       {/* ═══════════ STICKY HEADER ═══════════ */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between h-16 px-6">
-          <Link to="/" className="flex items-center gap-2.5">
-            <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
-            <span className="text-[15px] font-semibold tracking-tight">Genogy</span>
+        <div className="max-w-[1400px] mx-auto flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6">
+          <Link to="/" className="flex items-center gap-2">
+            <img src={gogyIcon} alt="Genogy" className="w-7 h-7 sm:w-8 sm:h-8" />
+            <span className="text-sm sm:text-[15px] font-semibold tracking-tight">Genogy</span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="rounded-lg gap-1.5 px-2.5 h-9">
+                <Button variant="ghost" size="sm" className="rounded-lg gap-1 sm:gap-1.5 px-2 h-8 sm:h-9">
                   {lang === 'fr' ? (
                     <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
                       <rect width="12" height="24" fill="#002395" />
@@ -96,7 +96,7 @@ const LandingPage: React.FC = () => {
                       <path d="M18,0 V24 M0,12 H36" stroke="#C8102E" strokeWidth="3.5" />
                     </svg>
                   )}
-                  <span className="text-xs font-medium">{lang.toUpperCase()}</span>
+                  <span className="text-xs font-medium hidden sm:inline">{lang.toUpperCase()}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
                 </Button>
               </DropdownMenuTrigger>
@@ -129,10 +129,10 @@ const LandingPage: React.FC = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-5" onClick={() => openAuth('login')}>
+            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-3 sm:px-5 text-xs sm:text-sm h-8 sm:h-9" onClick={() => openAuth('login')}>
               {t.landing.login}
             </Button>
-            <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90 rounded-lg px-5" onClick={() => openAuth('signup')}>
+            <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90 rounded-lg px-3 sm:px-5 text-xs sm:text-sm h-8 sm:h-9" onClick={() => openAuth('signup')}>
               {t.landing.signup}
             </Button>
           </div>
