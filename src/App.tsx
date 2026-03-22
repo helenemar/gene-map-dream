@@ -57,8 +57,8 @@ const App = () => {
                 <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              <CookieBanner />
             </BrowserRouter>
-            <CookieBanner />
           </MobileBlocker>
         </TooltipProvider>
       </AuthProvider>
