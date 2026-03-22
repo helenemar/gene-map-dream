@@ -64,6 +64,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
     e.preventDefault();
     setSubmitting(true);
     setError('');
+    if (!acceptPrivacy) {
+      setError(t.auth.acceptPrivacyRequired);
+      setSubmitting(false);
+      return;
+    }
     try {
       const { error } = await supabase.auth.signUp({
         email,
