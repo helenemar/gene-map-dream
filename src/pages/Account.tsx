@@ -100,6 +100,35 @@ const Account: React.FC = () => {
     setSendingPassword(false);
   };
 
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportData = async () => {
+    if (!user) return;
+    setExporting(true);
+    try {
+      const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
+      const { data: genograms } = await supabase.from('genograms').select('*').eq('user_id', user.id);
+      const exportPayload = {
+        exportDate: new Date().toISOString(),
+        user: { id: user.id, email: user.email },
+        profile,
+        genograms,
+      };
+      const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `genogy-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(t.account.exportSuccess);
+    } catch {
+      toast.error(t.account.exportError);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-card flex items-center justify-center">
