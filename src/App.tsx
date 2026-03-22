@@ -17,6 +17,8 @@ import SharedEditor from "./pages/SharedEditor";
 import NotFound from "./pages/NotFound";
 import Account from "./pages/Account";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import LegalNotice from "./pages/LegalNotice";
+import TermsOfService from "./pages/TermsOfService";
 import MobileBlocker from "./components/MobileBlocker";
 import OAuthProxy from "./pages/OAuthProxy";
 
@@ -49,6 +51,8 @@ const App = () => {
                 <Route path="/shared-edit/:token" element={<SharedEditor />} />
                 <Route path="/design-system" element={<DesignSystemPage />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/legal" element={<LegalNotice />} />
+                <Route path="/terms" element={<TermsOfService />} />
                 <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
