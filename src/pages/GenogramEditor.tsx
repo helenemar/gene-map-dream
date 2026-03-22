@@ -1884,7 +1884,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       {genogramId && !isSharedMode && (
         <DossierNotesModal
           open={notesModalOpen}
-          onClose={() => setNotesModalOpen(false)}
+          onClose={() => { setNotesModalOpen(false); refreshNoteCount(); }}
           genogramId={genogramId}
           genogramName={fileName}
         />
