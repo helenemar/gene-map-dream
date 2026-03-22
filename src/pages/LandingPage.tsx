@@ -109,6 +109,13 @@ const LandingPage: React.FC = () => {
             <span className="text-[15px] font-semibold tracking-tight">Genogy</span>
           </Link>
           <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="rounded-lg w-9 h-9" aria-label="Français" title="Français">
+              <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
+                <rect width="12" height="24" fill="#002395" />
+                <rect x="12" width="12" height="24" fill="#fff" />
+                <rect x="24" width="12" height="24" fill="#ED2939" />
+              </svg>
+            </Button>
             <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-5" onClick={() => openAuth('login')}>
               Connexion
             </Button>
