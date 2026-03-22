@@ -19,6 +19,7 @@ import Account from "./pages/Account";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import LegalNotice from "./pages/LegalNotice";
 import TermsOfService from "./pages/TermsOfService";
+import Disclaimer from "./pages/Disclaimer";
 import MobileBlocker from "./components/MobileBlocker";
 import CookieBanner from "./components/CookieBanner";
 
@@ -50,6 +51,7 @@ const App = () => {
                   <Route path="/privacy" element={<PrivacyPolicy />} />
                   <Route path="/legal" element={<LegalNotice />} />
                   <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/disclaimer" element={<Disclaimer />} />
                   <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
