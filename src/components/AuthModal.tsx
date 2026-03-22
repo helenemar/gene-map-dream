@@ -113,9 +113,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
     }
   };
 
+  const getOAuthRedirectUri = () => {
+    const host = window.location.hostname;
+    const isCustomDomain = !host.endsWith('.lovable.app') && !host.endsWith('.lovableproject.com');
+    return isCustomDomain ? 'https://gene-map-dream.lovable.app' : window.location.origin;
+  };
+
   const handleGoogleAuth = async () => {
     const { error } = await lovable.auth.signInWithOAuth('google', {
-      redirect_uri: window.location.origin,
+      redirect_uri: getOAuthRedirectUri(),
     });
     if (error) toast.error(error.message || t.auth.googleError);
   };
