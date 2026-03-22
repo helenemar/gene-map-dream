@@ -490,4 +490,4 @@ export const fr = {
     neglect: 'Négligence',
     controlling: 'Contrôlant',
   },
-} as const;
+};
