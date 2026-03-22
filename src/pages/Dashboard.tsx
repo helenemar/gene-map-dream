@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Bell, Settings, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -39,6 +40,7 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, signOut } = useAuth();
+  const { lang, setLang } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
 
   const [sortKey, setSortKey] = useState<SortKey>('updated_at');
@@ -165,6 +167,49 @@ const Dashboard: React.FC = () => {
            <span className="text-[15px] font-semibold text-foreground tracking-tight">Genogy</span>
          </a>
         <div className="flex items-center gap-2">
+          <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="rounded-lg gap-1.5 px-2.5 h-9">
+                  {lang === 'fr' ? (
+                    <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
+                      <rect width="12" height="24" fill="#002395" />
+                      <rect x="12" width="12" height="24" fill="#fff" />
+                      <rect x="24" width="12" height="24" fill="#ED2939" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
+                      <rect width="36" height="24" fill="#012169" />
+                      <path d="M0,0 L36,24 M36,0 L0,24" stroke="#fff" strokeWidth="4" />
+                      <path d="M0,0 L36,24 M36,0 L0,24" stroke="#C8102E" strokeWidth="2.5" />
+                      <path d="M18,0 V24 M0,12 H36" stroke="#fff" strokeWidth="6" />
+                      <path d="M18,0 V24 M0,12 H36" stroke="#C8102E" strokeWidth="3.5" />
+                    </svg>
+                  )}
+                  <span className="text-xs font-medium">{lang.toUpperCase()}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[140px]">
+                <DropdownMenuItem onClick={() => setLang('fr')} className="gap-2.5 cursor-pointer">
+                  <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden shrink-0" aria-hidden="true">
+                    <rect width="12" height="24" fill="#002395" />
+                    <rect x="12" width="12" height="24" fill="#fff" />
+                    <rect x="24" width="12" height="24" fill="#ED2939" />
+                  </svg>
+                  <span className={lang === 'fr' ? 'font-semibold' : ''}>Français</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLang('en')} className="gap-2.5 cursor-pointer">
+                  <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden shrink-0" aria-hidden="true">
+                    <rect width="36" height="24" fill="#012169" />
+                    <path d="M0,0 L36,24 M36,0 L0,24" stroke="#fff" strokeWidth="4" />
+                    <path d="M0,0 L36,24 M36,0 L0,24" stroke="#C8102E" strokeWidth="2.5" />
+                    <path d="M18,0 V24 M0,12 H36" stroke="#fff" strokeWidth="6" />
+                    <path d="M18,0 V24 M0,12 H36" stroke="#C8102E" strokeWidth="3.5" />
+                  </svg>
+                  <span className={lang === 'en' ? 'font-semibold' : ''}>English</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           <Button variant="beta" size="sm" className="h-9 px-4 text-xs font-bold" onClick={() => setBetaModalOpen(true)}>
             <Atom className="w-3.5 h-3.5" />
             BETA Test
