@@ -55,6 +55,19 @@ const Dashboard: React.FC = () => {
 
   const locale = lang === 'fr' ? 'fr-FR' : lang === 'de' ? 'de-DE' : 'en-US';
 
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, display_name')
+        .eq('user_id', user!.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+  });
+
   const { data: realGenograms, isLoading } = useQuery({
     queryKey: ['genograms', user?.id],
     queryFn: async () => {
