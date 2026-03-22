@@ -74,13 +74,15 @@ interface OnboardingTutorialProps {
 const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
   active, step, onNext, onPrev, onFinish, onDismiss,
 }) => {
+  const { t } = useLanguage();
+  const steps = t.onboarding.steps;
   const [spotlight, setSpotlight] = useState<SpotlightRect | null>(null);
   const rafRef = useRef<number>(0);
 
   const isIntro = step === 0;
   const tipIndex = step - 1;
-  const isLastStep = step === STEPS.length;
-  const currentTip = STEPS[tipIndex];
+  const isLastStep = step === steps.length;
+  const currentStep = steps[tipIndex];
 
   // Update spotlight rect on step changes & window resize
   useEffect(() => {
