@@ -239,7 +239,7 @@ const Dashboard: React.FC = () => {
       </header>
 
       <main className="px-6 py-5">
-        <h1 className="text-7xl font-black text-destructive mb-6">test</h1>
+        
         <div className="dot-grid bg-background border border-border rounded-xl px-8 py-5 mb-4">
           <h1 className="text-[26px] font-bold text-foreground leading-tight mb-1.5">
             {t.dashboard.createNew}
