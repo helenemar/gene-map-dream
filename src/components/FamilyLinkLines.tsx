@@ -31,7 +31,7 @@ const UnionLine: React.FC<{
 }> = ({ x1, y1, x2, y2, status }) => {
   const lineY = (y1 + y2) / 2;
   const stroke = 'hsl(var(--foreground))';
-  const opacity = 0.5;
+  const opacity = 1;
   const needsConnectors = Math.abs(y1 - y2) > 1;
   const dashArray = (status === 'common_law' || status === 'love_affair') ? '8 4' : undefined;
 
