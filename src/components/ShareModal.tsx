@@ -48,7 +48,6 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
   }, [open, genogramId]);
 
   const linkShares = shares.filter(s => !s.shared_with_email);
-  const emailShares = shares.filter(s => !!s.shared_with_email);
 
   const createLinkShare = async () => {
     if (!user) return;
