@@ -393,7 +393,7 @@ const Dashboard: React.FC = () => {
               ))}
             </div>
           ) : filteredFiles.length > 0 ? (
-            <div className="border border-border rounded-lg overflow-hidden">
+            <div className="border border-border rounded-lg overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent bg-transparent">
