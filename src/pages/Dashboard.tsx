@@ -379,7 +379,6 @@ const Dashboard: React.FC = () => {
               />
             </div>
           </div>
-          </div>
 
           {isLoading ? (
             <div className="space-y-3">
