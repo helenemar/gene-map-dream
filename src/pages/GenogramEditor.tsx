@@ -132,11 +132,22 @@ function getDirectionalAnchors(from: FamilyMember, to: FamilyMember) {
 }
 
 
-const GenogramEditor: React.FC = () => {
+interface GenogramEditorProps {
+  shareToken?: string;
+  sharedInitialData?: {
+    name: string;
+    members: FamilyMember[];
+    unions: Union[];
+    emotionalLinks: EmotionalLink[];
+  };
+}
+
+const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedInitialData }) => {
+  const isSharedMode = !!shareToken;
   const { id: genogramId } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [dbLoaded, setDbLoaded] = useState(false);
-  const onboarding = useOnboarding(genogramId);
+  const onboarding = useOnboarding(isSharedMode ? undefined : genogramId);
 
   // Initialize with empty state — will be populated from DB or sample data
   const [members, setMembers] = useState<FamilyMember[]>(() => {
