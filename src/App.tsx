@@ -19,6 +19,7 @@ import Account from "./pages/Account";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import LegalNotice from "./pages/LegalNotice";
 import TermsOfService from "./pages/TermsOfService";
+import Disclaimer from "./pages/Disclaimer";
 import MobileBlocker from "./components/MobileBlocker";
 import CookieBanner from "./components/CookieBanner";
 
