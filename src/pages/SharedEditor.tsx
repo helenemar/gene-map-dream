@@ -47,7 +47,7 @@ const SharedEditor: React.FC = () => {
       // Claim this share for the logged-in user so it appears in their dashboard
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        await supabase.rpc('claim_shared_genogram', { p_token: token });
+        await (supabase.rpc as any)('claim_shared_genogram', { p_token: token });
       }
     })();
   }, [token, navigate]);
