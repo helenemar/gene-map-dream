@@ -217,9 +217,6 @@ const Dashboard: React.FC = () => {
           <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-muted transition-colors">
             <Bell className="w-[18px] h-[18px] text-foreground" />
           </button>
-          <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-muted transition-colors">
-            <Settings className="w-[18px] h-[18px] text-foreground" />
-          </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-1.5 h-10 pl-1 pr-2 rounded-full bg-foreground hover:opacity-90 transition-opacity">
