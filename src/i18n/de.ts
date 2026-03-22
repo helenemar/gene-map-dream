@@ -505,4 +505,9 @@ export const de: Translations = {
     neglect: 'Vernachlässigung',
     controlling: 'Kontrollierend',
   },
+  cookieBanner: {
+    message: 'Diese Website verwendet ausschließlich technisch notwendige Cookies (Authentifizierung, Sitzung).',
+    accept: 'Verstanden',
+    learnMore: 'Mehr erfahren',
+  },
 };
