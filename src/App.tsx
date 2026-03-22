@@ -17,6 +17,7 @@ import SharedEditor from "./pages/SharedEditor";
 import NotFound from "./pages/NotFound";
 import Account from "./pages/Account";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import MobileBlocker from "./components/MobileBlocker";
 
 const queryClient = new QueryClient();
 
@@ -26,23 +27,25 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/auth" element={<Navigate to="/" replace />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/editor" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
-            <Route path="/editor/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
-            <Route path="/tree/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
-            <Route path="/shared/:token" element={<SharedGenogram />} />
-            <Route path="/shared-edit/:token" element={<SharedEditor />} />
-            <Route path="/design-system" element={<DesignSystemPage />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <MobileBlocker>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/auth" element={<Navigate to="/" replace />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/editor" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
+              <Route path="/editor/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
+              <Route path="/tree/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
+              <Route path="/shared/:token" element={<SharedGenogram />} />
+              <Route path="/shared-edit/:token" element={<SharedEditor />} />
+              <Route path="/design-system" element={<DesignSystemPage />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </MobileBlocker>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
