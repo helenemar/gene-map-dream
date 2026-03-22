@@ -337,7 +337,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           <button
             onClick={handleCancelAnchor}
             className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-destructive/10 hover:border-destructive/30 transition-colors"
-            title="Annuler"
+            title={t.memberCard.cancelLabel}
           >
             <X className="w-3.5 h-3.5 text-foreground" />
           </button>
