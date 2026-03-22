@@ -1,0 +1,35 @@
+name: Deploy Website to Hostinger
+
+on:
+  push:
+    branches:
+      - main # Vérifie que ta branche Lovable s'appelle bien main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚚 Checkout du code
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configuration de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Installation des dépendances
+        run: npm install
+
+      - name: 🏗️ Build du projet (Vite)
+        run: npm run build
+
+      - name: 🚀 Déploiement via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/  # Le dossier généré par Lovable/Vite
+          server-dir: ./public_html/ # Le dossier de destination chez Hostinger
