@@ -202,6 +202,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_shared_genogram: { Args: { p_token: string }; Returns: boolean }
       get_shared_genogram: {
         Args: { p_token: string }
         Returns: {

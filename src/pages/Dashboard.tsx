@@ -31,6 +31,10 @@ interface GenogramRow {
   updated_at: string;
   user_id: string;
   data: any;
+  isShared?: boolean;
+  ownerName?: string;
+  ownerInitials?: string;
+  accessLevel?: string;
 }
 
 type SortKey = 'name' | 'updated_at' | 'created_at';
@@ -68,20 +72,78 @@ const Dashboard: React.FC = () => {
     enabled: !!user,
   });
 
-  const { data: realGenograms, isLoading } = useQuery({
+  const { data: ownGenograms, isLoading: isLoadingOwn } = useQuery({
     queryKey: ['genograms', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('genograms')
         .select('*')
+        .eq('user_id', user!.id)
         .order('updated_at', { ascending: false });
       if (error) throw error;
-      return data as GenogramRow[];
+      return (data as GenogramRow[]).map(g => ({ ...g, isShared: false }));
     },
     enabled: !!user,
   });
 
-  const genograms = useMemo(() => realGenograms || [], [realGenograms]);
+  const { data: sharedGenograms, isLoading: isLoadingShared } = useQuery({
+    queryKey: ['shared-genograms', user?.id],
+    queryFn: async () => {
+      // Get shares for this user
+      const { data: shares, error: sharesError } = await supabase
+        .from('genogram_shares')
+        .select('genogram_id, access_level')
+        .eq('shared_with_user_id', user!.id)
+        .eq('is_active', true);
+      if (sharesError || !shares?.length) return [];
+
+      const genogramIds = shares.map(s => s.genogram_id);
+      const accessMap = Object.fromEntries(shares.map(s => [s.genogram_id, s.access_level]));
+
+      // Get the genograms
+      const { data: genos, error: genosError } = await supabase
+        .from('genograms')
+        .select('*')
+        .in('id', genogramIds);
+      if (genosError || !genos?.length) return [];
+
+      // Get owner profiles
+      const ownerIds = [...new Set(genos.map(g => g.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, first_name, last_name, display_name')
+        .in('user_id', ownerIds);
+
+      const profileMap = Object.fromEntries(
+        (profiles || []).map(p => [p.user_id, p])
+      );
+
+      return genos.map(g => {
+        const p = profileMap[g.user_id];
+        const ownerName = p?.first_name && p?.last_name
+          ? `${p.first_name} ${p.last_name}`
+          : p?.display_name || '?';
+        const ownerInitials = p?.first_name && p?.last_name
+          ? `${p.first_name[0]}${p.last_name[0]}`.toUpperCase()
+          : ownerName.slice(0, 2).toUpperCase();
+        return {
+          ...g,
+          isShared: true,
+          ownerName,
+          ownerInitials,
+          accessLevel: accessMap[g.id] || 'reader',
+        } as GenogramRow;
+      });
+    },
+    enabled: !!user,
+  });
+
+  const isLoading = isLoadingOwn || isLoadingShared;
+
+  const genograms = useMemo(() => [
+    ...(ownGenograms || []),
+    ...(sharedGenograms || []),
+  ], [ownGenograms, sharedGenograms]);
 
   useEffect(() => {
     if (!genograms?.length) return;
@@ -132,7 +194,8 @@ const Dashboard: React.FC = () => {
   const MAX_GENOGRAMS = 2;
 
   const handleCreate = () => {
-    if (genograms && genograms.length >= MAX_GENOGRAMS) {
+    const ownCount = (ownGenograms || []).length;
+    if (ownCount >= MAX_GENOGRAMS) {
       toast.error(t.dashboard.limitReached.replace('{max}', String(MAX_GENOGRAMS)), { duration: 3000 });
       return;
     }
@@ -352,7 +415,34 @@ const Dashboard: React.FC = () => {
                   {filteredFiles.map((file) => (
                     <TableRow
                       key={file.id}
-                      onClick={() => navigate(`/editor/${file.id}`)}
+                      onClick={() => {
+                        if (file.isShared && file.accessLevel === 'editor') {
+                          // Find share token for this genogram
+                          supabase.from('genogram_shares')
+                            .select('share_token')
+                            .eq('genogram_id', file.id)
+                            .eq('shared_with_user_id', user!.id)
+                            .eq('is_active', true)
+                            .single()
+                            .then(({ data }) => {
+                              if (data?.share_token) navigate(`/shared-edit/${data.share_token}`);
+                              else navigate(`/editor/${file.id}`);
+                            });
+                        } else if (file.isShared) {
+                          supabase.from('genogram_shares')
+                            .select('share_token')
+                            .eq('genogram_id', file.id)
+                            .eq('shared_with_user_id', user!.id)
+                            .eq('is_active', true)
+                            .single()
+                            .then(({ data }) => {
+                              if (data?.share_token) navigate(`/shared/${data.share_token}`);
+                              else navigate(`/editor/${file.id}`);
+                            });
+                        } else {
+                          navigate(`/editor/${file.id}`);
+                        }
+                      }}
                       className="cursor-pointer group h-[60px]"
                     >
                       <TableCell className="pl-6">
@@ -380,11 +470,13 @@ const Dashboard: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'hsl(var(--primary))' }}>
-                            <span className="text-[10px] font-bold text-primary-foreground">{userInitials}</span>
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: file.isShared ? 'hsl(var(--muted-foreground))' : 'hsl(var(--primary))' }}>
+                            <span className="text-[10px] font-bold text-primary-foreground">
+                              {file.isShared ? file.ownerInitials : userInitials}
+                            </span>
                           </div>
                           <span className="text-[13px] text-foreground">
-                            {displayName} <span className="text-muted-foreground">{t.dashboard.me}</span>
+                            {file.isShared ? file.ownerName : <>{displayName} <span className="text-muted-foreground">{t.dashboard.me}</span></>}
                           </span>
                         </div>
                       </TableCell>
