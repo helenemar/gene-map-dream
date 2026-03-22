@@ -65,6 +65,9 @@ const Footer: React.FC = () => {
               <li>
                 <Link to="/terms" className="text-sm hover:text-primary transition-colors">Conditions Générales d'Utilisation</Link>
               </li>
+              <li>
+                <Link to="/disclaimer" className="text-sm hover:text-primary transition-colors">Avertissement légal</Link>
+              </li>
             </ul>
           </div>
 
