@@ -53,7 +53,7 @@ const Dashboard: React.FC = () => {
   const [renameValue, setRenameValue] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
-  const locale = lang === 'fr' ? 'fr-FR' : 'en-US';
+  const locale = lang === 'fr' ? 'fr-FR' : lang === 'de' ? 'de-DE' : 'en-US';
 
   const { data: realGenograms, isLoading } = useQuery({
     queryKey: ['genograms', user?.id],
