@@ -34,7 +34,7 @@ const UnionLine: React.FC<{
   const lineY = (y1 + y2) / 2;
   const isSharedVariant = variant === 'shared';
   const stroke = isSharedVariant ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))';
-  const opacity = 1;
+  const opacity = isSharedVariant ? 1 : 0.35;
   const lineWidth = isSharedVariant ? 2.5 : 2;
   const connectorWidth = isSharedVariant ? 2.25 : 1.5;
   const needsConnectors = Math.abs(y1 - y2) > 1;
