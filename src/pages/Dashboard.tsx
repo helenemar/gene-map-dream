@@ -253,15 +253,15 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-card">
-      <header className="h-[64px] bg-card border-b border-border flex items-center justify-between px-8">
-        <a href="/" className="flex items-center gap-2.5">
-          <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
-          <span className="text-[15px] font-semibold text-foreground tracking-tight">Genogy</span>
+      <header className="h-14 sm:h-[64px] bg-card border-b border-border flex items-center justify-between px-4 sm:px-8">
+        <a href="/" className="flex items-center gap-2">
+          <img src={gogyIcon} alt="Genogy" className="w-7 h-7 sm:w-8 sm:h-8" />
+          <span className="text-sm sm:text-[15px] font-semibold text-foreground tracking-tight">Genogy</span>
         </a>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="rounded-lg gap-1.5 px-2.5 h-9">
+              <Button variant="ghost" size="sm" className="rounded-lg gap-1 px-2 h-8 sm:h-9">
                 {lang === 'fr' ? (
                   <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
                     <rect width="12" height="24" fill="#002395" />
@@ -283,7 +283,7 @@ const Dashboard: React.FC = () => {
                     <path d="M18,0 V24 M0,12 H36" stroke="#C8102E" strokeWidth="3.5" />
                   </svg>
                 )}
-                <span className="text-xs font-medium">{lang.toUpperCase()}</span>
+                <span className="text-xs font-medium hidden sm:inline">{lang.toUpperCase()}</span>
                 <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
@@ -317,20 +317,20 @@ const Dashboard: React.FC = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="beta" size="sm" className="h-9 px-4 text-xs font-bold" onClick={() => setBetaModalOpen(true)}>
+          <Button variant="beta" size="sm" className="h-8 sm:h-9 px-2.5 sm:px-4 text-[10px] sm:text-xs font-bold" onClick={() => setBetaModalOpen(true)}>
             <Atom className="w-3.5 h-3.5" />
-            BETA Test
+            <span className="hidden sm:inline">BETA Test</span>
           </Button>
-          <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-muted transition-colors">
-            <Bell className="w-[18px] h-[18px] text-foreground" />
+          <button className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:bg-muted transition-colors">
+            <Bell className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-foreground" />
           </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1.5 h-10 pl-1 pr-2 rounded-full bg-foreground hover:opacity-90 transition-opacity">
-                <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center">
-                  <span className="text-card text-[11px] font-bold tracking-wide">{userInitials}</span>
+              <button className="flex items-center gap-1 sm:gap-1.5 h-8 sm:h-10 pl-0.5 sm:pl-1 pr-1.5 sm:pr-2 rounded-full bg-foreground hover:opacity-90 transition-opacity">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-foreground flex items-center justify-center">
+                  <span className="text-card text-[10px] sm:text-[11px] font-bold tracking-wide">{userInitials}</span>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-card" />
+                <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-card" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
@@ -346,16 +346,16 @@ const Dashboard: React.FC = () => {
         </div>
       </header>
 
-      <main className="px-6 py-5">
+      <main className="px-4 sm:px-6 py-4 sm:py-5">
         
-        <div className="dot-grid bg-background border border-border rounded-xl px-8 py-5 mb-4">
-          <h1 className="text-[26px] font-bold text-foreground leading-tight mb-1.5">
+        <div className="dot-grid bg-background border border-border rounded-xl px-5 sm:px-8 py-5 mb-4">
+          <h1 className="text-xl sm:text-[26px] font-bold text-foreground leading-tight mb-1.5">
             {t.dashboard.createNew}
           </h1>
-          <p className="text-[14px] text-muted-foreground mb-7 max-w-lg">
+          <p className="text-[13px] sm:text-[14px] text-muted-foreground mb-5 sm:mb-7 max-w-lg">
             {t.dashboard.noFiles}
           </p>
-          <Button onClick={handleCreate} className="gap-2 px-6 h-11 text-[14px] font-semibold">
+          <Button onClick={handleCreate} className="gap-2 px-5 sm:px-6 h-10 sm:h-11 text-[13px] sm:text-[14px] font-semibold">
             <Plus className="w-4 h-4" />
             {t.dashboard.createFromMember}
           </Button>
@@ -363,12 +363,12 @@ const Dashboard: React.FC = () => {
 
         <CreateGenogramModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
 
-        <div className="bg-card border border-border rounded-xl px-6 py-5">
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <h2 className="text-[16px] font-bold text-foreground">
+        <div className="bg-card border border-border rounded-xl px-4 sm:px-6 py-4 sm:py-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4">
+            <h2 className="text-[15px] sm:text-[16px] font-bold text-foreground">
               {t.dashboard.myGenograms} {genograms ? `(${filteredFiles.length})` : ''}
             </h2>
-            <div className="relative w-72">
+            <div className="relative w-full sm:w-72">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
@@ -393,7 +393,7 @@ const Dashboard: React.FC = () => {
               ))}
             </div>
           ) : filteredFiles.length > 0 ? (
-            <div className="border border-border rounded-lg overflow-hidden">
+            <div className="border border-border rounded-lg overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent bg-transparent">

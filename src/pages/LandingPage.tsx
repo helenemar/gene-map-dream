@@ -66,15 +66,15 @@ const LandingPage: React.FC = () => {
 
       {/* ═══════════ STICKY HEADER ═══════════ */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between h-16 px-6">
-          <Link to="/" className="flex items-center gap-2.5">
-            <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
-            <span className="text-[15px] font-semibold tracking-tight">Genogy</span>
+        <div className="max-w-[1400px] mx-auto flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6">
+          <Link to="/" className="flex items-center gap-2">
+            <img src={gogyIcon} alt="Genogy" className="w-7 h-7 sm:w-8 sm:h-8" />
+            <span className="text-sm sm:text-[15px] font-semibold tracking-tight">Genogy</span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="rounded-lg gap-1.5 px-2.5 h-9">
+                <Button variant="ghost" size="sm" className="rounded-lg gap-1 sm:gap-1.5 px-2 h-8 sm:h-9">
                   {lang === 'fr' ? (
                     <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
                       <rect width="12" height="24" fill="#002395" />
@@ -96,7 +96,7 @@ const LandingPage: React.FC = () => {
                       <path d="M18,0 V24 M0,12 H36" stroke="#C8102E" strokeWidth="3.5" />
                     </svg>
                   )}
-                  <span className="text-xs font-medium">{lang.toUpperCase()}</span>
+                  <span className="text-xs font-medium hidden sm:inline">{lang.toUpperCase()}</span>
                   <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
                 </Button>
               </DropdownMenuTrigger>
@@ -129,10 +129,10 @@ const LandingPage: React.FC = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-5" onClick={() => openAuth('login')}>
+            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-3 sm:px-5 text-xs sm:text-sm h-8 sm:h-9" onClick={() => openAuth('login')}>
               {t.landing.login}
             </Button>
-            <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90 rounded-lg px-5" onClick={() => openAuth('signup')}>
+            <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90 rounded-lg px-3 sm:px-5 text-xs sm:text-sm h-8 sm:h-9" onClick={() => openAuth('signup')}>
               {t.landing.signup}
             </Button>
           </div>
@@ -141,16 +141,16 @@ const LandingPage: React.FC = () => {
 
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative overflow-hidden">
-        <div className="max-w-[1440px] mx-auto px-12 lg:px-24 pt-14 pb-20 lg:pt-16 lg:pb-24">
+        <div className="max-w-[1440px] mx-auto px-5 sm:px-12 lg:px-24 pt-10 sm:pt-14 pb-14 sm:pb-20 lg:pt-16 lg:pb-24">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <img src={gogyIcon} alt="" className="w-[64px] h-[64px] mb-6" />
+              <img src={gogyIcon} alt="" className="w-12 h-12 sm:w-[64px] sm:h-[64px] mb-4 sm:mb-6" />
 
-              <h1 className="text-[1.6rem] lg:text-[2rem] font-extrabold leading-[1.08] tracking-[-0.01em] mb-4 whitespace-nowrap">
+              <h1 className="text-[1.3rem] sm:text-[1.6rem] lg:text-[2rem] font-extrabold leading-[1.12] tracking-[-0.01em] mb-3 sm:mb-4">
                 {t.landing.heroTitle1}
                 <br />
                 {t.landing.heroTitle2}{' '}
@@ -159,18 +159,18 @@ const LandingPage: React.FC = () => {
                 {t.landing.heroTitle3}
               </h1>
 
-              <p className="text-muted-foreground text-[14px] leading-[1.5] mb-1 max-w-[420px]">
+              <p className="text-muted-foreground text-[13px] sm:text-[14px] leading-[1.5] mb-1 max-w-[420px]">
                 {t.landing.heroSub1}
                 <br className="hidden sm:block" />
                 {t.landing.heroSub2}
               </p>
-              <p className="text-foreground/50 text-[12.5px] leading-[1.5] mb-6 max-w-[420px]">
+              <p className="text-foreground/50 text-[11.5px] sm:text-[12.5px] leading-[1.5] mb-5 sm:mb-6 max-w-[420px]">
                 {t.landing.heroSub3}
                 <br className="hidden sm:block" />
                 {t.landing.heroSub4}
               </p>
 
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                 <Button variant="brand" size="lg" onClick={() => openAuth('signup')} className="gap-2 px-8 rounded-full">
                   {t.landing.ctaBeta}
                 </Button>
