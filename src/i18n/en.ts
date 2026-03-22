@@ -387,6 +387,11 @@ export const en: Translations = {
     deleteAccountConfirmDesc: 'This action is irreversible. All your genograms, data and settings will be permanently deleted.',
     yesDelete: 'Yes, delete',
     deleteRequested: 'Your deletion request has been received.',
+    exportData: 'Export my data',
+    exportDataDesc: 'Download a copy of all your personal data (GDPR data portability right).',
+    exporting: 'Exporting…',
+    exportSuccess: 'Your data has been exported successfully.',
+    exportError: 'Error exporting data.',
   },
 
   // ── Reset Password ──
