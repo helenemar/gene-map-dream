@@ -39,7 +39,6 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, signOut } = useAuth();
-  const { resolvedTheme, setTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
 
   const [sortKey, setSortKey] = useState<SortKey>('updated_at');
