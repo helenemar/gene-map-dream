@@ -5,20 +5,15 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_PATHOLOGIES } from '@/constants/defaultPathologies';
 
 type Gender = 'male' | 'female' | 'non-binary';
-
-const GENDER_OPTIONS: { value: Gender; label: string }[] = [
-  { value: 'male', label: 'Homme' },
-  { value: 'female', label: 'Femme' },
-];
 
 interface Props {
   open: boolean;
@@ -28,14 +23,19 @@ interface Props {
 const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
   const [creating, setCreating] = useState(false);
-
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [gender, setGender] = useState<Gender>('female');
   const [birthDate, setBirthDate] = useState('');
   const [isAdopted, setIsAdopted] = useState(false);
+
+  const genderOptions: { value: Gender; label: string }[] = [
+    { value: 'male', label: t.createModal.male },
+    { value: 'female', label: t.createModal.female },
+  ];
 
   const resetForm = () => {
     setFirstName('');
@@ -114,7 +114,7 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
         isAdoption: isAdopted,
       };
 
-      const genogramName = `Génogramme de ${firstName.trim()} ${lastName.trim()}`;
+      const genogramName = `${t.createModal.genogramOf} ${firstName.trim()} ${lastName.trim()}`;
 
       const { data, error } = await supabase
         .from('genograms')
@@ -132,7 +132,6 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
 
       if (error) throw error;
 
-      // Seed default pathologies for this genogram
       const pathologyRows = DEFAULT_PATHOLOGIES.map(p => ({
         genogram_id: data.id,
         name: p.name,
@@ -144,10 +143,10 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
       resetForm();
       onOpenChange(false);
 
-      toast.success(`Génogramme créé avec le patient ${firstName.trim()} ${lastName.trim()}`);
+      toast.success(`${t.createModal.created} ${firstName.trim()} ${lastName.trim()}`);
       navigate(`/editor/${data.id}`);
     } catch (err: any) {
-      toast.error(err.message || 'Erreur lors de la création');
+      toast.error(err.message || t.createModal.createError);
     } finally {
       setCreating(false);
     }
@@ -157,39 +156,26 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
     <Dialog open={open} onOpenChange={(v) => { if (!creating) { onOpenChange(v); if (!v) resetForm(); } }}>
       <DialogContent className="sm:max-w-[460px]">
         <DialogHeader>
-          <DialogTitle>Nouveau fichier</DialogTitle>
-          <DialogDescription>
-            Renseignez les informations du patient index pour créer votre génogramme.
-          </DialogDescription>
+          <DialogTitle>{t.createModal.title}</DialogTitle>
+          <DialogDescription>{t.createModal.description}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-2">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="cg-firstName">Prénom *</Label>
-              <Input
-                id="cg-firstName"
-                placeholder="Prénom"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                autoFocus
-              />
+              <Label htmlFor="cg-firstName">{t.createModal.firstName} *</Label>
+              <Input id="cg-firstName" placeholder={t.createModal.firstName} value={firstName} onChange={(e) => setFirstName(e.target.value)} autoFocus />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="cg-lastName">Nom *</Label>
-              <Input
-                id="cg-lastName"
-                placeholder="Nom"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
+              <Label htmlFor="cg-lastName">{t.createModal.lastName} *</Label>
+              <Input id="cg-lastName" placeholder={t.createModal.lastName} value={lastName} onChange={(e) => setLastName(e.target.value)} />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>Genre *</Label>
+            <Label>{t.createModal.gender} *</Label>
             <div className="flex gap-2">
-              {GENDER_OPTIONS.map((opt) => (
+              {genderOptions.map((opt) => (
                 <button
                   key={opt.value}
                   type="button"
@@ -207,23 +193,15 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="cg-birthDate">Date de naissance *</Label>
-            <Input
-              id="cg-birthDate"
-              type="date"
-              value={birthDate}
-              onChange={(e) => setBirthDate(e.target.value)}
-            />
+            <Label htmlFor="cg-birthDate">{t.createModal.birthDate} *</Label>
+            <Input id="cg-birthDate" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
           </div>
-
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => { onOpenChange(false); resetForm(); }} disabled={creating}>
-            Annuler
-          </Button>
+          <Button variant="outline" onClick={() => { onOpenChange(false); resetForm(); }} disabled={creating}>{t.common.cancel}</Button>
           <Button onClick={handleCreate} disabled={!isValid || creating} className="gap-2">
-            {creating ? 'Création…' : 'Créer le génogramme'}
+            {creating ? t.createModal.creating : t.createModal.create}
           </Button>
         </DialogFooter>
       </DialogContent>
