@@ -126,7 +126,11 @@ export interface Translations {
     changePasswordDesc: string; sendResetLink: string; sendingLink: string; emailSent: string;
     emailSendError: string; deleteAccount: string; deleteAccountDesc: string;
     deleteAccountConfirmTitle: string; deleteAccountConfirmDesc: string; yesDelete: string;
-    deleteRequested: string;
+    deleteRequested: string; exportData: string; exportDataDesc: string; exporting: string;
+    exportSuccess: string; exportError: string;
+  };
+  cookieBanner: {
+    message: string; accept: string; learnMore: string;
   };
   resetPassword: {
     newPassword: string; chooseSecure: string; newPasswordLabel: string;
