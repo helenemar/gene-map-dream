@@ -470,8 +470,8 @@ const Dashboard: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: file.isShared ? 'hsl(var(--muted-foreground))' : 'hsl(var(--primary))' }}>
-                            <span className="text-[10px] font-bold text-primary-foreground">
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: file.isShared ? getSharedAvatarColor(file.ownerName || '') : 'hsl(var(--primary))' }}>
+                            <span className="text-[10px] font-bold text-white">
                               {file.isShared ? file.ownerInitials : userInitials}
                             </span>
                           </div>
