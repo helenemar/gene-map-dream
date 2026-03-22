@@ -32,6 +32,5 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          server-dir: ./
-          state-name: .ftp-deploy-sync-state.json
-          delete-destination: true
+          server-dir: /  # On essaie le slash seul
+          dry-run: false
