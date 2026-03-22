@@ -130,6 +130,8 @@ export const fr: Translations = {
     googleError: 'Erreur de connexion Google',
     minCharsPlaceholder: '6 caractères minimum',
     welcomeToast: 'Bienvenue sur Genogy,',
+    acceptPrivacy: "J'accepte la politique de confidentialité",
+    acceptPrivacyRequired: 'Vous devez accepter la politique de confidentialité pour créer un compte.',
   },
 
   // ── Dashboard ──
