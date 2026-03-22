@@ -3,7 +3,7 @@ name: Deploy Website to Hostinger
 on:
   push:
     branches:
-      - main # Vérifie que ta branche Lovable s'appelle bien main
+      - main
 
 jobs:
   build-and-deploy:
@@ -22,14 +22,16 @@ jobs:
       - name: 📦 Installation des dépendances
         run: npm install
 
-      - name: 🏗️ Build du projet (Vite)
+      - name: 🏗️ Build du projet
         run: npm run build
 
       - name: 🚀 Déploiement via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}  
+          server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/  # Le dossier généré par Lovable/Vite
-          server-dir: public_html/ # Le dossier de destination chez Hostinger
+          local-dir: ./dist/
+          server-dir: public_html/
+          state-name: .ftp-deploy-sync-state.json
+          delete-destination: true
