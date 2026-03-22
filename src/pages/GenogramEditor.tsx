@@ -32,6 +32,7 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { usePathologies } from '@/hooks/usePathologies';
+import { useSharedAutoSave } from '@/hooks/useSharedAutoSave';
 import { toast } from 'sonner';
 import { Undo2, Redo2, Link } from 'lucide-react';
 
@@ -131,14 +132,26 @@ function getDirectionalAnchors(from: FamilyMember, to: FamilyMember) {
 }
 
 
-const GenogramEditor: React.FC = () => {
+interface GenogramEditorProps {
+  shareToken?: string;
+  sharedInitialData?: {
+    name: string;
+    members: FamilyMember[];
+    unions: Union[];
+    emotionalLinks: EmotionalLink[];
+  };
+}
+
+const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedInitialData }) => {
+  const isSharedMode = !!shareToken;
   const { id: genogramId } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [dbLoaded, setDbLoaded] = useState(false);
-  const onboarding = useOnboarding(genogramId);
+  const onboarding = useOnboarding(isSharedMode ? undefined : genogramId);
 
-  // Initialize with empty state — will be populated from DB or sample data
+  // Initialize with empty state — will be populated from DB, shared data, or sample data
   const [members, setMembers] = useState<FamilyMember[]>(() => {
+    if (sharedInitialData) return sharedInitialData.members;
     if (genogramId) return []; // Will load from DB
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -152,12 +165,12 @@ const GenogramEditor: React.FC = () => {
   const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set());
   const [anchorActiveMember, setAnchorActiveMember] = useState<string | null>(null);
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
-  const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(() => genogramId ? [] : SAMPLE_EMOTIONAL_LINKS);
-  const [unions, setUnions] = useState<Union[]>(() => genogramId ? [] : SAMPLE_UNIONS);
-  const { pathologies: dynamicPathologies, addPathology, deletePathology } = usePathologies(genogramId);
+  const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(() => sharedInitialData ? sharedInitialData.emotionalLinks : (genogramId ? [] : SAMPLE_EMOTIONAL_LINKS));
+  const [unions, setUnions] = useState<Union[]>(() => sharedInitialData ? sharedInitialData.unions : (genogramId ? [] : SAMPLE_UNIONS));
+  const { pathologies: dynamicPathologies, addPathology, deletePathology } = usePathologies(isSharedMode ? undefined : genogramId);
   const search = useFamilySearch(members, unions, emotionalLinks, dynamicPathologies);
   const [editingUnionId, setEditingUnionId] = useState<string | null>(null);
-  const [fileName, setFileName] = useState('Sans titre');
+  const [fileName, setFileName] = useState(sharedInitialData?.name || 'Sans titre');
   const [isAnimating, setIsAnimating] = useState(false);
   const [snapToGrid, setSnapToGrid] = useState(true);
   const [smartGuides, setSmartGuides] = useState<{ type: 'horizontal' | 'vertical'; pos: number; from: number; to: number }[]>([]);
@@ -198,14 +211,16 @@ const GenogramEditor: React.FC = () => {
   // ─── Notes du dossier ───
   const [notesModalOpen, setNotesModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
-  const noteCount = useGenogramNoteCount(genogramId);
+  const noteCount = useGenogramNoteCount(isSharedMode ? undefined : genogramId);
 
   // ─── Auto-save ───
-  const { saveStatus, debouncedSave, saveNow } = useAutoSave(genogramId ?? null);
+  const ownerAutoSave = useAutoSave(isSharedMode ? null : (genogramId ?? null));
+  const sharedAutoSave = useSharedAutoSave(shareToken ?? null);
+  const { saveStatus, debouncedSave, saveNow } = isSharedMode ? sharedAutoSave : ownerAutoSave;
 
-  // ─── Load genogram from DB ───
+  // ─── Load genogram from DB (owner mode only) ───
   useEffect(() => {
-    if (!genogramId || !user) return;
+    if (isSharedMode || !genogramId || !user) return;
     const load = async () => {
       const { data, error } = await supabase
         .from('genograms')
@@ -248,13 +263,34 @@ const GenogramEditor: React.FC = () => {
       }
     };
     load();
-  }, [genogramId, user]);
+  }, [genogramId, user, isSharedMode]);
+
+  // ─── Center canvas for shared mode on mount ───
+  useEffect(() => {
+    if (!isSharedMode || !sharedInitialData || sharedInitialData.members.length === 0) return;
+    setDbLoaded(true);
+    requestAnimationFrame(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const m = sharedInitialData.members[0];
+      setPan({
+        x: rect.width / 2 - (m.x + CARD_W / 2),
+        y: rect.height / 2 - (m.y + CARD_H / 2),
+      });
+    });
+  }, [isSharedMode, sharedInitialData]);
 
   // ─── Trigger auto-save on data changes ───
   useEffect(() => {
+    if (isSharedMode) {
+      if (!dbLoaded) return;
+      debouncedSave({ members, unions, emotionalLinks }, fileName);
+      return;
+    }
     if (!genogramId || !dbLoaded) return;
     debouncedSave({ members, unions, emotionalLinks }, fileName);
-  }, [members, unions, emotionalLinks, fileName, genogramId, dbLoaded]);
+  }, [members, unions, emotionalLinks, fileName, genogramId, dbLoaded, isSharedMode]);
 
   // ─── Undo/Redo system ───
   type CanvasSnapshot = { members: FamilyMember[]; unions: Union[]; emotionalLinks: EmotionalLink[] };
@@ -1411,11 +1447,11 @@ const GenogramEditor: React.FC = () => {
             toast('Export PDF en cours…', { duration: 2000 });
           }
         }}
-        saveStatus={genogramId ? saveStatus : undefined}
-        onOpenNotes={() => setNotesModalOpen(true)}
-        noteCount={noteCount}
-        onShare={() => genogramId && setShareModalOpen(true)}
-        onBack={() => setShowLeaveDialog(true)}
+        saveStatus={(genogramId || isSharedMode) ? saveStatus : undefined}
+        onOpenNotes={isSharedMode ? undefined : () => setNotesModalOpen(true)}
+        noteCount={isSharedMode ? 0 : noteCount}
+        onShare={isSharedMode ? undefined : () => genogramId && setShareModalOpen(true)}
+        onBack={() => isSharedMode ? navigate('/') : setShowLeaveDialog(true)}
       />
       <div className="flex flex-1 overflow-hidden">
         {!presentationMode && (
@@ -1845,7 +1881,7 @@ const GenogramEditor: React.FC = () => {
           })()}
         </div>
       </div>
-      {genogramId && (
+      {genogramId && !isSharedMode && (
         <DossierNotesModal
           open={notesModalOpen}
           onClose={() => setNotesModalOpen(false)}
@@ -1853,7 +1889,7 @@ const GenogramEditor: React.FC = () => {
           genogramName={fileName}
         />
       )}
-      {genogramId && (
+      {genogramId && !isSharedMode && (
         <ShareModal
           open={shareModalOpen}
           onOpenChange={setShareModalOpen}

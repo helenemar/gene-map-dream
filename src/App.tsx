@@ -12,6 +12,7 @@ import DesignSystemPage from "./pages/DesignSystem";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import SharedGenogram from "./pages/SharedGenogram";
+import SharedEditor from "./pages/SharedEditor";
 import NotFound from "./pages/NotFound";
 import Account from "./pages/Account";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/editor/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
             <Route path="/tree/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
             <Route path="/shared/:token" element={<SharedGenogram />} />
+            <Route path="/shared-edit/:token" element={<SharedEditor />} />
             <Route path="/design-system" element={<DesignSystemPage />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
