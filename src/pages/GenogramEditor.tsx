@@ -211,14 +211,16 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   // ─── Notes du dossier ───
   const [notesModalOpen, setNotesModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
-  const noteCount = useGenogramNoteCount(genogramId);
+  const noteCount = useGenogramNoteCount(isSharedMode ? undefined : genogramId);
 
   // ─── Auto-save ───
-  const { saveStatus, debouncedSave, saveNow } = useAutoSave(genogramId ?? null);
+  const ownerAutoSave = useAutoSave(isSharedMode ? null : (genogramId ?? null));
+  const sharedAutoSave = useSharedAutoSave(shareToken ?? null);
+  const { saveStatus, debouncedSave, saveNow } = isSharedMode ? sharedAutoSave : ownerAutoSave;
 
-  // ─── Load genogram from DB ───
+  // ─── Load genogram from DB (owner mode only) ───
   useEffect(() => {
-    if (!genogramId || !user) return;
+    if (isSharedMode || !genogramId || !user) return;
     const load = async () => {
       const { data, error } = await supabase
         .from('genograms')
@@ -261,13 +263,34 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       }
     };
     load();
-  }, [genogramId, user]);
+  }, [genogramId, user, isSharedMode]);
+
+  // ─── Center canvas for shared mode on mount ───
+  useEffect(() => {
+    if (!isSharedMode || !sharedInitialData || sharedInitialData.members.length === 0) return;
+    setDbLoaded(true);
+    requestAnimationFrame(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const m = sharedInitialData.members[0];
+      setPan({
+        x: rect.width / 2 - (m.x + CARD_W / 2),
+        y: rect.height / 2 - (m.y + CARD_H / 2),
+      });
+    });
+  }, [isSharedMode, sharedInitialData]);
 
   // ─── Trigger auto-save on data changes ───
   useEffect(() => {
+    if (isSharedMode) {
+      if (!dbLoaded) return;
+      debouncedSave({ members, unions, emotionalLinks }, fileName);
+      return;
+    }
     if (!genogramId || !dbLoaded) return;
     debouncedSave({ members, unions, emotionalLinks }, fileName);
-  }, [members, unions, emotionalLinks, fileName, genogramId, dbLoaded]);
+  }, [members, unions, emotionalLinks, fileName, genogramId, dbLoaded, isSharedMode]);
 
   // ─── Undo/Redo system ───
   type CanvasSnapshot = { members: FamilyMember[]; unions: Union[]; emotionalLinks: EmotionalLink[] };
