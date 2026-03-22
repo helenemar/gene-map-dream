@@ -197,8 +197,8 @@ const SharedGenogram: React.FC = () => {
         >
           <FamilyLinkLines members={members} unions={unions} />
 
-          {/* Emotional links */}
-          <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
+          {/* Emotional links — below cards (z-index 5) */}
+          <svg className="absolute pointer-events-none" style={{ zIndex: 5, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
             {emotionalLinks.map((link) => {
               const from = members.find(m => m.id === link.from);
               const to = members.find(m => m.id === link.to);
