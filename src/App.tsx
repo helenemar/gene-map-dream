@@ -33,29 +33,29 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <MobileBlocker>
             <BrowserRouter>
-              <Routes>
+              <MobileBlocker>
+                <Routes>
                 
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/auth" element={<Navigate to="/" replace />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/editor" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
-                <Route path="/editor/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
-                <Route path="/tree/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
-                <Route path="/shared/:token" element={<SharedGenogram />} />
-                <Route path="/shared-edit/:token" element={<SharedEditor />} />
-                <Route path="/design-system" element={<DesignSystemPage />} />
-                <Route path="/privacy" element={<PrivacyPolicy />} />
-                <Route path="/legal" element={<LegalNotice />} />
-                <Route path="/terms" element={<TermsOfService />} />
-                <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <CookieBanner />
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/auth" element={<Navigate to="/" replace />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/editor" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
+                  <Route path="/editor/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
+                  <Route path="/tree/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
+                  <Route path="/shared/:token" element={<SharedGenogram />} />
+                  <Route path="/shared-edit/:token" element={<SharedEditor />} />
+                  <Route path="/design-system" element={<DesignSystemPage />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/legal" element={<LegalNotice />} />
+                  <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <CookieBanner />
+              </MobileBlocker>
             </BrowserRouter>
-          </MobileBlocker>
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
