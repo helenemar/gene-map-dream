@@ -252,6 +252,21 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
                         </div>
                       </div>
 
+                      <div className="flex items-start gap-2.5">
+                        <Checkbox
+                          id="accept-privacy"
+                          checked={acceptPrivacy}
+                          onCheckedChange={(checked) => setAcceptPrivacy(checked === true)}
+                          className="mt-0.5"
+                        />
+                        <label htmlFor="accept-privacy" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                          {t.auth.acceptPrivacy}{' '}
+                          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                            →
+                          </a>
+                        </label>
+                      </div>
+
                       {error && <p className="text-sm text-destructive">{error}</p>}
 
                       <Button type="submit" className="w-full h-11 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90" disabled={submitting}>
