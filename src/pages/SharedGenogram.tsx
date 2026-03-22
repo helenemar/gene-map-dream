@@ -195,7 +195,7 @@ const SharedGenogram: React.FC = () => {
             willChange: 'transform',
           }}
         >
-          <FamilyLinkLines members={members} unions={unions} />
+          <FamilyLinkLines members={members} unions={unions} variant="shared" />
 
           {/* Emotional links — below cards (z-index 5) */}
           <svg className="absolute pointer-events-none" style={{ zIndex: 5, overflow: 'visible', top: 0, left: 0, width: 1, height: 1 }}>
