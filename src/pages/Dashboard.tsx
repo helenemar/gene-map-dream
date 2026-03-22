@@ -167,8 +167,13 @@ const Dashboard: React.FC = () => {
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-  const displayName = 'Sophie Marchand';
-  const userInitials = 'SM';
+  const displayName = profile?.display_name
+    || (profile?.first_name && profile?.last_name ? `${profile.first_name} ${profile.last_name}` : null)
+    || user?.email?.split('@')[0]
+    || '?';
+  const userInitials = profile?.first_name && profile?.last_name
+    ? `${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase()
+    : displayName.slice(0, 2).toUpperCase();
 
   return (
     <div className="min-h-screen bg-card">
