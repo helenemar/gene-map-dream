@@ -115,9 +115,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
   };
 
   const getOAuthRedirectUri = () => {
-    const host = window.location.hostname;
-    const isCustomDomain = !host.endsWith('.lovable.app') && !host.endsWith('.lovableproject.com');
-    return isCustomDomain ? 'https://gene-map-dream.lovable.app' : window.location.origin;
+    return getRedirectOrigin();
   };
 
   const handleGoogleAuth = async () => {

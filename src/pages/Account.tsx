@@ -90,7 +90,7 @@ const Account: React.FC = () => {
   const handlePasswordReset = async () => {
     setSendingPassword(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${getRedirectOrigin()}/reset-password`,
     });
     if (error) {
       toast.error(t.account.emailSendError);
