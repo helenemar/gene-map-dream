@@ -14,6 +14,7 @@ interface FamilyLinkLinesProps {
   searchMatchedUnionIds?: Set<string>;
   isSearchActive?: boolean;
   highlightedUnionStatus?: UnionStatus | null;
+  variant?: 'default' | 'shared';
 }
 
 const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') => {
@@ -28,24 +29,28 @@ const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') =
 const UnionLine: React.FC<{
   x1: number; y1: number; x2: number; y2: number;
   status: UnionStatus;
-}> = ({ x1, y1, x2, y2, status }) => {
+  variant?: 'default' | 'shared';
+}> = ({ x1, y1, x2, y2, status, variant = 'default' }) => {
   const lineY = (y1 + y2) / 2;
-  const stroke = 'hsl(var(--foreground))';
+  const isSharedVariant = variant === 'shared';
+  const stroke = isSharedVariant ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))';
   const opacity = 1;
+  const lineWidth = isSharedVariant ? 2.5 : 2;
+  const connectorWidth = isSharedVariant ? 2.25 : 1.5;
   const needsConnectors = Math.abs(y1 - y2) > 1;
   const dashArray = (status === 'common_law' || status === 'love_affair') ? '8 4' : undefined;
 
   return (
     <g>
       <line x1={x1} y1={lineY} x2={x2} y2={lineY}
-        stroke={stroke} strokeWidth={2} strokeOpacity={opacity}
+        stroke={stroke} strokeWidth={lineWidth} strokeOpacity={opacity}
         strokeDasharray={dashArray} />
       {needsConnectors && (
         <>
           <line x1={x1} y1={y1} x2={x1} y2={lineY}
-            stroke={stroke} strokeWidth={1.5} strokeOpacity={opacity * 0.6} />
+            stroke={stroke} strokeWidth={connectorWidth} strokeOpacity={opacity} />
           <line x1={x2} y1={y2} x2={x2} y2={lineY}
-            stroke={stroke} strokeWidth={1.5} strokeOpacity={opacity * 0.6} />
+            stroke={stroke} strokeWidth={connectorWidth} strokeOpacity={opacity} />
         </>
       )}
     </g>
@@ -105,12 +110,13 @@ function buildAvoidingVerticalPath(
   return d;
 }
 
-const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, searchMatchedUnionIds, isSearchActive, highlightedUnionStatus }) => {
+const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, searchMatchedUnionIds, isSearchActive, highlightedUnionStatus, variant = 'default' }) => {
   const getMember = (id: string) => members.find(m => m.id === id);
 
-  const stroke = 'hsl(var(--foreground))';
+  const isSharedVariant = variant === 'shared';
+  const stroke = isSharedVariant ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))';
   const opacity = 1;
-  const sw = 1.5;
+  const sw = isSharedVariant ? 2.25 : 1.5;
 
   // ═══ PHASE 1: Compute all union line positions & comb data ═══
   interface UnionGeometry {
@@ -307,6 +313,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
             x1={leftAnchor.x} y1={leftAnchor.y}
             x2={rightAnchor.x} y2={rightAnchor.y}
             status={union.status}
+            variant={variant}
           />
         </g>
       );
@@ -323,6 +330,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
             x1={leftAnchor.x} y1={leftAnchor.y}
             x2={rightAnchor.x} y2={rightAnchor.y}
             status={union.status}
+            variant={variant}
           />
           {/* Straight vertical stem */}
           <line x1={directX} y1={unionLineY} x2={directX} y2={singleChildAnchor.y}
@@ -500,7 +508,11 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
   return (
     <>
       {/* Structural lines layer */}
-      <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, transition: 'opacity 0.3s' }}>
+      <svg
+        className="absolute pointer-events-none"
+        shapeRendering={isSharedVariant ? 'geometricPrecision' : undefined}
+        style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, transition: 'opacity 0.3s' }}
+      >
         {/* Glow filter for highlighted unions */}
         <defs>
           <filter id="union-glow" x="-30%" y="-30%" width="160%" height="160%">
