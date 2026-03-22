@@ -81,7 +81,10 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const { lang, setLang, t } = useLanguage();
-  const [authModal, setAuthModal] = useState<{ open: boolean; view: 'login' | 'signup' }>({ open: false, view: 'login' });
+  const [authModal, setAuthModal] = useState<{
+    open: boolean;
+    view: 'login' | 'signup';
+  }>({ open: false, view: 'login' });
 
   // Auto-redirect authenticated users to dashboard
   React.useEffect(() => {
