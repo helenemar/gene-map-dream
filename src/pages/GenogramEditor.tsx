@@ -35,7 +35,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { usePathologies } from '@/hooks/usePathologies';
 import { useSharedAutoSave } from '@/hooks/useSharedAutoSave';
 import { toast } from 'sonner';
-import { Undo2, Redo2, Link } from 'lucide-react';
+import { Undo2, Redo2, Link, Eye } from 'lucide-react';
 
 // Card bounding box
 const CARD_W = MEMBER_CARD_W;
