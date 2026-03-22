@@ -469,11 +469,13 @@ const Dashboard: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'hsl(var(--primary))' }}>
-                            <span className="text-[10px] font-bold text-primary-foreground">{userInitials}</span>
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: file.isShared ? 'hsl(var(--muted-foreground))' : 'hsl(var(--primary))' }}>
+                            <span className="text-[10px] font-bold text-primary-foreground">
+                              {file.isShared ? file.ownerInitials : userInitials}
+                            </span>
                           </div>
                           <span className="text-[13px] text-foreground">
-                            {displayName} <span className="text-muted-foreground">{t.dashboard.me}</span>
+                            {file.isShared ? file.ownerName : <>{displayName} <span className="text-muted-foreground">{t.dashboard.me}</span></>}
                           </span>
                         </div>
                       </TableCell>
