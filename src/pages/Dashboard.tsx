@@ -174,6 +174,12 @@ const Dashboard: React.FC = () => {
                     <rect x="12" width="12" height="24" fill="#fff" />
                     <rect x="24" width="12" height="24" fill="#ED2939" />
                   </svg>
+                ) : lang === 'de' ? (
+                  <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
+                    <rect width="36" height="8" fill="#000" />
+                    <rect y="8" width="36" height="8" fill="#DD0000" />
+                    <rect y="16" width="36" height="8" fill="#FFCC00" />
+                  </svg>
                 ) : (
                   <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
                     <rect width="36" height="24" fill="#012169" />
@@ -205,6 +211,14 @@ const Dashboard: React.FC = () => {
                   <path d="M18,0 V24 M0,12 H36" stroke="#C8102E" strokeWidth="3.5" />
                 </svg>
                 <span className={lang === 'en' ? 'font-semibold' : ''}>{t.common.english}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLang('de')} className="gap-2.5 cursor-pointer">
+                <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden shrink-0" aria-hidden="true">
+                  <rect width="36" height="8" fill="#000" />
+                  <rect y="8" width="36" height="8" fill="#DD0000" />
+                  <rect y="16" width="36" height="8" fill="#FFCC00" />
+                </svg>
+                <span className={lang === 'de' ? 'font-semibold' : ''}>{t.common.german}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
