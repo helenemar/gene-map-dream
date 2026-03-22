@@ -252,7 +252,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                       transition={{ type: 'spring', stiffness: 350, damping: 18 }}
                       className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 text-primary"
                     >
-                      {currentTip.icon}
+                      {STEP_ICONS[tipIndex]}
                     </motion.div>
                     <div className="flex-1 min-w-0">
                       <motion.h3
@@ -262,7 +262,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                         transition={{ delay: 0.05 }}
                         className="text-sm font-semibold text-foreground mb-1"
                       >
-                        {currentTip.title}
+                        {currentStep?.title}
                       </motion.h3>
                       <motion.p
                         key={`desc-${step}`}
@@ -271,9 +271,9 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                         transition={{ delay: 0.1 }}
                         className="text-[13px] text-muted-foreground leading-relaxed"
                       >
-                        {currentTip.description}
+                        {currentStep?.description}
                       </motion.p>
-                      {currentTip.shortcut && (
+                      {currentStep?.shortcut && (
                         <motion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -281,7 +281,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                           className="mt-2"
                         >
                           <span className="inline-block text-xs font-mono px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border">
-                            {currentTip.shortcut}
+                            {currentStep.shortcut}
                           </span>
                         </motion.div>
                       )}
@@ -301,7 +301,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
 
                   {/* Progress dots */}
                   <div className="flex items-center justify-center gap-1.5 mb-3.5">
-                    {STEPS.map((_, i) => (
+                    {steps.map((_, i) => (
                       <motion.div
                         key={i}
                         animate={{
@@ -325,11 +325,11 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                       className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4" />
-                      Précédent
+                      {t.onboarding.previous}
                     </button>
 
                     <span className="text-xs text-muted-foreground tabular-nums">
-                      {tipIndex + 1} / {STEPS.length}
+                      {tipIndex + 1} / {steps.length}
                     </span>
 
                     {isLastStep ? (
@@ -338,13 +338,13 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                           onClick={onDismiss}
                           className="px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground transition-colors"
                         >
-                          Ne plus afficher
+                          {t.onboarding.neverShow}
                         </button>
                         <button
                           onClick={onFinish}
                           className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
                         >
-                          Terminer
+                          {t.onboarding.finish}
                         </button>
                       </div>
                     ) : (
@@ -352,7 +352,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                         onClick={onNext}
                         className="flex items-center gap-1 text-sm text-primary font-medium hover:text-primary/80 transition-colors"
                       >
-                        Suivant
+                        {t.onboarding.next}
                         <ChevronRight className="w-4 h-4" />
                       </button>
                     )}
