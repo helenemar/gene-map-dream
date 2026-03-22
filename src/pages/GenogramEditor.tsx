@@ -211,7 +211,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   // ─── Notes du dossier ───
   const [notesModalOpen, setNotesModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
-  const noteCount = useGenogramNoteCount(isSharedMode ? undefined : genogramId);
+  const { count: noteCount, refresh: refreshNoteCount } = useGenogramNoteCount(isSharedMode ? undefined : genogramId);
 
   // ─── Auto-save ───
   const ownerAutoSave = useAutoSave(isSharedMode ? null : (genogramId ?? null));
@@ -1884,7 +1884,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       {genogramId && !isSharedMode && (
         <DossierNotesModal
           open={notesModalOpen}
-          onClose={() => setNotesModalOpen(false)}
+          onClose={() => { setNotesModalOpen(false); refreshNoteCount(); }}
           genogramId={genogramId}
           genogramName={fileName}
         />

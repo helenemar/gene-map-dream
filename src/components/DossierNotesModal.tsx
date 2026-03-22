@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, ArrowLeft, FileText, Download, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -328,6 +328,7 @@ export default DossierNotesModal;
 /** Hook to fetch note count for a genogram */
 export function useGenogramNoteCount(genogramId: string | undefined) {
   const [count, setCount] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   useEffect(() => {
     if (!genogramId) return;
     supabase
@@ -335,6 +336,7 @@ export function useGenogramNoteCount(genogramId: string | undefined) {
       .select('id', { count: 'exact', head: true })
       .eq('genogram_id', genogramId)
       .then(({ count: c }) => setCount(c ?? 0));
-  }, [genogramId]);
-  return count;
+  }, [genogramId, refreshKey]);
+  const refresh = useCallback(() => setRefreshKey(k => k + 1), []);
+  return { count, refresh };
 }
