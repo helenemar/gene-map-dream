@@ -222,9 +222,8 @@ const LandingPage: React.FC = () => {
                 {t.landing.heroTitle1}
                 <br />
                 {t.landing.heroTitle2}{' '}
+                {t.landing.heroTitle3}{' '}
                 <span className="text-primary">{t.landing.heroTitle4}</span>
-                <br />
-                {t.landing.heroTitle3}
               </h1>
 
               <p className="text-muted-foreground text-[13px] sm:text-[14px] leading-[1.5] mb-1 max-w-[420px]">
