@@ -20,11 +20,11 @@ const SECTIONS = [
     content: `L'accès au service nécessite la création d'un compte utilisateur avec une adresse e-mail valide.\n\nGenogy se réserve le droit de suspendre ou de supprimer un compte en cas de violation des présentes CGU, sans préavis ni indemnité.`,
   },
   {
-    title: '4. Obligations de l'utilisateur',
+    title: "4. Obligations de l'utilisateur",
     content: `L'utilisateur s'engage à :\n\n• Fournir des informations exactes lors de son inscription.\n• Ne pas utiliser le service à des fins illicites ou contraires aux bonnes mœurs.\n• Ne pas tenter de compromettre la sécurité ou le fonctionnement du service.\n• Respecter la confidentialité des données qu'il saisit, notamment les données relatives à des tiers.\n• Ne pas partager ses identifiants de connexion avec des tiers.`,
   },
   {
-    title: '5. Responsabilité de l'utilisateur',
+    title: "5. Responsabilité de l'utilisateur",
     content: `L'utilisateur est seul responsable du contenu qu'il saisit dans ses génogrammes. Il lui appartient de s'assurer que les informations saisies respectent le droit à la vie privée des personnes concernées et la réglementation en vigueur.\n\nGenogy ne saurait être tenu responsable de l'utilisation faite par l'utilisateur des informations saisies dans le service.`,
   },
   {
