@@ -100,7 +100,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[520px] p-0 gap-0 border-none [&>button]:hidden">
-        <div className="relative flex flex-col px-8 py-8">
+        <div className="relative flex flex-col px-5 py-6 sm:px-8 sm:py-8">
           <button
             onClick={() => onOpenChange(false)}
             className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
@@ -117,7 +117,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
               <span className="text-sm font-medium text-foreground">{t.shareModal.linkSharing}</span>
             </div>
 
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-3">
               <div className="flex items-center gap-1 bg-muted rounded-full p-0.5 flex-1">
                 <button
                   onClick={() => setLinkAccess('reader')}
@@ -136,7 +136,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
                   <Pencil className="w-3 h-3" /> {t.shareModal.editorAccess}
                 </button>
               </div>
-              <Button size="sm" onClick={createLinkShare} disabled={loading} className="rounded-full gap-1.5">
+              <Button size="sm" onClick={createLinkShare} disabled={loading} className="rounded-full gap-1.5 w-full sm:w-auto">
                 <Link2 className="w-3.5 h-3.5" />
                 {t.shareModal.generate}
               </Button>
