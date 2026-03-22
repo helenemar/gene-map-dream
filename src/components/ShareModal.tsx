@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { X, Copy, Check, Link2, Mail, Eye, Pencil, Trash2, Globe, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 
 type AccessLevel = 'reader' | 'editor';
@@ -26,6 +27,7 @@ interface ShareModalProps {
 
 const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId, genogramName }) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [shares, setShares] = useState<Share[]>([]);
   const [loading, setLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -61,9 +63,9 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
         created_by: user.id,
       } as any);
     if (error) {
-      toast.error('Erreur lors de la création du lien');
+      toast.error(t.shareModal.linkError);
     } else {
-      toast.success('Lien de partage créé');
+      toast.success(t.shareModal.linkCreated);
       await fetchShares();
     }
     setLoading(false);
@@ -81,9 +83,9 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
         created_by: user.id,
       } as any);
     if (error) {
-      toast.error('Erreur lors de l\'invitation');
+      toast.error(t.shareModal.inviteError);
     } else {
-      toast.success(`Invitation envoyée à ${inviteEmail.trim()}`);
+      toast.success(`${t.shareModal.inviteSent} ${inviteEmail.trim()}`);
       setInviteEmail('');
       await fetchShares();
     }
@@ -96,14 +98,14 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
       .update({ is_active: false } as any)
       .eq('id', shareId);
     await fetchShares();
-    toast.success('Partage supprimé');
+    toast.success(t.shareModal.shareDeleted);
   };
 
   const copyLink = (token: string, shareId: string) => {
     const url = `${window.location.origin}/shared/${token}`;
     navigator.clipboard.writeText(url);
     setCopiedId(shareId);
-    toast.success('Lien copié dans le presse-papiers');
+    toast.success(t.shareModal.linkCopied);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
@@ -114,7 +116,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
         : 'bg-muted text-muted-foreground'
     }`}>
       {level === 'editor' ? <Pencil className="w-2.5 h-2.5" /> : <Eye className="w-2.5 h-2.5" />}
-      {level === 'editor' ? 'Éditeur' : 'Lecteur'}
+      {level === 'editor' ? t.shareModal.editorAccess : t.shareModal.reader}
     </span>
   );
 
@@ -122,7 +124,6 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[520px] p-0 gap-0 border-none [&>button]:hidden">
         <div className="relative flex flex-col px-8 py-8">
-          {/* Close */}
           <button
             onClick={() => onOpenChange(false)}
             className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
@@ -130,15 +131,13 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
             <X className="w-5 h-5 text-foreground" />
           </button>
 
-          {/* Title */}
-          <h2 className="text-lg font-semibold text-foreground mb-1">Partager</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-1">{t.shareModal.title}</h2>
           <p className="text-sm text-muted-foreground mb-6">« {genogramName} »</p>
 
-          {/* ─── Link Sharing Section ─── */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
               <Globe className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-foreground">Lien de partage</span>
+              <span className="text-sm font-medium text-foreground">{t.shareModal.linkSharing}</span>
             </div>
 
             <div className="flex items-center gap-2 mb-3">
@@ -149,7 +148,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
                     linkAccess === 'reader' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
                   }`}
                 >
-                  <Eye className="w-3 h-3" /> Lecteur
+                  <Eye className="w-3 h-3" /> {t.shareModal.reader}
                 </button>
                 <button
                   onClick={() => setLinkAccess('editor')}
@@ -157,16 +156,15 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
                     linkAccess === 'editor' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
                   }`}
                 >
-                  <Pencil className="w-3 h-3" /> Éditeur
+                  <Pencil className="w-3 h-3" /> {t.shareModal.editorAccess}
                 </button>
               </div>
               <Button size="sm" onClick={createLinkShare} disabled={loading} className="rounded-full gap-1.5">
                 <Link2 className="w-3.5 h-3.5" />
-                Générer
+                {t.shareModal.generate}
               </Button>
             </div>
 
-            {/* Existing link shares */}
             {linkShares.length > 0 && (
               <div className="space-y-2">
                 {linkShares.map(share => (
@@ -197,11 +195,10 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
             )}
           </div>
 
-          {/* ─── Email Invitation Section ─── */}
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Users className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-foreground">Inviter par email</span>
+              <span className="text-sm font-medium text-foreground">{t.shareModal.inviteByEmail}</span>
             </div>
 
             <div className="flex items-center gap-2 mb-3">
@@ -212,7 +209,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
                     inviteAccess === 'reader' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
                   }`}
                 >
-                  <Eye className="w-3 h-3" /> Lecteur
+                  <Eye className="w-3 h-3" /> {t.shareModal.reader}
                 </button>
                 <button
                   onClick={() => setInviteAccess('editor')}
@@ -220,7 +217,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
                     inviteAccess === 'editor' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'
                   }`}
                 >
-                  <Pencil className="w-3 h-3" /> Éditeur
+                  <Pencil className="w-3 h-3" /> {t.shareModal.editorAccess}
                 </button>
               </div>
             </div>
@@ -236,11 +233,10 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
               />
               <Button size="sm" onClick={inviteByEmail} disabled={loading || !inviteEmail.trim()} className="rounded-full gap-1.5">
                 <Mail className="w-3.5 h-3.5" />
-                Inviter
+                {t.shareModal.invite}
               </Button>
             </div>
 
-            {/* Existing email invitations */}
             {emailShares.length > 0 && (
               <div className="space-y-2 mt-3">
                 {emailShares.map(share => (

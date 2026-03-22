@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 
@@ -39,11 +40,14 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
   open, onClose, genogramId, genogramName = 'Génogramme',
 }) => {
   const { user } = useAuth();
+  const { t, lang } = useLanguage();
   const [view, setView] = useState<'list' | 'add'>('list');
   const [notes, setNotes] = useState<GenogramNote[]>([]);
   const [loading, setLoading] = useState(false);
   const [newContent, setNewContent] = useState('');
   const [saving, setSaving] = useState(false);
+
+  const locale = lang === 'fr' ? 'fr-FR' : 'en-US';
 
   const fetchNotes = async () => {
     if (!genogramId) return;
@@ -54,7 +58,7 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
       .eq('genogram_id', genogramId)
       .order('created_at', { ascending: false });
     if (error) {
-      toast.error('Erreur lors du chargement des notes');
+      toast.error(t.notesModal.noteLoadError);
     } else {
       setNotes((data as GenogramNote[]) || []);
     }
@@ -78,9 +82,9 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
       content: newContent.trim(),
     });
     if (error) {
-      toast.error('Erreur lors de l\'enregistrement');
+      toast.error(t.notesModal.noteSaveError);
     } else {
-      toast.success('Note enregistrée');
+      toast.success(t.notesModal.noteSaved);
       setNewContent('');
       setView('list');
       fetchNotes();
@@ -91,7 +95,7 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
   const handleDelete = async (noteId: string) => {
     const { error } = await supabase.from('genogram_notes').delete().eq('id', noteId);
     if (error) {
-      toast.error('Erreur lors de la suppression');
+      toast.error(t.notesModal.noteDeleteError);
     } else {
       setNotes(prev => prev.filter(n => n.id !== noteId));
     }
@@ -100,8 +104,8 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
   const formatDateTime = (iso: string) => {
     const d = new Date(iso);
     return {
-      date: d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-      time: d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+      date: d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' }),
+      time: d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }),
     };
   };
 
@@ -119,7 +123,7 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(120);
-    doc.text(`Exporté le ${new Date().toLocaleDateString('fr-FR')}`, margin, y);
+    doc.text(`${t.notesModal.exportedOn} ${new Date().toLocaleDateString(locale)}`, margin, y);
     y += 12;
     doc.setTextColor(0);
 
@@ -127,7 +131,7 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
       const { date, time } = formatDateTime(note.created_at);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
-      doc.text(`${date} à ${time}`, margin, y);
+      doc.text(`${date} — ${time}`, margin, y);
       y += 6;
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
@@ -173,10 +177,8 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
           animate="visible"
           exit="exit"
         >
-          {/* Overlay */}
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
-          {/* Modal */}
           <motion.div
             className="relative w-full max-w-lg mx-4 bg-card rounded-3xl shadow-2xl border border-border overflow-hidden"
             variants={modalVariants}
@@ -184,7 +186,6 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
             animate="visible"
             exit="exit"
           >
-            {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-border">
               <div className="flex items-center gap-3">
                 {view === 'add' && (
@@ -195,7 +196,7 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-primary" />
                   <h2 className="text-sm font-semibold text-foreground">
-                    {view === 'list' ? 'Notes du dossier' : 'Nouvelle note'}
+                    {view === 'list' ? t.notesModal.dossierNotes : t.notesModal.newNote}
                   </h2>
                 </div>
                 {view === 'list' && notes.length > 0 && (
@@ -209,7 +210,6 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
               </button>
             </div>
 
-            {/* Content */}
             <div className="max-h-[60vh] overflow-y-auto">
               {view === 'list' ? (
                 <div className="px-6 py-4">
@@ -222,8 +222,8 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
                       <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center mb-3">
                         <FileText className="w-5 h-5 text-muted-foreground" />
                       </div>
-                      <p className="text-sm text-muted-foreground mb-1">Aucune note pour ce dossier</p>
-                      <p className="text-xs text-muted-foreground/60">Ajoutez votre première note de séance</p>
+                      <p className="text-sm text-muted-foreground mb-1">{t.notesModal.noNotes}</p>
+                      <p className="text-xs text-muted-foreground/60">{t.notesModal.addFirst}</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -256,7 +256,7 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
                 <div className="px-6 py-4">
                   <Textarea
                     className="min-h-[120px] text-sm border-border/50 bg-background focus-visible:ring-primary/30 resize-none"
-                    placeholder="Observations de séance, points de suivi, remarques cliniques..."
+                    placeholder={t.notesModal.notePlaceholder}
                     value={newContent}
                     onChange={(e) => setNewContent(e.target.value)}
                     autoFocus
@@ -265,7 +265,6 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
               )}
             </div>
 
-            {/* Footer */}
             <div className="px-6 py-4 border-t border-border flex items-center justify-between gap-3">
               {view === 'list' ? (
                 <>
@@ -276,19 +275,19 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
                   </div>
                   <Button onClick={() => setView('add')} size="sm" className="gap-2">
                     <Plus className="w-3.5 h-3.5" />
-                    Ajouter une note
+                    {t.notesModal.addNote}
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button variant="ghost" size="sm" onClick={() => setView('list')}>Annuler</Button>
+                  <Button variant="ghost" size="sm" onClick={() => setView('list')}>{t.common.cancel}</Button>
                   <Button size="sm" onClick={handleSave} disabled={!newContent.trim() || saving} className="gap-2">
                     {saving ? (
                       <div className="w-3.5 h-3.5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <FileText className="w-3.5 h-3.5" />
                     )}
-                    Enregistrer la note
+                    {t.notesModal.saveNote}
                   </Button>
                 </>
               )}
@@ -302,20 +301,21 @@ const DossierNotesModal: React.FC<DossierNotesModalProps> = ({
 
 /** Small dropdown for export options */
 const DropdownExport: React.FC<{ onExportPdf: () => void; onExportText: () => void }> = ({ onExportPdf, onExportText }) => {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   return (
     <div className="relative">
       <Button variant="outline" size="sm" className="gap-2 text-xs" onClick={() => setOpen(!open)}>
         <Download className="w-3.5 h-3.5" />
-        Exporter
+        {t.common.export}
       </Button>
       {open && (
         <div className="absolute bottom-full left-0 mb-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden z-10 min-w-[140px]">
           <button onClick={() => { onExportPdf(); setOpen(false); }} className="w-full text-left px-3 py-2 text-xs hover:bg-accent transition-colors">
-            Exporter en PDF
+            {t.notesModal.exportPdf}
           </button>
           <button onClick={() => { onExportText(); setOpen(false); }} className="w-full text-left px-3 py-2 text-xs hover:bg-accent transition-colors">
-            Exporter en TXT
+            {t.notesModal.exportTxt}
           </button>
         </div>
       )}
