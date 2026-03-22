@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Monitor, Tablet } from 'lucide-react';
 import gogyIcon from '@/assets/genogy-icon.svg';
 
-const EDITOR_ROUTES = ['/editor', '/tree/', '/shared-edit/'];
+const EDITOR_ROUTES = ['/shared-edit/'];
 
 const MobileBlocker: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { pathname } = useLocation();
