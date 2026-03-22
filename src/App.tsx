@@ -23,7 +23,6 @@ import Disclaimer from "./pages/Disclaimer";
 import MobileBlocker from "./components/MobileBlocker";
 import CookieBanner from "./components/CookieBanner";
 
-
 const queryClient = new QueryClient();
 
 const App = () => {
