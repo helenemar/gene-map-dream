@@ -75,9 +75,9 @@ const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-3">
               <li>
-                <a href="mailto:contact@genogy.app" className="text-sm inline-flex items-center gap-2 hover:text-primary transition-colors">
+                <a href="mailto:contact.genogy@gmail.com" className="text-sm inline-flex items-center gap-2 hover:text-primary transition-colors">
                   <Mail className="w-4 h-4 shrink-0" />
-                  contact@genogy.app
+                  contact.genogy@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-3 pt-1">

@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 const SECTIONS = [
   {
     title: '1. Responsable du traitement',
-    content: `Le responsable du traitement des données personnelles collectées via Genogy est la société éditrice de l'application. Pour toute question relative à la protection de vos données, vous pouvez nous contacter à l'adresse suivante : contact@genogy.app.`,
+    content: `Le responsable du traitement des données personnelles collectées via Genogy est la société éditrice de l'application. Pour toute question relative à la protection de vos données, vous pouvez nous contacter à l'adresse suivante : contact.genogy@gmail.com.`,
   },
   {
     title: '2. Données collectées',
@@ -37,7 +37,7 @@ const SECTIONS = [
   },
   {
     title: '8. Vos droits',
-    content: `Conformément au RGPD, vous disposez des droits suivants :\n\n• **Droit d'accès** : obtenir une copie de vos données personnelles.\n• **Droit de rectification** : corriger vos données inexactes.\n• **Droit à l'effacement** : demander la suppression de vos données.\n• **Droit à la portabilité** : recevoir vos données dans un format structuré.\n• **Droit d'opposition** : vous opposer au traitement de vos données.\n• **Droit de limitation** : limiter le traitement de vos données.\n\nPour exercer ces droits, contactez-nous à contact@genogy.app. Nous répondrons dans un délai de 30 jours.`,
+    content: `Conformément au RGPD, vous disposez des droits suivants :\n\n• **Droit d'accès** : obtenir une copie de vos données personnelles.\n• **Droit de rectification** : corriger vos données inexactes.\n• **Droit à l'effacement** : demander la suppression de vos données.\n• **Droit à la portabilité** : recevoir vos données dans un format structuré.\n• **Droit d'opposition** : vous opposer au traitement de vos données.\n• **Droit de limitation** : limiter le traitement de vos données.\n\nPour exercer ces droits, contactez-nous à contact.genogy@gmail.com. Nous répondrons dans un délai de 30 jours.`,
   },
   {
     title: '9. Cookies',
@@ -122,8 +122,8 @@ const PrivacyPolicy: React.FC = () => {
           <div className="mt-16 pt-8 border-t border-border">
             <p className="text-sm text-muted-foreground">
               Pour toute question concernant cette politique, contactez-nous à{' '}
-              <a href="mailto:contact@genogy.app" className="text-primary hover:underline">
-                contact@genogy.app
+              <a href="mailto:contact.genogy@gmail.com" className="text-primary hover:underline">
+                contact.genogy@gmail.com
               </a>.
             </p>
           </div>
