@@ -47,6 +47,7 @@ export interface Translations {
     forgotPasswordTitle: string; forgotPasswordSub: string; resetEmailSent: string;
     sending: string; resetPassword: string; welcomeGenogy: string; checkEmail: string;
     googleError: string; minCharsPlaceholder: string; welcomeToast: string;
+    acceptPrivacy: string; acceptPrivacyRequired: string;
   };
   dashboard: {
     createNew: string; noFiles: string; createFromMember: string; myGenograms: string;
