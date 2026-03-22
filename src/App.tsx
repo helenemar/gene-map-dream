@@ -17,6 +17,8 @@ import SharedEditor from "./pages/SharedEditor";
 import NotFound from "./pages/NotFound";
 import Account from "./pages/Account";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import LegalNotice from "./pages/LegalNotice";
+import TermsOfService from "./pages/TermsOfService";
 import MobileBlocker from "./components/MobileBlocker";
 import OAuthProxy from "./pages/OAuthProxy";
 
