@@ -1744,22 +1744,20 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
           <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>{lang === 'fr' ? 'Quitter l\'éditeur ?' : 'Leave the editor?'}</AlertDialogTitle>
+                <AlertDialogTitle>Quitter l'éditeur ?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  {lang === 'fr'
-                    ? 'Vos modifications sont sauvegardées automatiquement. Voulez-vous retourner au tableau de bord ?'
-                    : 'Your changes are saved automatically. Do you want to return to the dashboard?'}
+                  Vos modifications sont sauvegardées automatiquement. Voulez-vous retourner au tableau de bord ?
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>
-                  {lang === 'fr' ? 'Annuler' : 'Cancel'}
+                  Annuler
                 </AlertDialogCancel>
                 <AlertDialogAction onClick={async () => {
                   await saveNow({ members, unions, emotionalLinks });
                   navigate('/dashboard');
                 }}>
-                  {lang === 'fr' ? 'Oui, quitter' : 'Yes, leave'}
+                  Oui, quitter
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
