@@ -417,8 +417,8 @@ export const EmotionalLinkPreview: React.FC<{ type: EmotionalLinkType; width?: n
 
 /** Non-interactive straight-line preview for design system */
 const EmotionalLinkLineStatic: React.FC<{
-  x1: number; y1: number; x2: number; y2: number; type: EmotionalLinkType;
-}> = ({ x1, y1, x2, y2, type }) => {
+  x1: number; y1: number; x2: number; y2: number; type: EmotionalLinkType; strokeScale?: number;
+}> = ({ x1, y1, x2, y2, type, strokeScale = 1 }) => {
   const midX = (x1 + x2) / 2;
   const midY = (y1 + y2) / 2;
   const segments = 16;
