@@ -37,7 +37,7 @@ const SECTIONS = [
   },
   {
     title: '8. Vos droits',
-    content: `Conformément au RGPD, vous disposez des droits suivants :\n\n• **Droit d'accès** : obtenir une copie de vos données personnelles.\n• **Droit de rectification** : corriger vos données inexactes.\n• **Droit à l'effacement** : demander la suppression de vos données.\n• **Droit à la portabilité** : recevoir vos données dans un format structuré.\n• **Droit d'opposition** : vous opposer au traitement de vos données.\n• **Droit de limitation** : limiter le traitement de vos données.\n\nPour exercer ces droits, contactez-nous à contact@genogy.app. Nous répondrons dans un délai de 30 jours.`,
+    content: `Conformément au RGPD, vous disposez des droits suivants :\n\n• **Droit d'accès** : obtenir une copie de vos données personnelles.\n• **Droit de rectification** : corriger vos données inexactes.\n• **Droit à l'effacement** : demander la suppression de vos données.\n• **Droit à la portabilité** : recevoir vos données dans un format structuré.\n• **Droit d'opposition** : vous opposer au traitement de vos données.\n• **Droit de limitation** : limiter le traitement de vos données.\n\nPour exercer ces droits, contactez-nous à contact.genogy@gmail.com. Nous répondrons dans un délai de 30 jours.`,
   },
   {
     title: '9. Cookies',
