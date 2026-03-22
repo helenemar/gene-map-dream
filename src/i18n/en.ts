@@ -1,6 +1,6 @@
-import type { fr } from './fr';
+import type { Translations } from './types';
 
-export const en: typeof fr = {
+export const en: Translations = {
   // ── Common ──
   common: {
     cancel: 'Cancel',

@@ -1,6 +1,6 @@
-// French translations — source of truth for structure
-// Using type assertion to allow string values in EN translation
-export const fr = {
+import type { Translations } from './types';
+
+export const fr: Translations = {
   // ── Common ──
   common: {
     cancel: 'Annuler',

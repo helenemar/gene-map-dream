@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { fr } from '@/i18n/fr';
 import { en } from '@/i18n/en';
+import type { Translations } from '@/i18n/types';
 
 export type Lang = 'fr' | 'en';
-
-type Translations = typeof fr;
 
 interface LanguageContextValue {
   lang: Lang;
