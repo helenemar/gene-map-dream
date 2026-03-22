@@ -109,7 +109,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
   const getMember = (id: string) => members.find(m => m.id === id);
 
   const stroke = 'hsl(var(--foreground))';
-  const opacity = 0.3;
+  const opacity = 0.5;
   const sw = 1.5;
 
   // ═══ PHASE 1: Compute all union line positions & comb data ═══
