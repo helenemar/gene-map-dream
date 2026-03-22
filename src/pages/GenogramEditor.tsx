@@ -1544,14 +1544,21 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
         <div
           ref={canvasRef}
           data-onboarding="canvas"
-          className={`flex-1 relative overflow-hidden canvas-bg ${cursorClass}`}
+          className={`flex-1 relative overflow-hidden canvas-bg ${isMobileReadOnly ? 'cursor-grab' : cursorClass}`}
           style={{ ...dotGridStyle, overscrollBehavior: 'none', touchAction: 'none' }}
-          onMouseDown={handleCanvasMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
+          onMouseDown={isMobileReadOnly ? undefined : handleCanvasMouseDown}
+          onMouseMove={isMobileReadOnly ? undefined : handleMouseMove}
+          onMouseUp={isMobileReadOnly ? undefined : handleMouseUp}
+          onMouseLeave={isMobileReadOnly ? undefined : handleMouseUp}
           onContextMenu={e => e.preventDefault()}
         >
+          {/* Mobile read-only banner */}
+          {isMobileReadOnly && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 px-4 py-2 rounded-full bg-card/90 backdrop-blur border border-border shadow-sm">
+              <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-[11px] font-medium text-muted-foreground">Lecture seule</span>
+            </div>
+          )}
           <div
             className="absolute"
             style={{
