@@ -1884,27 +1884,29 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
             onFitToScreen={handleFitToScreen}
             onAutoLayout={undefined}
             zoom={zoom}
-            presentationMode={presentationMode}
-            onTogglePresentation={() => {
+            presentationMode={isMobileReadOnly || presentationMode}
+            onTogglePresentation={isMobileReadOnly ? undefined : () => {
               setPresentationMode(prev => !prev);
               setSelectedMembers(new Set());
               setAnchorActiveMember(null);
             }}
-            onUndo={handleUndo}
-            onRedo={handleRedo}
-            canUndo={history.canUndo}
-            canRedo={history.canRedo}
-            onHelp={onboarding.restart}
+            onUndo={isMobileReadOnly ? undefined : handleUndo}
+            onRedo={isMobileReadOnly ? undefined : handleRedo}
+            canUndo={isMobileReadOnly ? false : history.canUndo}
+            canRedo={isMobileReadOnly ? false : history.canRedo}
+            onHelp={isMobileReadOnly ? undefined : onboarding.restart}
           />
 
-          <OnboardingTutorial
-            active={onboarding.active}
-            step={onboarding.step}
-            onNext={onboarding.next}
-            onPrev={onboarding.prev}
-            onFinish={onboarding.finish}
-            onDismiss={onboarding.dismiss}
-          />
+          {!isMobileReadOnly && (
+            <OnboardingTutorial
+              active={onboarding.active}
+              step={onboarding.step}
+              onNext={onboarding.next}
+              onPrev={onboarding.prev}
+              onFinish={onboarding.finish}
+              onDismiss={onboarding.dismiss}
+            />
+          )}
 
           {/* Union action between 2 selected members */}
           {!presentationMode && selectedMembers.size === 2 && (() => {
