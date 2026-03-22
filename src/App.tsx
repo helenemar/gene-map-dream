@@ -26,10 +26,6 @@ import CookieBanner from "./components/CookieBanner";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const isCustomDomainHost =
-    typeof window !== "undefined" &&
-    !window.location.hostname.endsWith("lovable.app") &&
-    !window.location.hostname.endsWith("lovableproject.com");
 
   return (
     <QueryClientProvider client={queryClient}>
