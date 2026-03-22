@@ -130,6 +130,8 @@ export const fr: Translations = {
     googleError: 'Erreur de connexion Google',
     minCharsPlaceholder: '6 caractères minimum',
     welcomeToast: 'Bienvenue sur Genogy,',
+    acceptPrivacy: "J'accepte la politique de confidentialité",
+    acceptPrivacyRequired: 'Vous devez accepter la politique de confidentialité pour créer un compte.',
   },
 
   // ── Dashboard ──
@@ -388,6 +390,11 @@ export const fr: Translations = {
     deleteAccountConfirmDesc: 'Cette action est irréversible. Tous vos génogrammes, données et paramètres seront définitivement supprimés.',
     yesDelete: 'Oui, supprimer',
     deleteRequested: 'Votre demande de suppression a été prise en compte.',
+    exportData: 'Exporter mes données',
+    exportDataDesc: 'Téléchargez une copie de toutes vos données personnelles (droit à la portabilité RGPD).',
+    exporting: 'Export en cours…',
+    exportSuccess: 'Vos données ont été exportées avec succès.',
+    exportError: "Erreur lors de l'export des données.",
   },
 
   // ── Reset Password ──
@@ -501,5 +508,10 @@ export const fr: Translations = {
     sexual_abuse: 'Abus sexuel',
     neglect: 'Négligence',
     controlling: 'Contrôlant',
+  },
+  cookieBanner: {
+    message: 'Ce site utilise des cookies strictement nécessaires au fonctionnement du service (authentification, session).',
+    accept: 'Compris',
+    learnMore: 'En savoir plus',
   },
 };

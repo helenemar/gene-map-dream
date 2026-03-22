@@ -47,6 +47,7 @@ export interface Translations {
     forgotPasswordTitle: string; forgotPasswordSub: string; resetEmailSent: string;
     sending: string; resetPassword: string; welcomeGenogy: string; checkEmail: string;
     googleError: string; minCharsPlaceholder: string; welcomeToast: string;
+    acceptPrivacy: string; acceptPrivacyRequired: string;
   };
   dashboard: {
     createNew: string; noFiles: string; createFromMember: string; myGenograms: string;
@@ -125,7 +126,11 @@ export interface Translations {
     changePasswordDesc: string; sendResetLink: string; sendingLink: string; emailSent: string;
     emailSendError: string; deleteAccount: string; deleteAccountDesc: string;
     deleteAccountConfirmTitle: string; deleteAccountConfirmDesc: string; yesDelete: string;
-    deleteRequested: string;
+    deleteRequested: string; exportData: string; exportDataDesc: string; exporting: string;
+    exportSuccess: string; exportError: string;
+  };
+  cookieBanner: {
+    message: string; accept: string; learnMore: string;
   };
   resetPassword: {
     newPassword: string; chooseSecure: string; newPasswordLabel: string;

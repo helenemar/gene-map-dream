@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { Mail, ArrowLeft, X, Check, Eye, EyeOff } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -29,6 +30,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
 
   React.useEffect(() => {
     if (open) {
@@ -38,6 +40,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
       setPassword('');
       setFullName('');
       setShowPassword(false);
+      setAcceptPrivacy(false);
     }
   }, [open, defaultView]);
 
@@ -61,6 +64,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
     e.preventDefault();
     setSubmitting(true);
     setError('');
+    if (!acceptPrivacy) {
+      setError(t.auth.acceptPrivacyRequired);
+      setSubmitting(false);
+      return;
+    }
     try {
       const { error } = await supabase.auth.signUp({
         email,
@@ -242,6 +250,21 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
+                      </div>
+
+                      <div className="flex items-start gap-2.5">
+                        <Checkbox
+                          id="accept-privacy"
+                          checked={acceptPrivacy}
+                          onCheckedChange={(checked) => setAcceptPrivacy(checked === true)}
+                          className="mt-0.5"
+                        />
+                        <label htmlFor="accept-privacy" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                          {t.auth.acceptPrivacy}{' '}
+                          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                            →
+                          </a>
+                        </label>
                       </div>
 
                       {error && <p className="text-sm text-destructive">{error}</p>}

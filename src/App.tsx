@@ -20,6 +20,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import LegalNotice from "./pages/LegalNotice";
 import TermsOfService from "./pages/TermsOfService";
 import MobileBlocker from "./components/MobileBlocker";
+import CookieBanner from "./components/CookieBanner";
 import OAuthProxy from "./pages/OAuthProxy";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,7 @@ const App = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
+            <CookieBanner />
           </MobileBlocker>
         </TooltipProvider>
       </AuthProvider>

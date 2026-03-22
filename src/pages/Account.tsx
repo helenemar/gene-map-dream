@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -100,6 +100,35 @@ const Account: React.FC = () => {
     setSendingPassword(false);
   };
 
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportData = async () => {
+    if (!user) return;
+    setExporting(true);
+    try {
+      const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
+      const { data: genograms } = await supabase.from('genograms').select('*').eq('user_id', user.id);
+      const exportPayload = {
+        exportDate: new Date().toISOString(),
+        user: { id: user.id, email: user.email },
+        profile,
+        genograms,
+      };
+      const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `genogy-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(t.account.exportSuccess);
+    } catch {
+      toast.error(t.account.exportError);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-card flex items-center justify-center">
@@ -181,6 +210,16 @@ const Account: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="danger" className="mt-8 space-y-6">
+            <div className="border border-border rounded-xl p-6">
+              <h3 className="text-base font-semibold text-foreground mb-1">{t.account.exportData}</h3>
+              <p className="text-sm text-muted-foreground mb-4">{t.account.exportDataDesc}</p>
+              <Button variant="outline" disabled={exporting} onClick={handleExportData} className="gap-2">
+                <Download className="w-4 h-4" />
+                {exporting ? t.account.exporting : t.account.exportData}
+              </Button>
+            </div>
+
+
             <div className="border border-border rounded-xl p-6">
               <h3 className="text-base font-semibold text-foreground mb-1">{t.account.changePassword}</h3>
               <p className="text-sm text-muted-foreground mb-4">{t.account.changePasswordDesc}</p>
