@@ -1447,11 +1447,11 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
             toast('Export PDF en cours…', { duration: 2000 });
           }
         }}
-        saveStatus={genogramId ? saveStatus : undefined}
-        onOpenNotes={() => setNotesModalOpen(true)}
-        noteCount={noteCount}
-        onShare={() => genogramId && setShareModalOpen(true)}
-        onBack={() => setShowLeaveDialog(true)}
+        saveStatus={(genogramId || isSharedMode) ? saveStatus : undefined}
+        onOpenNotes={isSharedMode ? undefined : () => setNotesModalOpen(true)}
+        noteCount={isSharedMode ? 0 : noteCount}
+        onShare={isSharedMode ? undefined : () => genogramId && setShareModalOpen(true)}
+        onBack={() => isSharedMode ? navigate('/') : setShowLeaveDialog(true)}
       />
       <div className="flex flex-1 overflow-hidden">
         {!presentationMode && (
