@@ -109,18 +109,28 @@ const LandingPage: React.FC = () => {
             <span className="text-[15px] font-semibold tracking-tight">Genogy</span>
           </Link>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-lg w-9 h-9" aria-label="Français" title="Français">
-              <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
-                <rect width="12" height="24" fill="#002395" />
-                <rect x="12" width="12" height="24" fill="#fff" />
-                <rect x="24" width="12" height="24" fill="#ED2939" />
-              </svg>
+            <Button variant="ghost" size="icon" className="rounded-lg w-9 h-9" aria-label={lang === 'fr' ? 'Switch to English' : 'Passer en français'} title={lang === 'fr' ? 'Switch to English' : 'Passer en français'} onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>
+              {lang === 'fr' ? (
+                <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
+                  <rect width="12" height="24" fill="#002395" />
+                  <rect x="12" width="12" height="24" fill="#fff" />
+                  <rect x="24" width="12" height="24" fill="#ED2939" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
+                  <rect width="36" height="24" fill="#012169" />
+                  <path d="M0,0 L36,24 M36,0 L0,24" stroke="#fff" strokeWidth="4" />
+                  <path d="M0,0 L36,24 M36,0 L0,24" stroke="#C8102E" strokeWidth="2.5" />
+                  <path d="M18,0 V24 M0,12 H36" stroke="#fff" strokeWidth="6" />
+                  <path d="M18,0 V24 M0,12 H36" stroke="#C8102E" strokeWidth="3.5" />
+                </svg>
+              )}
             </Button>
             <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-5" onClick={() => openAuth('login')}>
-              Connexion
+              {t.landing.login}
             </Button>
             <Button size="sm" className="bg-foreground text-background hover:bg-foreground/90 rounded-lg px-5" onClick={() => openAuth('signup')}>
-              Inscription
+              {t.landing.signup}
             </Button>
           </div>
         </div>
