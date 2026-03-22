@@ -10,6 +10,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import gogyIcon from '@/assets/genogy-icon.svg';
@@ -17,6 +18,7 @@ import gogyIcon from '@/assets/genogy-icon.svg';
 const Account: React.FC = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { t } = useLanguage();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -55,7 +57,7 @@ const Account: React.FC = () => {
   const handleSave = async () => {
     if (!user) return;
     if (!firstName.trim() || !lastName.trim()) {
-      toast.error('Le prénom et le nom sont obligatoires.');
+      toast.error(t.account.requiredFields);
       return;
     }
     setSaving(true);
@@ -72,15 +74,15 @@ const Account: React.FC = () => {
       .eq('user_id', user.id);
 
     if (error) {
-      toast.error('Erreur lors de la sauvegarde');
+      toast.error(t.account.saveError);
     } else {
-      toast.success('Profil mis à jour');
+      toast.success(t.account.profileUpdated);
     }
     setSaving(false);
   };
 
   const handleDeleteAccount = async () => {
-    toast.success('Votre demande de suppression a été prise en compte.');
+    toast.success(t.account.deleteRequested);
     await signOut();
     navigate('/');
   };
@@ -91,7 +93,7 @@ const Account: React.FC = () => {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     if (error) {
-      toast.error('Erreur lors de l\'envoi de l\'e-mail.');
+      toast.error(t.account.emailSendError);
     } else {
       setPasswordSent(true);
     }
@@ -101,14 +103,13 @@ const Account: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-card flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Chargement…</div>
+        <div className="animate-pulse text-muted-foreground">{t.common.loading}</div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-card">
-      {/* Header */}
       <header className="h-[64px] bg-card border-b border-border flex items-center justify-between px-8">
         <a href="/dashboard" className="flex items-center gap-2.5">
           <img src={gogyIcon} alt="Genogy" className="w-8 h-8" />
@@ -117,134 +118,99 @@ const Account: React.FC = () => {
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-8">
-        {/* Back + Title */}
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-        >
+        <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
           <ArrowLeft className="w-4 h-4" />
-          Mon compte
+          {t.account.myAccount}
         </button>
 
         <Tabs defaultValue="profile" className="w-full">
           <TabsList className="bg-transparent border-b border-border rounded-none w-full justify-start gap-6 px-0 h-auto pb-0">
-            <TabsTrigger
-              value="profile"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-3 text-sm font-medium"
-            >
-              Mon profil
+            <TabsTrigger value="profile" className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-3 text-sm font-medium">
+              {t.account.myProfile}
             </TabsTrigger>
-            <TabsTrigger
-              value="danger"
-              className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-3 text-sm font-medium"
-            >
-              Paramètres
+            <TabsTrigger value="danger" className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-3 text-sm font-medium">
+              {t.account.settings}
             </TabsTrigger>
           </TabsList>
 
-          {/* Mon profil */}
           <TabsContent value="profile" className="mt-8">
             <div className="border border-border rounded-xl p-6 space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-sm">
-                    Prénom <span className="text-destructive">*</span>
-                  </Label>
-                  <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Prénom" />
+                  <Label className="text-sm">{t.account.firstName} <span className="text-destructive">*</span></Label>
+                  <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder={t.account.firstName} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-sm">
-                    Nom <span className="text-destructive">*</span>
-                  </Label>
-                  <Input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Nom" />
+                  <Label className="text-sm">{t.account.lastName} <span className="text-destructive">*</span></Label>
+                  <Input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder={t.account.lastName} />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-sm">Profession</Label>
-                <Input value={profession} onChange={(e) => setProfession(e.target.value)} placeholder="ex: Psychologue" />
+                <Label className="text-sm">{t.account.professionLabel}</Label>
+                <Input value={profession} onChange={(e) => setProfession(e.target.value)} placeholder={t.account.professionLabel} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-sm">
-                    Adresse e-mail <span className="text-destructive">*</span>
-                  </Label>
+                  <Label className="text-sm">{t.account.emailLabel} <span className="text-destructive">*</span></Label>
                   <Input value={email} disabled className="bg-muted/50" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-sm">Numéro de téléphone</Label>
+                  <Label className="text-sm">{t.account.phoneLabel}</Label>
                   <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+33..." />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-sm">Numéro de SIREN</Label>
+                  <Label className="text-sm">{t.account.sirenLabel}</Label>
                   <Input value={siren} onChange={(e) => setSiren(e.target.value)} placeholder="123 456 789" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-sm">Adresse de facturation</Label>
-                  <Input value={billingAddress} onChange={(e) => setBillingAddress(e.target.value)} placeholder="Adresse complète" />
+                  <Label className="text-sm">{t.account.billingLabel}</Label>
+                  <Input value={billingAddress} onChange={(e) => setBillingAddress(e.target.value)} placeholder={t.account.billingLabel} />
                 </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
-                <Button variant="outline" onClick={() => navigate('/dashboard')}>
-                  Annuler
-                </Button>
-                <Button onClick={handleSave} disabled={saving}>
-                  {saving ? 'Enregistrement…' : 'Enregistrer les modifications'}
-                </Button>
+                <Button variant="outline" onClick={() => navigate('/dashboard')}>{t.common.cancel}</Button>
+                <Button onClick={handleSave} disabled={saving}>{saving ? t.account.saving : t.account.saveChanges}</Button>
               </div>
             </div>
           </TabsContent>
 
-          {/* Paramètres */}
           <TabsContent value="danger" className="mt-8 space-y-6">
-            {/* Modifier mot de passe */}
             <div className="border border-border rounded-xl p-6">
-              <h3 className="text-base font-semibold text-foreground mb-1">Modifier le mot de passe</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Un e-mail de réinitialisation sera envoyé à votre adresse.
-              </p>
+              <h3 className="text-base font-semibold text-foreground mb-1">{t.account.changePassword}</h3>
+              <p className="text-sm text-muted-foreground mb-4">{t.account.changePasswordDesc}</p>
               <div className="flex flex-col gap-3">
                 {passwordSent ? (
-                  <p className="text-sm text-primary font-medium">✓ E-mail envoyé — vérifiez votre boîte de réception.</p>
+                  <p className="text-sm text-primary font-medium">{t.account.emailSent}</p>
                 ) : (
-                  <Button
-                    variant="outline"
-                    disabled={sendingPassword}
-                    onClick={handlePasswordReset}
-                  >
-                    {sendingPassword ? 'Envoi…' : 'Envoyer le lien de réinitialisation'}
+                  <Button variant="outline" disabled={sendingPassword} onClick={handlePasswordReset}>
+                    {sendingPassword ? t.account.sendingLink : t.account.sendResetLink}
                   </Button>
                 )}
               </div>
             </div>
 
-
-            {/* Supprimer compte */}
             <div className="border border-destructive/30 rounded-xl p-6">
-              <h3 className="text-base font-semibold text-foreground mb-1">Supprimer mon compte</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Cette action est irréversible. Tous vos génogrammes et données seront définitivement supprimés.
-              </p>
+              <h3 className="text-base font-semibold text-foreground mb-1">{t.account.deleteAccount}</h3>
+              <p className="text-sm text-muted-foreground mb-4">{t.account.deleteAccountDesc}</p>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive">Supprimer mon compte</Button>
+                  <Button variant="destructive">{t.account.deleteAccount}</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Supprimer votre compte ?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Cette action est irréversible. Tous vos génogrammes, données et paramètres seront définitivement supprimés.
-                    </AlertDialogDescription>
+                    <AlertDialogTitle>{t.account.deleteAccountConfirmTitle}</AlertDialogTitle>
+                    <AlertDialogDescription>{t.account.deleteAccountConfirmDesc}</AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
                     <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                      Oui, supprimer
+                      {t.account.yesDelete}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
