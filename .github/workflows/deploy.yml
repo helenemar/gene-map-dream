@@ -25,14 +25,12 @@ jobs:
       - name: 🏗️ Build du projet
         run: npm run build
 
-      - name: 🚀 Déploiement DIRECT
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: 🚀 Transfert de fichiers (Méthode Simple)
+        uses: sebastianpopp/ftp-action@v2.0.0
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          host: ${{ secrets.FTP_SERVER }}
+          user: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/
-          # ON NE MET RIEN ICI (juste un point) 
-          # car ton FTP est déjà dans public_html
-          server-dir: ./
-          dangerous-clean-slate: true
+          localDir: 'dist'
+          remoteDir: '.'
+          force: true
