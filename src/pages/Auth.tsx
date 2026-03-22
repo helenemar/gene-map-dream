@@ -46,7 +46,7 @@ const Auth: React.FC = () => {
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: getRedirectOrigin(),
             data: { full_name: fullName },
           },
         });
