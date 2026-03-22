@@ -1679,31 +1679,31 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
               <MemberCard
                 key={member.id}
                 member={member}
-                isSelected={selectedMembers.has(member.id)}
+                isSelected={isMobileReadOnly ? false : selectedMembers.has(member.id)}
                 isAnimating={isAnimating}
-                isColliding={collisions.has(member.id)}
-                state={getMemberState(member.id)}
-                isLinkTarget={!!linkDrag && linkDrag.fromId !== member.id}
+                isColliding={isMobileReadOnly ? false : collisions.has(member.id)}
+                state={isMobileReadOnly ? 'idle' : getMemberState(member.id)}
+                isLinkTarget={isMobileReadOnly ? false : (!!linkDrag && linkDrag.fromId !== member.id)}
                 isFadingOut={fadingOutIds.has(member.id)}
                 searchDimmed={search.isActive && !search.matchedMemberIds.has(member.id)}
                 searchHighlighted={search.isActive && search.matchedMemberIds.has(member.id)}
-                presentationMode={presentationMode}
-                multiSelected={selectedMembers.size > 1}
+                presentationMode={isMobileReadOnly || presentationMode}
+                multiSelected={isMobileReadOnly ? false : selectedMembers.size > 1}
                 compact={isBioParentOfAdoptedChild}
-                onSelect={handleSelect}
-                onDragStart={handleDragStart}
-                onCreateRelated={handleCreateRelated}
-                onEdit={handleEdit}
-                onToggleLock={handleToggleLock}
-                onView={handleView}
-                onHover={setHoveredMember}
-                onLinkDragStart={handleLinkDragStart}
-                onCancelAnchor={handleCancelAnchor}
+                onSelect={isMobileReadOnly ? (() => {}) : handleSelect}
+                onDragStart={isMobileReadOnly ? (() => {}) : handleDragStart}
+                onCreateRelated={isMobileReadOnly ? (() => {}) : handleCreateRelated}
+                onEdit={isMobileReadOnly ? (() => {}) : handleEdit}
+                onToggleLock={isMobileReadOnly ? (() => {}) : handleToggleLock}
+                onView={isMobileReadOnly ? (() => {}) : handleView}
+                onHover={isMobileReadOnly ? (() => {}) : setHoveredMember}
+                onLinkDragStart={isMobileReadOnly ? (() => {}) : handleLinkDragStart}
+                onCancelAnchor={isMobileReadOnly ? (() => {}) : handleCancelAnchor}
                 disabledOptions={getDisabledOptions(member.id)}
                 dynamicPathologies={pathologiesVisible ? dynamicPathologies : []}
                 showParentSplit={shouldShowParentSplit(member.id)}
                 isAdopted={isMemberAdopted(member.id)}
-                onboardingPulse={onboarding.active && onboarding.step === 5 && member.id === members[0]?.id}
+                onboardingPulse={false}
               />
               );
             })}
