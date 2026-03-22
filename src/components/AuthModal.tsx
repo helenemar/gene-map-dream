@@ -71,7 +71,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
         },
       });
       if (error) throw error;
-      setView('success');
+      toast.success(`${t.auth.welcomeToast} ${fullName} ! 🎉`);
+      onClose();
+      navigate('/dashboard');
     } catch (err: any) {
       if (err.message.includes('already registered')) {
         setError(t.auth.alreadyRegistered);

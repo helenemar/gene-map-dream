@@ -128,6 +128,7 @@ export const fr: Translations = {
     checkEmail: 'Vérifiez votre boîte mail pour confirmer votre inscription, puis connectez-vous.',
     googleError: 'Erreur de connexion Google',
     minCharsPlaceholder: '6 caractères minimum',
+    welcomeToast: 'Bienvenue sur Genogy,',
   },
 
   // ── Dashboard ──

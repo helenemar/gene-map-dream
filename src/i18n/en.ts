@@ -128,6 +128,7 @@ export const en: Translations = {
     checkEmail: 'Check your inbox to confirm your registration, then log in.',
     googleError: 'Google sign-in error',
     minCharsPlaceholder: '6 characters minimum',
+    welcomeToast: 'Welcome to Genogy,',
   },
 
   // ── Dashboard ──
