@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { Mail, ArrowLeft, X, Check, Eye, EyeOff } from 'lucide-react';
+import { getRedirectOrigin } from '@/utils/redirectUrl';
 import { Checkbox } from '@/components/ui/checkbox';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -74,7 +75,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
         email,
         password,
         options: {
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: getRedirectOrigin(),
           data: { full_name: fullName },
         },
       });
@@ -101,7 +102,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
     setError('');
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${getRedirectOrigin()}/reset-password`,
       });
       if (error) throw error;
       toast.success(t.auth.resetEmailSent);
@@ -114,9 +115,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
   };
 
   const getOAuthRedirectUri = () => {
-    const host = window.location.hostname;
-    const isCustomDomain = !host.endsWith('.lovable.app') && !host.endsWith('.lovableproject.com');
-    return isCustomDomain ? 'https://gene-map-dream.lovable.app' : window.location.origin;
+    return getRedirectOrigin();
   };
 
   const handleGoogleAuth = async () => {

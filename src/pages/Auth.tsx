@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { getRedirectOrigin } from '@/utils/redirectUrl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -46,7 +47,7 @@ const Auth: React.FC = () => {
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: getRedirectOrigin(),
             data: { full_name: fullName },
           },
         });
@@ -66,7 +67,7 @@ const Auth: React.FC = () => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: window.location.origin },
+        options: { emailRedirectTo: getRedirectOrigin() },
       });
       if (error) throw error;
       toast.success('Lien de connexion envoyé ! Vérifiez votre boîte mail.');
@@ -82,7 +83,7 @@ const Auth: React.FC = () => {
     setSubmitting(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${getRedirectOrigin()}/reset-password`,
       });
       if (error) throw error;
       toast.success('Email de réinitialisation envoyé !');
@@ -225,7 +226,7 @@ const Auth: React.FC = () => {
                   className="w-full gap-2"
                   onClick={async () => {
                     const { error } = await lovable.auth.signInWithOAuth('google', {
-                      redirect_uri: window.location.origin,
+                      redirect_uri: getRedirectOrigin(),
                     });
                     if (error) toast.error(error.message || 'Erreur de connexion Google');
                   }}
