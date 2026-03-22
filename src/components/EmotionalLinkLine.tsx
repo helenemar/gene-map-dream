@@ -404,21 +404,21 @@ export default EmotionalLinkLine;
 
 // ─── Static Preview (Design System) ─────────────────────────────────
 
-export const EmotionalLinkPreview: React.FC<{ type: EmotionalLinkType; width?: number; height?: number }> = ({
-  type, width = 200, height = 32,
+export const EmotionalLinkPreview: React.FC<{ type: EmotionalLinkType; width?: number; height?: number; strokeScale?: number }> = ({
+  type, width = 200, height = 32, strokeScale,
 }) => {
   const pad = 10;
   return (
     <svg width={width} height={height} className="shrink-0">
-      <EmotionalLinkLineStatic x1={pad} y1={height / 2} x2={width - pad} y2={height / 2} type={type} />
+      <EmotionalLinkLineStatic x1={pad} y1={height / 2} x2={width - pad} y2={height / 2} type={type} strokeScale={strokeScale} />
     </svg>
   );
 };
 
 /** Non-interactive straight-line preview for design system */
 const EmotionalLinkLineStatic: React.FC<{
-  x1: number; y1: number; x2: number; y2: number; type: EmotionalLinkType;
-}> = ({ x1, y1, x2, y2, type }) => {
+  x1: number; y1: number; x2: number; y2: number; type: EmotionalLinkType; strokeScale?: number;
+}> = ({ x1, y1, x2, y2, type, strokeScale = 1 }) => {
   const midX = (x1 + x2) / 2;
   const midY = (y1 + y2) / 2;
   const segments = 16;
@@ -474,21 +474,23 @@ const EmotionalLinkLineStatic: React.FC<{
     return <polygon points={`${ex2},${ey2} ${left.x},${left.y} ${right.x},${right.y}`} fill={color} />;
   }
 
+  const sw = 2 * strokeScale;
+
   switch (type) {
     case 'fusional': {
       const l1 = parallelLine(x1, y1, x2, y2, 2);
       const l2 = parallelLine(x1, y1, x2, y2, -2);
-      return (<g><line {...l1} stroke="hsl(var(--link-fusional))" strokeWidth={2} /><line {...l2} stroke="hsl(var(--link-fusional))" strokeWidth={2} /></g>);
+      return (<g><line {...l1} stroke="hsl(var(--link-fusional))" strokeWidth={sw} /><line {...l2} stroke="hsl(var(--link-fusional))" strokeWidth={sw} /></g>);
     }
     case 'distant':
-      return <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-distant))" strokeWidth={2} strokeDasharray="8 5" />;
+      return <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-distant))" strokeWidth={sw} strokeDasharray="8 5" />;
     case 'conflictual': {
       const l1 = parallelLine(x1, y1, x2, y2, 2.5);
       const l2 = parallelLine(x1, y1, x2, y2, -2.5);
-      return (<g><line {...l1} stroke="hsl(var(--link-conflictual))" strokeWidth={2} strokeDasharray="8 5" /><line {...l2} stroke="hsl(var(--link-conflictual))" strokeWidth={2} strokeDasharray="8 5" /></g>);
+      return (<g><line {...l1} stroke="hsl(var(--link-conflictual))" strokeWidth={sw} strokeDasharray="8 5" /><line {...l2} stroke="hsl(var(--link-conflictual))" strokeWidth={sw} strokeDasharray="8 5" /></g>);
     }
     case 'ambivalent':
-      return (<g><line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-ambivalent))" strokeWidth={2} /><polyline points={zigzagPath(x1, y1, x2, y2, amp, segments)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={2} /></g>);
+      return (<g><line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-ambivalent))" strokeWidth={sw} /><polyline points={zigzagPath(x1, y1, x2, y2, amp, segments)} fill="none" stroke="hsl(var(--link-conflictual))" strokeWidth={sw} /></g>);
     case 'cutoff': {
       const dx = x2 - x1;
       const dy = y2 - y1;
@@ -500,28 +502,28 @@ const EmotionalLinkLineStatic: React.FC<{
       const barGap = 4;
       const barH = 8;
       return (<g>
-        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-cutoff))" strokeWidth={2} strokeDasharray="4 3" />
-        <line x1={midX - ux * barGap + px * barH} y1={midY - uy * barGap + py * barH} x2={midX - ux * barGap - px * barH} y2={midY - uy * barGap - py * barH} stroke="hsl(var(--link-cutoff))" strokeWidth={2} />
-        <line x1={midX + ux * barGap + px * barH} y1={midY + uy * barGap + py * barH} x2={midX + ux * barGap - px * barH} y2={midY + uy * barGap - py * barH} stroke="hsl(var(--link-cutoff))" strokeWidth={2} />
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-cutoff))" strokeWidth={sw} strokeDasharray="4 3" />
+        <line x1={midX - ux * barGap + px * barH} y1={midY - uy * barGap + py * barH} x2={midX - ux * barGap - px * barH} y2={midY - uy * barGap - py * barH} stroke="hsl(var(--link-cutoff))" strokeWidth={sw} />
+        <line x1={midX + ux * barGap + px * barH} y1={midY + uy * barGap + py * barH} x2={midX + ux * barGap - px * barH} y2={midY + uy * barGap - py * barH} stroke="hsl(var(--link-cutoff))" strokeWidth={sw} />
       </g>);
     }
     case 'violence':
-      return <polyline points={zigzagPath(x1, y1, x2, y2, amp, segments)} fill="none" stroke="hsl(var(--link-violence))" strokeWidth={2} />;
+      return <polyline points={zigzagPath(x1, y1, x2, y2, amp, segments)} fill="none" stroke="hsl(var(--link-violence))" strokeWidth={sw} />;
     case 'emotional_abuse':
-      return (<g>{[-4, 0, 4].map((off, i) => (<polyline key={i} points={zigzagPathOffset(x1, y1, x2, y2, amp * 0.7, segments, off)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={2} />))}</g>);
+      return (<g>{[-4, 0, 4].map((off, i) => (<polyline key={i} points={zigzagPathOffset(x1, y1, x2, y2, amp * 0.7, segments, off)} fill="none" stroke="hsl(var(--link-emotional-abuse))" strokeWidth={sw} />))}</g>);
     case 'physical_violence':
-      return (<g><line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-physical-violence))" strokeWidth={2} /><polyline points={zigzagPath(x1, y1, x2, y2, amp, segments)} fill="none" stroke="hsl(var(--link-physical-violence))" strokeWidth={2} strokeOpacity={0.7} /></g>);
+      return (<g><line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-physical-violence))" strokeWidth={sw} /><polyline points={zigzagPath(x1, y1, x2, y2, amp, segments)} fill="none" stroke="hsl(var(--link-physical-violence))" strokeWidth={sw} strokeOpacity={0.7} /></g>);
     case 'sexual_abuse':
-      return (<g>{[-6, -2, 2, 6].map((off, i) => (<polyline key={i} points={zigzagPathOffset(x1, y1, x2, y2, amp * 0.6, segments, off)} fill="none" stroke="hsl(var(--link-sexual-abuse))" strokeWidth={2} />))}</g>);
+      return (<g>{[-6, -2, 2, 6].map((off, i) => (<polyline key={i} points={zigzagPathOffset(x1, y1, x2, y2, amp * 0.6, segments, off)} fill="none" stroke="hsl(var(--link-sexual-abuse))" strokeWidth={sw} />))}</g>);
     case 'neglect':
-      return (<g><line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-neglect))" strokeWidth={2} />{staticArrowHead(x2, y2, x1, y1, 7, 'hsl(var(--link-neglect))')}</g>);
+      return (<g><line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-neglect))" strokeWidth={sw} />{staticArrowHead(x2, y2, x1, y1, 7, 'hsl(var(--link-neglect))')}</g>);
     case 'controlling': {
       const sq = 6;
       return (<g>
-        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-controlling))" strokeWidth={2} />
-        <rect x={midX - sq} y={midY - sq} width={sq * 2} height={sq * 2} fill="hsl(var(--background))" stroke="hsl(var(--link-controlling))" strokeWidth={2} />
-        <line x1={midX - sq * 0.6} y1={midY - sq * 0.6} x2={midX + sq * 0.6} y2={midY + sq * 0.6} stroke="hsl(var(--link-controlling))" strokeWidth={2} />
-        <line x1={midX + sq * 0.6} y1={midY - sq * 0.6} x2={midX - sq * 0.6} y2={midY + sq * 0.6} stroke="hsl(var(--link-controlling))" strokeWidth={2} />
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-controlling))" strokeWidth={sw} />
+        <rect x={midX - sq} y={midY - sq} width={sq * 2} height={sq * 2} fill="hsl(var(--background))" stroke="hsl(var(--link-controlling))" strokeWidth={sw} />
+        <line x1={midX - sq * 0.6} y1={midY - sq * 0.6} x2={midX + sq * 0.6} y2={midY + sq * 0.6} stroke="hsl(var(--link-controlling))" strokeWidth={sw} />
+        <line x1={midX + sq * 0.6} y1={midY - sq * 0.6} x2={midX - sq * 0.6} y2={midY + sq * 0.6} stroke="hsl(var(--link-controlling))" strokeWidth={sw} />
         {staticArrowHead(x2, y2, x1, y1, 7, 'hsl(var(--link-controlling))')}
       </g>);
     }
