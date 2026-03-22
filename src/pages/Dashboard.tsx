@@ -414,7 +414,34 @@ const Dashboard: React.FC = () => {
                   {filteredFiles.map((file) => (
                     <TableRow
                       key={file.id}
-                      onClick={() => navigate(`/editor/${file.id}`)}
+                      onClick={() => {
+                        if (file.isShared && file.accessLevel === 'editor') {
+                          // Find share token for this genogram
+                          supabase.from('genogram_shares')
+                            .select('share_token')
+                            .eq('genogram_id', file.id)
+                            .eq('shared_with_user_id', user!.id)
+                            .eq('is_active', true)
+                            .single()
+                            .then(({ data }) => {
+                              if (data?.share_token) navigate(`/shared-edit/${data.share_token}`);
+                              else navigate(`/editor/${file.id}`);
+                            });
+                        } else if (file.isShared) {
+                          supabase.from('genogram_shares')
+                            .select('share_token')
+                            .eq('genogram_id', file.id)
+                            .eq('shared_with_user_id', user!.id)
+                            .eq('is_active', true)
+                            .single()
+                            .then(({ data }) => {
+                              if (data?.share_token) navigate(`/shared/${data.share_token}`);
+                              else navigate(`/editor/${file.id}`);
+                            });
+                        } else {
+                          navigate(`/editor/${file.id}`);
+                        }
+                      }}
                       className="cursor-pointer group h-[60px]"
                     >
                       <TableCell className="pl-6">
