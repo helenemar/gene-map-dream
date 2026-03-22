@@ -1457,7 +1457,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
         onBack={() => isSharedMode ? navigate('/') : setShowLeaveDialog(true)}
       />
       <div className="flex flex-1 overflow-hidden">
-        {!presentationMode && (
+        {!presentationMode && !isMobileReadOnly && (
           <EditorSidebar
             members={members}
             unions={unions}
