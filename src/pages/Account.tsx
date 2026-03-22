@@ -12,6 +12,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
+import { getRedirectOrigin } from '@/utils/redirectUrl';
 import { toast } from 'sonner';
 import gogyIcon from '@/assets/genogy-icon.svg';
 
