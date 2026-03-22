@@ -329,10 +329,10 @@ const MemberCard: React.FC<MemberCardProps> = ({
               onLinkDragStart?.(member.id, e);
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors cursor-crosshair"
-            title="Maintenir et glisser vers une autre carte"
+            title={t.memberCard.dragHint}
           >
             <Link className="w-3.5 h-3.5" />
-            Créer un lien
+            {t.memberCard.createLink}
           </button>
           <button
             onClick={handleCancelAnchor}
