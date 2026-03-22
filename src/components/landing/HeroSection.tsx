@@ -31,7 +31,7 @@ const HeroSection: React.FC<Props> = ({ onAuth }) => {
               {t.landing.heroTitle1}
               <br />
               {t.landing.heroTitle2}{' '}
-              <span className="bg-gradient-to-r from-primary to-[hsl(280,90%,60%)] bg-clip-text text-transparent">{t.landing.heroTitle3}</span>{' '}
+              <span className="text-primary">{t.landing.heroTitle3}</span>{' '}
               {t.landing.heroTitle4}
             </h1>
 
