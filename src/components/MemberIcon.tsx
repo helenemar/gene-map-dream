@@ -104,11 +104,11 @@ const MemberIcon: React.FC<MemberIconProps> = ({
 
       {/* Layer 0: White background fill inside shape */}
       {gender === 'female' ? (
-        <circle cx={cx} cy={cy} r={circleR} fill="white" />
+        <circle cx={cx} cy={cy} r={circleR} fill="hsl(var(--card))" />
       ) : gender === 'non-binary' ? (
-        <polygon points={`${cx},${half} ${s - half},${cy} ${cx},${s - half} ${half},${cy}`} fill="white" />
+        <polygon points={`${cx},${half} ${s - half},${cy} ${cx},${s - half} ${half},${cy}`} fill="hsl(var(--card))" />
       ) : (
-        <rect x={sqX} y={sqY} width={sqW} height={sqH} fill="white" />
+        <rect x={sqX} y={sqY} width={sqW} height={sqH} fill="hsl(var(--card))" />
       )}
 
       {/* Layer 1: Pathology color fills (clipped to shape) */}
@@ -271,7 +271,7 @@ const PerinatalIcon: React.FC<{
     // Simple triangle
     return (
       <svg width={size} height={size} viewBox="-4 -4 48 48" fill="none" className={className}>
-        <polygon points="20,0 40,40 0,40" stroke="currentColor" strokeWidth={sw} fill="white" strokeLinejoin="miter" />
+        <polygon points="20,0 40,40 0,40" stroke="currentColor" strokeWidth={sw} fill="hsl(var(--card))" strokeLinejoin="miter" />
       </svg>
     );
   }
@@ -280,7 +280,7 @@ const PerinatalIcon: React.FC<{
     // Triangle + X crossing through
     return (
       <svg width={size} height={size} viewBox="-4 -4 48 48" fill="none" className={className}>
-        <polygon points="20,0 40,40 0,40" stroke="currentColor" strokeWidth={sw} fill="white" strokeLinejoin="miter" />
+        <polygon points="20,0 40,40 0,40" stroke="currentColor" strokeWidth={sw} fill="hsl(var(--card))" strokeLinejoin="miter" />
         <line x1={-2} y1={42} x2={42} y2={-2} stroke="currentColor" strokeWidth={sw} />
         <line x1={42} y1={42} x2={-2} y2={-2} stroke="currentColor" strokeWidth={sw} />
       </svg>
@@ -291,7 +291,7 @@ const PerinatalIcon: React.FC<{
     // Triangle + X crossing through + horizontal line
     return (
       <svg width={size} height={size} viewBox="-4 -4 48 48" fill="none" className={className}>
-        <polygon points="20,0 40,40 0,40" stroke="currentColor" strokeWidth={sw} fill="white" strokeLinejoin="miter" />
+        <polygon points="20,0 40,40 0,40" stroke="currentColor" strokeWidth={sw} fill="hsl(var(--card))" strokeLinejoin="miter" />
         <line x1={-2} y1={42} x2={42} y2={-2} stroke="currentColor" strokeWidth={sw} />
         <line x1={42} y1={42} x2={-2} y2={-2} stroke="currentColor" strokeWidth={sw} />
         <line x1={-2} y1={20} x2={42} y2={20} stroke="currentColor" strokeWidth={sw} />
@@ -307,9 +307,9 @@ const PerinatalIcon: React.FC<{
     return (
       <svg width={size} height={size} viewBox="-4 -4 48 48" fill="none" className={className}>
         {gender === 'female' ? (
-          <circle cx={s / 2} cy={s / 2} r={shapeSize / 2} stroke="currentColor" strokeWidth={sw} fill="white" />
+          <circle cx={s / 2} cy={s / 2} r={shapeSize / 2} stroke="currentColor" strokeWidth={sw} fill="hsl(var(--card))" />
         ) : (
-          <rect x={offset} y={offset} width={shapeSize} height={shapeSize} stroke="currentColor" strokeWidth={sw} fill="white" />
+          <rect x={offset} y={offset} width={shapeSize} height={shapeSize} stroke="currentColor" strokeWidth={sw} fill="hsl(var(--card))" />
         )}
         <line x1={-2} y1={-2} x2={42} y2={42} stroke="currentColor" strokeWidth={sw} />
         <line x1={42} y1={-2} x2={-2} y2={42} stroke="currentColor" strokeWidth={sw} />

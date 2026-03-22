@@ -77,6 +77,77 @@
     --sidebar-border: 220 13% 90%;
     --sidebar-ring: 256 98% 59%;
   }
+
+  .dark {
+    --background: 224 20% 10%;
+    --page-bg: 224 20% 8%;
+    --foreground: 210 20% 90%;
+
+    --card: 224 18% 13%;
+    --card-foreground: 210 20% 90%;
+
+    --popover: 224 18% 13%;
+    --popover-foreground: 210 20% 90%;
+
+    --primary: 256 90% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 256 90% 65%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 14% 20%;
+    --muted-foreground: 220 9% 60%;
+
+    --accent: 220 14% 18%;
+    --accent-foreground: 210 20% 90%;
+
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 22%;
+    --input: 220 13% 22%;
+    --ring: 256 90% 65%;
+
+    /* Brand */
+    --brand-orange: 27 98% 59%;
+    --brand-orange-foreground: 0 0% 100%;
+
+    /* Canvas */
+    --canvas-bg: 224 20% 9%;
+    --canvas-dot: 220 10% 20%;
+
+    /* Pathology colors (slightly brighter for dark bg) */
+    --pathology-depression: 270 65% 65%;
+    --pathology-cancer: 220 70% 65%;
+    --pathology-addiction: 150 60% 55%;
+    --pathology-bipolar: 30 85% 60%;
+    --pathology-cardiovascular: 0 70% 60%;
+    --pathology-diabetes: 45 75% 60%;
+    --pathology-psychogenic: 310 55% 60%;
+    --pathology-neurodegeneration: 200 55% 60%;
+
+    /* Emotional link colors (brighter for dark bg) */
+    --link-fusional: 150 65% 55%;
+    --link-distant: 0 60% 65%;
+    --link-conflictual: 0 75% 60%;
+    --link-ambivalent: 150 65% 55%;
+    --link-cutoff: 0 75% 55%;
+    --link-violence: 0 85% 50%;
+    --link-emotional-abuse: 220 65% 65%;
+    --link-physical-violence: 220 75% 50%;
+    --link-sexual-abuse: 270 65% 65%;
+    --link-neglect: 220 65% 65%;
+    --link-controlling: 0 75% 60%;
+
+    --sidebar-background: 224 18% 12%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 256 90% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 18%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 220 13% 22%;
+    --sidebar-ring: 256 90% 65%;
+  }
 }
 
 @layer base {
