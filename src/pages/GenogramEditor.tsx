@@ -1909,7 +1909,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
           )}
 
           {/* Union action between 2 selected members */}
-          {!presentationMode && selectedMembers.size === 2 && (() => {
+          {!isMobileReadOnly && !presentationMode && selectedMembers.size === 2 && (() => {
             const [idA, idB] = Array.from(selectedMembers);
             const mA = members.find(m => m.id === idA);
             const mB = members.find(m => m.id === idB);
