@@ -211,6 +211,16 @@ const Account: React.FC = () => {
 
           <TabsContent value="danger" className="mt-8 space-y-6">
             <div className="border border-border rounded-xl p-6">
+              <h3 className="text-base font-semibold text-foreground mb-1">{t.account.exportData}</h3>
+              <p className="text-sm text-muted-foreground mb-4">{t.account.exportDataDesc}</p>
+              <Button variant="outline" disabled={exporting} onClick={handleExportData} className="gap-2">
+                <Download className="w-4 h-4" />
+                {exporting ? t.account.exporting : t.account.exportData}
+              </Button>
+            </div>
+
+
+            <div className="border border-border rounded-xl p-6">
               <h3 className="text-base font-semibold text-foreground mb-1">{t.account.changePassword}</h3>
               <p className="text-sm text-muted-foreground mb-4">{t.account.changePasswordDesc}</p>
               <div className="flex flex-col gap-3">
