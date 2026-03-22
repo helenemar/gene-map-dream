@@ -57,13 +57,13 @@ const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-sm hover:text-primary transition-colors">Mentions légales</a>
+                <Link to="/legal" className="text-sm hover:text-primary transition-colors">Mentions légales</Link>
               </li>
               <li>
                 <Link to="/privacy" className="text-sm hover:text-primary transition-colors">Politique de confidentialité (RGPD)</Link>
               </li>
               <li>
-                <a href="#" className="text-sm hover:text-primary transition-colors">Conditions Générales d'Utilisation</a>
+                <Link to="/terms" className="text-sm hover:text-primary transition-colors">Conditions Générales d'Utilisation</Link>
               </li>
             </ul>
           </div>

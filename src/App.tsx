@@ -51,6 +51,8 @@ const App = () => {
                 <Route path="/shared-edit/:token" element={<SharedEditor />} />
                 <Route path="/design-system" element={<DesignSystemPage />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/legal" element={<LegalNotice />} />
+                <Route path="/terms" element={<TermsOfService />} />
                 <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
