@@ -4,6 +4,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import AuthModal from '@/components/AuthModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import heroComposition from '@/assets/hero-mockup-composition.png';
 import aboutIllustration from '@/assets/about-illustration.png';
@@ -13,11 +19,11 @@ import abstract206 from '@/assets/abstract-206.svg';
 import abstract65 from '@/assets/abstract-65.svg';
 import {
   Brain, Heart, GraduationCap, Stethoscope, Users, BookOpen,
-  ArrowRight,
+  ArrowRight, ChevronDown,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Footer from '@/components/Footer';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage, Lang } from '@/contexts/LanguageContext';
 
 const AUDIENCE_ICONS = [
   <Brain className="w-5 h-5" />,
