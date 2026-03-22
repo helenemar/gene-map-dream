@@ -34,7 +34,7 @@ const UnionLine: React.FC<{
   const lineY = (y1 + y2) / 2;
   const isSharedVariant = variant === 'shared';
   const stroke = isSharedVariant ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))';
-  const opacity = 1;
+  const opacity = isSharedVariant ? 1 : 0.35;
   const lineWidth = isSharedVariant ? 2.5 : 2;
   const connectorWidth = isSharedVariant ? 2.25 : 1.5;
   const needsConnectors = Math.abs(y1 - y2) > 1;
@@ -115,7 +115,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
 
   const isSharedVariant = variant === 'shared';
   const stroke = isSharedVariant ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))';
-  const opacity = 1;
+  const opacity = isSharedVariant ? 1 : 0.35;
   const sw = isSharedVariant ? 2.25 : 1.5;
 
   // ═══ PHASE 1: Compute all union line positions & comb data ═══
