@@ -226,7 +226,7 @@ const Auth: React.FC = () => {
                   className="w-full gap-2"
                   onClick={async () => {
                     const { error } = await lovable.auth.signInWithOAuth('google', {
-                      redirect_uri: getRedirectOrigin(),
+                      redirect_uri: 'https://genogy-app.com',
                     });
                     if (error) toast.error(error.message || 'Erreur de connexion Google');
                   }}
