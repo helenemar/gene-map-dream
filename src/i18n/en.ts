@@ -23,6 +23,7 @@ export const en: Translations = {
     with: 'with',
     french: 'Français',
     english: 'English',
+    german: 'Deutsch',
   },
 
   // ── Landing page ──

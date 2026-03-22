@@ -20,7 +20,7 @@ export interface Translations {
     cancel: string; save: string; delete: string; confirm: string; back: string;
     search: string; loading: string; error: string; close: string; export: string;
     share: string; rename: string; open: string; add: string; yes: string; no: string;
-    or: string; with: string; french: string; english: string;
+    or: string; with: string; french: string; english: string; german: string;
   };
   landing: {
     metaTitle: string; metaDesc: string; login: string; signup: string;
