@@ -21,15 +21,11 @@ import LegalNotice from "./pages/LegalNotice";
 import TermsOfService from "./pages/TermsOfService";
 import MobileBlocker from "./components/MobileBlocker";
 import CookieBanner from "./components/CookieBanner";
-import OAuthProxy from "./pages/OAuthProxy";
+
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  const isCustomDomainHost =
-    typeof window !== "undefined" &&
-    !window.location.hostname.endsWith("lovable.app") &&
-    !window.location.hostname.endsWith("lovableproject.com");
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -40,7 +36,7 @@ const App = () => {
           <MobileBlocker>
             <BrowserRouter>
               <Routes>
-                {isCustomDomainHost && <Route path="/~oauth/*" element={<OAuthProxy />} />}
+                
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/auth" element={<Navigate to="/" replace />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
