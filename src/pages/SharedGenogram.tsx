@@ -150,11 +150,24 @@ const SharedGenogram: React.FC = () => {
     );
   }
 
-  // Emotional link anchor helper
+  // Emotional link anchor helper — uses side centers like structural links
   const getEmotionalAnchors = (from: FamilyMember, to: FamilyMember) => {
-    const cx1 = from.x + CARD_W / 2, cy1 = from.y + CARD_H / 2;
-    const cx2 = to.x + CARD_W / 2, cy2 = to.y + CARD_H / 2;
-    return { x1: cx1, y1: cy1, x2: cx2, y2: cy2 };
+    const sides = (m: FamilyMember) => [
+      { x: m.x + CARD_W / 2, y: m.y },           // top
+      { x: m.x + CARD_W / 2, y: m.y + CARD_H },  // bottom
+      { x: m.x, y: m.y + CARD_H / 2 },            // left
+      { x: m.x + CARD_W, y: m.y + CARD_H / 2 },   // right
+    ];
+    const fc = sides(from), tc = sides(to);
+    let best = { x1: fc[0].x, y1: fc[0].y, x2: tc[0].x, y2: tc[0].y };
+    let bestDist = Infinity;
+    for (const f of fc) {
+      for (const t of tc) {
+        const d = Math.hypot(f.x - t.x, f.y - t.y);
+        if (d < bestDist) { bestDist = d; best = { x1: f.x, y1: f.y, x2: t.x, y2: t.y }; }
+      }
+    }
+    return best;
   };
 
   return (
