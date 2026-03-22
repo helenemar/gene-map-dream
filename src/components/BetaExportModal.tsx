@@ -15,7 +15,7 @@ const BetaExportModal: React.FC<Props> = ({ open, onOpenChange }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[520px] p-0 gap-0 border-none [&>button]:hidden">
-        <div className="relative flex flex-col items-center px-10 py-10">
+        <div className="relative flex flex-col items-center px-6 py-8 sm:px-10 sm:py-10">
           <button
             onClick={() => onOpenChange(false)}
             className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
