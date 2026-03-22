@@ -25,16 +25,14 @@ jobs:
       - name: 🏗️ Build du projet
         run: |
           npm run build
-          echo "Contenu généré dans dist :"
-          ls -R dist
+          echo "Ce fichier prouve que le déploiement arrive ici" > dist/OU_SONT_MES_FICHIERS.txt
 
-      - name: 🚀 Déploiement via FTP
+      - name: 🚀 Déploiement de Test
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          server-dir: ./public_html/
-          # FORCE LE RENVOI DE TOUT
-          dangerous-clean-slate: true
+          server-dir: ./
+          dangerous-clean-slate: false
