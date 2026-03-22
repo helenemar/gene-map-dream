@@ -21,18 +21,32 @@ const ResetPassword: React.FC = () => {
 
   useEffect(() => {
     const hash = window.location.hash;
+    const search = window.location.search;
+    
+    // Check hash for recovery type (legacy implicit flow)
     if (hash.includes('type=recovery')) {
       setIsRecovery(true);
     }
+    
+    // Check query params for PKCE code flow
+    if (search.includes('code=') || search.includes('type=recovery')) {
+      setIsRecovery(true);
+    }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+    // Listen for PASSWORD_RECOVERY event (set up BEFORE getSession)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsRecovery(true);
+      }
+      // Also treat SIGNED_IN with a session on this page as recovery
+      if (event === 'SIGNED_IN' && session) {
         setIsRecovery(true);
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
+    // Then check existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
         setIsRecovery(true);
       }
     });
