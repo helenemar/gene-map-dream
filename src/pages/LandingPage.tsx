@@ -4,6 +4,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import AuthModal from '@/components/AuthModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import heroComposition from '@/assets/hero-mockup-composition.png';
 import aboutIllustration from '@/assets/about-illustration.png';
@@ -13,11 +19,11 @@ import abstract206 from '@/assets/abstract-206.svg';
 import abstract65 from '@/assets/abstract-65.svg';
 import {
   Brain, Heart, GraduationCap, Stethoscope, Users, BookOpen,
-  ArrowRight,
+  ArrowRight, ChevronDown,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Footer from '@/components/Footer';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage, Lang } from '@/contexts/LanguageContext';
 
 const AUDIENCE_ICONS = [
   <Brain className="w-5 h-5" />,
@@ -66,23 +72,49 @@ const LandingPage: React.FC = () => {
             <span className="text-[15px] font-semibold tracking-tight">Genogy</span>
           </Link>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="rounded-lg w-9 h-9" aria-label={lang === 'fr' ? 'Switch to English' : 'Passer en français'} title={lang === 'fr' ? 'Switch to English' : 'Passer en français'} onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>
-              {lang === 'fr' ? (
-                <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
-                  <rect width="12" height="24" fill="#002395" />
-                  <rect x="12" width="12" height="24" fill="#fff" />
-                  <rect x="24" width="12" height="24" fill="#ED2939" />
-                </svg>
-              ) : (
-                <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
-                  <rect width="36" height="24" fill="#012169" />
-                  <path d="M0,0 L36,24 M36,0 L0,24" stroke="#fff" strokeWidth="4" />
-                  <path d="M0,0 L36,24 M36,0 L0,24" stroke="#C8102E" strokeWidth="2.5" />
-                  <path d="M18,0 V24 M0,12 H36" stroke="#fff" strokeWidth="6" />
-                  <path d="M18,0 V24 M0,12 H36" stroke="#C8102E" strokeWidth="3.5" />
-                </svg>
-              )}
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="rounded-lg gap-1.5 px-2.5 h-9">
+                  {lang === 'fr' ? (
+                    <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
+                      <rect width="12" height="24" fill="#002395" />
+                      <rect x="12" width="12" height="24" fill="#fff" />
+                      <rect x="24" width="12" height="24" fill="#ED2939" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden" aria-hidden="true">
+                      <rect width="36" height="24" fill="#012169" />
+                      <path d="M0,0 L36,24 M36,0 L0,24" stroke="#fff" strokeWidth="4" />
+                      <path d="M0,0 L36,24 M36,0 L0,24" stroke="#C8102E" strokeWidth="2.5" />
+                      <path d="M18,0 V24 M0,12 H36" stroke="#fff" strokeWidth="6" />
+                      <path d="M18,0 V24 M0,12 H36" stroke="#C8102E" strokeWidth="3.5" />
+                    </svg>
+                  )}
+                  <span className="text-xs font-medium">{lang.toUpperCase()}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[140px]">
+                <DropdownMenuItem onClick={() => setLang('fr')} className="gap-2.5 cursor-pointer">
+                  <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden shrink-0" aria-hidden="true">
+                    <rect width="12" height="24" fill="#002395" />
+                    <rect x="12" width="12" height="24" fill="#fff" />
+                    <rect x="24" width="12" height="24" fill="#ED2939" />
+                  </svg>
+                  <span className={lang === 'fr' ? 'font-semibold' : ''}>Français</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLang('en')} className="gap-2.5 cursor-pointer">
+                  <svg viewBox="0 0 36 24" className="w-5 h-3.5 rounded-[2px] overflow-hidden shrink-0" aria-hidden="true">
+                    <rect width="36" height="24" fill="#012169" />
+                    <path d="M0,0 L36,24 M36,0 L0,24" stroke="#fff" strokeWidth="4" />
+                    <path d="M0,0 L36,24 M36,0 L0,24" stroke="#C8102E" strokeWidth="2.5" />
+                    <path d="M18,0 V24 M0,12 H36" stroke="#fff" strokeWidth="6" />
+                    <path d="M18,0 V24 M0,12 H36" stroke="#C8102E" strokeWidth="3.5" />
+                  </svg>
+                  <span className={lang === 'en' ? 'font-semibold' : ''}>English</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-5" onClick={() => openAuth('login')}>
               {t.landing.login}
             </Button>
