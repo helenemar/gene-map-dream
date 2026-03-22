@@ -266,7 +266,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
                 {(member.birthYear > 0 || member.age > 0) && (
                   <div className="flex items-center gap-1 shrink-0">
                     <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                      {isDeceased && member.deathYear ? `${member.deathYear - member.birthYear} ans` : `${member.age} ans`}
+                      {isDeceased && member.deathYear ? `${member.deathYear - member.birthYear} ${t.memberCard.yearsOld}` : `${member.age} ${t.memberCard.yearsOld}`}
                     </span>
                   </div>
                 )}
