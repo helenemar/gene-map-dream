@@ -386,6 +386,11 @@ export const de: Translations = {
     deleteAccountConfirmDesc: 'Diese Aktion ist unwiderruflich. Alle Ihre Genogramme, Daten und Einstellungen werden dauerhaft gelöscht.',
     yesDelete: 'Ja, löschen',
     deleteRequested: 'Ihre Löschanfrage wurde erfasst.',
+    exportData: 'Meine Daten exportieren',
+    exportDataDesc: 'Laden Sie eine Kopie all Ihrer persönlichen Daten herunter (DSGVO-Datenportabilität).',
+    exporting: 'Export läuft…',
+    exportSuccess: 'Ihre Daten wurden erfolgreich exportiert.',
+    exportError: 'Fehler beim Exportieren der Daten.',
   },
 
   // ── Reset Password ──
