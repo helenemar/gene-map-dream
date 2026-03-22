@@ -188,10 +188,6 @@ const Dashboard: React.FC = () => {
               <DropdownMenuItem onClick={() => navigate('/account')}>
                 Mon compte
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
-                {resolvedTheme === 'dark' ? <Sun className="w-3.5 h-3.5 mr-2" /> : <Moon className="w-3.5 h-3.5 mr-2" />}
-                {resolvedTheme === 'dark' ? 'Mode clair' : 'Mode sombre'}
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut()} className="text-destructive focus:text-destructive">
                 Se déconnecter
