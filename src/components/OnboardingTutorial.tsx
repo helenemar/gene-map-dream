@@ -211,7 +211,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                     transition={{ delay: 0.15 }}
                     className="text-lg font-semibold text-foreground mb-2"
                   >
-                    Bienvenue dans l'éditeur
+                    {t.onboarding.welcomeTitle}
                   </motion.h2>
                   <motion.p
                     initial={{ opacity: 0, y: 8 }}
@@ -219,26 +219,26 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                     transition={{ delay: 0.25 }}
                     className="text-sm text-muted-foreground mb-6 leading-relaxed"
                   >
-                    Découvrez les contrôles essentiels pour naviguer et construire votre génogramme.
+                    {t.onboarding.welcomeDesc}
                   </motion.p>
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}>
                     <button
                       onClick={onNext}
                       className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
                     >
-                      C'est parti
+                      {t.onboarding.letsGo}
                     </button>
                     <button
                       onClick={onFinish}
                       className="w-full mt-2 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      Passer le tutoriel
+                      {t.onboarding.skipTutorial}
                     </button>
                     <button
                       onClick={onDismiss}
                       className="w-full mt-1 py-1.5 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
                     >
-                      Ne plus afficher
+                      {t.onboarding.neverShow}
                     </button>
                   </motion.div>
                 </div>
