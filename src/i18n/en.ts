@@ -486,4 +486,4 @@ export const en: Translations = {
     neglect: 'Neglect',
     controlling: 'Controlling',
   },
-} as const;
+};
