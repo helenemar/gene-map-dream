@@ -125,7 +125,8 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
 
   const groupX = x - blockW / 2;
   // Position so that: with icon → icon centered on line, pill above; without icon → pill above line
-  const groupY = showIcon ? y - ICON_R : y - PILL_H - GAP;
+  const EXTRA_LIFT = 10;
+  const groupY = showIcon ? y - ICON_R - EXTRA_LIFT : y - PILL_H - GAP - EXTRA_LIFT;
 
   const stroke = 'hsl(var(--border))';
   const bg = 'hsl(var(--card))';
