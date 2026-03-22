@@ -1,3 +1,5 @@
+// French translations — source of truth for structure
+// Using type assertion to allow string values in EN translation
 export const fr = {
   // ── Common ──
   common: {
