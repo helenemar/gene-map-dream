@@ -153,8 +153,8 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
             rx={PILL_RX}
             fill={bg}
             stroke={stroke}
-            strokeWidth={0.8}
-            strokeOpacity={0.4}
+            strokeWidth={1.2}
+            strokeOpacity={0.7}
             filter={`url(#badge-shadow-${union.id})`}
           />
           <text
@@ -162,7 +162,7 @@ const UnionBadge: React.FC<UnionBadgeProps> = ({ union, x, y, onClick }) => {
             y={pillY + PILL_H / 2}
             textAnchor="middle"
             dominantBaseline="central"
-            fill="hsl(var(--muted-foreground))"
+            fill="hsl(var(--foreground))"
             fontSize={FONT_SIZE}
             fontWeight={600}
             fontFamily="Inter, system-ui, -apple-system, sans-serif"
