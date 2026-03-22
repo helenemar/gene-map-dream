@@ -328,7 +328,17 @@ export const de: Translations = {
     stillbornFemale: 'Totgeburt (Mädchen)',
   },
 
-  // ── Share Modal ──
+  // ── Member Card ──
+  memberCard: {
+    yearsOld: 'J.',
+    createMember: 'Mitglied erstellen',
+    createLink: 'Verbindung erstellen',
+    dragHint: 'Halten und auf eine andere Karte ziehen',
+    cancelLabel: 'Abbrechen',
+    retiredF: 'Im Ruhestand',
+    retiredM: 'Im Ruhestand',
+  },
+
   shareModal: {
     title: 'Teilen',
     linkSharing: 'Freigabelink',

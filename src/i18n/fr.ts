@@ -332,7 +332,17 @@ export const fr: Translations = {
     stillbornFemale: 'Mortinaissance (Fille)',
   },
 
-  // ── Share Modal ──
+  // ── Member Card ──
+  memberCard: {
+    yearsOld: 'ans',
+    createMember: 'Créer un membre',
+    createLink: 'Créer un lien',
+    dragHint: 'Maintenir et glisser vers une autre carte',
+    cancelLabel: 'Annuler',
+    retiredF: 'Retraitée',
+    retiredM: 'Retraité',
+  },
+
   shareModal: {
     title: 'Partager',
     linkSharing: 'Lien de partage',

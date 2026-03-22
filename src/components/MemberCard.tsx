@@ -5,6 +5,7 @@ import type { DynamicPathology } from '@/hooks/usePathologies';
 import MemberIcon from '@/components/MemberIcon';
 import CreateMemberDropdown, { RelationshipChoice, DisabledOptions } from '@/components/CreateMemberDropdown';
 import { Plus, PencilLine, Link, X, Eye, UserPlus, FileText, HeartHandshake, HelpCircle, Lock, Unlock } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 
 /**
