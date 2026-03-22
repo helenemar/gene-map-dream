@@ -99,6 +99,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   isAdopted = false,
   onboardingPulse = false,
 }) => {
+  const { t } = useLanguage();
   const isDeceased = !!member.deathYear;
   const isPlaceholder = !!member.isPlaceholder;
   const isDraft = !!member.isDraft;
