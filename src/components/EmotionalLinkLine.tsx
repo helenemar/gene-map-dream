@@ -404,13 +404,13 @@ export default EmotionalLinkLine;
 
 // ─── Static Preview (Design System) ─────────────────────────────────
 
-export const EmotionalLinkPreview: React.FC<{ type: EmotionalLinkType; width?: number; height?: number }> = ({
-  type, width = 200, height = 32,
+export const EmotionalLinkPreview: React.FC<{ type: EmotionalLinkType; width?: number; height?: number; strokeScale?: number }> = ({
+  type, width = 200, height = 32, strokeScale,
 }) => {
   const pad = 10;
   return (
     <svg width={width} height={height} className="shrink-0">
-      <EmotionalLinkLineStatic x1={pad} y1={height / 2} x2={width - pad} y2={height / 2} type={type} />
+      <EmotionalLinkLineStatic x1={pad} y1={height / 2} x2={width - pad} y2={height / 2} type={type} strokeScale={strokeScale} />
     </svg>
   );
 };
