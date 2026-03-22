@@ -32,6 +32,7 @@ import { useAutoSave } from '@/hooks/useAutoSave';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { usePathologies } from '@/hooks/usePathologies';
+import { useSharedAutoSave } from '@/hooks/useSharedAutoSave';
 import { toast } from 'sonner';
 import { Undo2, Redo2, Link } from 'lucide-react';
 
