@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import BetaExportModal from '@/components/BetaExportModal';
-import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode, FileText, LogOut, ChevronDown } from 'lucide-react';
+import { Search, Download, Share2, X, User, Briefcase, HeartPulse, Link2, Image, FileCode, FileText, LogOut, ChevronDown, Sun, Moon } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
