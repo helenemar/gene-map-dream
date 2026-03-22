@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 const SECTIONS = [
   {
     title: "Nature de l'outil",
-    content: "Bien que ce projet ait été co-conçu avec **Jona Machicote, Psychologue Clinicienne**, l'utilisation de la plateforme ne constitue en aucun cas une thérapie, une consultation psychologique ou un avis médical.",
+    content: "Bien que ce projet ait été co-conçu avec une **Psychologue Clinicienne**, l'utilisation de la plateforme ne constitue en aucun cas une thérapie, une consultation psychologique ou un avis médical.",
   },
   {
     title: 'Santé mentale',
