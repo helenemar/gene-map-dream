@@ -145,27 +145,29 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
             {linkShares.length > 0 && (
               <div className="space-y-2">
                 {linkShares.map(share => (
-                  <div key={share.id} className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2">
-                    <Link2 className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    <span className="text-xs text-muted-foreground truncate flex-1 font-mono">
-                      .../shared/{share.share_token.slice(0, 12)}...
-                    </span>
-                    <AccessBadge level={share.access_level as AccessLevel} />
-                    <button
-                      onClick={() => copyLink(share.share_token, share.id)}
-                      className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
-                    >
-                      {copiedId === share.id
-                        ? <Check className="w-3.5 h-3.5 text-green-600" />
-                        : <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-                      }
-                    </button>
-                    <button
-                      onClick={() => deleteShare(share.id)}
-                      className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-destructive/10 transition-colors"
-                    >
-                      <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                    </button>
+                  <div key={share.id} className="bg-muted/50 rounded-lg px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <Link2 className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <span className="text-[11px] text-muted-foreground truncate flex-1 font-mono">
+                        .../{share.share_token.slice(0, 8)}...
+                      </span>
+                      <AccessBadge level={share.access_level as AccessLevel} />
+                      <button
+                        onClick={() => copyLink(share.share_token, share.id)}
+                        className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-accent transition-colors shrink-0"
+                      >
+                        {copiedId === share.id
+                          ? <Check className="w-3.5 h-3.5 text-green-600" />
+                          : <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                        }
+                      </button>
+                      <button
+                        onClick={() => deleteShare(share.id)}
+                        className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-destructive/10 transition-colors shrink-0"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
