@@ -393,7 +393,111 @@ const Dashboard: React.FC = () => {
               ))}
             </div>
           ) : filteredFiles.length > 0 ? (
-            <div className="border border-border rounded-lg overflow-x-auto">
+            <>
+              {/* ── Mobile card view ── */}
+              <div className="sm:hidden flex flex-col gap-3">
+                {filteredFiles.map((file) => (
+                  <div
+                    key={file.id}
+                    onClick={() => {
+                      if (file.isShared) {
+                        supabase.from('genogram_shares')
+                          .select('share_token')
+                          .eq('genogram_id', file.id)
+                          .eq('shared_with_user_id', user!.id)
+                          .eq('is_active', true)
+                          .single()
+                          .then(({ data }) => {
+                            if (data?.share_token) {
+                              navigate(file.accessLevel === 'editor' ? `/shared-edit/${data.share_token}` : `/shared/${data.share_token}`);
+                            } else navigate(`/editor/${file.id}`);
+                          });
+                      } else {
+                        navigate(`/editor/${file.id}`);
+                      }
+                    }}
+                    className="border border-border rounded-xl p-4 bg-background active:bg-muted/50 transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-start gap-3">
+                      <GenogramThumbnail data={file.data || {}} width={56} height={40} />
+                      <div className="flex-1 min-w-0">
+                        {renamingId === file.id ? (
+                          <input
+                            autoFocus
+                            value={renameValue}
+                            onChange={(e) => setRenameValue(e.target.value)}
+                            onBlur={() => handleRename(file.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleRename(file.id);
+                              if (e.key === 'Escape') setRenamingId(null);
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[13px] font-medium text-foreground bg-transparent border border-ring rounded px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-ring w-full"
+                          />
+                        ) : (
+                          <p className="text-[13px] font-semibold text-foreground truncate">{file.name}</p>
+                        )}
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: file.isShared ? getSharedAvatarColor(file.ownerName || '') : 'hsl(var(--primary))' }}>
+                            <span className="text-[8px] font-bold text-white">
+                              {file.isShared ? file.ownerInitials : userInitials}
+                            </span>
+                          </div>
+                          <span className="text-[11px] text-muted-foreground truncate">
+                            {file.isShared ? file.ownerName : displayName}
+                          </span>
+                        </div>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button onClick={(e) => e.stopPropagation()} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors shrink-0">
+                            <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/editor/${file.id}`); }}>
+                            {t.common.open}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setNotesModal({ open: true, genogramId: file.id, genogramName: file.name }); }}>
+                            {t.dashboard.dossierNotes}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setRenamingId(file.id); setRenameValue(file.name); }}>
+                            {t.common.rename}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: file.id, name: file.name }); }} className="text-destructive focus:text-destructive">
+                            {t.common.delete}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                      <div className="text-[11px] text-muted-foreground">
+                        <span>{t.dashboard.lastModified}: </span>
+                        <span className="text-foreground font-medium">{formatDate(file.updated_at)}</span>
+                      </div>
+                      {(() => {
+                        const count = noteCounts[file.id] ?? 0;
+                        if (count === 0) return null;
+                        const latestNote = latestNoteDates[file.id];
+                        const hasNew = latestNote && new Date(latestNote) > new Date(file.updated_at);
+                        return (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setNotesModal({ open: true, genogramId: file.id, genogramName: file.name }); }}
+                            className="flex items-center gap-1 text-[11px] font-medium"
+                          >
+                            <FileText className={`w-3.5 h-3.5 ${hasNew ? 'text-primary' : 'text-muted-foreground'}`} />
+                            <span className={hasNew ? 'text-primary' : 'text-muted-foreground'}>{count}</span>
+                          </button>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* ── Desktop table view ── */}
+              <div className="hidden sm:block border border-border rounded-lg overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent bg-transparent">
@@ -430,7 +534,6 @@ const Dashboard: React.FC = () => {
                       key={file.id}
                       onClick={() => {
                         if (file.isShared && file.accessLevel === 'editor') {
-                          // Find share token for this genogram
                           supabase.from('genogram_shares')
                             .select('share_token')
                             .eq('genogram_id', file.id)
@@ -546,7 +649,8 @@ const Dashboard: React.FC = () => {
                   ))}
                 </TableBody>
               </Table>
-            </div>
+              </div>
+            </>
           ) : genograms.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center mb-4">
