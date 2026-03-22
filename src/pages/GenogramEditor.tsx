@@ -1682,7 +1682,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 isSelected={isMobileReadOnly ? false : selectedMembers.has(member.id)}
                 isAnimating={isAnimating}
                 isColliding={isMobileReadOnly ? false : collisions.has(member.id)}
-                state={isMobileReadOnly ? 'idle' : getMemberState(member.id)}
+                state={isMobileReadOnly ? 'default' : getMemberState(member.id)}
                 isLinkTarget={isMobileReadOnly ? false : (!!linkDrag && linkDrag.fromId !== member.id)}
                 isFadingOut={fadingOutIds.has(member.id)}
                 searchDimmed={search.isActive && !search.matchedMemberIds.has(member.id)}
