@@ -50,6 +50,7 @@ const LandingPage: React.FC = () => {
     open: boolean;
     view: 'login' | 'signup';
   }>({ open: false, view: 'login' });
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   React.useEffect(() => {
     if (!loading && user) {
