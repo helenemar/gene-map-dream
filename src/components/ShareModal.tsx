@@ -100,7 +100,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[520px] p-0 gap-0 border-none [&>button]:hidden">
-        <div className="relative flex flex-col px-8 py-8">
+        <div className="relative flex flex-col px-5 py-6 sm:px-8 sm:py-8">
           <button
             onClick={() => onOpenChange(false)}
             className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
