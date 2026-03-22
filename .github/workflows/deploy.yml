@@ -35,6 +35,5 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          # On remonte à la racine pour être sûr de trouver le bon domaine
-          server-dir: domains/genogy-app.com/public_html/
+          server-dir: ./public_html/
           delete-destination: false
