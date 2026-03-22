@@ -390,6 +390,11 @@ export const fr: Translations = {
     deleteAccountConfirmDesc: 'Cette action est irréversible. Tous vos génogrammes, données et paramètres seront définitivement supprimés.',
     yesDelete: 'Oui, supprimer',
     deleteRequested: 'Votre demande de suppression a été prise en compte.',
+    exportData: 'Exporter mes données',
+    exportDataDesc: 'Téléchargez une copie de toutes vos données personnelles (droit à la portabilité RGPD).',
+    exporting: 'Export en cours…',
+    exportSuccess: 'Vos données ont été exportées avec succès.',
+    exportError: "Erreur lors de l'export des données.",
   },
 
   // ── Reset Password ──
