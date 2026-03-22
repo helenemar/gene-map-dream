@@ -9,31 +9,23 @@ import Footer from '@/components/Footer';
 const SECTIONS = [
   {
     title: '1. Éditeur du site',
-    content: `Le site **Genogy** (accessible à l'adresse genogy.app) est édité par :\n\n• Raison sociale : Genogy\n• Adresse e-mail : contact@genogy.app\n• Directeur de la publication : le représentant légal de la société éditrice.`,
+    content: `Le site **genogy-app.com** est édité par :\n\n• Nom / Raison sociale : Genogy\n• Statut : Auto-entrepreneur\n• Siège social : 10 Boulevard Morland\n• Email : contact.genogy@gmail.com\n• Directeur de la publication : Genogy`,
   },
   {
-    title: '2. Hébergement',
-    content: `Le site est hébergé par :\n\n• **Lovable Cloud** (infrastructure Supabase)\n• Les données sont hébergées au sein de l'Union Européenne, conformément au RGPD.`,
+    title: '2. Hébergement du site',
+    content: `Le site est hébergé par :\n\n• Hébergeur : **Hostinger International Ltd.**\n• Adresse : 61 Lordou Vironos Street, 6023 Larnaca, Chypre\n• Site web : www.hostinger.fr`,
   },
   {
     title: '3. Propriété intellectuelle',
-    content: `L'ensemble des contenus présents sur le site Genogy (textes, images, logos, icônes, logiciels, base de données) sont protégés par le droit de la propriété intellectuelle.\n\nToute reproduction, représentation, modification ou exploitation non autorisée de tout ou partie du site est interdite et constitue une contrefaçon sanctionnée par les articles L.335-2 et suivants du Code de la propriété intellectuelle.`,
+    content: `L'ensemble du contenu de ce site (textes, graphismes, logos, icônes, etc.) est la propriété exclusive de l'éditeur, sauf mention contraire. Toute reproduction ou représentation, intégrale ou partielle, du site ou de l'un de ses éléments, est interdite sans autorisation préalable.`,
   },
   {
-    title: '4. Données personnelles',
-    content: `Genogy collecte et traite des données personnelles conformément au Règlement Général sur la Protection des Données (RGPD).\n\nPour en savoir plus sur la collecte et le traitement de vos données, consultez notre [Politique de confidentialité](/privacy).`,
+    title: '4. Données personnelles (RGPD)',
+    content: `Conformément au Règlement Général sur la Protection des Données (RGPD) :\n\n• **Finalité** : Les données collectées (via Google Auth ou formulaires) servent uniquement à la gestion de votre compte utilisateur et à la création de vos génogrammes.\n• **Conservation** : Vos données sont conservées tant que votre compte est actif.\n• **Vos droits** : Vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour l'exercer, contactez-nous à : contact.genogy@gmail.com.\n• **Stockage** : Les données sont stockées via une solution backend sécurisée.`,
   },
   {
     title: '5. Cookies',
-    content: `Le site utilise uniquement des cookies strictement nécessaires au fonctionnement du service (authentification, préférences de session). Aucun cookie publicitaire ou de tracking tiers n'est utilisé.`,
-  },
-  {
-    title: '6. Limitation de responsabilité',
-    content: `Genogy s'efforce de fournir des informations aussi précises que possible. Toutefois, l'éditeur ne pourra être tenu responsable des omissions, des inexactitudes ou des carences dans la mise à jour des informations.\n\nL'utilisateur est seul responsable du contenu qu'il saisit dans ses génogrammes. Genogy ne saurait être tenu responsable de l'utilisation qui est faite des informations saisies par les utilisateurs.`,
-  },
-  {
-    title: '7. Droit applicable',
-    content: `Les présentes mentions légales sont régies par le droit français. En cas de litige, les tribunaux français seront seuls compétents.`,
+    content: `Le site utilise des cookies essentiels au fonctionnement de l'authentification (Google Auth) et à la navigation. En utilisant ce site, vous acceptez l'utilisation de ces cookies techniques.`,
   },
 ];
 
