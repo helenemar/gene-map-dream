@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { fr } from '@/i18n/fr';
 import { en } from '@/i18n/en';
+import { de } from '@/i18n/de';
 import type { Translations } from '@/i18n/types';
 
-export type Lang = 'fr' | 'en';
+export type Lang = 'fr' | 'en' | 'de';
 
 interface LanguageContextValue {
   lang: Lang;
@@ -17,12 +18,12 @@ const LanguageContext = createContext<LanguageContextValue>({
   t: fr,
 });
 
-const TRANSLATIONS: Record<Lang, Translations> = { fr, en };
+const TRANSLATIONS: Record<Lang, Translations> = { fr, en, de };
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [lang, setLangState] = useState<Lang>(() => {
     const stored = localStorage.getItem('genogy-lang');
-    return (stored === 'en' || stored === 'fr') ? stored : 'fr';
+    return (stored === 'en' || stored === 'fr' || stored === 'de') ? stored : 'fr';
   });
 
   const setLang = useCallback((l: Lang) => {
