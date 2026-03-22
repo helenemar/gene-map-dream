@@ -31,7 +31,7 @@ const UnionLine: React.FC<{
 }> = ({ x1, y1, x2, y2, status }) => {
   const lineY = (y1 + y2) / 2;
   const stroke = 'hsl(var(--foreground))';
-  const opacity = 0.5;
+  const opacity = 1;
   const needsConnectors = Math.abs(y1 - y2) > 1;
   const dashArray = (status === 'common_law' || status === 'love_affair') ? '8 4' : undefined;
 
@@ -109,7 +109,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
   const getMember = (id: string) => members.find(m => m.id === id);
 
   const stroke = 'hsl(var(--foreground))';
-  const opacity = 0.5;
+  const opacity = 1;
   const sw = 1.5;
 
   // ═══ PHASE 1: Compute all union line positions & comb data ═══
@@ -500,7 +500,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
   return (
     <>
       {/* Structural lines layer */}
-      <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: 0.9, transition: 'opacity 0.3s' }}>
+      <svg className="absolute pointer-events-none" style={{ zIndex: 0, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, transition: 'opacity 0.3s' }}>
         {/* Glow filter for highlighted unions */}
         <defs>
           <filter id="union-glow" x="-30%" y="-30%" width="160%" height="160%">
