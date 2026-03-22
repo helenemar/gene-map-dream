@@ -21,7 +21,7 @@ import LegalNotice from "./pages/LegalNotice";
 import TermsOfService from "./pages/TermsOfService";
 import MobileBlocker from "./components/MobileBlocker";
 import CookieBanner from "./components/CookieBanner";
-import OAuthProxy from "./pages/OAuthProxy";
+
 
 const queryClient = new QueryClient();
 
