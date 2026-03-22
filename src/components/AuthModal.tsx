@@ -75,7 +75,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, defaultView = 'log
         email,
         password,
         options: {
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: getRedirectOrigin(),
           data: { full_name: fullName },
         },
       });
