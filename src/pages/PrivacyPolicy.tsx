@@ -122,8 +122,8 @@ const PrivacyPolicy: React.FC = () => {
           <div className="mt-16 pt-8 border-t border-border">
             <p className="text-sm text-muted-foreground">
               Pour toute question concernant cette politique, contactez-nous à{' '}
-              <a href="mailto:contact@genogy.app" className="text-primary hover:underline">
-                contact@genogy.app
+              <a href="mailto:contact.genogy@gmail.com" className="text-primary hover:underline">
+                contact.genogy@gmail.com
               </a>.
             </p>
           </div>
