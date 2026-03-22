@@ -51,6 +51,13 @@ export const en: Translations = {
       { title: 'Advanced features', desc: 'Easily add medical pathologies, family and emotional links, and clinical notes.' },
       { title: 'Built for professionals', desc: 'Collaborate with colleagues, share files as PDF and manage your patients easily.' },
     ],
+    stepsTitle: 'How it works',
+    stepsSub: 'Create your first genogram in 3 simple steps.',
+    steps: [
+      { title: 'Create your account', desc: 'Sign up for free in seconds and get immediate access to the tool.' },
+      { title: 'Add your members', desc: 'Build your tree by adding members, their relationships and clinical information.' },
+      { title: 'Share & export', desc: 'Export as PDF, share with colleagues or save for later.' },
+    ],
     aboutTitle: 'About Genogy',
     aboutP1: 'Genogy is a digital tool designed to help helping professionals create genograms.',
     aboutP2: 'It is aimed at psychologists, specialized educators, therapists, social workers, or any professional working in a clinical, medico-social or institutional context.',
