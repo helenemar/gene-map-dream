@@ -51,6 +51,13 @@ const SharedGenogram: React.FC = () => {
     })();
   }, [token]);
 
+  // Redirect editors to the full shared editor
+  useEffect(() => {
+    if (data?.access_level === 'editor' && token) {
+      navigate(`/shared-edit/${token}`, { replace: true });
+    }
+  }, [data, token, navigate]);
+
   // Parse genogram data
   const members: FamilyMember[] = data?.genogram_data?.members || [];
   const unions: Union[] = data?.genogram_data?.unions || [];
