@@ -72,20 +72,78 @@ const Dashboard: React.FC = () => {
     enabled: !!user,
   });
 
-  const { data: realGenograms, isLoading } = useQuery({
+  const { data: ownGenograms, isLoading: isLoadingOwn } = useQuery({
     queryKey: ['genograms', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('genograms')
         .select('*')
+        .eq('user_id', user!.id)
         .order('updated_at', { ascending: false });
       if (error) throw error;
-      return data as GenogramRow[];
+      return (data as GenogramRow[]).map(g => ({ ...g, isShared: false }));
     },
     enabled: !!user,
   });
 
-  const genograms = useMemo(() => realGenograms || [], [realGenograms]);
+  const { data: sharedGenograms, isLoading: isLoadingShared } = useQuery({
+    queryKey: ['shared-genograms', user?.id],
+    queryFn: async () => {
+      // Get shares for this user
+      const { data: shares, error: sharesError } = await supabase
+        .from('genogram_shares')
+        .select('genogram_id, access_level')
+        .eq('shared_with_user_id', user!.id)
+        .eq('is_active', true);
+      if (sharesError || !shares?.length) return [];
+
+      const genogramIds = shares.map(s => s.genogram_id);
+      const accessMap = Object.fromEntries(shares.map(s => [s.genogram_id, s.access_level]));
+
+      // Get the genograms
+      const { data: genos, error: genosError } = await supabase
+        .from('genograms')
+        .select('*')
+        .in('id', genogramIds);
+      if (genosError || !genos?.length) return [];
+
+      // Get owner profiles
+      const ownerIds = [...new Set(genos.map(g => g.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, first_name, last_name, display_name')
+        .in('user_id', ownerIds);
+
+      const profileMap = Object.fromEntries(
+        (profiles || []).map(p => [p.user_id, p])
+      );
+
+      return genos.map(g => {
+        const p = profileMap[g.user_id];
+        const ownerName = p?.first_name && p?.last_name
+          ? `${p.first_name} ${p.last_name}`
+          : p?.display_name || '?';
+        const ownerInitials = p?.first_name && p?.last_name
+          ? `${p.first_name[0]}${p.last_name[0]}`.toUpperCase()
+          : ownerName.slice(0, 2).toUpperCase();
+        return {
+          ...g,
+          isShared: true,
+          ownerName,
+          ownerInitials,
+          accessLevel: accessMap[g.id] || 'reader',
+        } as GenogramRow;
+      });
+    },
+    enabled: !!user,
+  });
+
+  const isLoading = isLoadingOwn || isLoadingShared;
+
+  const genograms = useMemo(() => [
+    ...(ownGenograms || []),
+    ...(sharedGenograms || []),
+  ], [ownGenograms, sharedGenograms]);
 
   useEffect(() => {
     if (!genograms?.length) return;
