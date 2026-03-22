@@ -23,18 +23,16 @@ jobs:
         run: npm install
 
       - name: 🏗️ Build du projet
-        run: |
-          npm run build
-          echo "Vérification du dossier dist :"
-          ls -R dist
+        run: npm run build
 
-      - name: 🚀 Déploiement Direct
+      - name: 🚀 Déploiement DIRECT
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          # ON LAISSE VIDE car ton FTP pointe déjà sur public_html
+          # ON NE MET RIEN ICI (juste un point) 
+          # car ton FTP est déjà dans public_html
           server-dir: ./
           dangerous-clean-slate: true
