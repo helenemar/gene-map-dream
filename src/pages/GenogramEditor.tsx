@@ -149,8 +149,9 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   const [dbLoaded, setDbLoaded] = useState(false);
   const onboarding = useOnboarding(isSharedMode ? undefined : genogramId);
 
-  // Initialize with empty state — will be populated from DB or sample data
+  // Initialize with empty state — will be populated from DB, shared data, or sample data
   const [members, setMembers] = useState<FamilyMember[]>(() => {
+    if (sharedInitialData) return sharedInitialData.members;
     if (genogramId) return []; // Will load from DB
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -164,12 +165,12 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set());
   const [anchorActiveMember, setAnchorActiveMember] = useState<string | null>(null);
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
-  const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(() => genogramId ? [] : SAMPLE_EMOTIONAL_LINKS);
-  const [unions, setUnions] = useState<Union[]>(() => genogramId ? [] : SAMPLE_UNIONS);
-  const { pathologies: dynamicPathologies, addPathology, deletePathology } = usePathologies(genogramId);
+  const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(() => sharedInitialData ? sharedInitialData.emotionalLinks : (genogramId ? [] : SAMPLE_EMOTIONAL_LINKS));
+  const [unions, setUnions] = useState<Union[]>(() => sharedInitialData ? sharedInitialData.unions : (genogramId ? [] : SAMPLE_UNIONS));
+  const { pathologies: dynamicPathologies, addPathology, deletePathology } = usePathologies(isSharedMode ? undefined : genogramId);
   const search = useFamilySearch(members, unions, emotionalLinks, dynamicPathologies);
   const [editingUnionId, setEditingUnionId] = useState<string | null>(null);
-  const [fileName, setFileName] = useState('Sans titre');
+  const [fileName, setFileName] = useState(sharedInitialData?.name || 'Sans titre');
   const [isAnimating, setIsAnimating] = useState(false);
   const [snapToGrid, setSnapToGrid] = useState(true);
   const [smartGuides, setSmartGuides] = useState<{ type: 'horizontal' | 'vertical'; pos: number; from: number; to: number }[]>([]);
