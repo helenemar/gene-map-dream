@@ -183,7 +183,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           return (
           <div
             key={side}
-            className={`absolute w-4 h-4 rounded-full border-2 border-primary cursor-crosshair transition-all duration-150 ${
+            className={`absolute w-3 h-3 rounded-full border-[1.5px] border-primary cursor-crosshair transition-all duration-150 ${
               dotsFilled
                 ? 'bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.5)]'
                 : isLinkTarget
