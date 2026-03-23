@@ -133,88 +133,167 @@ export const DragAnimation: React.FC = () => (
   </div>
 );
 
-/* ── 4. Create link: drag from anchor to another card ── */
+/* ── 4. Create emotional link: select card → dots appear → drag from corner dot → target highlights → modal appears ── */
 export const LinkAnimation: React.FC = () => {
-  const cardAX = 16, cardAY = 14, cardBX = 100, cardBY = 14;
+  const cardAX = 10, cardAY = 10, cardBX = 104, cardBY = 10;
   const cardW = 48, cardH = 28;
 
-  // Anchor positions on all 4 sides of each card (midpoints)
-  const anchorsA = [
-    { cx: cardAX + cardW / 2, cy: cardAY, label: 'top' },           // top
-    { cx: cardAX + cardW, cy: cardAY + cardH / 2, label: 'right' }, // right ← active
-    { cx: cardAX + cardW / 2, cy: cardAY + cardH, label: 'bottom' },// bottom
-    { cx: cardAX, cy: cardAY + cardH / 2, label: 'left' },          // left
+  // Corner dots on card A (like real MemberCard)
+  const cornersA = [
+    { cx: cardAX, cy: cardAY },                       // top-left
+    { cx: cardAX + cardW, cy: cardAY },                // top-right ← active
+    { cx: cardAX, cy: cardAY + cardH },                // bottom-left
+    { cx: cardAX + cardW, cy: cardAY + cardH },        // bottom-right
   ];
-  const anchorsB = [
-    { cx: cardBX + cardW / 2, cy: cardBY, label: 'top' },
-    { cx: cardBX + cardW, cy: cardBY + cardH / 2, label: 'right' },
-    { cx: cardBX + cardW / 2, cy: cardBY + cardH, label: 'bottom' },
-    { cx: cardBX, cy: cardBY + cardH / 2, label: 'left' },          // left ← active
+  // Corner dots on card B
+  const cornersB = [
+    { cx: cardBX, cy: cardBY },
+    { cx: cardBX + cardW, cy: cardBY },
+    { cx: cardBX, cy: cardBY + cardH },
+    { cx: cardBX + cardW, cy: cardBY + cardH },
   ];
 
-  const fromAnchor = anchorsA[1]; // right side of A
-  const toAnchor = anchorsB[3];   // left side of B
+  const fromDot = cornersA[1]; // top-right of A
+  const toDot = cornersB[0];   // top-left of B
+
+  // Total cycle: 4s
+  // Phase 1 (0-0.2): card A selected, dots appear
+  // Phase 2 (0.2-0.5): drag from dot to card B
+  // Phase 3 (0.5-0.65): target highlight + snap
+  // Phase 4 (0.65-0.85): mini modal appears
+  // Phase 5 (0.85-1): reset
 
   return (
-    <div className="relative w-full h-[80px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
-      <svg width="164" height="56" viewBox="0 0 164 56">
-        {/* Card A */}
-        <MiniCard x={cardAX} y={cardAY} w={cardW} h={cardH} label="Marie" />
+    <div className="relative w-full h-[100px] rounded-lg bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center">
+      <svg width="164" height="80" viewBox="0 0 164 80">
+        {/* Card A with selection border */}
+        <motion.rect
+          x={cardAX} y={cardAY} width={cardW} height={cardH} rx={4}
+          fill="hsl(var(--card))"
+          stroke="hsl(var(--primary))"
+          strokeWidth={1.5}
+          animate={{
+            stroke: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--primary))', 'hsl(var(--primary))', 'hsl(var(--border))'],
+          }}
+          transition={{ duration: 4, repeat: Infinity, times: [0, 0.1, 0.7, 0.85, 1] }}
+        />
+        <text x={cardAX + cardW / 2} y={cardAY + cardH / 2 + 3.5} textAnchor="middle" fontSize={7} fill="hsl(var(--muted-foreground))" fontFamily="sans-serif">Marie</text>
+
         {/* Card B */}
-        <MiniCard x={cardBX} y={cardBY} w={cardW} h={cardH} label="Paul" />
+        <motion.rect
+          x={cardBX} y={cardBY} width={cardW} height={cardH} rx={4}
+          fill="hsl(var(--card))"
+          strokeWidth={1.5}
+          animate={{
+            stroke: ['hsl(var(--border))', 'hsl(var(--border))', 'hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--primary))', 'hsl(var(--border))'],
+          }}
+          transition={{ duration: 4, repeat: Infinity, times: [0, 0.3, 0.45, 0.5, 0.7, 0.85] }}
+        />
+        <text x={cardBX + cardW / 2} y={cardBY + cardH / 2 + 3.5} textAnchor="middle" fontSize={7} fill="hsl(var(--muted-foreground))" fontFamily="sans-serif">Paul</text>
 
-        {/* All 4 anchor dots on Card A */}
-        {anchorsA.map((a, i) => (
+        {/* Target halo on card B */}
+        <motion.rect
+          x={cardBX - 3} y={cardBY - 3} width={cardW + 6} height={cardH + 6} rx={6}
+          fill="none"
+          stroke="hsl(var(--primary))"
+          strokeWidth={1.5}
+          animate={{
+            opacity: [0, 0, 0, 0.6, 0.8, 0],
+            scale: [1, 1, 1, 1, 1.04, 1],
+          }}
+          transition={{ duration: 4, repeat: Infinity, times: [0, 0.3, 0.45, 0.5, 0.6, 0.7] }}
+          style={{ transformOrigin: `${cardBX + cardW / 2}px ${cardBY + cardH / 2}px` }}
+        />
+
+        {/* Corner dots on card A — appear when selected */}
+        {cornersA.map((dot, i) => (
           <motion.circle
-            key={`a-${i}`}
-            cx={a.cx} cy={a.cy} r={2.5}
-            fill={i === 1 ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.35)'}
-            stroke={i === 1 ? 'hsl(var(--primary))' : 'hsl(var(--border))'}
-            strokeWidth={0.8}
-            animate={i === 1 ? { scale: [1, 1.5, 1], r: [2.5, 3.5, 2.5] } : { scale: [0.8, 1, 0.8] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: i === 1 ? 0 : 0.3 }}
+            key={`ca-${i}`}
+            cx={dot.cx} cy={dot.cy} r={3}
+            fill={i === 1 ? 'hsl(var(--primary))' : 'hsl(var(--card))'}
+            stroke="hsl(var(--primary))"
+            strokeWidth={1.2}
+            animate={{
+              opacity: [0, 1, 1, 1, 0],
+              scale: i === 1 ? [0, 1, 1.3, 1, 0] : [0, 1, 1, 1, 0],
+            }}
+            transition={{ duration: 4, repeat: Infinity, times: [0, 0.12, 0.2, 0.7, 0.85] }}
           />
         ))}
 
-        {/* All 4 anchor dots on Card B */}
-        {anchorsB.map((a, i) => (
+        {/* Corner dots on card B — appear when target is hovered */}
+        {cornersB.map((dot, i) => (
           <motion.circle
-            key={`b-${i}`}
-            cx={a.cx} cy={a.cy} r={2.5}
-            fill={i === 3 ? 'hsl(var(--primary) / 0.3)' : 'hsl(var(--muted-foreground) / 0.35)'}
-            stroke={i === 3 ? 'hsl(var(--primary))' : 'hsl(var(--border))'}
-            strokeWidth={0.8}
-            animate={i === 3 ? { scale: [0, 0, 1.4, 1, 0], opacity: [0, 0, 1, 1, 0] } : { scale: [0.8, 1, 0.8] }}
-            transition={i === 3
-              ? { duration: 2.8, repeat: Infinity, times: [0, 0.3, 0.45, 0.6, 0.7] }
-              : { duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }
-            }
+            key={`cb-${i}`}
+            cx={dot.cx} cy={dot.cy} r={3}
+            fill="hsl(var(--primary) / 0.2)"
+            stroke="hsl(var(--primary))"
+            strokeWidth={1}
+            animate={{
+              opacity: [0, 0, 0, 0.5, 0.5, 0],
+            }}
+            transition={{ duration: 4, repeat: Infinity, times: [0, 0.3, 0.45, 0.5, 0.65, 0.85] }}
           />
         ))}
 
-        {/* Elastic line from right side of A → left side of B */}
+        {/* Elastic line from corner dot A → corner dot B */}
         <motion.line
-          x1={fromAnchor.cx} y1={fromAnchor.cy}
-          x2={fromAnchor.cx} y2={fromAnchor.cy}
+          x1={fromDot.cx} y1={fromDot.cy}
+          x2={fromDot.cx} y2={fromDot.cy}
           stroke="hsl(var(--primary))"
           strokeWidth={2}
           strokeLinecap="round"
-          animate={{ x2: [fromAnchor.cx, toAnchor.cx, toAnchor.cx, fromAnchor.cx] }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.6, 1] }}
+          animate={{
+            x2: [fromDot.cx, fromDot.cx, toDot.cx, toDot.cx, fromDot.cx],
+            y2: [fromDot.cy, fromDot.cy, toDot.cy, toDot.cy, fromDot.cy],
+            opacity: [0, 1, 1, 1, 0],
+          }}
+          transition={{ duration: 4, repeat: Infinity, times: [0, 0.2, 0.5, 0.65, 0.85] }}
         />
 
-        {/* Cursor following the line */}
+        {/* Cursor — drags from dot to target */}
         <motion.g
           animate={{
-            x: [0, toAnchor.cx - fromAnchor.cx - 6, toAnchor.cx - fromAnchor.cx - 6, 0],
-            opacity: [1, 1, 0.4, 1],
+            x: [0, 0, toDot.cx - fromDot.cx - 6, toDot.cx - fromDot.cx - 6, 0],
+            y: [0, 0, toDot.cy - fromDot.cy, toDot.cy - fromDot.cy, 0],
+            opacity: [0, 1, 1, 0.4, 0],
           }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.6, 1] }}
+          transition={{ duration: 4, repeat: Infinity, times: [0, 0.18, 0.5, 0.65, 0.85] }}
         >
-          <g transform={`translate(${fromAnchor.cx + 2}, ${fromAnchor.cy + 2})`}>
+          <g transform={`translate(${fromDot.cx + 2}, ${fromDot.cy + 2})`}>
             {CURSOR}
           </g>
         </motion.g>
+
+        {/* Mini modal appearing after drop */}
+        <motion.g
+          animate={{
+            opacity: [0, 0, 0, 0, 1, 1, 0],
+            y: [4, 4, 4, 4, 0, 0, 4],
+          }}
+          transition={{ duration: 4, repeat: Infinity, times: [0, 0.5, 0.55, 0.62, 0.68, 0.82, 0.88] }}
+        >
+          <rect x={70} y={44} width={56} height={30} rx={4} fill="hsl(var(--card))" stroke="hsl(var(--border))" strokeWidth={1} />
+          <text x={98} y={55} textAnchor="middle" fontSize={6} fill="hsl(var(--foreground))" fontFamily="sans-serif" fontWeight="600">Type de lien</text>
+          <rect x={74} y={60} width={48} height={10} rx={2} fill="hsl(var(--primary) / 0.1)" stroke="hsl(var(--primary) / 0.3)" strokeWidth={0.5} />
+          <text x={98} y={67.5} textAnchor="middle" fontSize={5.5} fill="hsl(var(--primary))" fontFamily="sans-serif">Fusionnel ▾</text>
+        </motion.g>
+
+        {/* Step labels */}
+        <motion.text x={cardAX + cardW / 2} y={cardAY + cardH + 14} textAnchor="middle" fontSize={5.5} fill="hsl(var(--primary))" fontFamily="sans-serif" fontWeight="600"
+          animate={{ opacity: [0, 1, 1, 0, 0] }}
+          transition={{ duration: 4, repeat: Infinity, times: [0, 0.08, 0.18, 0.22, 1] }}
+        >① Sélectionner</motion.text>
+
+        <motion.text x={82} y={6} textAnchor="middle" fontSize={5.5} fill="hsl(var(--primary))" fontFamily="sans-serif" fontWeight="600"
+          animate={{ opacity: [0, 0, 1, 1, 0] }}
+          transition={{ duration: 4, repeat: Infinity, times: [0, 0.2, 0.28, 0.48, 0.52] }}
+        >② Glisser</motion.text>
+
+        <motion.text x={98} y={42} textAnchor="middle" fontSize={5.5} fill="hsl(var(--primary))" fontFamily="sans-serif" fontWeight="600"
+          animate={{ opacity: [0, 0, 0, 1, 1, 0] }}
+          transition={{ duration: 4, repeat: Infinity, times: [0, 0.6, 0.64, 0.68, 0.82, 0.88] }}
+        >③ Choisir</motion.text>
       </svg>
     </div>
   );

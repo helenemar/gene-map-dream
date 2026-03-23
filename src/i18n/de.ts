@@ -481,7 +481,7 @@ export const de: Translations = {
       { title: 'Mitglied erstellen', description: 'Fahren Sie über eine vorhandene Karte und klicken Sie auf die +-Schaltfläche, um einen Ehepartner, ein Kind oder ein Elternteil hinzuzufügen.' },
       { title: 'Mitglied bearbeiten', description: 'Klicken Sie auf eine Karte, um sie auszuwählen, und dann auf das Stiftsymbol, um das Bearbeitungsfenster zu öffnen (Name, Daten, Pathologien…).' },
       { title: 'Mitglied verschieben', description: 'Klicken und ziehen Sie eine Karte, um sie neu zu positionieren. Intelligente Hilfslinien helfen beim Ausrichten.' },
-      { title: 'Emotionale Verbindung erstellen', description: 'Fahren Sie über eine Karte und ziehen Sie von einem Ankerpunkt (●) an der Seite zu einem anderen Mitglied.' },
+      { title: 'Emotionale Verbindung erstellen', description: '1. Wählen Sie eine Karte aus — 4 violette Punkte (●) erscheinen an den Ecken.\n2. Klicken und halten Sie einen Punkt, dann ziehen Sie zu einer anderen Karte.\n3. Lassen Sie auf der Zielkarte los: ein Fenster öffnet sich zur Auswahl des Verbindungstyps (fusionell, Konflikt, usw.).' },
       { title: 'Verbindung erstellen', description: 'Verwenden Sie die +-Schaltfläche auf einer Karte und wählen Sie „Ehepartner", um eine Verbindung zwischen zwei Mitgliedern zu erstellen.' },
       { title: 'Suchen & Filtern', description: 'Verwenden Sie die Suchleiste, um ein Mitglied, eine Verbindung oder eine Pathologie zu finden. Die Seitenleiste ermöglicht das Filtern nach Verbindungstyp.' },
       { title: 'Rückgängig / Wiederherstellen', description: 'Verwenden Sie Strg+Z zum Rückgängigmachen und Strg+Umschalt+Z zum Wiederherstellen.', shortcut: 'Strg+Z / Strg+Umschalt+Z' },

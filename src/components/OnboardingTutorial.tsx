@@ -269,7 +269,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                         initial={{ opacity: 0, x: -8 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-[13px] text-muted-foreground leading-relaxed"
+                        className="text-[13px] text-muted-foreground leading-relaxed whitespace-pre-line"
                       >
                         {currentStep?.description}
                       </motion.p>

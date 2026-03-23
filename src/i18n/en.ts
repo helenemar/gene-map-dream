@@ -482,7 +482,7 @@ export const en: Translations = {
       { title: 'Create a member', description: 'Hover over an existing card and click the + button to add a spouse, child or parent.' },
       { title: 'Edit a member', description: 'Click on a card to select it, then click the pencil icon to open the edit panel (name, dates, pathologies…).' },
       { title: 'Move a member', description: 'Click and drag a card to reposition it. Smart guides help you align members.' },
-      { title: 'Create an emotional link', description: 'Hover over a card and drag from an anchor point (●) on the side to another member.' },
+      { title: 'Create an emotional link', description: '1. Select a card — 4 purple dots (●) appear at the corners.\n2. Click and hold on a dot, then drag towards another card.\n3. Release on the target card: a window opens to choose the link type (fusional, conflict, etc.).' },
       { title: 'Create a union', description: 'Use the + button on a card and choose "Spouse" to create a union between two members.' },
       { title: 'Search & filter', description: 'Use the search bar to find a member, link or pathology. The sidebar allows filtering by link type or hiding elements.' },
       { title: 'Undo / Redo', description: 'Use Ctrl+Z to undo and Ctrl+Shift+Z to redo your actions.', shortcut: 'Ctrl+Z / Ctrl+Shift+Z' },
