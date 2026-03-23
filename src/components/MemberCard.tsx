@@ -65,11 +65,11 @@ interface MemberCardProps {
   zoom?: number;
 }
 
-const CORNER_DOTS: { side: AnchorSide; pos: { top?: number; bottom?: number; left?: number; right?: number } }[] = [
-  { side: 'top-left',     pos: { top: -6, left: -6 } },
-  { side: 'top-right',    pos: { top: -6, right: -6 } },
-  { side: 'bottom-left',  pos: { bottom: -6, left: -6 } },
-  { side: 'bottom-right', pos: { bottom: -6, right: -6 } },
+const EDGE_DOTS: { side: AnchorSide; pos: { top?: string; bottom?: string; left?: string; right?: string } }[] = [
+  { side: 'top',    pos: { top: '-6px', left: '50%' } },
+  { side: 'right',  pos: { top: '50%', right: '-6px' } },
+  { side: 'bottom', pos: { bottom: '-6px', left: '50%' } },
+  { side: 'left',   pos: { top: '50%', left: '-6px' } },
 ];
 
 const MemberCard: React.FC<MemberCardProps> = ({
