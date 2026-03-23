@@ -162,6 +162,7 @@ export interface Translations {
     welcomeTitle: string; welcomeDesc: string; letsGo: string; skipTutorial: string;
     neverShow: string; previous: string; next: string; finish: string;
     steps: TranslationStep[];
+    linkAnimSelect: string; linkAnimDrag: string; linkAnimChoose: string;
   };
   familyLinks: {
     married: string; common_law: string; separated: string; divorced: string;

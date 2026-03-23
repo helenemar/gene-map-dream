@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, Move, ZoomIn, MousePointer2, Link, RotateCcw, UserPlus, Pencil, Heart, Search } from 'lucide-react';
-import STEP_ANIMATIONS from '@/components/OnboardingAnimations';
+import STEP_ANIMATIONS, { LinkAnimation } from '@/components/OnboardingAnimations';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const STEP_ICONS = [
@@ -296,7 +296,14 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                     transition={{ delay: 0.15, duration: 0.3 }}
                     className="mb-4"
                   >
-                    {(() => { const Anim = STEP_ANIMATIONS[tipIndex]; return Anim ? <Anim /> : null; })()}
+                    {(() => {
+                      // Special case: LinkAnimation (step 5) needs translated labels
+                      if (tipIndex === 5) {
+                        return <LinkAnimation labels={{ select: t.onboarding.linkAnimSelect, drag: t.onboarding.linkAnimDrag, choose: t.onboarding.linkAnimChoose }} />;
+                      }
+                      const Anim = STEP_ANIMATIONS[tipIndex];
+                      return Anim ? <Anim /> : null;
+                    })()}
                   </motion.div>
 
                   {/* Progress dots */}
