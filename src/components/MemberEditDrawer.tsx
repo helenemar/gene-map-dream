@@ -40,7 +40,7 @@ import {
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { Trash2, Heart, Pencil, FileText, Check, HelpCircle, Plus, ChevronRight, User, Palette } from 'lucide-react';
+import { Trash2, Heart, Pencil, FileText, Check, HelpCircle, Plus, ChevronRight, Fingerprint, Activity } from 'lucide-react';
 import MemberAvatarUpload from '@/components/MemberAvatarUpload';
 import {
   Tooltip,
@@ -546,28 +546,29 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               <Separator className="opacity-50" />
 
-              {/* ── Identity & Orientation + Pathologies (side-by-side popovers) ── */}
-              <div className="grid grid-cols-2 gap-2">
+              {/* ── Identity & Orientation + Pathologies (popovers) ── */}
+              <div className="flex flex-col gap-2">
                 <Popover>
                   <PopoverTrigger asChild>
                     <button
                       type="button"
-                      className="flex flex-col items-center gap-1.5 px-2 py-3 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group text-center"
+                      className="flex items-center gap-3 w-full px-3 py-2 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group"
                     >
-                      <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center">
-                        <User className="w-3.5 h-3.5 text-primary" />
+                      <Fingerprint className="w-4 h-4 text-primary shrink-0" />
+                      <div className="flex flex-col items-start gap-0.5 flex-1 min-w-0">
+                        <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
+                          {t.memberEdit.genderIdentity}
+                        </span>
+                        <span className="text-xs text-foreground truncate">
+                          {genderIdentity !== 'cisgender' || sexualOrientation !== 'heterosexual'
+                            ? [
+                                genderIdentity !== 'cisgender' ? genderIdentityLabel(genderIdentity) : '',
+                                sexualOrientation !== 'heterosexual' ? sexualOrientationLabel(sexualOrientation, gender) : '',
+                              ].filter(Boolean).join(', ')
+                            : '—'}
+                        </span>
                       </div>
-                      <span className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider leading-tight">
-                        {t.memberEdit.genderIdentity}
-                      </span>
-                      <span className="text-[10px] text-foreground leading-tight">
-                        {genderIdentity !== 'cisgender' || sexualOrientation !== 'heterosexual'
-                          ? [
-                              genderIdentity !== 'cisgender' ? genderIdentityLabel(genderIdentity) : '',
-                              sexualOrientation !== 'heterosexual' ? sexualOrientationLabel(sexualOrientation, gender) : '',
-                            ].filter(Boolean).join(', ')
-                          : '—'}
-                      </span>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
                     </button>
                   </PopoverTrigger>
                   <PopoverContent side="left" align="start" sideOffset={8} collisionPadding={16} className="w-[240px] p-3 flex flex-col gap-3">
@@ -617,31 +618,30 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   <PopoverTrigger asChild>
                     <button
                       type="button"
-                      className="flex flex-col items-center gap-1.5 px-2 py-3 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group text-center"
+                      className="flex items-center gap-3 w-full px-3 py-2 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group"
                     >
-                      <div className="w-7 h-7 rounded-md bg-accent flex items-center justify-center">
-                        <Palette className="w-3.5 h-3.5 text-foreground/70" />
+                      <Activity className="w-4 h-4 text-primary shrink-0" />
+                      <div className="flex flex-col items-start gap-0.5 flex-1 min-w-0">
+                        <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
+                          {t.memberEdit.pathologiesLabel}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {selectedPathologies.length > 0 ? (
+                            <>
+                              {dynamicPathologies
+                                .filter(p => selectedPathologies.includes(p.id))
+                                .slice(0, 4)
+                                .map(p => (
+                                  <span key={p.id} className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: p.color_hex }} />
+                                ))}
+                              <span className="text-xs text-muted-foreground ml-0.5">{selectedPathologies.length}</span>
+                            </>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">—</span>
+                          )}
+                        </div>
                       </div>
-                      <span className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider leading-tight">
-                        {t.memberEdit.pathologiesLabel}
-                      </span>
-                      <div className="flex items-center justify-center gap-1">
-                        {selectedPathologies.length > 0 ? (
-                          <>
-                            {dynamicPathologies
-                              .filter(p => selectedPathologies.includes(p.id))
-                              .slice(0, 3)
-                              .map(p => (
-                                <span key={p.id} className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: p.color_hex }} />
-                              ))}
-                            {selectedPathologies.length > 3 && (
-                              <span className="text-[10px] text-muted-foreground">+{selectedPathologies.length - 3}</span>
-                            )}
-                          </>
-                        ) : (
-                          <span className="text-[10px] text-muted-foreground">—</span>
-                        )}
-                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
                     </button>
                   </PopoverTrigger>
                 <PopoverContent side="left" align="start" sideOffset={8} collisionPadding={16} className="w-[280px] p-3">
