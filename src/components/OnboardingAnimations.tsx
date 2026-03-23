@@ -286,17 +286,17 @@ export const LinkAnimation: React.FC<{ labels?: { select: string; drag: string; 
         <motion.text x={cardAX + cardW / 2} y={cardAY + cardH + 14} textAnchor="middle" fontSize={5.5} fill="hsl(var(--primary))" fontFamily="sans-serif" fontWeight="600"
           animate={{ opacity: [0, 1, 1, 0, 0] }}
           transition={{ duration: 4, repeat: Infinity, times: [0, 0.08, 0.18, 0.22, 1] }}
-        >① Sélectionner</motion.text>
+        >① {selectLabel}</motion.text>
 
         <motion.text x={82} y={6} textAnchor="middle" fontSize={5.5} fill="hsl(var(--primary))" fontFamily="sans-serif" fontWeight="600"
           animate={{ opacity: [0, 0, 1, 1, 0] }}
           transition={{ duration: 4, repeat: Infinity, times: [0, 0.2, 0.28, 0.48, 0.52] }}
-        >② Glisser</motion.text>
+        >② {dragLabel}</motion.text>
 
         <motion.text x={98} y={42} textAnchor="middle" fontSize={5.5} fill="hsl(var(--primary))" fontFamily="sans-serif" fontWeight="600"
           animate={{ opacity: [0, 0, 0, 1, 1, 0] }}
           transition={{ duration: 4, repeat: Infinity, times: [0, 0.6, 0.64, 0.68, 0.82, 0.88] }}
-        >③ Choisir</motion.text>
+        >③ {chooseLabel}</motion.text>
       </svg>
     </div>
   );
