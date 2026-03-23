@@ -1704,6 +1704,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 showParentSplit={shouldShowParentSplit(member.id)}
                 isAdopted={isMemberAdopted(member.id)}
                 onboardingPulse={false}
+                zoom={zoom}
               />
               );
             })}

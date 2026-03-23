@@ -61,13 +61,15 @@ interface MemberCardProps {
   onCancelAnchor?: (id: string) => void;
   /** Show a pulsing ring around this card (onboarding hint) */
   onboardingPulse?: boolean;
+  /** Current canvas zoom level — used to keep dots at constant visual size */
+  zoom?: number;
 }
 
-const CORNER_DOTS: { side: AnchorSide; style: React.CSSProperties }[] = [
-  { side: 'top-left',     style: { top: -6, left: -6 } },
-  { side: 'top-right',    style: { top: -6, right: -6 } },
-  { side: 'bottom-left',  style: { bottom: -6, left: -6 } },
-  { side: 'bottom-right', style: { bottom: -6, right: -6 } },
+const CORNER_DOTS: { side: AnchorSide; pos: { top?: number; bottom?: number; left?: number; right?: number } }[] = [
+  { side: 'top-left',     pos: { top: -6, left: -6 } },
+  { side: 'top-right',    pos: { top: -6, right: -6 } },
+  { side: 'bottom-left',  pos: { bottom: -6, left: -6 } },
+  { side: 'bottom-right', pos: { bottom: -6, right: -6 } },
 ];
 
 const MemberCard: React.FC<MemberCardProps> = ({
@@ -98,6 +100,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   showParentSplit = false,
   isAdopted = false,
   onboardingPulse = false,
+  zoom = 1,
 }) => {
   const { t } = useLanguage();
   const isDeceased = !!member.deathYear;
@@ -174,23 +177,29 @@ const MemberCard: React.FC<MemberCardProps> = ({
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}
-        {/* Corner anchor dots */}
-        {showDots && CORNER_DOTS.map(({ side, style }) => (
+        {/* Corner anchor dots — inverse-scaled so they stay constant size regardless of zoom */}
+        {showDots && CORNER_DOTS.map(({ side, pos }) => {
+          const invScale = 1 / zoom;
+          return (
           <div
             key={side}
             className={`absolute w-4 h-4 rounded-full border-2 border-primary cursor-crosshair transition-all duration-150 ${
               dotsFilled
-                ? 'bg-primary scale-125 shadow-[0_0_8px_hsl(var(--primary)/0.5)]'
+                ? 'bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.5)]'
                 : isLinkTarget
                   ? 'bg-primary/20 opacity-50 hover:opacity-100 hover:bg-primary/40 hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
                   : dotsSubtle
                     ? 'bg-card/80 border-primary/40 opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-primary/30 hover:border-primary hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
                     : 'bg-card hover:bg-primary/30 hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
             }`}
-            style={style}
+            style={{
+              ...pos,
+              transform: `scale(${Math.max(invScale, 1)})`,
+            }}
             onMouseDown={(e) => handleDotMouseDown(side, e)}
           />
-        ))}
+          );
+        })}
 
         {/* Icon with pathology fills, placeholder, or draft */}
         <div className={`relative ${compact ? 'w-9 h-9' : 'w-12 h-12'} shrink-0 flex items-center justify-center`}>
