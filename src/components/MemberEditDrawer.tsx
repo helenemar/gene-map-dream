@@ -4,6 +4,11 @@ import type { DynamicPathology } from '@/hooks/usePathologies';
 import AddPathologyModal from '@/components/AddPathologyModal';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
   Sheet,
   SheetContent,
   SheetHeader,
@@ -35,7 +40,7 @@ import {
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { Trash2, Heart, Pencil, FileText, Check, HelpCircle, Plus } from 'lucide-react';
+import { Trash2, Heart, Pencil, FileText, Check, HelpCircle, Plus, ChevronRight } from 'lucide-react';
 import MemberAvatarUpload from '@/components/MemberAvatarUpload';
 import {
   Tooltip,
@@ -541,88 +546,140 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               <Separator className="opacity-50" />
 
-              {/* ── Gender Identity ── */}
-              <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.genderIdentity}</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {GENDER_IDENTITY_OPTIONS.map(opt => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setGenderIdentity(genderIdentity === opt.id ? 'cisgender' : opt.id)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                        genderIdentity === opt.id
-                          ? 'bg-primary/10 border-primary/30 text-foreground'
-                          : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
-                      }`}
-                    >
-                      {genderIdentityLabel(opt.id)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* ── Sexual Orientation ── */}
-              <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.sexualOrientation}</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {SEXUAL_ORIENTATION_OPTIONS.map(opt => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setSexualOrientation(sexualOrientation === opt.id ? 'heterosexual' : opt.id)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                        sexualOrientation === opt.id
-                          ? 'bg-primary/10 border-primary/30 text-foreground'
-                          : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
-                      }`}
-                    >
-                      {sexualOrientationLabel(opt.id, gender)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <Separator className="opacity-50" />
-
-              {/* ── Pathologies ── */}
-              <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
-                  {t.memberEdit.pathologiesLabel} ({selectedPathologies.length})
-                </span>
-                {dynamicPathologies.length === 0 ? (
-                  <p className="text-xs text-muted-foreground/50 italic">{t.memberEdit.noPathologyDefined}</p>
-                ) : (
-                  <div className="flex flex-col gap-1">
-                    {dynamicPathologies.map(p => (
-                      <label
-                        key={p.id}
-                        className="flex items-center gap-2.5 py-1.5 cursor-pointer hover:bg-accent/20 rounded-md px-1 -mx-1 transition-colors"
-                      >
-                        <Checkbox
-                          checked={selectedPathologies.includes(p.id)}
-                          onCheckedChange={() => togglePathology(p.id)}
-                          className="border-primary/40"
-                        />
-                        <span
-                          className="w-3.5 h-3.5 rounded shrink-0"
-                          style={{ backgroundColor: p.color_hex }}
-                        />
-                        <span className="text-sm text-foreground">{p.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-                {onAddPathology && (
+              {/* ── Identity & Orientation (popover) ── */}
+              <Popover>
+                <PopoverTrigger asChild>
                   <button
-                    onClick={() => setAddPathologyModalOpen(true)}
-                    className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-dashed border-border/60 text-sm text-muted-foreground hover:border-border hover:text-foreground transition-colors"
+                    type="button"
+                    className="flex items-center justify-between w-full px-3 py-2.5 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group"
                   >
-                    <Plus className="w-3.5 h-3.5" />
-                    {t.memberEdit.addPathology}
+                    <div className="flex flex-col items-start gap-0.5">
+                      <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
+                        {t.memberEdit.genderIdentity} / {t.memberEdit.sexualOrientation}
+                      </span>
+                      <span className="text-xs text-foreground">
+                        {genderIdentity !== 'cisgender' ? genderIdentityLabel(genderIdentity) : ''}
+                        {genderIdentity !== 'cisgender' && sexualOrientation !== 'heterosexual' ? ', ' : ''}
+                        {sexualOrientation !== 'heterosexual' ? sexualOrientationLabel(sexualOrientation, gender) : ''}
+                        {genderIdentity === 'cisgender' && sexualOrientation === 'heterosexual' ? '—' : ''}
+                      </span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors rotate-180" />
                   </button>
-                )}
-              </div>
+                </PopoverTrigger>
+                <PopoverContent side="left" align="start" className="w-[260px] p-4 flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.genderIdentity}</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {GENDER_IDENTITY_OPTIONS.map(opt => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => setGenderIdentity(genderIdentity === opt.id ? 'cisgender' : opt.id)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                            genderIdentity === opt.id
+                              ? 'bg-primary/10 border-primary/30 text-foreground'
+                              : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
+                          }`}
+                        >
+                          {genderIdentityLabel(opt.id)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <Separator className="opacity-50" />
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.sexualOrientation}</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {SEXUAL_ORIENTATION_OPTIONS.map(opt => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => setSexualOrientation(sexualOrientation === opt.id ? 'heterosexual' : opt.id)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                            sexualOrientation === opt.id
+                              ? 'bg-primary/10 border-primary/30 text-foreground'
+                              : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
+                          }`}
+                        >
+                          {sexualOrientationLabel(opt.id, gender)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+
+              {/* ── Pathologies (popover) ── */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center justify-between w-full px-3 py-2.5 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group"
+                  >
+                    <div className="flex flex-col items-start gap-0.5">
+                      <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
+                        {t.memberEdit.pathologiesLabel}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        {selectedPathologies.length > 0 ? (
+                          <>
+                            {dynamicPathologies
+                              .filter(p => selectedPathologies.includes(p.id))
+                              .slice(0, 4)
+                              .map(p => (
+                                <span key={p.id} className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: p.color_hex }} />
+                              ))}
+                            <span className="text-xs text-foreground">{selectedPathologies.length}</span>
+                          </>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors rotate-180" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent side="left" align="start" className="w-[280px] p-4">
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
+                      {t.memberEdit.pathologiesLabel} ({selectedPathologies.length})
+                    </span>
+                    {dynamicPathologies.length === 0 ? (
+                      <p className="text-xs text-muted-foreground/50 italic">{t.memberEdit.noPathologyDefined}</p>
+                    ) : (
+                      <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto">
+                        {dynamicPathologies.map(p => (
+                          <label
+                            key={p.id}
+                            className="flex items-center gap-2.5 py-1.5 cursor-pointer hover:bg-accent/20 rounded-md px-1 -mx-1 transition-colors"
+                          >
+                            <Checkbox
+                              checked={selectedPathologies.includes(p.id)}
+                              onCheckedChange={() => togglePathology(p.id)}
+                              className="border-primary/40"
+                            />
+                            <span
+                              className="w-3.5 h-3.5 rounded shrink-0"
+                              style={{ backgroundColor: p.color_hex }}
+                            />
+                            <span className="text-sm text-foreground">{p.name}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                    {onAddPathology && (
+                      <button
+                        onClick={() => setAddPathologyModalOpen(true)}
+                        className="flex items-center justify-center gap-1.5 py-2 rounded-lg border border-dashed border-border/60 text-sm text-muted-foreground hover:border-border hover:text-foreground transition-colors mt-1"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        {t.memberEdit.addPathology}
+                      </button>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
 
               <AddPathologyModal
                 open={addPathologyModalOpen}
