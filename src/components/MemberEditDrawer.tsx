@@ -369,34 +369,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
             </div>
           </SheetHeader>
 
-          {/* ── Live icon preview ── */}
-          <div className="flex items-center gap-3 mt-3 px-3 py-2.5 rounded-xl bg-accent/20 border border-border/50">
-            <div className="shrink-0">
-              <MemberIcon
-                gender={gender}
-                isGay={isGay}
-                isBisexual={isBisexual}
-                isTransgender={isTransgender}
-                isDead={isDeceased}
-                pathologyColors={
-                  dynamicPathologies
-                    .filter(p => selectedPathologies.includes(p.id))
-                    .map(p => p.color_hex)
-                }
-                size={44}
-                className="text-foreground"
-              />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-foreground truncate">
-                {firstName || t.memberEdit.newMember} {lastName}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {birthYear || '?'}{isDeceased ? ` - ${deathYear}` : ' -'} · {age > 0 ? `${age} ${t.memberEdit.yearsOld}` : ''}
-              </p>
-              <p className="text-xs text-muted-foreground truncate">{profession}</p>
-            </div>
-          </div>
         </div>
 
         <Separator />
