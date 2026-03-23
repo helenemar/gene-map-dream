@@ -61,6 +61,8 @@ interface MemberCardProps {
   onCancelAnchor?: (id: string) => void;
   /** Show a pulsing ring around this card (onboarding hint) */
   onboardingPulse?: boolean;
+  /** Current canvas zoom level — used to keep dots at constant visual size */
+  zoom?: number;
 }
 
 const CORNER_DOTS: { side: AnchorSide; style: React.CSSProperties }[] = [
