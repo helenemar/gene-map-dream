@@ -243,7 +243,7 @@ export const de: Translations = {
     retiredM: 'Rentner',
     birth: 'Geburt',
     death: 'Tod',
-    alive: 'Lebend',
+    alive: 'Jahr',
     yearsOld: 'Jahre',
     deceasedAt: 'Verstorben mit',
     dateMarkedUncertain: 'Datum als unsicher markiert',
