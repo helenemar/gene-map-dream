@@ -620,11 +620,13 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   <PopoverTrigger asChild>
                     <button
                       type="button"
-                      className="flex items-center gap-3 w-full px-3 py-2 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group"
+                      className="flex items-center gap-3 w-full px-3 py-3 rounded-lg border border-border bg-accent/30 hover:bg-accent/50 transition-colors group"
                     >
-                      <Activity className="w-4 h-4 text-primary shrink-0" />
+                      <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
+                        <Activity className="w-4 h-4 text-primary" />
+                      </div>
                       <div className="flex flex-col items-start gap-0.5 flex-1 min-w-0">
-                        <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
+                        <span className="text-[11px] font-semibold text-foreground/80 uppercase tracking-wider">
                           {t.memberEdit.pathologiesLabel}
                         </span>
                         <div className="flex items-center gap-1">
@@ -634,7 +636,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                 .filter(p => selectedPathologies.includes(p.id))
                                 .slice(0, 4)
                                 .map(p => (
-                                  <span key={p.id} className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: p.color_hex }} />
+                                  <span key={p.id} className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: p.color_hex }} />
                                 ))}
                               <span className="text-xs text-muted-foreground ml-0.5">{selectedPathologies.length}</span>
                             </>
@@ -643,7 +645,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           )}
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
+                      <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
                     </button>
                   </PopoverTrigger>
                 <PopoverContent side="left" align="start" sideOffset={8} collisionPadding={16} className="w-[280px] p-3">
