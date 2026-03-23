@@ -134,7 +134,10 @@ export const DragAnimation: React.FC = () => (
 );
 
 /* ── 4. Create emotional link: select card → dots appear → drag from corner dot → target highlights → modal appears ── */
-export const LinkAnimation: React.FC = () => {
+export const LinkAnimation: React.FC<{ labels?: { select: string; drag: string; choose: string } }> = ({ labels }) => {
+  const selectLabel = labels?.select || 'Sélectionner';
+  const dragLabel = labels?.drag || 'Glisser';
+  const chooseLabel = labels?.choose || 'Choisir';
   const cardAX = 10, cardAY = 10, cardBX = 104, cardBY = 10;
   const cardW = 48, cardH = 28;
 
