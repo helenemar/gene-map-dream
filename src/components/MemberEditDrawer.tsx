@@ -4,6 +4,11 @@ import type { DynamicPathology } from '@/hooks/usePathologies';
 import AddPathologyModal from '@/components/AddPathologyModal';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
   Sheet,
   SheetContent,
   SheetHeader,
