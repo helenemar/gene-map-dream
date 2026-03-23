@@ -404,6 +404,24 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
         <ScrollArea className="flex-1 px-3">
           {isEditing ? (
             <div className="flex flex-col gap-5 py-4 px-3">
+              {/* ── Photo ── */}
+              <div className="flex flex-col gap-1">
+                <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                  {t.memberEdit.photo}
+                </Label>
+                {genogramId ? (
+                  <MemberAvatarUpload
+                    memberId={member.id}
+                    genogramId={genogramId}
+                    currentAvatar={avatar}
+                    onAvatarChange={setAvatar}
+                    size={56}
+                  />
+                ) : (
+                  <p className="text-[10px] text-muted-foreground/50 italic">{t.memberEdit.saveForPhoto}</p>
+                )}
+              </div>
+
               {/* ── Identity ── */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
@@ -422,24 +440,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   {t.memberEdit.birthName}
                 </Label>
                 <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Martin" value={birthName} onChange={(e) => setBirthName(e.target.value)} />
-              </div>
-
-              {/* ── Photo ── */}
-              <div className="flex flex-col gap-1">
-                <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                  {t.memberEdit.photo}
-                </Label>
-                {genogramId ? (
-                  <MemberAvatarUpload
-                    memberId={member.id}
-                    genogramId={genogramId}
-                    currentAvatar={avatar}
-                    onAvatarChange={setAvatar}
-                    size={56}
-                  />
-                ) : (
-                  <p className="text-[10px] text-muted-foreground/50 italic">{t.memberEdit.saveForPhoto}</p>
-                )}
               </div>
 
               <div className="flex flex-col gap-1">
