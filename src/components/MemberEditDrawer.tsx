@@ -551,20 +551,23 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="flex items-center justify-between w-full px-3 py-2.5 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group"
+                    className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group"
                   >
-                    <div className="flex flex-col items-start gap-0.5">
+                    <div className="shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <User className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="flex flex-col items-start gap-0.5 flex-1 min-w-0">
                       <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
                         {t.memberEdit.genderIdentity} / {t.memberEdit.sexualOrientation}
                       </span>
-                      <span className="text-xs text-foreground">
+                      <span className="text-xs text-foreground truncate">
                         {genderIdentity !== 'cisgender' ? genderIdentityLabel(genderIdentity) : ''}
                         {genderIdentity !== 'cisgender' && sexualOrientation !== 'heterosexual' ? ', ' : ''}
                         {sexualOrientation !== 'heterosexual' ? sexualOrientationLabel(sexualOrientation, gender) : ''}
                         {genderIdentity === 'cisgender' && sexualOrientation === 'heterosexual' ? '—' : ''}
                       </span>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors rotate-180" />
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors rotate-180 shrink-0" />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent side="left" align="start" className="w-[260px] p-4 flex flex-col gap-4">
