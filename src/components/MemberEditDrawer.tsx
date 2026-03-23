@@ -683,7 +683,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     )}
                   </div>
                 </PopoverContent>
-              </Popover>
+               </Popover>
+              </div>
 
               <AddPathologyModal
                 open={addPathologyModalOpen}
