@@ -679,17 +679,25 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               {/* ── Twins ── */}
               <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.twins}</span>
-                <div className="flex flex-col gap-1">
-                  <Label className="text-xs text-muted-foreground">{t.memberEdit.twinGroup}</Label>
-                  <Input
-                    className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30"
-                    placeholder={t.memberEdit.twinGroupPlaceholder}
-                    value={twinGroup}
-                    onChange={(e) => setTwinGroup(e.target.value)}
+                <label className="flex items-center justify-between cursor-pointer">
+                  <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.twins}</span>
+                  <Switch
+                    checked={!!twinGroup}
+                    onCheckedChange={(checked) => setTwinGroup(checked ? 'twin-1' : '')}
                   />
-                  <span className="text-[9px] text-muted-foreground/60">{t.memberEdit.twinGroupHint}</span>
-                </div>
+                </label>
+                {twinGroup && (
+                  <div className="flex flex-col gap-1.5 p-3 rounded-lg bg-accent/30 border border-border/50">
+                    <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{t.memberEdit.twinGroup}</Label>
+                    <Input
+                      className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30"
+                      placeholder={t.memberEdit.twinGroupPlaceholder}
+                      value={twinGroup}
+                      onChange={(e) => setTwinGroup(e.target.value)}
+                    />
+                    <span className="text-[9px] text-muted-foreground/60">{t.memberEdit.twinGroupHint}</span>
+                  </div>
+                )}
               </div>
 
               <Separator className="opacity-50" />
