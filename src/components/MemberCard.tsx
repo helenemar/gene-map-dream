@@ -199,7 +199,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
             onMouseDown={(e) => handleDotMouseDown(side, e)}
           />
           );
-        }
+        })}
 
         {/* Icon with pathology fills, placeholder, or draft */}
         <div className={`relative ${compact ? 'w-9 h-9' : 'w-12 h-12'} shrink-0 flex items-center justify-center`}>
