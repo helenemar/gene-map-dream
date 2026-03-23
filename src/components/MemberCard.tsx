@@ -100,6 +100,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   showParentSplit = false,
   isAdopted = false,
   onboardingPulse = false,
+  zoom = 1,
 }) => {
   const { t } = useLanguage();
   const isDeceased = !!member.deathYear;
