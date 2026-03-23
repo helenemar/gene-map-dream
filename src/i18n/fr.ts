@@ -245,7 +245,7 @@ export const fr: Translations = {
     retiredM: 'Retraité',
     birth: 'Naissance',
     death: 'Décès',
-    alive: 'Vivant',
+    alive: 'Année',
     yearsOld: 'ans',
     deceasedAt: 'Décédé(e) à',
     dateMarkedUncertain: 'Date marquée incertaine',
