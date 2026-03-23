@@ -644,7 +644,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                       </div>
                     </button>
                   </PopoverTrigger>
-                <PopoverContent side="left" align="start" className="w-[280px] p-4">
+                <PopoverContent side="left" align="start" sideOffset={8} collisionPadding={16} className="w-[280px] p-3">
                   <div className="flex flex-col gap-2">
                     <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
                       {t.memberEdit.pathologiesLabel} ({selectedPathologies.length})
