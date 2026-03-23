@@ -296,7 +296,15 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                     transition={{ delay: 0.15, duration: 0.3 }}
                     className="mb-4"
                   >
-                    {(() => { const Anim = STEP_ANIMATIONS[tipIndex]; return Anim ? <Anim /> : null; })()}
+                    {(() => {
+                      const Anim = STEP_ANIMATIONS[tipIndex];
+                      if (!Anim) return null;
+                      // Pass translated labels to LinkAnimation (step index 5)
+                      if (tipIndex === 5) {
+                        return <Anim labels={{ select: t.onboarding.linkAnimSelect, drag: t.onboarding.linkAnimDrag, choose: t.onboarding.linkAnimChoose }} />;
+                      }
+                      return <Anim />;
+                    })()}
                   </motion.div>
 
                   {/* Progress dots */}
