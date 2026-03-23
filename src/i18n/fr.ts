@@ -485,7 +485,7 @@ export const fr: Translations = {
       { title: 'Créer un membre', description: 'Survolez une carte existante et cliquez sur le bouton + pour ajouter un conjoint, enfant ou parent.' },
       { title: 'Éditer un membre', description: 'Cliquez sur une carte pour la sélectionner, puis cliquez sur l\'icône crayon pour ouvrir le panneau d\'édition (nom, dates, pathologies…).' },
       { title: 'Déplacer un membre', description: 'Cliquez et faites glisser une carte pour la repositionner. Les guides intelligents vous aident à aligner les membres.' },
-      { title: 'Créer un lien émotionnel', description: 'Survolez une carte et glissez depuis un point d\'ancrage (●) sur le côté vers un autre membre.' },
+      { title: 'Créer un lien émotionnel', description: '1. Sélectionnez une carte — 4 points violets (●) apparaissent aux coins.\n2. Cliquez et maintenez sur un point, puis glissez vers une autre carte.\n3. Relâchez sur la carte cible : une fenêtre s\'ouvre pour choisir le type de lien (fusionnel, conflit, etc.).' },
       { title: 'Créer une union', description: 'Utilisez le bouton + sur une carte et choisissez "Conjoint(e)" pour créer une union entre deux membres.' },
       { title: 'Rechercher & filtrer', description: 'Utilisez la barre de recherche pour trouver un membre, un lien ou une pathologie. La sidebar à gauche permet de filtrer par type de lien ou de masquer des éléments.' },
       { title: 'Annuler / Rétablir', description: 'Utilisez Ctrl+Z pour annuler et Ctrl+Shift+Z pour rétablir vos actions.', shortcut: 'Ctrl+Z / Ctrl+Shift+Z' },
