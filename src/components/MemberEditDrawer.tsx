@@ -403,7 +403,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
         <ScrollArea className="flex-1 px-3">
           {isEditing ? (
-            <div className="flex flex-col gap-3 py-3 px-3">
+            <div className="flex flex-col gap-5 py-4 px-3">
               {/* ── Identity ── */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
