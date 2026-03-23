@@ -20,7 +20,7 @@ export type MemberCardState = 'default' | 'hover' | 'selected' | 'anchor-active'
 /** Min width for layout calculations — actual card uses fit-content */
 export const MEMBER_CARD_W = 220;
 
-type AnchorSide = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+type AnchorSide = 'top' | 'right' | 'bottom' | 'left';
 
 interface MemberCardProps {
   member: FamilyMember;
@@ -65,11 +65,11 @@ interface MemberCardProps {
   zoom?: number;
 }
 
-const CORNER_DOTS: { side: AnchorSide; pos: { top?: number; bottom?: number; left?: number; right?: number } }[] = [
-  { side: 'top-left',     pos: { top: -6, left: -6 } },
-  { side: 'top-right',    pos: { top: -6, right: -6 } },
-  { side: 'bottom-left',  pos: { bottom: -6, left: -6 } },
-  { side: 'bottom-right', pos: { bottom: -6, right: -6 } },
+const EDGE_DOTS: { side: AnchorSide; pos: { top?: string; bottom?: string; left?: string; right?: string } }[] = [
+  { side: 'top',    pos: { top: '-6px', left: '50%' } },
+  { side: 'right',  pos: { top: '50%', right: '-6px' } },
+  { side: 'bottom', pos: { bottom: '-6px', left: '50%' } },
+  { side: 'left',   pos: { top: '50%', left: '-6px' } },
 ];
 
 const MemberCard: React.FC<MemberCardProps> = ({
@@ -177,13 +177,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}
-        {/* Corner anchor dots — inverse-scaled so they stay constant size regardless of zoom */}
-        {showDots && CORNER_DOTS.map(({ side, pos }) => {
+        {/* Edge anchor dots — centered on each side, inverse-scaled to stay constant size */}
+        {showDots && EDGE_DOTS.map(({ side, pos }) => {
           const invScale = 1 / zoom;
           return (
           <div
             key={side}
-            className={`absolute w-3 h-3 rounded-full border-[1.5px] border-primary cursor-crosshair transition-all duration-150 ${
+            className={`absolute w-3 h-3 rounded-full border-[1.5px] border-primary cursor-crosshair transition-all duration-150 -translate-x-1/2 -translate-y-1/2 ${
               dotsFilled
                 ? 'bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.5)]'
                 : isLinkTarget
@@ -194,7 +194,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
             }`}
             style={{
               ...pos,
-              transform: `scale(${Math.max(invScale, 1)})`,
+              transform: `translate(-50%, -50%) scale(${Math.max(invScale, 1)})`,
             }}
             onMouseDown={(e) => handleDotMouseDown(side, e)}
           />
