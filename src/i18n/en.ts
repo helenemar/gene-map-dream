@@ -487,6 +487,9 @@ export const en: Translations = {
       { title: 'Search & filter', description: 'Use the search bar to find a member, link or pathology. The sidebar allows filtering by link type or hiding elements.' },
       { title: 'Undo / Redo', description: 'Use Ctrl+Z to undo and Ctrl+Shift+Z to redo your actions.', shortcut: 'Ctrl+Z / Ctrl+Shift+Z' },
     ],
+    linkAnimSelect: 'Select',
+    linkAnimDrag: 'Drag',
+    linkAnimChoose: 'Choose',
   },
 
   // ── Family Link Types ──

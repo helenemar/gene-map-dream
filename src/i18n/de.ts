@@ -486,6 +486,9 @@ export const de: Translations = {
       { title: 'Suchen & Filtern', description: 'Verwenden Sie die Suchleiste, um ein Mitglied, eine Verbindung oder eine Pathologie zu finden. Die Seitenleiste ermöglicht das Filtern nach Verbindungstyp.' },
       { title: 'Rückgängig / Wiederherstellen', description: 'Verwenden Sie Strg+Z zum Rückgängigmachen und Strg+Umschalt+Z zum Wiederherstellen.', shortcut: 'Strg+Z / Strg+Umschalt+Z' },
     ],
+    linkAnimSelect: 'Auswählen',
+    linkAnimDrag: 'Ziehen',
+    linkAnimChoose: 'Wählen',
   },
 
   // ── Family Link Types ──

@@ -490,6 +490,9 @@ export const fr: Translations = {
       { title: 'Rechercher & filtrer', description: 'Utilisez la barre de recherche pour trouver un membre, un lien ou une pathologie. La sidebar à gauche permet de filtrer par type de lien ou de masquer des éléments.' },
       { title: 'Annuler / Rétablir', description: 'Utilisez Ctrl+Z pour annuler et Ctrl+Shift+Z pour rétablir vos actions.', shortcut: 'Ctrl+Z / Ctrl+Shift+Z' },
     ],
+    linkAnimSelect: 'Sélectionner',
+    linkAnimDrag: 'Glisser',
+    linkAnimChoose: 'Choisir',
   },
 
   // ── Family Link Types ──
