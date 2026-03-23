@@ -546,107 +546,105 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               <Separator className="opacity-50" />
 
-              {/* ── Identity & Orientation (popover) ── */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group"
-                  >
-                    <div className="shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <User className="w-4 h-4 text-primary" />
-                    </div>
-                    <div className="flex flex-col items-start gap-0.5 flex-1 min-w-0">
-                      <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
-                        {t.memberEdit.genderIdentity} / {t.memberEdit.sexualOrientation}
+              {/* ── Identity & Orientation + Pathologies (side-by-side popovers) ── */}
+              <div className="grid grid-cols-2 gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex flex-col items-center gap-1.5 px-2 py-3 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group text-center"
+                    >
+                      <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center">
+                        <User className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <span className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider leading-tight">
+                        {t.memberEdit.genderIdentity}
                       </span>
-                      <span className="text-xs text-foreground truncate">
-                        {genderIdentity !== 'cisgender' ? genderIdentityLabel(genderIdentity) : ''}
-                        {genderIdentity !== 'cisgender' && sexualOrientation !== 'heterosexual' ? ', ' : ''}
-                        {sexualOrientation !== 'heterosexual' ? sexualOrientationLabel(sexualOrientation, gender) : ''}
-                        {genderIdentity === 'cisgender' && sexualOrientation === 'heterosexual' ? '—' : ''}
+                      <span className="text-[10px] text-foreground leading-tight">
+                        {genderIdentity !== 'cisgender' || sexualOrientation !== 'heterosexual'
+                          ? [
+                              genderIdentity !== 'cisgender' ? genderIdentityLabel(genderIdentity) : '',
+                              sexualOrientation !== 'heterosexual' ? sexualOrientationLabel(sexualOrientation, gender) : '',
+                            ].filter(Boolean).join(', ')
+                          : '—'}
                       </span>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="left" align="start" sideOffset={8} collisionPadding={16} className="w-[240px] p-3 flex flex-col gap-3">
+                    <div className="flex flex-col gap-2">
+                      <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.genderIdentity}</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {GENDER_IDENTITY_OPTIONS.map(opt => (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => setGenderIdentity(genderIdentity === opt.id ? 'cisgender' : opt.id)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                              genderIdentity === opt.id
+                                ? 'bg-primary/10 border-primary/30 text-foreground'
+                                : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
+                            }`}
+                          >
+                            {genderIdentityLabel(opt.id)}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors rotate-180 shrink-0" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent side="left" align="start" className="w-[260px] p-4 flex flex-col gap-4">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.genderIdentity}</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {GENDER_IDENTITY_OPTIONS.map(opt => (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => setGenderIdentity(genderIdentity === opt.id ? 'cisgender' : opt.id)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                            genderIdentity === opt.id
-                              ? 'bg-primary/10 border-primary/30 text-foreground'
-                              : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
-                          }`}
-                        >
-                          {genderIdentityLabel(opt.id)}
-                        </button>
-                      ))}
+                    <Separator className="opacity-50" />
+                    <div className="flex flex-col gap-2">
+                      <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.sexualOrientation}</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {SEXUAL_ORIENTATION_OPTIONS.map(opt => (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => setSexualOrientation(sexualOrientation === opt.id ? 'heterosexual' : opt.id)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                              sexualOrientation === opt.id
+                                ? 'bg-primary/10 border-primary/30 text-foreground'
+                                : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
+                            }`}
+                          >
+                            {sexualOrientationLabel(opt.id, gender)}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                  <Separator className="opacity-50" />
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.sexualOrientation}</span>
-                    <div className="flex flex-wrap gap-1.5">
-                      {SEXUAL_ORIENTATION_OPTIONS.map(opt => (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => setSexualOrientation(sexualOrientation === opt.id ? 'heterosexual' : opt.id)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                            sexualOrientation === opt.id
-                              ? 'bg-primary/10 border-primary/30 text-foreground'
-                              : 'border-border/50 bg-card text-muted-foreground hover:border-border hover:bg-accent/30'
-                          }`}
-                        >
-                          {sexualOrientationLabel(opt.id, gender)}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
+                  </PopoverContent>
+                </Popover>
 
-              {/* ── Pathologies (popover) ── */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group"
-                  >
-                    <div className="shrink-0 w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-                      <Palette className="w-4 h-4 text-foreground/70" />
-                    </div>
-                    <div className="flex flex-col items-start gap-0.5 flex-1 min-w-0">
-                      <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex flex-col items-center gap-1.5 px-2 py-3 rounded-lg border border-border/50 bg-card hover:bg-accent/20 transition-colors group text-center"
+                    >
+                      <div className="w-7 h-7 rounded-md bg-accent flex items-center justify-center">
+                        <Palette className="w-3.5 h-3.5 text-foreground/70" />
+                      </div>
+                      <span className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider leading-tight">
                         {t.memberEdit.pathologiesLabel}
                       </span>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center justify-center gap-1">
                         {selectedPathologies.length > 0 ? (
                           <>
                             {dynamicPathologies
                               .filter(p => selectedPathologies.includes(p.id))
-                              .slice(0, 4)
+                              .slice(0, 3)
                               .map(p => (
-                                <span key={p.id} className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: p.color_hex }} />
+                                <span key={p.id} className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: p.color_hex }} />
                               ))}
-                            <span className="text-xs text-foreground">{selectedPathologies.length}</span>
+                            {selectedPathologies.length > 3 && (
+                              <span className="text-[10px] text-muted-foreground">+{selectedPathologies.length - 3}</span>
+                            )}
                           </>
                         ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
+                          <span className="text-[10px] text-muted-foreground">—</span>
                         )}
                       </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors rotate-180 shrink-0" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent side="left" align="start" className="w-[280px] p-4">
+                    </button>
+                  </PopoverTrigger>
+                <PopoverContent side="left" align="start" sideOffset={8} collisionPadding={16} className="w-[280px] p-3">
                   <div className="flex flex-col gap-2">
                     <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
                       {t.memberEdit.pathologiesLabel} ({selectedPathologies.length})
@@ -685,7 +683,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     )}
                   </div>
                 </PopoverContent>
-              </Popover>
+               </Popover>
+              </div>
 
               <AddPathologyModal
                 open={addPathologyModalOpen}
