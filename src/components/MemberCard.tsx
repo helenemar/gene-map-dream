@@ -180,10 +180,17 @@ const MemberCard: React.FC<MemberCardProps> = ({
         {/* Edge anchor dots — centered on each side, inverse-scaled to stay constant size */}
         {showDots && EDGE_DOTS.map(({ side, pos }) => {
           const invScale = 1 / zoom;
+          const sideTranslate =
+            side === 'right'
+              ? 'translate(50%, -50%)'
+              : side === 'bottom'
+                ? 'translate(-50%, 50%)'
+                : 'translate(-50%, -50%)';
+
           return (
           <div
             key={side}
-            className={`absolute w-3 h-3 rounded-full border-[1.5px] border-primary cursor-crosshair transition-all duration-150 -translate-x-1/2 -translate-y-1/2 ${
+            className={`absolute w-3 h-3 rounded-full border-[1.5px] border-primary cursor-crosshair transition-all duration-150 ${
               dotsFilled
                 ? 'bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.5)]'
                 : isLinkTarget
@@ -194,7 +201,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
             }`}
             style={{
               ...pos,
-              transform: `translate(-50%, -50%) scale(${Math.max(invScale, 1)})`,
+              transform: `${sideTranslate} scale(${Math.max(invScale, 1)})`,
             }}
             onMouseDown={(e) => handleDotMouseDown(side, e)}
           />
