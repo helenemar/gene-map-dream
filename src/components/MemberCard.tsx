@@ -20,7 +20,7 @@ export type MemberCardState = 'default' | 'hover' | 'selected' | 'anchor-active'
 /** Min width for layout calculations — actual card uses fit-content */
 export const MEMBER_CARD_W = 220;
 
-type AnchorSide = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+type AnchorSide = 'top' | 'right' | 'bottom' | 'left';
 
 interface MemberCardProps {
   member: FamilyMember;
