@@ -80,6 +80,7 @@ const SharedEditor: React.FC = () => {
         members: data.genogram_data?.members || [],
         unions: data.genogram_data?.unions || [],
         emotionalLinks: data.genogram_data?.emotionalLinks || [],
+        pathologies: data.genogram_data?.pathologies || [],
       }}
     />
   );
