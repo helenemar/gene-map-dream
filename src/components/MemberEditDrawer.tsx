@@ -194,11 +194,12 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       pathologies: selectedPathologies,
       twinGroup: twinGroup || undefined,
       twinType: (twinType as TwinType) || undefined,
+      perinatalType: isStillborn ? 'stillborn' : (twinGroup ? undefined : member.perinatalType),
       notes: notes || undefined,
       avatar: avatar || undefined,
       isDraft: member?.isDraft ?? false,
     };
-  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, avatar, currentYear]);
+  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, currentYear]);
 
   useEffect(() => {
     if (open && member && onLiveUpdate) {
