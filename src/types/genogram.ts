@@ -139,16 +139,16 @@ export const FAMILY_LINK_TYPES: { id: UnionStatus; label: string; icon: string }
   { id: 'love_affair', label: 'Liaison', icon: '♡' },
 ];
 
-export const EMOTIONAL_LINK_TYPES: { id: EmotionalLinkType; label: string; color: string }[] = [
-  { id: 'fusional', label: 'Fusionnel', color: 'link-fusional' },
-  { id: 'distant', label: 'Distant', color: 'link-distant' },
-  { id: 'conflictual', label: 'Conflit', color: 'link-conflictual' },
-  { id: 'ambivalent', label: 'Ambivalent', color: 'link-ambivalent' },
-  { id: 'cutoff', label: 'Lien rompu', color: 'link-cutoff' },
-  { id: 'violence', label: 'Violence', color: 'link-violence' },
-  { id: 'emotional_abuse', label: 'Abus émotionnel', color: 'link-emotional-abuse' },
-  { id: 'physical_violence', label: 'Violence physique', color: 'link-physical-violence' },
-  { id: 'sexual_abuse', label: 'Abus sexuel', color: 'link-sexual-abuse' },
-  { id: 'neglect', label: 'Négligence', color: 'link-neglect' },
-  { id: 'controlling', label: 'Contrôlant', color: 'link-controlling' },
+export const EMOTIONAL_LINK_TYPES: { id: EmotionalLinkType; label: string; color: string; description: string; category: 'relational' | 'abusive' }[] = [
+  { id: 'fusional', label: 'Fusionnel', color: 'link-fusional', description: 'Relation très proche, symbiose', category: 'relational' },
+  { id: 'distant', label: 'Distant', color: 'link-distant', description: 'Éloignement émotionnel', category: 'relational' },
+  { id: 'conflictual', label: 'Conflit', color: 'link-conflictual', description: 'Relation conflictuelle', category: 'relational' },
+  { id: 'ambivalent', label: 'Ambivalent', color: 'link-ambivalent', description: 'Proche et conflictuel à la fois', category: 'relational' },
+  { id: 'cutoff', label: 'Lien rompu', color: 'link-cutoff', description: 'Rupture totale de contact', category: 'relational' },
+  { id: 'violence', label: 'Violence', color: 'link-violence', description: 'Relation violente', category: 'abusive' },
+  { id: 'emotional_abuse', label: 'Abus émotionnel', color: 'link-emotional-abuse', description: 'Manipulation, emprise psychologique', category: 'abusive' },
+  { id: 'physical_violence', label: 'Violence physique', color: 'link-physical-violence', description: 'Violences corporelles', category: 'abusive' },
+  { id: 'sexual_abuse', label: 'Abus sexuel', color: 'link-sexual-abuse', description: 'Abus à caractère sexuel', category: 'abusive' },
+  { id: 'neglect', label: 'Négligence', color: 'link-neglect', description: 'Manque de soins ou d\'attention', category: 'abusive' },
+  { id: 'controlling', label: 'Contrôlant', color: 'link-controlling', description: 'Comportement de contrôle', category: 'abusive' },
 ];
