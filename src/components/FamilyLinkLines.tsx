@@ -332,7 +332,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
       const adoptionDash = '6 4';
       const tickLen = 6;
       const childTopY = Math.min(...childAnchors.map((anchor) => anchor.y));
-      const forkY = Math.max(unionLineY + 24, Math.min(combY + 20, childTopY - 24));
+      const forkY = unionLineY + 8;
 
       return (
         <g key={union.id}>
