@@ -1303,58 +1303,73 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     recordSnapshot();
 
     if (wasDraft && updated.twinGroup) {
-      const twinId = `twin-${Date.now()}`;
-
-      let leftX = updated.x;
-      let rightX = updated.x + CARD_W + 35;
+      const siblingCount = updated.twinGroup === 'Triplés' ? 2 : 1; // extra siblings to create
+      const totalCount = siblingCount + 1; // total children in group
+      const gap = 35;
 
       const parentUnion = unions.find(u => u.children.includes(updated.id));
       let nextUnions = unions;
 
+      // Calculate center
+      let centerX = updated.x;
       if (parentUnion) {
         const p1 = members.find(m => m.id === parentUnion.partner1);
         const p2 = members.find(m => m.id === parentUnion.partner2);
         if (p1 && p2) {
           const coupleLeft = Math.min(p1.x, p2.x);
           const coupleRight = Math.max(p1.x, p2.x) + CARD_W;
-          const unionCenterX = (coupleLeft + coupleRight) / 2;
-          const pairWidth = CARD_W * 2 + 35;
-          leftX = Math.round(unionCenterX - pairWidth / 2);
-          rightX = leftX + CARD_W + 35;
+          centerX = (coupleLeft + coupleRight) / 2;
         }
+      }
+
+      const totalWidth = CARD_W * totalCount + gap * (totalCount - 1);
+      const startX = Math.round(centerX - totalWidth / 2);
+
+      // Create sibling members
+      const siblingIds: string[] = [];
+      const siblings: FamilyMember[] = [];
+      for (let i = 0; i < siblingCount; i++) {
+        const id = `twin-${Date.now()}-${i}`;
+        siblingIds.push(id);
+        siblings.push({
+          ...updated,
+          id,
+          firstName: '',
+          lastName: updated.lastName,
+          birthName: updated.birthName,
+          birthYear: updated.birthYear,
+          age,
+          gender: updated.gender,
+          profession: '',
+          pathologies: [],
+          twinGroup: updated.twinGroup,
+          twinType: updated.twinType,
+          isDraft: false,
+          x: startX + (i + 1) * (CARD_W + gap),
+          y: updated.y,
+          isPlaceholder: false,
+          isIndexPatient: false,
+          notes: undefined,
+        });
+      }
+
+      // Update parent union to include new siblings
+      if (parentUnion) {
         nextUnions = unions.map(u => {
-          if (u.id === parentUnion.id && !u.children.includes(twinId)) {
-            return { ...u, children: [...u.children, twinId] };
+          if (u.id === parentUnion.id) {
+            const newChildren = [...u.children];
+            siblingIds.forEach(sid => { if (!newChildren.includes(sid)) newChildren.push(sid); });
+            return { ...u, children: newChildren };
           }
           return u;
         });
       }
 
-      const updatedPrimary: FamilyMember = { ...updated, age, isPlaceholder: false, isDraft: false, x: leftX };
-      const twinSibling: FamilyMember = {
-        ...updated,
-        id: twinId,
-        firstName: '',
-        lastName: updated.lastName,
-        birthName: updated.birthName,
-        birthYear: updated.birthYear,
-        age,
-        gender: updated.gender,
-        profession: '',
-        pathologies: [],
-        twinGroup: updated.twinGroup,
-        twinType: updated.twinType,
-        isDraft: false,
-        x: rightX,
-        y: updated.y,
-        isPlaceholder: false,
-        isIndexPatient: false,
-        notes: undefined,
-      };
+      const updatedPrimary: FamilyMember = { ...updated, age, isPlaceholder: false, isDraft: false, x: startX };
 
       const nextMembers = members.flatMap(m => {
         if (m.id !== updated.id) return [m];
-        return [updatedPrimary, twinSibling];
+        return [updatedPrimary, ...siblings];
       });
 
       setMembers(nextMembers);
