@@ -75,6 +75,10 @@ const TermsOfService: React.FC = () => {
       <Helmet>
         <title>Conditions Générales d'Utilisation — Genogy</title>
         <meta name="description" content="Conditions Générales d'Utilisation de Genogy. Modalités d'accès, obligations et responsabilités des utilisateurs." />
+        <link rel="canonical" href="https://genogy.app/terms" />
+        <meta property="og:title" content="CGU — Genogy" />
+        <meta property="og:description" content="Conditions Générales d'Utilisation de Genogy." />
+        <meta property="og:url" content="https://genogy.app/terms" />
       </Helmet>
 
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
