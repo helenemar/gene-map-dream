@@ -12,6 +12,7 @@ interface SharedData {
     members?: FamilyMember[];
     unions?: Union[];
     emotionalLinks?: EmotionalLink[];
+    pathologies?: { id: string; name: string; color_hex: string }[];
   };
   access_level: 'reader' | 'editor';
 }
