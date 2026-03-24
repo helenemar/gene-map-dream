@@ -237,7 +237,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
         ...member,
         birthYear: parsedBirthYear && !isNaN(parsedBirthYear) ? parsedBirthYear : 0,
         birthYearUnsure: birthYearUnsure || undefined,
-        isDraft: false,
+        isDraft: member.isDraft ?? false,
       };
       onSave(updated);
       onClose();
