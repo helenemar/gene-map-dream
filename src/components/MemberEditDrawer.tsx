@@ -824,10 +824,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                     value={(union.eventYear ?? union.marriageYear) || ''}
                                     onChange={(e) => onUpdateUnion?.(union.id, { eventYear: e.target.value ? parseInt(e.target.value) : undefined, marriageYear: e.target.value ? parseInt(e.target.value) : undefined })}
                                   />
-                                  <UnsureBtn
-                                    active={!!union.eventYearUnsure}
-                                    onToggle={() => onUpdateUnion?.(union.id, { eventYearUnsure: !union.eventYearUnsure })}
-                                  />
+                                  {renderUnsureBtn(
+                                    !!union.eventYearUnsure,
+                                    () => onUpdateUnion?.(union.id, { eventYearUnsure: !union.eventYearUnsure })
+                                  )}
                                 </div>
                               </div>
                               {!hideEnd && (
