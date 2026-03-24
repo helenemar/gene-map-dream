@@ -155,6 +155,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setTwinType(member.twinType || '');
       setNotes(member.notes || '');
       setAvatar(member.avatar);
+      setIsStillborn(member.perinatalType === 'stillborn');
     }
   }, [member]);
 
