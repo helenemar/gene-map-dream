@@ -38,6 +38,21 @@ const LandingPage: React.FC = () => {
     operatingSystem: 'Web',
     description: t.landing.metaDesc,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+    screenshot: 'https://genogy.app/og-image.png',
+    aggregateRating: undefined,
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: t.landing.faq.map(item => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
+      },
+    })),
   };
 
   return (
