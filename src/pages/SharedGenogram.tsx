@@ -68,6 +68,7 @@ const SharedGenogram: React.FC = () => {
   const members: FamilyMember[] = data?.genogram_data?.members || [];
   const unions: Union[] = data?.genogram_data?.unions || [];
   const emotionalLinks: EmotionalLink[] = data?.genogram_data?.emotionalLinks || [];
+  const sharedPathologies: { id: string; name: string; color_hex: string }[] = data?.genogram_data?.pathologies || [];
 
   // Fit to screen on load
   useEffect(() => {
