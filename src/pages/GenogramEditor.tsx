@@ -1040,6 +1040,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       x: coupleCenterX,
       y: coupleBottomY + LEVEL_Y,
       pathologies: [],
+      isDraft: true,
     };
 
     recordSnapshot();
