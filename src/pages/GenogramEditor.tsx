@@ -1297,11 +1297,55 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   const handleSaveMember = useCallback((updated: FamilyMember) => {
     const currentYear = new Date().getFullYear();
     const age = updated.birthYear ? currentYear - updated.birthYear : updated.age;
-    // Clear placeholder flag when user fills in data
+    const wasDraft = members.find(m => m.id === updated.id)?.isDraft;
     recordSnapshot();
-    setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false } : m));
-    setEditingNewMember(null);
-  }, [recordSnapshot]);
+
+    // If this is a new member with twins enabled, create a twin sibling
+    if (wasDraft && updated.twinGroup && updated.twinType) {
+      const twinId = `twin-${Date.now()}`;
+      const twinSibling: FamilyMember = {
+        ...updated,
+        id: twinId,
+        firstName: '',
+        lastName: updated.lastName,
+        birthName: updated.birthName,
+        birthYear: updated.birthYear,
+        age,
+        gender: updated.gender,
+        profession: '',
+        pathologies: [],
+        twinGroup: updated.twinGroup,
+        twinType: updated.twinType,
+        isDraft: true,
+        x: updated.x + 260,
+        y: updated.y,
+        isPlaceholder: false,
+        isIndexPatient: false,
+        notes: undefined,
+      };
+
+      setMembers(prev => {
+        const withUpdated = prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false } : m);
+        return [...withUpdated, twinSibling];
+      });
+
+      // Add twin to the same union(s) as the original member
+      setUnions(prev => prev.map(u => {
+        if (u.children.includes(updated.id)) {
+          return { ...u, children: [...u.children, twinId] };
+        }
+        return u;
+      }));
+
+      // Open drawer for the twin
+      setEditingNewMember(twinSibling);
+      setNewMemberDrawerOpen(true);
+      setDrawerEditing(true);
+    } else {
+      setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false } : m));
+      setEditingNewMember(null);
+    }
+  }, [recordSnapshot, members]);
 
   const [fadingOutIds, setFadingOutIds] = useState<Set<string>>(new Set());
 
