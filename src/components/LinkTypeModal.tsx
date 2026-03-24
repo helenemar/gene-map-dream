@@ -64,7 +64,7 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
         {isEditing && onDelete && (
           <button
             onClick={onDelete}
-            className="flex items-center gap-2 w-full mt-4 px-3 py-2.5 rounded-xl text-sm text-destructive hover:bg-destructive/10 transition-colors shrink-0 border-t border-border/50 pt-4 mx-1"
+            className="flex items-center gap-2 w-full mt-4 px-3 h-12 rounded-xl text-sm text-destructive hover:bg-destructive/10 transition-colors shrink-0 border-t border-border/50 mx-1"
           >
             <Trash2 className="w-4 h-4" />
             Supprimer ce lien
