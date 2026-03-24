@@ -428,6 +428,11 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     if (!canvas) return;
 
     const onWheel = (e: WheelEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('[data-scroll-lock="modal-scroll"]')) {
+        return;
+      }
+
       e.preventDefault();
 
       // Pinch-to-zoom: browsers set ctrlKey=true for trackpad pinch gestures
