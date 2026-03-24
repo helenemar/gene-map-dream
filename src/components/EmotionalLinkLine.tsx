@@ -377,7 +377,7 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
           opacity: searchHighlighted
             ? (hovered ? 1 : 0.95)
             : searchDimmed
-              ? 0.06
+              ? 0.4
               : dimmed
                 ? 0.1
                 : (hovered ? 0.9 : 0.55),
