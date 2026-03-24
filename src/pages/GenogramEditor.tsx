@@ -1301,7 +1301,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     recordSnapshot();
 
     // If this is a new member with twins enabled, create a twin sibling
-    if (wasDraft && updated.twinGroup && updated.twinType) {
+    if (wasDraft && updated.twinGroup) {
       const twinId = `twin-${Date.now()}`;
       const twinSibling: FamilyMember = {
         ...updated,
