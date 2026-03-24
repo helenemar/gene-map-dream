@@ -319,6 +319,68 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
       );
     }
 
+    const singleTwinGroup = childMembers[0]?.twinGroup;
+    const isTwinOnlyFork =
+      effectiveDropCount === 1 &&
+      childMembers.length > 1 &&
+      !!singleTwinGroup &&
+      childMembers.every((member) => member.twinGroup === singleTwinGroup);
+
+    // Twin/triplet-only unions: render a centered inverted V from a single fork point
+    if (isTwinOnlyFork) {
+      const isAdoption = !!union.isAdoption;
+      const adoptionDash = '6 4';
+      const tickLen = 6;
+      const childTopY = Math.min(...childAnchors.map((anchor) => anchor.y));
+      const forkY = Math.max(unionLineY + 24, Math.min(combY + 20, childTopY - 24));
+
+      return (
+        <g key={union.id}>
+          <UnionLine
+            x1={leftAnchor.x} y1={leftAnchor.y}
+            x2={rightAnchor.x} y2={rightAnchor.y}
+            status={union.status}
+            variant={variant}
+          />
+
+          <line
+            x1={unionMidX} y1={unionLineY}
+            x2={unionMidX} y2={forkY}
+            stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+            strokeDasharray={isAdoption ? adoptionDash : undefined}
+          />
+
+          {childAnchors.map((anchor, index) => {
+            const branchMidX = (unionMidX + anchor.x) / 2;
+            const branchMidY = (forkY + anchor.y) / 2;
+            const dx = anchor.x - unionMidX;
+            const dy = anchor.y - forkY;
+            const len = Math.hypot(dx, dy) || 1;
+            const nx = -dy / len;
+            const ny = dx / len;
+
+            return (
+              <g key={`twin-only-branch-${union.id}-${index}`}>
+                <line
+                  x1={unionMidX} y1={forkY}
+                  x2={anchor.x} y2={anchor.y}
+                  stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                  strokeDasharray={isAdoption ? adoptionDash : undefined}
+                />
+                {isAdoption && (
+                  <line
+                    x1={branchMidX - nx * tickLen} y1={branchMidY - ny * tickLen}
+                    x2={branchMidX + nx * tickLen} y2={branchMidY + ny * tickLen}
+                    stroke={stroke} strokeWidth={sw} strokeOpacity={opacity}
+                  />
+                )}
+              </g>
+            );
+          })}
+        </g>
+      );
+    }
+
     // For single-child unions, draw a straight vertical from union midpoint down to child
     if (effectiveDropCount === 1) {
       const singleChildAnchor = childAnchors[0];
