@@ -12,3 +12,11 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /editor/
+Disallow: /dashboard
+Disallow: /account
+Disallow: /shared/
+Disallow: /shared-edit/
+Disallow: /design-system
+
+Sitemap: https://genogy.app/sitemap.xml

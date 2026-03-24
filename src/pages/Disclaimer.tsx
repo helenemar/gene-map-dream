@@ -47,6 +47,10 @@ const Disclaimer: React.FC = () => {
       <Helmet>
         <title>Avertissement légal — Genogy</title>
         <meta name="description" content="Clause de non-responsabilité et avertissement légal de Genogy. L'outil ne constitue pas une thérapie ou un avis médical." />
+        <link rel="canonical" href="https://genogy.app/disclaimer" />
+        <meta property="og:title" content="Avertissement légal — Genogy" />
+        <meta property="og:description" content="Clause de non-responsabilité de Genogy." />
+        <meta property="og:url" content="https://genogy.app/disclaimer" />
       </Helmet>
 
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">

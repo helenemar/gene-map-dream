@@ -38,6 +38,21 @@ const LandingPage: React.FC = () => {
     operatingSystem: 'Web',
     description: t.landing.metaDesc,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+    screenshot: 'https://genogy.app/og-image.png',
+    aggregateRating: undefined,
+  };
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: t.landing.faq.map(item => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
+      },
+    })),
   };
 
   return (
@@ -45,8 +60,13 @@ const LandingPage: React.FC = () => {
       <Helmet>
         <title>{t.landing.metaTitle}</title>
         <meta name="description" content={t.landing.metaDesc} />
+        <meta name="keywords" content="génogramme, génogramme en ligne, outil génogramme, psychologue, thérapie familiale, arbre familial, travail social, relations familiales" />
         <link rel="canonical" href="https://genogy.app/" />
+        <meta property="og:title" content={t.landing.metaTitle} />
+        <meta property="og:description" content={t.landing.metaDesc} />
+        <meta property="og:url" content="https://genogy.app/" />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       </Helmet>
 
       <LandingHeader onAuth={openAuth} />
