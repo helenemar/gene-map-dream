@@ -706,7 +706,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.twins}</span>
                   <Switch
                     checked={!!twinGroup}
-                    onCheckedChange={(checked) => setTwinGroup(checked ? t.memberEdit.twinGroupPlaceholder || 'Jumeaux' : '')}
+                    onCheckedChange={(checked) => setTwinGroup(checked ? t.memberEdit.twinGroup || 'Jumeaux' : '')}
                   />
                 </label>
                 {twinGroup && (
