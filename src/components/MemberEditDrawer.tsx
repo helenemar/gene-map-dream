@@ -630,21 +630,36 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     ) : (
                       <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto">
                         {dynamicPathologies.map(p => (
-                          <label
+                          <div
                             key={p.id}
-                            className="flex items-center gap-2.5 py-1.5 cursor-pointer hover:bg-accent/20 rounded-md px-1 -mx-1 transition-colors"
+                            className="flex items-center gap-2.5 py-1.5 hover:bg-accent/20 rounded-md px-1 -mx-1 transition-colors group"
                           >
-                            <Checkbox
-                              checked={selectedPathologies.includes(p.id)}
-                              onCheckedChange={() => togglePathology(p.id)}
-                              className="border-primary/40"
-                            />
-                            <span
-                              className="w-3.5 h-3.5 rounded shrink-0"
-                              style={{ backgroundColor: p.color_hex }}
-                            />
-                            <span className="text-sm text-foreground">{p.name}</span>
-                          </label>
+                            <label className="flex items-center gap-2.5 cursor-pointer flex-1 min-w-0">
+                              <Checkbox
+                                checked={selectedPathologies.includes(p.id)}
+                                onCheckedChange={() => togglePathology(p.id)}
+                                className="border-primary/40"
+                              />
+                              <span
+                                className="w-3.5 h-3.5 rounded shrink-0"
+                                style={{ backgroundColor: p.color_hex }}
+                              />
+                              <span className="text-sm text-foreground truncate">{p.name}</span>
+                            </label>
+                            {onDeletePathology && (
+                              <button
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  setSelectedPathologies(prev => prev.filter(id => id !== p.id));
+                                  await onDeletePathology(p.id);
+                                }}
+                                className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all shrink-0"
+                                title={t.memberEdit.deletePathology || 'Supprimer'}
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
                         ))}
                       </div>
                     )}
