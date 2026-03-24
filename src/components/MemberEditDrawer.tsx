@@ -620,47 +620,55 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                       <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
                     </button>
                   </PopoverTrigger>
-                <PopoverContent side="left" align="start" sideOffset={8} collisionPadding={16} className="w-[280px] p-3">
-                  <div className="flex flex-col gap-2">
+                <PopoverContent
+                  side="left"
+                  align="start"
+                  sideOffset={8}
+                  collisionPadding={16}
+                  className="w-[280px] max-h-[calc(100vh-32px)] p-3 flex flex-col"
+                >
+                  <div className="flex min-h-0 flex-col gap-2">
                     <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
                       {t.memberEdit.pathologiesLabel} ({selectedPathologies.length})
                     </span>
                     {dynamicPathologies.length === 0 ? (
                       <p className="text-xs text-muted-foreground/50 italic">{t.memberEdit.noPathologyDefined}</p>
                     ) : (
-                      <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto">
-                        {dynamicPathologies.map(p => (
-                          <div
-                            key={p.id}
-                            className="flex items-center gap-2.5 py-1.5 hover:bg-accent/20 rounded-md px-1 -mx-1 transition-colors group"
-                          >
-                            <label className="flex items-center gap-2.5 cursor-pointer flex-1 min-w-0">
-                              <Checkbox
-                                checked={selectedPathologies.includes(p.id)}
-                                onCheckedChange={() => togglePathology(p.id)}
-                                className="border-primary/40"
-                              />
-                              <span
-                                className="w-3.5 h-3.5 rounded shrink-0"
-                                style={{ backgroundColor: p.color_hex }}
-                              />
-                              <span className="text-sm text-foreground truncate">{p.name}</span>
-                            </label>
-                            {onDeletePathology && (
-                              <button
-                                onClick={async (e) => {
-                                  e.stopPropagation();
-                                  setSelectedPathologies(prev => prev.filter(id => id !== p.id));
-                                  await onDeletePathology(p.id);
-                                }}
-                                className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all shrink-0"
-                                title="Supprimer"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            )}
-                          </div>
-                        ))}
+                      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1">
+                        <div className="flex flex-col gap-1">
+                          {dynamicPathologies.map(p => (
+                            <div
+                              key={p.id}
+                              className="flex items-center gap-2.5 py-1.5 hover:bg-accent/20 rounded-md px-1 -mx-1 transition-colors group"
+                            >
+                              <label className="flex items-center gap-2.5 cursor-pointer flex-1 min-w-0">
+                                <Checkbox
+                                  checked={selectedPathologies.includes(p.id)}
+                                  onCheckedChange={() => togglePathology(p.id)}
+                                  className="border-primary/40"
+                                />
+                                <span
+                                  className="w-3.5 h-3.5 rounded shrink-0"
+                                  style={{ backgroundColor: p.color_hex }}
+                                />
+                                <span className="text-sm text-foreground truncate">{p.name}</span>
+                              </label>
+                              {onDeletePathology && (
+                                <button
+                                  onClick={async (e) => {
+                                    e.stopPropagation();
+                                    setSelectedPathologies(prev => prev.filter(id => id !== p.id));
+                                    await onDeletePathology(p.id);
+                                  }}
+                                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all shrink-0"
+                                  title="Supprimer"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                     {onAddPathology && (
