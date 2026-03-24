@@ -86,13 +86,13 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
     onUpdate({ ...union, [field]: !union[field] });
   };
 
-  const UnsureButton: React.FC<{ field: 'meetingYearUnsure' | 'eventYearUnsure' | 'endYearUnsure'; value: boolean }> = ({ field, value }) => (
+  const renderUnsureButton = (field: 'meetingYearUnsure' | 'eventYearUnsure' | 'endYearUnsure', value: boolean) => (
     <TooltipProvider delayDuration={200}>
       <Tooltip>
         <TooltipTrigger asChild>
           <button
             type="button"
-            onClick={() => toggleUnsure(field)}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleUnsure(field); }}
             className={`shrink-0 w-9 h-9 rounded-lg border flex items-center justify-center transition-colors ${
               value
                 ? 'bg-primary/10 border-primary/30 text-primary'
