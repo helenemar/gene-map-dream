@@ -55,18 +55,32 @@ const LandingPage: React.FC = () => {
     })),
   };
 
+  const howToJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'Comment faire un génogramme en ligne',
+    description: 'Créez votre génogramme professionnel en 3 étapes simples avec Genogy.',
+    step: t.landing.steps.map((step, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: step.title,
+      text: step.desc,
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-page-bg text-foreground">
       <Helmet>
         <title>{t.landing.metaTitle}</title>
         <meta name="description" content={t.landing.metaDesc} />
-        <meta name="keywords" content="génogramme, génogramme en ligne, outil génogramme, psychologue, thérapie familiale, arbre familial, travail social, relations familiales" />
+        <meta name="keywords" content="génogramme, génogramme en ligne, faire un génogramme, comment faire un génogramme, outil génogramme gratuit, génogramme site web, génogramme psychologie, arbre familial émotionnel, genogram online" />
         <link rel="canonical" href="https://genogy.app/" />
         <meta property="og:title" content={t.landing.metaTitle} />
         <meta property="og:description" content={t.landing.metaDesc} />
         <meta property="og:url" content="https://genogy.app/" />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(howToJsonLd)}</script>
       </Helmet>
 
       <LandingHeader onAuth={openAuth} />
