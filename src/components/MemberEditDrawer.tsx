@@ -731,6 +731,19 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 )}
               </div>
 
+              {/* ── Mortinaissance (for twin/triplet members) ── */}
+              {twinGroup && (
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Mortinaissance</span>
+                    <Switch
+                      checked={isStillborn}
+                      onCheckedChange={setIsStillborn}
+                    />
+                  </label>
+                </div>
+              )}
+
               <Separator className="opacity-50" />
 
               {/* ── Notes ── */}
