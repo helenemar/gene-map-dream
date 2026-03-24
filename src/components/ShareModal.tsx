@@ -78,6 +78,16 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
     toast.success(t.shareModal.shareDeleted);
   };
 
+  const toggleShareAccess = async (share: Share) => {
+    const newLevel: AccessLevel = share.access_level === 'editor' ? 'reader' : 'editor';
+    await supabase
+      .from('genogram_shares')
+      .update({ access_level: newLevel } as any)
+      .eq('id', share.id);
+    await fetchShares();
+    toast.success(newLevel === 'reader' ? t.shareModal.reader : t.shareModal.editorAccess);
+  };
+
   const copyLink = (token: string, shareId: string) => {
     const url = `${window.location.origin}/shared/${token}`;
     navigator.clipboard.writeText(url);
