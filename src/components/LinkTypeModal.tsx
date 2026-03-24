@@ -22,13 +22,12 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
   const isEditing = !!currentType;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose} onWheel={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="bg-card border border-border rounded-xl shadow-modal p-5 w-[340px] max-h-[75vh] flex flex-col"
+        className="bg-card border border-border rounded-xl shadow-modal p-5 w-[340px] max-h-[75vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
-        onWheel={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-4 shrink-0">
+        <div className="flex items-center justify-between mb-4 shrink-0 px-1">
           <h3 className="font-semibold text-foreground text-base">
             {isEditing ? 'Modifier le lien émotionnel' : 'Type de lien émotionnel'}
           </h3>
@@ -39,13 +38,16 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
-        <div className="flex flex-col gap-1 overflow-y-auto min-h-0">
+        <div
+          data-scroll-lock="modal-scroll"
+          className="flex flex-col gap-1 overflow-y-auto min-h-0 px-1 py-1 overscroll-contain"
+        >
           {EMOTIONAL_LINK_TYPES.map((lt) => (
             <button
               key={lt.id}
               onClick={() => onSelect(lt.id)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-foreground hover:bg-accent transition-colors text-left shrink-0 ${
-                currentType === lt.id ? 'bg-primary/10 ring-1 ring-primary/30' : ''
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-foreground hover:bg-accent transition-colors text-left shrink-0 border border-transparent ${
+                currentType === lt.id ? 'bg-primary/10 border-primary/30' : ''
               }`}
             >
               <div
@@ -62,7 +64,7 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
         {isEditing && onDelete && (
           <button
             onClick={onDelete}
-            className="flex items-center gap-2 w-full mt-4 px-3 py-2.5 rounded-xl text-sm text-destructive hover:bg-destructive/10 transition-colors shrink-0 border-t border-border/50 pt-4"
+            className="flex items-center gap-2 w-full mt-4 px-3 py-2.5 rounded-xl text-sm text-destructive hover:bg-destructive/10 transition-colors shrink-0 border-t border-border/50 pt-4 mx-1"
           >
             <Trash2 className="w-4 h-4" />
             Supprimer ce lien
