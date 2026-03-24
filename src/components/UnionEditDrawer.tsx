@@ -178,7 +178,7 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
                 min={1900}
                 max={2100}
               />
-              <UnsureButton field="eventYearUnsure" value={eff.eventYearUnsure} />
+              {renderUnsureButton('eventYearUnsure', eff.eventYearUnsure)}
             </div>
           </div>
 
