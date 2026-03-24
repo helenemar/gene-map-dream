@@ -773,7 +773,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           };
                           const hideEnd = ['separated', 'divorced', 'widowed'].includes(union.status);
 
-                          const UnsureBtn: React.FC<{ active: boolean; onToggle: () => void }> = ({ active, onToggle }) => (
+                          const renderUnsureBtn = (active: boolean, onToggle: () => void) => (
                             <TooltipProvider delayDuration={200}>
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -808,10 +808,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                     value={union.meetingYear || ''}
                                     onChange={(e) => onUpdateUnion?.(union.id, { meetingYear: e.target.value ? parseInt(e.target.value) : undefined })}
                                   />
-                                  <UnsureBtn
-                                    active={!!union.meetingYearUnsure}
-                                    onToggle={() => onUpdateUnion?.(union.id, { meetingYearUnsure: !union.meetingYearUnsure })}
-                                  />
+                                  {renderUnsureBtn(
+                                    !!union.meetingYearUnsure,
+                                    () => onUpdateUnion?.(union.id, { meetingYearUnsure: !union.meetingYearUnsure })
+                                  )}
                                 </div>
                               </div>
                               <div className="flex flex-col gap-0.5">
@@ -824,10 +824,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                     value={(union.eventYear ?? union.marriageYear) || ''}
                                     onChange={(e) => onUpdateUnion?.(union.id, { eventYear: e.target.value ? parseInt(e.target.value) : undefined, marriageYear: e.target.value ? parseInt(e.target.value) : undefined })}
                                   />
-                                  <UnsureBtn
-                                    active={!!union.eventYearUnsure}
-                                    onToggle={() => onUpdateUnion?.(union.id, { eventYearUnsure: !union.eventYearUnsure })}
-                                  />
+                                  {renderUnsureBtn(
+                                    !!union.eventYearUnsure,
+                                    () => onUpdateUnion?.(union.id, { eventYearUnsure: !union.eventYearUnsure })
+                                  )}
                                 </div>
                               </div>
                               {!hideEnd && (
@@ -841,10 +841,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                       value={(union.endYear ?? union.divorceYear) || ''}
                                       onChange={(e) => onUpdateUnion?.(union.id, { endYear: e.target.value ? parseInt(e.target.value) : undefined, divorceYear: e.target.value ? parseInt(e.target.value) : undefined })}
                                     />
-                                    <UnsureBtn
-                                      active={!!union.endYearUnsure}
-                                      onToggle={() => onUpdateUnion?.(union.id, { endYearUnsure: !union.endYearUnsure })}
-                                    />
+                                    {renderUnsureBtn(
+                                      !!union.endYearUnsure,
+                                      () => onUpdateUnion?.(union.id, { endYearUnsure: !union.endYearUnsure })
+                                    )}
                                   </div>
                                 </div>
                               )}
