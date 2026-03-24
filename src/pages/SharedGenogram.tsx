@@ -68,6 +68,13 @@ const SharedGenogram: React.FC = () => {
   const members: FamilyMember[] = data?.genogram_data?.members || [];
   const unions: Union[] = data?.genogram_data?.unions || [];
   const emotionalLinks: EmotionalLink[] = data?.genogram_data?.emotionalLinks || [];
+  const sharedPathologies = (data?.genogram_data?.pathologies || []).map((p: any) => ({
+    id: p.id,
+    name: p.name,
+    color_hex: p.color_hex,
+    genogram_id: data?.genogram_id || '',
+    created_at: '',
+  }));
 
   // Fit to screen on load
   useEffect(() => {
@@ -245,7 +252,7 @@ const SharedGenogram: React.FC = () => {
               key={member.id}
               member={member}
               presentationMode={true}
-              dynamicPathologies={[]}
+              dynamicPathologies={sharedPathologies}
             />
           ))}
         </div>

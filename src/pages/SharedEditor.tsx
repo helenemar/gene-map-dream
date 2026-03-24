@@ -12,6 +12,7 @@ interface SharedData {
     members?: FamilyMember[];
     unions?: Union[];
     emotionalLinks?: EmotionalLink[];
+    pathologies?: { id: string; name: string; color_hex: string }[];
   };
   access_level: 'reader' | 'editor';
 }
@@ -80,6 +81,7 @@ const SharedEditor: React.FC = () => {
         members: data.genogram_data?.members || [],
         unions: data.genogram_data?.unions || [],
         emotionalLinks: data.genogram_data?.emotionalLinks || [],
+        pathologies: data.genogram_data?.pathologies || [],
       }}
     />
   );
