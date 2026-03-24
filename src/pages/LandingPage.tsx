@@ -60,8 +60,13 @@ const LandingPage: React.FC = () => {
       <Helmet>
         <title>{t.landing.metaTitle}</title>
         <meta name="description" content={t.landing.metaDesc} />
+        <meta name="keywords" content="génogramme, génogramme en ligne, outil génogramme, psychologue, thérapie familiale, arbre familial, travail social, relations familiales" />
         <link rel="canonical" href="https://genogy.app/" />
+        <meta property="og:title" content={t.landing.metaTitle} />
+        <meta property="og:description" content={t.landing.metaDesc} />
+        <meta property="og:url" content="https://genogy.app/" />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       </Helmet>
 
       <LandingHeader onAuth={openAuth} />
