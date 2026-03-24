@@ -246,7 +246,7 @@ const SharedGenogram: React.FC = () => {
               key={member.id}
               member={member}
               presentationMode={true}
-              dynamicPathologies={[]}
+              dynamicPathologies={sharedPathologies}
             />
           ))}
         </div>
