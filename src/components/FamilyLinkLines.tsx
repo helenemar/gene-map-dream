@@ -595,7 +595,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
             <g
               key={geo.union.id}
               style={{
-                opacity: dimmed ? 0.08 : isStatusDimmed ? 0.12 : 1,
+                opacity: dimmed ? 0.45 : isStatusDimmed ? 0.12 : 1,
                 filter: isStatusMatch ? 'url(#union-glow)' : 'none',
                 transition: 'opacity 0.2s, filter 0.2s',
               }}
