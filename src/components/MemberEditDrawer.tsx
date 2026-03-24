@@ -700,7 +700,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               <Separator className="opacity-50" />
 
-              {/* ── Twins ── */}
+              {/* ── Twins / Triplets ── */}
               <div className="flex flex-col gap-2">
                 <label className="flex items-center justify-between cursor-pointer">
                   <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.twins}</span>
@@ -711,14 +711,19 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                 </label>
                 {twinGroup && (
                   <div className="flex flex-col gap-1.5 p-3 rounded-lg bg-accent/30 border border-border/50">
-                    <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{t.memberEdit.twinGroup}</Label>
-                    <Input
-                      className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30"
-                      placeholder={t.memberEdit.twinGroupPlaceholder}
-                      value={twinGroup}
-                      onChange={(e) => setTwinGroup(e.target.value)}
-                    />
-                    <span className="text-[9px] text-muted-foreground/60">{t.memberEdit.twinGroupHint}</span>
+                    <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Type</Label>
+                    <Select
+                      value={twinGroup === 'Triplés' ? 'triplets' : 'twins'}
+                      onValueChange={(v) => setTwinGroup(v === 'triplets' ? 'Triplés' : 'Jumeaux')}
+                    >
+                      <SelectTrigger className="h-8 text-sm border-border/50 bg-card">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="twins">Jumeaux (2)</SelectItem>
+                        <SelectItem value="triplets">Triplés (3)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 )}
               </div>
