@@ -373,7 +373,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       animate={{
         left: member.x,
         top: member.y,
-        opacity: isFadingOut ? 0 : searchDimmed ? 0.12 : 1,
+        opacity: isFadingOut ? 0 : searchDimmed ? 0.35 : 1,
         scale: isFadingOut ? 0.85 : 1,
       }}
       transition={isFadingOut
