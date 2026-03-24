@@ -78,6 +78,16 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
     toast.success(t.shareModal.shareDeleted);
   };
 
+  const toggleShareAccess = async (share: Share) => {
+    const newLevel: AccessLevel = share.access_level === 'editor' ? 'reader' : 'editor';
+    await supabase
+      .from('genogram_shares')
+      .update({ access_level: newLevel } as any)
+      .eq('id', share.id);
+    await fetchShares();
+    toast.success(newLevel === 'reader' ? t.shareModal.reader : t.shareModal.editorAccess);
+  };
+
   const copyLink = (token: string, shareId: string) => {
     const url = `${window.location.origin}/shared/${token}`;
     navigator.clipboard.writeText(url);
@@ -152,6 +162,16 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
                         .../{share.share_token.slice(0, 8)}...
                       </span>
                       <AccessBadge level={share.access_level as AccessLevel} />
+                      <button
+                        onClick={() => toggleShareAccess(share)}
+                        title={share.access_level === 'editor' ? t.shareModal.reader : t.shareModal.editorAccess}
+                        className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-accent transition-colors shrink-0"
+                      >
+                        {share.access_level === 'editor'
+                          ? <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                          : <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+                        }
+                      </button>
                       <button
                         onClick={() => copyLink(share.share_token, share.id)}
                         className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-accent transition-colors shrink-0"
