@@ -40,7 +40,7 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
         </div>
         <div
           data-scroll-lock="modal-scroll"
-          className="flex flex-col gap-1 overflow-y-auto min-h-0 px-1 py-1 overscroll-contain"
+          className="flex flex-col gap-1 overflow-y-scroll min-h-0 px-1 py-1 overscroll-contain"
         >
           {EMOTIONAL_LINK_TYPES.map((lt) => (
             <button
