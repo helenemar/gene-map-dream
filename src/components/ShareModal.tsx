@@ -163,6 +163,16 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onOpenChange, genogramId,
                       </span>
                       <AccessBadge level={share.access_level as AccessLevel} />
                       <button
+                        onClick={() => toggleShareAccess(share)}
+                        title={share.access_level === 'editor' ? t.shareModal.reader : t.shareModal.editorAccess}
+                        className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-accent transition-colors shrink-0"
+                      >
+                        {share.access_level === 'editor'
+                          ? <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                          : <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+                        }
+                      </button>
+                      <button
                         onClick={() => copyLink(share.share_token, share.id)}
                         className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-accent transition-colors shrink-0"
                       >
