@@ -99,6 +99,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [twinType, setTwinType] = useState<TwinType | ''>('');
   const [notes, setNotes] = useState('');
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
+  const [isStillborn, setIsStillborn] = useState(false);
 
   const [birthYearUnsure, setBirthYearUnsure] = useState(false);
   const [deathYearUnsure, setDeathYearUnsure] = useState(false);
@@ -154,6 +155,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setTwinType(member.twinType || '');
       setNotes(member.notes || '');
       setAvatar(member.avatar);
+      setIsStillborn(member.perinatalType === 'stillborn');
     }
   }, [member]);
 
@@ -192,18 +194,19 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       pathologies: selectedPathologies,
       twinGroup: twinGroup || undefined,
       twinType: (twinType as TwinType) || undefined,
+      perinatalType: isStillborn ? 'stillborn' : (twinGroup ? undefined : member.perinatalType),
       notes: notes || undefined,
       avatar: avatar || undefined,
       isDraft: member?.isDraft ?? false,
     };
-  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, avatar, currentYear]);
+  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, currentYear]);
 
   useEffect(() => {
     if (open && member && onLiveUpdate) {
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, avatar]);
+  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar]);
 
   if (!member) return null;
 
@@ -727,6 +730,19 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   </div>
                 )}
               </div>
+
+              {/* ── Mortinaissance (for twin/triplet members) ── */}
+              {twinGroup && (
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">Mortinaissance</span>
+                    <Switch
+                      checked={isStillborn}
+                      onCheckedChange={setIsStillborn}
+                    />
+                  </label>
+                </div>
+              )}
 
               <Separator className="opacity-50" />
 
