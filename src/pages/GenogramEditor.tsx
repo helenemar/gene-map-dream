@@ -1318,7 +1318,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
         pathologies: [],
         twinGroup: updated.twinGroup,
         twinType: updated.twinType,
-        isDraft: true,
+        isDraft: false,
         x: updated.x + 260,
         y: updated.y,
         isPlaceholder: false,
@@ -1328,21 +1328,19 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
 
       setMembers(prev => {
         const withUpdated = prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false } : m);
-        return [...withUpdated, twinSibling];
+        const alreadyExists = withUpdated.some(m => m.id === twinId);
+        return alreadyExists ? withUpdated : [...withUpdated, twinSibling];
       });
 
-      // Add twin to the same union(s) as the original member
       setUnions(prev => prev.map(u => {
-        if (u.children.includes(updated.id)) {
+        if (u.children.includes(updated.id) && !u.children.includes(twinId)) {
           return { ...u, children: [...u.children, twinId] };
         }
         return u;
       }));
 
-      // Open drawer for the twin
-      setEditingNewMember(twinSibling);
-      setNewMemberDrawerOpen(true);
-      setDrawerEditing(true);
+      setEditingNewMember(null);
+      setNewMemberDrawerOpen(false);
     } else {
       setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false } : m));
       setEditingNewMember(null);
