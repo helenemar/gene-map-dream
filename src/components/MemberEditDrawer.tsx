@@ -773,7 +773,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           };
                           const hideEnd = ['separated', 'divorced', 'widowed'].includes(union.status);
 
-                          const UnsureBtn: React.FC<{ active: boolean; onToggle: () => void }> = ({ active, onToggle }) => (
+                          const renderUnsureBtn = (active: boolean, onToggle: () => void) => (
                             <TooltipProvider delayDuration={200}>
                               <Tooltip>
                                 <TooltipTrigger asChild>
