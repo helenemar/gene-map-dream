@@ -895,6 +895,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       x: source?.x ?? 200,
       y: (source?.y ?? 200) + LEVEL_Y,
       pathologies: [],
+      isDraft: !perinatal,
       ...(perinatal ? { perinatalType: perinatal } : {}),
     };
 
