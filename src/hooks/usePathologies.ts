@@ -9,8 +9,8 @@ export interface DynamicPathology {
   genogram_id: string;
 }
 
-export function usePathologies(genogramId: string | undefined) {
-  const [pathologies, setPathologies] = useState<DynamicPathology[]>([]);
+export function usePathologies(genogramId: string | undefined, initialPathologies?: DynamicPathology[]) {
+  const [pathologies, setPathologies] = useState<DynamicPathology[]>(initialPathologies || []);
   const [loading, setLoading] = useState(false);
 
   const fetchPathologies = useCallback(async () => {
