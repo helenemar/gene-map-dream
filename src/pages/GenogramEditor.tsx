@@ -140,6 +140,7 @@ interface GenogramEditorProps {
     members: FamilyMember[];
     unions: Union[];
     emotionalLinks: EmotionalLink[];
+    pathologies?: { id: string; name: string; color_hex: string }[];
   };
 }
 
