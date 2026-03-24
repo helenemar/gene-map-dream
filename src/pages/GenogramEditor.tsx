@@ -1299,7 +1299,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   const handleSaveMember = useCallback((updated: FamilyMember) => {
     const currentYear = new Date().getFullYear();
     const age = updated.birthYear ? currentYear - updated.birthYear : updated.age;
-    const wasDraft = members.find(m => m.id === updated.id)?.isDraft;
+    const wasDraft = members.find(m => m.id === updated.id)?.isDraft ?? updated.isDraft;
     recordSnapshot();
 
     // If this is a new member with twins enabled, create a twin sibling
