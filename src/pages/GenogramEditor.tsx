@@ -171,7 +171,12 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   const [hoveredMember, setHoveredMember] = useState<string | null>(null);
   const [emotionalLinks, setEmotionalLinks] = useState<EmotionalLink[]>(() => sharedInitialData ? sharedInitialData.emotionalLinks : (genogramId ? [] : SAMPLE_EMOTIONAL_LINKS));
   const [unions, setUnions] = useState<Union[]>(() => sharedInitialData ? sharedInitialData.unions : (genogramId ? [] : SAMPLE_UNIONS));
-  const { pathologies: dynamicPathologies, addPathology, deletePathology } = usePathologies(isSharedMode ? undefined : genogramId);
+  const sharedPathologiesInit = sharedInitialData?.pathologies?.map(p => ({
+    ...p,
+    genogram_id: '',
+    created_at: '',
+  })) || [];
+  const { pathologies: dynamicPathologies, addPathology, deletePathology } = usePathologies(isSharedMode ? undefined : genogramId, isSharedMode ? sharedPathologiesInit : undefined);
   const search = useFamilySearch(members, unions, emotionalLinks, dynamicPathologies);
   const [editingUnionId, setEditingUnionId] = useState<string | null>(null);
   const [fileName, setFileName] = useState(sharedInitialData?.name || 'Sans titre');
