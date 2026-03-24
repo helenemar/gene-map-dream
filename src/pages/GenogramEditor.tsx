@@ -1380,7 +1380,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       return;
     }
 
-    setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false } : m));
+    setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false, isDraft: false } : m));
     setEditingNewMember(null);
   }, [recordSnapshot, members, unions, emotionalLinks, fileName, saveNow]);
 
