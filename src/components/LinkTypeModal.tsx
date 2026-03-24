@@ -22,10 +22,11 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
   const isEditing = !!currentType;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose} onWheel={(e) => e.stopPropagation()}>
       <div
         className="bg-card border border-border rounded-xl shadow-modal p-5 w-[340px] max-h-[75vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
+        onWheel={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4 shrink-0">
           <h3 className="font-semibold text-foreground text-base">
