@@ -654,7 +654,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                   await onDeletePathology(p.id);
                                 }}
                                 className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all shrink-0"
-                                title={t.memberEdit.deletePathology || 'Supprimer'}
+                                title="Supprimer"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
