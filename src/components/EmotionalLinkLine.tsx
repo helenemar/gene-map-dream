@@ -375,12 +375,12 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       <g
         style={{
           opacity: searchHighlighted
-            ? (hovered ? 1 : 0.95)
+            ? (hovered ? 1 : 1)
             : searchDimmed
-              ? 0.55
+              ? 0.8
               : dimmed
-                ? 0.1
-                : (hovered ? 0.9 : 0.55),
+                ? 0.18
+                : (hovered ? 0.95 : 0.8),
           strokeWidth: searchHighlighted ? 2 : (hovered ? 1.8 : undefined),
           filter: (hovered || searchHighlighted) ? `url(#glow-${type})` : 'none',
         }}
