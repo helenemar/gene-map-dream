@@ -808,10 +808,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                     value={union.meetingYear || ''}
                                     onChange={(e) => onUpdateUnion?.(union.id, { meetingYear: e.target.value ? parseInt(e.target.value) : undefined })}
                                   />
-                                  <UnsureBtn
-                                    active={!!union.meetingYearUnsure}
-                                    onToggle={() => onUpdateUnion?.(union.id, { meetingYearUnsure: !union.meetingYearUnsure })}
-                                  />
+                                  {renderUnsureBtn(
+                                    !!union.meetingYearUnsure,
+                                    () => onUpdateUnion?.(union.id, { meetingYearUnsure: !union.meetingYearUnsure })
+                                  )}
                                 </div>
                               </div>
                               <div className="flex flex-col gap-0.5">
