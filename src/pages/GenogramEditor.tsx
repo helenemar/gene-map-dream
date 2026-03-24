@@ -1305,6 +1305,24 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     // If this is a new member with twins enabled, create a twin sibling
     if (wasDraft && updated.twinGroup) {
       const twinId = `twin-${Date.now()}`;
+
+      let leftX = updated.x;
+      let rightX = updated.x + CARD_W + 35;
+
+      const parentUnion = unions.find(u => u.children.includes(updated.id));
+      if (parentUnion) {
+        const p1 = members.find(m => m.id === parentUnion.partner1);
+        const p2 = members.find(m => m.id === parentUnion.partner2);
+        if (p1 && p2) {
+          const coupleLeft = Math.min(p1.x, p2.x);
+          const coupleRight = Math.max(p1.x, p2.x) + CARD_W;
+          const unionCenterX = (coupleLeft + coupleRight) / 2;
+          const pairWidth = CARD_W * 2 + 35;
+          leftX = Math.round(unionCenterX - pairWidth / 2);
+          rightX = leftX + CARD_W + 35;
+        }
+      }
+
       const twinSibling: FamilyMember = {
         ...updated,
         id: twinId,
@@ -1319,7 +1337,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
         twinGroup: updated.twinGroup,
         twinType: updated.twinType,
         isDraft: false,
-        x: updated.x + 260,
+        x: rightX,
         y: updated.y,
         isPlaceholder: false,
         isIndexPatient: false,
@@ -1327,7 +1345,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       };
 
       setMembers(prev => {
-        const withUpdated = prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false } : m);
+        const withUpdated = prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false, x: leftX } : m);
         const alreadyExists = withUpdated.some(m => m.id === twinId);
         return alreadyExists ? withUpdated : [...withUpdated, twinSibling];
       });
