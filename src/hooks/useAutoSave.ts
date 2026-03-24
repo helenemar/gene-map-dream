@@ -16,6 +16,7 @@ export function useAutoSave(genogramId: string | null, debounceMs = 2000) {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestDataRef = useRef<GenogramData | null>(null);
+  const latestNameRef = useRef<string | undefined>(undefined);
 
   const save = useCallback(async (data: GenogramData, name?: string) => {
     if (!genogramId || !user) return;
@@ -46,9 +47,12 @@ export function useAutoSave(genogramId: string | null, debounceMs = 2000) {
 
   const debouncedSave = useCallback((data: GenogramData, name?: string) => {
     latestDataRef.current = data;
+    latestNameRef.current = name;
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
-      save(data, name);
+      if (latestDataRef.current) {
+        save(latestDataRef.current, latestNameRef.current);
+      }
     }, debounceMs);
   }, [save, debounceMs]);
 

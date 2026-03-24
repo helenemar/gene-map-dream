@@ -1302,7 +1302,6 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     const wasDraft = members.find(m => m.id === updated.id)?.isDraft ?? updated.isDraft;
     recordSnapshot();
 
-    // If this is a new member with twins enabled, create a twin sibling
     if (wasDraft && updated.twinGroup) {
       const twinId = `twin-${Date.now()}`;
 
@@ -1310,6 +1309,8 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       let rightX = updated.x + CARD_W + 35;
 
       const parentUnion = unions.find(u => u.children.includes(updated.id));
+      let nextUnions = unions;
+
       if (parentUnion) {
         const p1 = members.find(m => m.id === parentUnion.partner1);
         const p2 = members.find(m => m.id === parentUnion.partner2);
@@ -1321,8 +1322,15 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
           leftX = Math.round(unionCenterX - pairWidth / 2);
           rightX = leftX + CARD_W + 35;
         }
+        nextUnions = unions.map(u => {
+          if (u.id === parentUnion.id && !u.children.includes(twinId)) {
+            return { ...u, children: [...u.children, twinId] };
+          }
+          return u;
+        });
       }
 
+      const updatedPrimary: FamilyMember = { ...updated, age, isPlaceholder: false, isDraft: false, x: leftX };
       const twinSibling: FamilyMember = {
         ...updated,
         id: twinId,
@@ -1344,26 +1352,22 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
         notes: undefined,
       };
 
-      setMembers(prev => {
-        const withUpdated = prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false, x: leftX } : m);
-        const alreadyExists = withUpdated.some(m => m.id === twinId);
-        return alreadyExists ? withUpdated : [...withUpdated, twinSibling];
+      const nextMembers = members.flatMap(m => {
+        if (m.id !== updated.id) return [m];
+        return [updatedPrimary, twinSibling];
       });
 
-      setUnions(prev => prev.map(u => {
-        if (u.children.includes(updated.id) && !u.children.includes(twinId)) {
-          return { ...u, children: [...u.children, twinId] };
-        }
-        return u;
-      }));
-
+      setMembers(nextMembers);
+      setUnions(nextUnions);
+      saveNow({ members: nextMembers, unions: nextUnions, emotionalLinks }, fileName);
       setEditingNewMember(null);
       setNewMemberDrawerOpen(false);
-    } else {
-      setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false } : m));
-      setEditingNewMember(null);
+      return;
     }
-  }, [recordSnapshot, members]);
+
+    setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age, isPlaceholder: false } : m));
+    setEditingNewMember(null);
+  }, [recordSnapshot, members, unions, emotionalLinks, fileName, saveNow]);
 
   const [fadingOutIds, setFadingOutIds] = useState<Set<string>>(new Set());
 
