@@ -194,7 +194,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       twinType: (twinType as TwinType) || undefined,
       notes: notes || undefined,
       avatar: avatar || undefined,
-      isDraft: false,
+      isDraft: member?.isDraft ?? false,
     };
   }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, notes, avatar, currentYear]);
 
@@ -237,7 +237,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
         ...member,
         birthYear: parsedBirthYear && !isNaN(parsedBirthYear) ? parsedBirthYear : 0,
         birthYearUnsure: birthYearUnsure || undefined,
-        isDraft: false,
+        isDraft: member.isDraft ?? false,
       };
       onSave(updated);
       onClose();
