@@ -364,18 +364,18 @@ const Dashboard: React.FC = () => {
         {/* Beta feedback banner */}
         <button
           onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLScXWN4YvQ690jGl5BWHbq1Xg1I-OTUiZ0JZLjleFKNVFoCTUg/viewform?usp=publish-editor', '_blank')}
-          className="w-full mb-4 flex items-center justify-between gap-3 rounded-xl bg-brand-orange px-5 sm:px-8 py-4 hover:opacity-90 transition-opacity group cursor-pointer shadow-md"
+          className="w-full mb-4 flex items-center justify-between gap-3 rounded-xl bg-brand-orange/10 border border-brand-orange/40 px-5 sm:px-8 py-4 hover:bg-brand-orange/15 transition-colors group cursor-pointer"
         >
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-              <MessageSquarePlus className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 rounded-lg bg-brand-orange/20 flex items-center justify-center shrink-0">
+              <MessageSquarePlus className="w-5 h-5 text-brand-orange" />
             </div>
             <div className="text-left">
-              <p className="text-[15px] font-bold text-white">Donnez votre avis sur Genogy !</p>
-              <p className="text-xs text-white/80">Aidez-nous à améliorer l'outil en répondant à notre court questionnaire.</p>
+              <p className="text-[15px] font-bold text-brand-orange">Donnez votre avis sur Genogy !</p>
+              <p className="text-xs text-brand-orange/70">Aidez-nous à améliorer l'outil en répondant à notre court questionnaire.</p>
             </div>
           </div>
-          <span className="text-sm font-bold text-white group-hover:underline shrink-0 hidden sm:inline">Répondre →</span>
+          <span className="text-sm font-bold text-brand-orange group-hover:underline shrink-0 hidden sm:inline">Répondre →</span>
         </button>
 
         <CreateGenogramModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
