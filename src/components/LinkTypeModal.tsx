@@ -129,7 +129,7 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
               {/* Abusive category */}
               <div className="flex items-center gap-2 px-2 pt-1 pb-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-destructive/60" />
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Abus & violences</span>
+                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Violences</span>
                 <div className="flex-1 h-px bg-border/50" />
               </div>
               {abusiveLinks.map(renderItem)}
