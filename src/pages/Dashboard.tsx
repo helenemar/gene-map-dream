@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Bell, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText } from 'lucide-react';
+import { Plus, Search, Bell, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText, MessageSquarePlus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
