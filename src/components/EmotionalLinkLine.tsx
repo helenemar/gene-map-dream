@@ -200,35 +200,48 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
 }) => {
   const [hovered, setHovered] = useState(false);
 
-  const mainPath = `M ${x1} ${y1} L ${x2} ${y2}`;
+  // Apply perpendicular offset when multiple links share the same pair
+  const MULTI_LINK_GAP = 12; // px between each link
+  const offsetIndex = linkCount <= 1 ? 0 : linkIndex - (linkCount - 1) / 2;
+  const rawDx = x2 - x1;
+  const rawDy = y2 - y1;
+  const rawDist = Math.sqrt(rawDx * rawDx + rawDy * rawDy);
+  const perpX = rawDist > 0 ? -rawDy / rawDist : 0;
+  const perpY = rawDist > 0 ? rawDx / rawDist : 1;
+  const oX1 = x1 + perpX * offsetIndex * MULTI_LINK_GAP;
+  const oY1 = y1 + perpY * offsetIndex * MULTI_LINK_GAP;
+  const oX2 = x2 + perpX * offsetIndex * MULTI_LINK_GAP;
+  const oY2 = y2 + perpY * offsetIndex * MULTI_LINK_GAP;
+
+  const mainPath = `M ${oX1} ${oY1} L ${oX2} ${oY2}`;
   const segments = 16;
   const amp = 6;
 
   // Straight-line helpers
-  const dx = x2 - x1;
-  const dy = y2 - y1;
+  const dx = oX2 - oX1;
+  const dy = oY2 - oY1;
   const dist = Math.sqrt(dx * dx + dy * dy);
   const ux = dist > 0 ? dx / dist : 1;
   const uy = dist > 0 ? dy / dist : 0;
   const px = -uy; // perpendicular
   const py = ux;
 
-  const midX = (x1 + x2) / 2;
-  const midY = (y1 + y2) / 2;
+  const midX = (oX1 + oX2) / 2;
+  const midY = (oY1 + oY2) / 2;
 
   function parallelLine(offset: number) {
-    return `M ${x1 + px * offset} ${y1 + py * offset} L ${x2 + px * offset} ${y2 + py * offset}`;
+    return `M ${oX1 + px * offset} ${oY1 + py * offset} L ${oX2 + px * offset} ${oY2 + py * offset}`;
   }
 
   function zigzagStraight(amplitude: number, segs: number, lineOffset = 0) {
-    const ox1 = x1 + px * lineOffset, oy1 = y1 + py * lineOffset;
-    const ox2 = x2 + px * lineOffset, oy2 = y2 + py * lineOffset;
-    const odx = ox2 - ox1, ody = oy2 - oy1;
+    const zx1 = oX1 + px * lineOffset, zy1 = oY1 + py * lineOffset;
+    const zx2 = oX2 + px * lineOffset, zy2 = oY2 + py * lineOffset;
+    const odx = zx2 - zx1, ody = zy2 - zy1;
     const pts: string[] = [];
     for (let i = 0; i <= segs + 1; i++) {
       const t = i / (segs + 1);
-      const bx = ox1 + odx * t;
-      const by = oy1 + ody * t;
+      const bx = zx1 + odx * t;
+      const by = zy1 + ody * t;
       if (i === 0 || i === segs + 1) {
         pts.push(`${bx},${by}`);
       } else {
@@ -241,9 +254,9 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
 
   function straightArrowHead(size: number, color: string) {
     if (dist === 0) return null;
-    const left = { x: x2 - ux * size + px * size * 0.5, y: y2 - uy * size + py * size * 0.5 };
-    const right = { x: x2 - ux * size - px * size * 0.5, y: y2 - uy * size - py * size * 0.5 };
-    return <polygon points={`${x2},${y2} ${left.x},${left.y} ${right.x},${right.y}`} fill={color} />;
+    const left = { x: oX2 - ux * size + px * size * 0.5, y: oY2 - uy * size + py * size * 0.5 };
+    const right = { x: oX2 - ux * size - px * size * 0.5, y: oY2 - uy * size - py * size * 0.5 };
+    return <polygon points={`${oX2},${oY2} ${left.x},${left.y} ${right.x},${right.y}`} fill={color} />;
   }
 
   const renderLine = () => {
