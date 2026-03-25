@@ -240,8 +240,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
     const pts: string[] = [];
     for (let i = 0; i <= segs + 1; i++) {
       const t = i / (segs + 1);
-      const bx = ox1 + odx * t;
-      const by = oy1 + ody * t;
+      const bx = zx1 + odx * t;
+      const by = zy1 + ody * t;
       if (i === 0 || i === segs + 1) {
         pts.push(`${bx},${by}`);
       } else {
