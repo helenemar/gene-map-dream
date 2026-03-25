@@ -533,7 +533,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                         <Fingerprint className="w-4 h-4 text-primary" />
                       </div>
                       <div className="flex flex-col items-start gap-0.5 flex-1 min-w-0">
-                        <span className="text-[11px] font-semibold text-foreground/80 uppercase tracking-wider">
+                        <span className="text-[11px] font-semibold text-foreground/80 uppercase tracking-wider text-left">
                           {t.memberEdit.genderAndOrientation}
                         </span>
                         <span className="text-xs text-muted-foreground truncate">
