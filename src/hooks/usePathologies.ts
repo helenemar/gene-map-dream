@@ -37,7 +37,17 @@ export function usePathologies(genogramId: string | undefined, initialPathologie
           setPathologies(seeded as DynamicPathology[]);
         }
       } else {
-        setPathologies(data as DynamicPathology[]);
+        // Sort: default pathologies in canonical order first, then custom by created_at
+        const defaultNames = DEFAULT_PATHOLOGIES.map(d => d.name);
+        const sorted = [...data].sort((a, b) => {
+          const idxA = defaultNames.indexOf(a.name);
+          const idxB = defaultNames.indexOf(b.name);
+          if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+          if (idxA !== -1) return -1;
+          if (idxB !== -1) return 1;
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        });
+        setPathologies(sorted as DynamicPathology[]);
       }
     }
     setLoading(false);
