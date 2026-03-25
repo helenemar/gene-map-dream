@@ -994,13 +994,11 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 600);
 
-      // Select and open drawer for new child (skip for perinatal)
+      // Select and open drawer for new child
       setSelectedMembers(new Set([newChild.id]));
-      if (!perinatal) {
-        setEditingNewMember(newChild);
-        setDrawerEditing(true);
-        setNewMemberDrawerOpen(true);
-      }
+      setEditingNewMember(newChild);
+      setDrawerEditing(true);
+      setNewMemberDrawerOpen(true);
       setTimeout(() => centerOnMember(newChild), 100);
       return;
     }
