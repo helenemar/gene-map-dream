@@ -200,24 +200,32 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
 }) => {
   const [hovered, setHovered] = useState(false);
 
-  // Apply perpendicular offset when multiple links share the same pair
-  const MULTI_LINK_GAP = 20; // px between each link
+  // Multiple links share the same anchors but fan out in the middle
+  const MULTI_LINK_GAP = 18; // px between each link at midpoint
   const offsetIndex = linkCount <= 1 ? 0 : linkIndex - (linkCount - 1) / 2;
   const rawDx = x2 - x1;
   const rawDy = y2 - y1;
   const rawDist = Math.sqrt(rawDx * rawDx + rawDy * rawDy);
   const perpX = rawDist > 0 ? -rawDy / rawDist : 0;
   const perpY = rawDist > 0 ? rawDx / rawDist : 1;
-  const oX1 = x1 + perpX * offsetIndex * MULTI_LINK_GAP;
-  const oY1 = y1 + perpY * offsetIndex * MULTI_LINK_GAP;
-  const oX2 = x2 + perpX * offsetIndex * MULTI_LINK_GAP;
-  const oY2 = y2 + perpY * offsetIndex * MULTI_LINK_GAP;
+  const perpOffset = offsetIndex * MULTI_LINK_GAP;
 
-  const mainPath = `M ${oX1} ${oY1} L ${oX2} ${oY2}`;
+  // Endpoints stay on the same anchors
+  const oX1 = x1;
+  const oY1 = y1;
+  const oX2 = x2;
+  const oY2 = y2;
+
+  // For multi-links, use a quadratic Bézier through an offset midpoint
+  const cX = (x1 + x2) / 2 + perpX * perpOffset;
+  const cY = (y1 + y2) / 2 + perpY * perpOffset;
+  const mainPath = perpOffset === 0
+    ? `M ${oX1} ${oY1} L ${oX2} ${oY2}`
+    : `M ${oX1} ${oY1} Q ${cX} ${cY} ${oX2} ${oY2}`;
   const segments = 16;
   const amp = 6;
 
-  // Straight-line helpers
+  // Straight-line helpers (direction along the chord)
   const dx = oX2 - oX1;
   const dy = oY2 - oY1;
   const dist = Math.sqrt(dx * dx + dy * dy);
@@ -226,36 +234,80 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   const px = -uy; // perpendicular
   const py = ux;
 
-  const midX = (oX1 + oX2) / 2;
-  const midY = (oY1 + oY2) / 2;
+  // Visual midpoint: on the curve for multi-links, on the chord for single
+  const midX = perpOffset === 0 ? (oX1 + oX2) / 2 : cX;
+  const midY = perpOffset === 0 ? (oY1 + oY2) / 2 : cY;
+
+  /** Sample a point on the quadratic Bézier at parameter t */
+  function bezierPt(t: number) {
+    const mt = 1 - t;
+    return {
+      x: mt * mt * oX1 + 2 * mt * t * cX + t * t * oX2,
+      y: mt * mt * oY1 + 2 * mt * t * cY + t * t * oY2,
+    };
+  }
+  /** Tangent direction at parameter t (normalized) */
+  function bezierTangent(t: number) {
+    const tx = 2 * ((1 - t) * (cX - oX1) + t * (oX2 - cX));
+    const ty = 2 * ((1 - t) * (cY - oY1) + t * (oY2 - cY));
+    const len = Math.sqrt(tx * tx + ty * ty);
+    return len > 0 ? { ux: tx / len, uy: ty / len, px: -ty / len, py: tx / len } : { ux: 1, uy: 0, px: 0, py: 1 };
+  }
 
   function parallelLine(offset: number) {
-    return `M ${oX1 + px * offset} ${oY1 + py * offset} L ${oX2 + px * offset} ${oY2 + py * offset}`;
+    if (perpOffset === 0) {
+      return `M ${oX1 + px * offset} ${oY1 + py * offset} L ${oX2 + px * offset} ${oY2 + py * offset}`;
+    }
+    const steps = 20;
+    const pts: string[] = [];
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      const p = bezierPt(t);
+      const tang = bezierTangent(t);
+      pts.push(`${p.x + tang.px * offset},${p.y + tang.py * offset}`);
+    }
+    return `M ${pts[0]} ` + pts.slice(1).map(p => `L ${p}`).join(' ');
   }
 
   function zigzagStraight(amplitude: number, segs: number, lineOffset = 0) {
-    const zx1 = oX1 + px * lineOffset, zy1 = oY1 + py * lineOffset;
-    const zx2 = oX2 + px * lineOffset, zy2 = oY2 + py * lineOffset;
-    const odx = zx2 - zx1, ody = zy2 - zy1;
+    if (perpOffset === 0) {
+      const zx1 = oX1 + px * lineOffset, zy1 = oY1 + py * lineOffset;
+      const zx2 = oX2 + px * lineOffset, zy2 = oY2 + py * lineOffset;
+      const odx = zx2 - zx1, ody = zy2 - zy1;
+      const pts: string[] = [];
+      for (let i = 0; i <= segs + 1; i++) {
+        const t = i / (segs + 1);
+        const bx = zx1 + odx * t;
+        const by = zy1 + ody * t;
+        if (i === 0 || i === segs + 1) {
+          pts.push(`${bx},${by}`);
+        } else {
+          const dir = i % 2 === 1 ? 1 : -1;
+          pts.push(`${bx + px * amplitude * dir},${by + py * amplitude * dir}`);
+        }
+      }
+      return pts.join(' ');
+    }
     const pts: string[] = [];
     for (let i = 0; i <= segs + 1; i++) {
       const t = i / (segs + 1);
-      const bx = zx1 + odx * t;
-      const by = zy1 + ody * t;
+      const p = bezierPt(t);
+      const tang = bezierTangent(t);
       if (i === 0 || i === segs + 1) {
-        pts.push(`${bx},${by}`);
+        pts.push(`${p.x + tang.px * lineOffset},${p.y + tang.py * lineOffset}`);
       } else {
         const dir = i % 2 === 1 ? 1 : -1;
-        pts.push(`${bx + px * amplitude * dir},${by + py * amplitude * dir}`);
+        const totalOff = lineOffset + amplitude * dir;
+        pts.push(`${p.x + tang.px * totalOff},${p.y + tang.py * totalOff}`);
       }
     }
     return pts.join(' ');
   }
 
   function straightArrowHead(size: number, color: string) {
-    if (dist === 0) return null;
-    const left = { x: oX2 - ux * size + px * size * 0.5, y: oY2 - uy * size + py * size * 0.5 };
-    const right = { x: oX2 - ux * size - px * size * 0.5, y: oY2 - uy * size - py * size * 0.5 };
+    const tang = perpOffset === 0 ? { ux, uy, px, py } : bezierTangent(1);
+    const left = { x: oX2 - tang.ux * size + tang.px * size * 0.5, y: oY2 - tang.uy * size + tang.py * size * 0.5 };
+    const right = { x: oX2 - tang.ux * size - tang.px * size * 0.5, y: oY2 - tang.uy * size - tang.py * size * 0.5 };
     return <polygon points={`${oX2},${oY2} ${left.x},${left.y} ${right.x},${right.y}`} fill={color} />;
   }
 
@@ -287,16 +339,17 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       case 'cutoff': {
         const barGap = 4;
         const barH = 10;
+        const tang = perpOffset === 0 ? { ux, uy, px, py } : bezierTangent(0.5);
         return (
           <>
             <path d={mainPath} fill="none" stroke="hsl(var(--link-cutoff))" strokeWidth={2} strokeDasharray="4 3" />
             <line
-              x1={midX - ux * barGap + px * barH} y1={midY - uy * barGap + py * barH}
-              x2={midX - ux * barGap - px * barH} y2={midY - uy * barGap - py * barH}
+              x1={midX - tang.ux * barGap + tang.px * barH} y1={midY - tang.uy * barGap + tang.py * barH}
+              x2={midX - tang.ux * barGap - tang.px * barH} y2={midY - tang.uy * barGap - tang.py * barH}
               stroke="hsl(var(--link-cutoff))" strokeWidth={2} />
             <line
-              x1={midX + ux * barGap + px * barH} y1={midY + uy * barGap + py * barH}
-              x2={midX + ux * barGap - px * barH} y2={midY + uy * barGap - py * barH}
+              x1={midX + tang.ux * barGap + tang.px * barH} y1={midY + tang.uy * barGap + tang.py * barH}
+              x2={midX + tang.ux * barGap - tang.px * barH} y2={midY + tang.uy * barGap - tang.py * barH}
               stroke="hsl(var(--link-cutoff))" strokeWidth={2} />
           </>
         );
@@ -337,7 +390,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
         );
       case 'controlling': {
         const sq = 8;
-        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+        const tang = perpOffset === 0 ? { ux, uy, px, py } : bezierTangent(0.5);
+        const angle = Math.atan2(tang.uy, tang.ux) * 180 / Math.PI;
         return (
           <>
             <path d={mainPath} fill="none" stroke="hsl(var(--link-controlling))" strokeWidth={2} />
