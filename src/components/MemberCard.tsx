@@ -324,12 +324,14 @@ const MemberCard: React.FC<MemberCardProps> = ({
           <button
             onClick={(e) => { e.stopPropagation(); onView?.(member.id); }}
             className="w-10 h-10 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
+            title={t.memberCard.viewLabel || 'Voir'}
           >
             <Eye className="w-4 h-4 text-foreground" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onEdit?.(member.id); }}
             className="w-10 h-10 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
+            title={t.memberCard.editLabel || 'Éditer'}
           >
             <PencilLine className="w-4 h-4 text-foreground" />
           </button>
