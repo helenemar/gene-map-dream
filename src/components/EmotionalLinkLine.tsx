@@ -234,9 +234,9 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   }
 
   function zigzagStraight(amplitude: number, segs: number, lineOffset = 0) {
-    const ox1 = x1 + px * lineOffset, oy1 = y1 + py * lineOffset;
-    const ox2 = x2 + px * lineOffset, oy2 = y2 + py * lineOffset;
-    const odx = ox2 - ox1, ody = oy2 - oy1;
+    const zx1 = oX1 + px * lineOffset, zy1 = oY1 + py * lineOffset;
+    const zx2 = oX2 + px * lineOffset, zy2 = oY2 + py * lineOffset;
+    const odx = zx2 - zx1, ody = zy2 - zy1;
     const pts: string[] = [];
     for (let i = 0; i <= segs + 1; i++) {
       const t = i / (segs + 1);
