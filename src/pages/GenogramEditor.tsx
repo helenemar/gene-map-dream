@@ -1133,8 +1133,6 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
         partner1: sourceId,
         partner2: newMember.id,
         status,
-        eventYear: currentYear,
-        marriageYear: currentYear,
         children: [],
       };
       setUnions(prev => [...prev, newUnion]);
