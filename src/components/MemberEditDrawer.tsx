@@ -843,12 +843,12 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           );
 
                           return (
-                            <div className="flex flex-col gap-2">
-                              <div className="flex flex-col gap-0.5">
-                                <Label className="text-[9px] font-semibold text-muted-foreground/70 uppercase tracking-wider">{t.memberEdit.meetingYear}</Label>
-                                <div className="flex items-center gap-1">
+                            <div className="flex flex-col gap-2.5 pt-1">
+                              <div className="flex flex-col gap-1">
+                                <Label className="text-[10px] font-semibold text-foreground/60 uppercase tracking-wider">{t.memberEdit.meetingYear}</Label>
+                                <div className="flex items-center gap-1.5">
                                   <Input
-                                    className="h-8 text-xs border-border/60 bg-card flex-1"
+                                    className="h-9 text-sm border-border/70 bg-card flex-1"
                                     type="number"
                                     placeholder="Année"
                                     value={union.meetingYear || ''}
@@ -860,11 +860,11 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                   )}
                                 </div>
                               </div>
-                              <div className="flex flex-col gap-0.5">
-                                <Label className="text-[9px] font-semibold text-muted-foreground/70 uppercase tracking-wider">{eventLabelMap[union.status]}</Label>
-                                <div className="flex items-center gap-1">
+                              <div className="flex flex-col gap-1">
+                                <Label className="text-[10px] font-semibold text-foreground/60 uppercase tracking-wider">{eventLabelMap[union.status]}</Label>
+                                <div className="flex items-center gap-1.5">
                                   <Input
-                                    className="h-8 text-xs border-border/60 bg-card flex-1"
+                                    className="h-9 text-sm border-border/70 bg-card flex-1"
                                     type="number"
                                     placeholder="Année"
                                     value={(union.eventYear ?? union.marriageYear) || ''}
@@ -877,11 +877,11 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                 </div>
                               </div>
                               {!hideEnd && (
-                                <div className="flex flex-col gap-0.5">
-                                  <Label className="text-[9px] font-semibold text-muted-foreground/70 uppercase tracking-wider">{t.memberEdit.endYear}</Label>
-                                  <div className="flex items-center gap-1">
+                                <div className="flex flex-col gap-1">
+                                  <Label className="text-[10px] font-semibold text-foreground/60 uppercase tracking-wider">{t.memberEdit.endYear}</Label>
+                                  <div className="flex items-center gap-1.5">
                                     <Input
-                                      className="h-8 text-xs border-border/60 bg-card flex-1"
+                                      className="h-9 text-sm border-border/70 bg-card flex-1"
                                       type="number"
                                       placeholder="Année"
                                       value={(union.endYear ?? union.divorceYear) || ''}
