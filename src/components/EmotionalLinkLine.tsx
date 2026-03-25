@@ -342,7 +342,7 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
         );
       case 'controlling': {
         const sq = 8;
-        const tang = perpOffset === 0 ? { ux, uy, px, py } : bezierTangent(0.5);
+        const tang = { ux, uy, px, py };
         const angle = Math.atan2(tang.uy, tang.ux) * 180 / Math.PI;
         return (
           <>
