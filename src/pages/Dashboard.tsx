@@ -347,6 +347,23 @@ const Dashboard: React.FC = () => {
       </header>
 
       <main className="px-4 sm:px-6 py-4 sm:py-5">
+
+        {/* Beta feedback banner */}
+        <button
+          onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLScXWN4YvQ690jGl5BWHbq1Xg1I-OTUiZ0JZLjleFKNVFoCTUg/viewform?usp=publish-editor', '_blank')}
+          className="w-full mb-4 flex items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-brand-orange/10 via-brand-orange/15 to-brand-orange/8 border border-brand-orange/30 px-5 sm:px-6 py-4 hover:border-brand-orange/50 hover:shadow-md transition-all group cursor-pointer"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-brand-orange/20 flex items-center justify-center shrink-0 group-hover:bg-brand-orange/25 transition-colors">
+              <MessageSquarePlus className="w-5 h-5 text-brand-orange" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-foreground">Votre avis compte ✨</p>
+              <p className="text-xs text-muted-foreground">2 min pour nous aider à améliorer Genogy</p>
+            </div>
+          </div>
+          <span className="text-xs font-semibold text-brand-orange bg-brand-orange/15 px-3.5 py-1.5 rounded-full group-hover:bg-brand-orange/25 transition-colors shrink-0 hidden sm:inline">Répondre</span>
+        </button>
         
         <div className="dot-grid bg-background border border-border rounded-xl px-5 sm:px-8 py-5 mb-4">
           <h1 className="text-xl sm:text-[26px] font-bold text-foreground leading-tight mb-1.5">
@@ -360,23 +377,6 @@ const Dashboard: React.FC = () => {
             {t.dashboard.createFromMember}
           </Button>
         </div>
-
-        {/* Beta feedback banner */}
-        <button
-          onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLScXWN4YvQ690jGl5BWHbq1Xg1I-OTUiZ0JZLjleFKNVFoCTUg/viewform?usp=publish-editor', '_blank')}
-          className="w-full mb-4 flex items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-brand-orange/8 via-brand-orange/12 to-brand-orange/6 border border-brand-orange/25 px-5 sm:px-6 py-3.5 hover:border-brand-orange/40 hover:shadow-sm transition-all group cursor-pointer"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-brand-orange/15 flex items-center justify-center shrink-0 group-hover:bg-brand-orange/20 transition-colors">
-              <MessageSquarePlus className="w-4.5 h-4.5 text-brand-orange" />
-            </div>
-            <div className="text-left">
-              <p className="text-sm font-semibold text-foreground">Votre avis compte ✨</p>
-              <p className="text-xs text-muted-foreground">2 min pour nous aider à améliorer Genogy</p>
-            </div>
-          </div>
-          <span className="text-xs font-semibold text-brand-orange bg-brand-orange/10 px-3 py-1.5 rounded-full group-hover:bg-brand-orange/20 transition-colors shrink-0 hidden sm:inline">Répondre</span>
-        </button>
 
         <CreateGenogramModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
 
