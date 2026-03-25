@@ -124,10 +124,10 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
   // Border & ring logic (no collision outline)
   const borderClasses = isLinkTarget
-      ? 'border-primary ring-2 ring-primary/40 shadow-[0_0_16px_hsl(var(--primary)/0.2)]'
+      ? 'border-2 border-primary ring-2 ring-primary/40 shadow-[0_0_16px_hsl(var(--primary)/0.2)]'
       : isHighlighted
-        ? 'border-primary ring-2 ring-primary/30'
-        : 'border-border';
+        ? 'border-2 border-primary ring-2 ring-primary/30'
+        : 'border border-border';
 
   const handleDotMouseDown = useCallback((side: AnchorSide, e: React.MouseEvent) => {
     e.stopPropagation();
