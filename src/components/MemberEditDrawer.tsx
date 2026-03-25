@@ -534,7 +534,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                       </div>
                       <div className="flex flex-col items-start gap-0.5 flex-1 min-w-0">
                         <span className="text-[11px] font-semibold text-foreground/80 uppercase tracking-wider">
-                          {t.memberEdit.genderIdentity}
+                          {t.memberEdit.genderAndOrientation}
                         </span>
                         <span className="text-xs text-muted-foreground truncate">
                           {genderIdentity !== 'cisgender' || sexualOrientation !== 'heterosexual'
