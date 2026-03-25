@@ -628,7 +628,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   align="start"
                   sideOffset={8}
                   collisionPadding={16}
-                  className="w-[280px] max-h-[calc(100vh-32px)] p-3 flex flex-col"
+                  className="w-auto min-w-[280px] max-w-[380px] max-h-[calc(100vh-32px)] p-3 flex flex-col"
                 >
                   <div className="flex min-h-0 flex-col gap-2">
                     <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
@@ -654,7 +654,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                   className="w-3.5 h-3.5 rounded shrink-0"
                                   style={{ backgroundColor: p.color_hex }}
                                 />
-                                <span className="text-sm text-foreground truncate">{p.name}</span>
+                                <span className="text-sm text-foreground whitespace-nowrap">{p.name}</span>
                               </label>
                               {onDeletePathology && (
                                 <button
