@@ -230,7 +230,7 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   const midY = (oY1 + oY2) / 2;
 
   function parallelLine(offset: number) {
-    return `M ${x1 + px * offset} ${y1 + py * offset} L ${x2 + px * offset} ${y2 + py * offset}`;
+    return `M ${oX1 + px * offset} ${oY1 + py * offset} L ${oX2 + px * offset} ${oY2 + py * offset}`;
   }
 
   function zigzagStraight(amplitude: number, segs: number, lineOffset = 0) {
