@@ -778,14 +778,16 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                       return !child?.perinatalType || child.perinatalType === 'stillborn';
                     }).length;
                     return (
-                      <div key={union.id} className="flex flex-col gap-2.5 p-3 rounded-xl bg-accent/20 border border-border/50">
-                        <div className="flex items-center gap-2">
+                      <div key={union.id} className="flex flex-col gap-3 p-3.5 rounded-xl bg-primary/5 border border-primary/15 shadow-sm">
+                        <div className="flex items-center gap-2.5">
                           {partner && (
-                            <MemberIcon gender={partner.gender} size={20} className="text-foreground shrink-0" />
+                            <div className="w-7 h-7 rounded-lg bg-accent/40 flex items-center justify-center shrink-0">
+                              <MemberIcon gender={partner.gender} size={18} className="text-foreground" />
+                            </div>
                           )}
-                          <span className="text-sm font-medium text-foreground truncate flex-1">{partnerName}</span>
+                          <span className="text-sm font-semibold text-foreground truncate flex-1">{partnerName}</span>
                           {childCount > 0 && (
-                            <span className="text-[10px] text-muted-foreground bg-accent/30 border border-border/40 rounded-full px-2 py-0.5 shrink-0">
+                            <span className="text-[10px] font-medium text-primary/70 bg-primary/10 border border-primary/20 rounded-full px-2.5 py-0.5 shrink-0">
                               {childCount} {childCount > 1 ? t.memberEdit.childrenPlural : t.memberEdit.children}
                             </span>
                           )}
