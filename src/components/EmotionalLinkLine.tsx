@@ -230,80 +230,36 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   const px = -uy; // perpendicular
   const py = ux;
 
-  // Visual midpoint: on the curve for multi-links, on the chord for single
-  const midX = perpOffset === 0 ? (oX1 + oX2) / 2 : cX;
-  const midY = perpOffset === 0 ? (oY1 + oY2) / 2 : cY;
-
-  /** Sample a point on the quadratic Bézier at parameter t */
-  function bezierPt(t: number) {
-    const mt = 1 - t;
-    return {
-      x: mt * mt * oX1 + 2 * mt * t * cX + t * t * oX2,
-      y: mt * mt * oY1 + 2 * mt * t * cY + t * t * oY2,
-    };
-  }
-  /** Tangent direction at parameter t (normalized) */
-  function bezierTangent(t: number) {
-    const tx = 2 * ((1 - t) * (cX - oX1) + t * (oX2 - cX));
-    const ty = 2 * ((1 - t) * (cY - oY1) + t * (oY2 - cY));
-    const len = Math.sqrt(tx * tx + ty * ty);
-    return len > 0 ? { ux: tx / len, uy: ty / len, px: -ty / len, py: tx / len } : { ux: 1, uy: 0, px: 0, py: 1 };
-  }
+  const midX = (oX1 + oX2) / 2;
+  const midY = (oY1 + oY2) / 2;
 
   function parallelLine(offset: number) {
-    if (perpOffset === 0) {
-      return `M ${oX1 + px * offset} ${oY1 + py * offset} L ${oX2 + px * offset} ${oY2 + py * offset}`;
-    }
-    const steps = 20;
-    const pts: string[] = [];
-    for (let i = 0; i <= steps; i++) {
-      const t = i / steps;
-      const p = bezierPt(t);
-      const tang = bezierTangent(t);
-      pts.push(`${p.x + tang.px * offset},${p.y + tang.py * offset}`);
-    }
-    return `M ${pts[0]} ` + pts.slice(1).map(p => `L ${p}`).join(' ');
+    return `M ${oX1 + px * offset} ${oY1 + py * offset} L ${oX2 + px * offset} ${oY2 + py * offset}`;
   }
 
   function zigzagStraight(amplitude: number, segs: number, lineOffset = 0) {
-    if (perpOffset === 0) {
-      const zx1 = oX1 + px * lineOffset, zy1 = oY1 + py * lineOffset;
-      const zx2 = oX2 + px * lineOffset, zy2 = oY2 + py * lineOffset;
-      const odx = zx2 - zx1, ody = zy2 - zy1;
-      const pts: string[] = [];
-      for (let i = 0; i <= segs + 1; i++) {
-        const t = i / (segs + 1);
-        const bx = zx1 + odx * t;
-        const by = zy1 + ody * t;
-        if (i === 0 || i === segs + 1) {
-          pts.push(`${bx},${by}`);
-        } else {
-          const dir = i % 2 === 1 ? 1 : -1;
-          pts.push(`${bx + px * amplitude * dir},${by + py * amplitude * dir}`);
-        }
-      }
-      return pts.join(' ');
-    }
+    const zx1 = oX1 + px * lineOffset, zy1 = oY1 + py * lineOffset;
+    const zx2 = oX2 + px * lineOffset, zy2 = oY2 + py * lineOffset;
+    const odx = zx2 - zx1, ody = zy2 - zy1;
     const pts: string[] = [];
     for (let i = 0; i <= segs + 1; i++) {
       const t = i / (segs + 1);
-      const p = bezierPt(t);
-      const tang = bezierTangent(t);
+      const bx = zx1 + odx * t;
+      const by = zy1 + ody * t;
       if (i === 0 || i === segs + 1) {
-        pts.push(`${p.x + tang.px * lineOffset},${p.y + tang.py * lineOffset}`);
+        pts.push(`${bx},${by}`);
       } else {
         const dir = i % 2 === 1 ? 1 : -1;
-        const totalOff = lineOffset + amplitude * dir;
-        pts.push(`${p.x + tang.px * totalOff},${p.y + tang.py * totalOff}`);
+        pts.push(`${bx + px * amplitude * dir},${by + py * amplitude * dir}`);
       }
     }
     return pts.join(' ');
   }
 
   function straightArrowHead(size: number, color: string) {
-    const tang = perpOffset === 0 ? { ux, uy, px, py } : bezierTangent(1);
-    const left = { x: oX2 - tang.ux * size + tang.px * size * 0.5, y: oY2 - tang.uy * size + tang.py * size * 0.5 };
-    const right = { x: oX2 - tang.ux * size - tang.px * size * 0.5, y: oY2 - tang.uy * size - tang.py * size * 0.5 };
+    if (dist === 0) return null;
+    const left = { x: oX2 - ux * size + px * size * 0.5, y: oY2 - uy * size + py * size * 0.5 };
+    const right = { x: oX2 - ux * size - px * size * 0.5, y: oY2 - uy * size - py * size * 0.5 };
     return <polygon points={`${oX2},${oY2} ${left.x},${left.y} ${right.x},${right.y}`} fill={color} />;
   }
 
