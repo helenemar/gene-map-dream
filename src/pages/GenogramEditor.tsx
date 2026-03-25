@@ -1867,6 +1867,12 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
           })()}
           <LinkTypeModal
             open={!!linkModalTarget}
+            existingTypes={linkModalTarget ? emotionalLinks
+              .filter(l =>
+                (l.from === linkModalTarget.fromId && l.to === linkModalTarget.toId) ||
+                (l.from === linkModalTarget.toId && l.to === linkModalTarget.fromId)
+              )
+              .map(l => l.type) : []}
             onSelect={(type: EmotionalLinkType) => {
               if (linkModalTarget) {
                 recordSnapshot();

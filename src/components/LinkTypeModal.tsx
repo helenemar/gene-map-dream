@@ -9,9 +9,11 @@ interface LinkTypeModalProps {
   onClose: () => void;
   currentType?: EmotionalLinkType;
   onDelete?: () => void;
+  /** Types already used between this pair (to prevent exact duplicates) */
+  existingTypes?: EmotionalLinkType[];
 }
 
-const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, currentType, onDelete }) => {
+const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, currentType, onDelete, existingTypes = [] }) => {
   React.useEffect(() => {
     if (open) window.getSelection()?.removeAllRanges();
   }, [open]);
@@ -22,26 +24,35 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
   const relationalLinks = EMOTIONAL_LINK_TYPES.filter(lt => lt.category === 'relational');
   const abusiveLinks = EMOTIONAL_LINK_TYPES.filter(lt => lt.category === 'abusive');
 
-  const renderItem = (lt: typeof EMOTIONAL_LINK_TYPES[0]) => (
-    <button
-      key={lt.id}
-      onClick={() => onSelect(lt.id)}
-      className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all shrink-0 border ${
-        currentType === lt.id
-          ? 'bg-primary/10 border-primary/30 shadow-sm'
-          : 'border-transparent hover:bg-accent/60'
-      }`}
-    >
-      <EmotionalLinkPreview type={lt.id} width={48} height={20} strokeScale={0.8} />
-      <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-sm font-medium text-foreground leading-tight">{lt.label}</span>
-        <span className="text-[11px] text-muted-foreground leading-tight">{lt.description}</span>
-      </div>
-      {currentType === lt.id && (
-        <span className="text-[10px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full shrink-0">Actuel</span>
-      )}
-    </button>
-  );
+  const renderItem = (lt: typeof EMOTIONAL_LINK_TYPES[0]) => {
+    const isAlreadyUsed = !isEditing && existingTypes.includes(lt.id);
+    return (
+      <button
+        key={lt.id}
+        onClick={() => !isAlreadyUsed && onSelect(lt.id)}
+        disabled={isAlreadyUsed}
+        className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all shrink-0 border ${
+          currentType === lt.id
+            ? 'bg-primary/10 border-primary/30 shadow-sm'
+            : isAlreadyUsed
+              ? 'border-transparent opacity-40 cursor-not-allowed'
+              : 'border-transparent hover:bg-accent/60'
+        }`}
+      >
+        <EmotionalLinkPreview type={lt.id} width={48} height={20} strokeScale={0.8} />
+        <div className="flex flex-col min-w-0 flex-1">
+          <span className="text-sm font-medium text-foreground leading-tight">{lt.label}</span>
+          <span className="text-[11px] text-muted-foreground leading-tight">{lt.description}</span>
+        </div>
+        {currentType === lt.id && (
+          <span className="text-[10px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full shrink-0">Actuel</span>
+        )}
+        {isAlreadyUsed && (
+          <span className="text-[10px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">Déjà utilisé</span>
+        )}
+      </button>
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
