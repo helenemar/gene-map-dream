@@ -341,7 +341,7 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                       {t.onboarding.previous}
                     </button>
 
-                    <span className="text-xs text-muted-foreground tabular-nums">
+                    <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap shrink-0">
                       {tipIndex + 1} / {steps.length}
                     </span>
 
