@@ -371,7 +371,7 @@ const Dashboard: React.FC = () => {
               <MessageSquarePlus className="w-5 h-5 text-white" />
             </div>
             <div className="text-left">
-              <p className="text-[15px] font-bold text-white">🎯 Donnez votre avis sur Genogy !</p>
+              <p className="text-[15px] font-bold text-white">Donnez votre avis sur Genogy !</p>
               <p className="text-xs text-white/80">Aidez-nous à améliorer l'outil en répondant à notre court questionnaire.</p>
             </div>
           </div>
