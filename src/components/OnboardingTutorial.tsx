@@ -291,12 +291,24 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                     className="mb-4"
                   >
                     {(() => {
-                      // Special case: LinkAnimation (step 5) needs translated labels
-                      if (tipIndex === 5) {
-                        return <LinkAnimation labels={{ select: t.onboarding.linkAnimSelect, drag: t.onboarding.linkAnimDrag, choose: t.onboarding.linkAnimChoose }} />;
-                      }
+                      const animLabels = {
+                        clickPlus: t.onboarding.animClickPlus,
+                        holdAndDrag: t.onboarding.animHoldAndDrag,
+                        click: t.onboarding.animClick,
+                        clickPencil: t.onboarding.animClickPencil,
+                        guide: t.onboarding.animGuide,
+                        slide: t.onboarding.animSlide,
+                        spouse: t.onboarding.animSpouse,
+                        found: t.onboarding.animFound,
+                        undoDesc: t.onboarding.animUndoDesc,
+                        typeLien: t.onboarding.animTypeLien,
+                        fusionnel: t.onboarding.animFusionnel,
+                        select: t.onboarding.linkAnimSelect,
+                        drag: t.onboarding.linkAnimDrag,
+                        choose: t.onboarding.linkAnimChoose,
+                      };
                       const Anim = STEP_ANIMATIONS[tipIndex];
-                      return Anim ? <Anim /> : null;
+                      return Anim ? <Anim labels={animLabels} /> : null;
                     })()}
                   </motion.div>
 
