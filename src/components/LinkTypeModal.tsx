@@ -13,7 +13,7 @@ interface LinkTypeModalProps {
   existingTypes?: EmotionalLinkType[];
 }
 
-const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, currentType, onDelete }) => {
+const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, currentType, onDelete, existingTypes = [] }) => {
   React.useEffect(() => {
     if (open) window.getSelection()?.removeAllRanges();
   }, [open]);
