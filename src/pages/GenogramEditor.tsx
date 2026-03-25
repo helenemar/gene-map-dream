@@ -1725,11 +1725,21 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                     pairMap.get(key)!.push(i);
                   });
 
+                  // Pre-compute anchors once per pair so all links share the same endpoints
+                  const pairAnchors = new Map<string, { x1: number; y1: number; x2: number; y2: number }>();
+                  for (const key of pairMap.keys()) {
+                    const [idA, idB] = key.split('|');
+                    const mA = members.find(m => m.id === idA);
+                    const mB = members.find(m => m.id === idB);
+                    if (mA && mB) pairAnchors.set(key, getEmotionalAnchors(mA, mB));
+                  }
+
                   return emotionalLinks.map((link, globalIdx) => {
                     const from = members.find(m => m.id === link.from);
                     const to = members.find(m => m.id === link.to);
                     if (!from || !to) return null;
-                    const anchors = getEmotionalAnchors(from, to);
+                    const key = [link.from, link.to].sort().join('|');
+                    const anchors = pairAnchors.get(key)!;
                     const key = [link.from, link.to].sort().join('|');
                     const group = pairMap.get(key)!;
                     const linkIndex = group.indexOf(globalIdx);
