@@ -200,8 +200,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
 }) => {
   const [hovered, setHovered] = useState(false);
 
-  // Multiple links share the same anchors but fan out in the middle
-  const MULTI_LINK_GAP = 18; // px between each link at midpoint
+  // Multiple links: offset perpendicular to the line (straight, no curve)
+  const MULTI_LINK_GAP = 16; // px between each link
   const offsetIndex = linkCount <= 1 ? 0 : linkIndex - (linkCount - 1) / 2;
   const rawDx = x2 - x1;
   const rawDy = y2 - y1;
@@ -210,18 +210,14 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   const perpY = rawDist > 0 ? rawDx / rawDist : 1;
   const perpOffset = offsetIndex * MULTI_LINK_GAP;
 
-  // Endpoints stay on the same anchors
-  const oX1 = x1;
-  const oY1 = y1;
-  const oX2 = x2;
-  const oY2 = y2;
+  const oX1 = x1 + perpX * perpOffset;
+  const oY1 = y1 + perpY * perpOffset;
+  const oX2 = x2 + perpX * perpOffset;
+  const oY2 = y2 + perpY * perpOffset;
 
-  // For multi-links, use a quadratic Bézier through an offset midpoint
-  const cX = (x1 + x2) / 2 + perpX * perpOffset;
-  const cY = (y1 + y2) / 2 + perpY * perpOffset;
-  const mainPath = perpOffset === 0
-    ? `M ${oX1} ${oY1} L ${oX2} ${oY2}`
-    : `M ${oX1} ${oY1} Q ${cX} ${cY} ${oX2} ${oY2}`;
+  const cX = (oX1 + oX2) / 2;
+  const cY = (oY1 + oY2) / 2;
+  const mainPath = `M ${oX1} ${oY1} L ${oX2} ${oY2}`;
   const segments = 16;
   const amp = 6;
 
