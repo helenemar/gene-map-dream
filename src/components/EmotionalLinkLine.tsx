@@ -69,11 +69,11 @@ function computeControlPoint(
     baseCurvature = Math.max(baseCurvature, 0.4);
   }
 
-  // "Onion" offset: alternate sign, increment by 0.1 per link
+  // "Onion" offset: alternate sign, increment per link for visible separation
   const offsetIndex = linkCount <= 1
     ? 0
     : linkIndex - (linkCount - 1) / 2;
-  const curvature = baseCurvature + offsetIndex * 0.1;
+  const curvature = baseCurvature + offsetIndex * 0.25;
 
   const mx = px - dy * curvature;
   const my = py + dx * curvature;
