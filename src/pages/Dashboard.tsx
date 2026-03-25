@@ -321,15 +321,6 @@ const Dashboard: React.FC = () => {
             <Atom className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">BETA Test</span>
           </Button>
-          <Button
-            variant="default"
-            size="sm"
-            className="h-8 sm:h-9 px-3 sm:px-5 text-[10px] sm:text-xs font-bold gap-1.5 animate-pulse hover:animate-none shadow-md"
-            onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLScXWN4YvQ690jGl5BWHbq1Xg1I-OTUiZ0JZLjleFKNVFoCTUg/viewform?usp=publish-editor', '_blank')}
-          >
-            <MessageSquarePlus className="w-4 h-4" />
-            <span className="hidden sm:inline">Donnez votre avis !</span>
-          </Button>
           <button className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:bg-muted transition-colors">
             <Bell className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-foreground" />
           </button>
