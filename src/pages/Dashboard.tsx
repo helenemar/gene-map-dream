@@ -364,7 +364,7 @@ const Dashboard: React.FC = () => {
         {/* Beta feedback banner */}
         <button
           onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLScXWN4YvQ690jGl5BWHbq1Xg1I-OTUiZ0JZLjleFKNVFoCTUg/viewform?usp=publish-editor', '_blank')}
-          className="w-full mb-4 flex items-center justify-between gap-3 rounded-xl bg-brand px-5 sm:px-8 py-4 hover:opacity-90 transition-opacity group cursor-pointer shadow-md"
+          className="w-full mb-4 flex items-center justify-between gap-3 rounded-xl bg-brand-orange px-5 sm:px-8 py-4 hover:opacity-90 transition-opacity group cursor-pointer shadow-md"
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
