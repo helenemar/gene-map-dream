@@ -794,7 +794,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           value={union.status}
                           onValueChange={(v) => onUpdateUnion?.(union.id, { status: v as UnionStatus })}
                         >
-                          <SelectTrigger className="h-7 text-xs border-border/50 bg-card">
+                          <SelectTrigger className="h-8 text-xs border-border/60 bg-card font-medium">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
