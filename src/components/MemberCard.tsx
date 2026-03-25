@@ -307,15 +307,15 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
       {activeState === 'selected' && !presentationMode && !multiSelected && (
         <motion.div
-          className="flex items-center gap-1.5 justify-center mt-2"
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-1 justify-center mt-1.5"
+          initial={{ opacity: 0, y: -6, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
           <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)} disabledOptions={disabledOptions} showParentSplit={showParentSplit}>
             <button
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 px-3 h-10 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors whitespace-nowrap"
+              className="flex items-center gap-1.5 px-4 h-9 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-md hover:bg-primary/90 hover:shadow-lg active:scale-[0.97] transition-all whitespace-nowrap"
             >
               <UserPlus className="w-3.5 h-3.5" />
               {t.memberCard.createMember}
@@ -323,17 +323,17 @@ const MemberCard: React.FC<MemberCardProps> = ({
           </CreateMemberDropdown>
           <button
             onClick={(e) => { e.stopPropagation(); onView?.(member.id); }}
-            className="w-10 h-10 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
+            className="w-9 h-9 rounded-full bg-card border border-border/80 shadow-sm flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 active:scale-[0.93] transition-all"
             title={t.memberCard.viewLabel}
           >
-            <Eye className="w-4 h-4 text-foreground" />
+            <Eye className="w-4 h-4 text-muted-foreground" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onEdit?.(member.id); }}
-            className="w-10 h-10 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
+            className="w-9 h-9 rounded-full bg-card border border-border/80 shadow-sm flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 active:scale-[0.93] transition-all"
             title={t.memberCard.editLabel}
           >
-            <PencilLine className="w-4 h-4 text-foreground" />
+            <PencilLine className="w-4 h-4 text-muted-foreground" />
           </button>
         </motion.div>
       )}
