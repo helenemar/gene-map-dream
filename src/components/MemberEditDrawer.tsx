@@ -764,9 +764,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               {/* ── Unions (editing) ── */}
               {memberUnions.length > 0 && (
-                <div className="flex flex-col gap-2">
-                  <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider flex items-center gap-1">
-                    <Heart className="w-3 h-3" />
+                <div className="flex flex-col gap-3">
+                  <span className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider flex items-center gap-1.5">
+                    <Heart className="w-3.5 h-3.5 text-primary/60" />
                     {t.memberEdit.relations} ({memberUnions.length})
                   </span>
                   {memberUnions.map(union => {
@@ -778,14 +778,16 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                       return !child?.perinatalType || child.perinatalType === 'stillborn';
                     }).length;
                     return (
-                      <div key={union.id} className="flex flex-col gap-2.5 p-3 rounded-xl bg-accent/20 border border-border/50">
-                        <div className="flex items-center gap-2">
+                      <div key={union.id} className="flex flex-col gap-3 p-3.5 rounded-xl bg-primary/5 border border-primary/15 shadow-sm">
+                        <div className="flex items-center gap-2.5">
                           {partner && (
-                            <MemberIcon gender={partner.gender} size={20} className="text-foreground shrink-0" />
+                            <div className="w-7 h-7 rounded-lg bg-accent/40 flex items-center justify-center shrink-0">
+                              <MemberIcon gender={partner.gender} size={18} className="text-foreground" />
+                            </div>
                           )}
-                          <span className="text-sm font-medium text-foreground truncate flex-1">{partnerName}</span>
+                          <span className="text-sm font-semibold text-foreground truncate flex-1">{partnerName}</span>
                           {childCount > 0 && (
-                            <span className="text-[10px] text-muted-foreground bg-accent/30 border border-border/40 rounded-full px-2 py-0.5 shrink-0">
+                            <span className="text-[10px] font-medium text-primary/70 bg-primary/10 border border-primary/20 rounded-full px-2.5 py-0.5 shrink-0">
                               {childCount} {childCount > 1 ? t.memberEdit.childrenPlural : t.memberEdit.children}
                             </span>
                           )}
@@ -794,7 +796,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           value={union.status}
                           onValueChange={(v) => onUpdateUnion?.(union.id, { status: v as UnionStatus })}
                         >
-                          <SelectTrigger className="h-8 text-xs border-border/60 bg-card font-medium">
+                          <SelectTrigger className="h-9 text-sm border-border/70 bg-card font-medium">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -841,12 +843,12 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                           );
 
                           return (
-                            <div className="flex flex-col gap-2">
-                              <div className="flex flex-col gap-0.5">
-                                <Label className="text-[9px] font-semibold text-muted-foreground/70 uppercase tracking-wider">{t.memberEdit.meetingYear}</Label>
-                                <div className="flex items-center gap-1">
+                            <div className="flex flex-col gap-2.5 pt-1">
+                              <div className="flex flex-col gap-1">
+                                <Label className="text-[10px] font-semibold text-foreground/60 uppercase tracking-wider">{t.memberEdit.meetingYear}</Label>
+                                <div className="flex items-center gap-1.5">
                                   <Input
-                                    className="h-8 text-xs border-border/60 bg-card flex-1"
+                                    className="h-9 text-sm border-border/70 bg-card flex-1"
                                     type="number"
                                     placeholder="Année"
                                     value={union.meetingYear || ''}
@@ -858,11 +860,11 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                   )}
                                 </div>
                               </div>
-                              <div className="flex flex-col gap-0.5">
-                                <Label className="text-[9px] font-semibold text-muted-foreground/70 uppercase tracking-wider">{eventLabelMap[union.status]}</Label>
-                                <div className="flex items-center gap-1">
+                              <div className="flex flex-col gap-1">
+                                <Label className="text-[10px] font-semibold text-foreground/60 uppercase tracking-wider">{eventLabelMap[union.status]}</Label>
+                                <div className="flex items-center gap-1.5">
                                   <Input
-                                    className="h-8 text-xs border-border/60 bg-card flex-1"
+                                    className="h-9 text-sm border-border/70 bg-card flex-1"
                                     type="number"
                                     placeholder="Année"
                                     value={(union.eventYear ?? union.marriageYear) || ''}
@@ -875,11 +877,11 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                 </div>
                               </div>
                               {!hideEnd && (
-                                <div className="flex flex-col gap-0.5">
-                                  <Label className="text-[9px] font-semibold text-muted-foreground/70 uppercase tracking-wider">{t.memberEdit.endYear}</Label>
-                                  <div className="flex items-center gap-1">
+                                <div className="flex flex-col gap-1">
+                                  <Label className="text-[10px] font-semibold text-foreground/60 uppercase tracking-wider">{t.memberEdit.endYear}</Label>
+                                  <div className="flex items-center gap-1.5">
                                     <Input
-                                      className="h-8 text-xs border-border/60 bg-card flex-1"
+                                      className="h-9 text-sm border-border/70 bg-card flex-1"
                                       type="number"
                                       placeholder="Année"
                                       value={(union.endYear ?? union.divorceYear) || ''}
