@@ -778,7 +778,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                       return !child?.perinatalType || child.perinatalType === 'stillborn';
                     }).length;
                     return (
-                      <div key={union.id} className="flex flex-col gap-2 p-2.5 rounded-lg bg-accent/10 border border-border/30">
+                      <div key={union.id} className="flex flex-col gap-2.5 p-3 rounded-xl bg-accent/20 border border-border/50">
                         <div className="flex items-center gap-2">
                           {partner && (
                             <MemberIcon gender={partner.gender} size={20} className="text-foreground shrink-0" />
