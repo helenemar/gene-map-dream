@@ -307,7 +307,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
       {activeState === 'selected' && !presentationMode && !multiSelected && (
         <motion.div
-          className="flex items-center gap-2 justify-center mt-2"
+          className="flex items-center gap-1.5 justify-center mt-2"
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
