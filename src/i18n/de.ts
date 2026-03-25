@@ -350,6 +350,8 @@ export const de: Translations = {
     cancelLabel: 'Abbrechen',
     retiredF: 'Im Ruhestand',
     retiredM: 'Im Ruhestand',
+    viewLabel: 'Akte anzeigen',
+    editLabel: 'Bearbeiten',
   },
 
   shareModal: {

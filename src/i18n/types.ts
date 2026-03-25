@@ -112,6 +112,7 @@ export interface Translations {
   memberCard: {
     yearsOld: string; createMember: string; createLink: string;
     dragHint: string; cancelLabel: string; retiredF: string; retiredM: string;
+    viewLabel: string; editLabel: string;
   };
   shareModal: {
     title: string; linkSharing: string; reader: string; editorAccess: string;

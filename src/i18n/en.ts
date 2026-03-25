@@ -350,6 +350,8 @@ export const en: Translations = {
     cancelLabel: 'Cancel',
     retiredF: 'Retired',
     retiredM: 'Retired',
+    viewLabel: 'View record',
+    editLabel: 'Edit',
   },
 
   // ── Share Modal ──
