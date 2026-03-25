@@ -354,6 +354,8 @@ export const fr: Translations = {
     cancelLabel: 'Annuler',
     retiredF: 'Retraitée',
     retiredM: 'Retraité',
+    viewLabel: 'Voir le dossier',
+    editLabel: 'Éditer',
   },
 
   shareModal: {
