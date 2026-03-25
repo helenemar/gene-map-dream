@@ -323,13 +323,13 @@ const MemberCard: React.FC<MemberCardProps> = ({
           </CreateMemberDropdown>
           <button
             onClick={(e) => { e.stopPropagation(); onView?.(member.id); }}
-            className="w-8 h-8 min-w-[40px] min-h-[40px] rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
+            className="w-10 h-10 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
           >
             <Eye className="w-4 h-4 text-foreground" />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onEdit?.(member.id); }}
-            className="w-8 h-8 min-w-[40px] min-h-[40px] rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
+            className="w-10 h-10 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
           >
             <PencilLine className="w-4 h-4 text-foreground" />
           </button>
