@@ -9,6 +9,8 @@ interface LinkTypeModalProps {
   onClose: () => void;
   currentType?: EmotionalLinkType;
   onDelete?: () => void;
+  /** Types already used between this pair (to prevent exact duplicates) */
+  existingTypes?: EmotionalLinkType[];
 }
 
 const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, currentType, onDelete }) => {
