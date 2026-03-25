@@ -254,9 +254,9 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
 
   function straightArrowHead(size: number, color: string) {
     if (dist === 0) return null;
-    const left = { x: x2 - ux * size + px * size * 0.5, y: y2 - uy * size + py * size * 0.5 };
-    const right = { x: x2 - ux * size - px * size * 0.5, y: y2 - uy * size - py * size * 0.5 };
-    return <polygon points={`${x2},${y2} ${left.x},${left.y} ${right.x},${right.y}`} fill={color} />;
+    const left = { x: oX2 - ux * size + px * size * 0.5, y: oY2 - uy * size + py * size * 0.5 };
+    const right = { x: oX2 - ux * size - px * size * 0.5, y: oY2 - uy * size - py * size * 0.5 };
+    return <polygon points={`${oX2},${oY2} ${left.x},${left.y} ${right.x},${right.y}`} fill={color} />;
   }
 
   const renderLine = () => {
