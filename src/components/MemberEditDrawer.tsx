@@ -463,7 +463,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     )}
                   </Label>
                   <div className="flex items-center gap-1">
-                    <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30 flex-1" type="number" placeholder="1985" min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} />
+                    <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30 flex-1" type="number" placeholder={t.memberEdit.alive} min={1900} max={2100} value={birthYear} onChange={(e) => setBirthYear(e.target.value)} />
                     <TooltipProvider delayDuration={200}>
                       <Tooltip>
                         <TooltipTrigger asChild>
