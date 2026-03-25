@@ -124,10 +124,10 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
   // Border & ring logic (no collision outline)
   const borderClasses = isLinkTarget
-      ? 'border-primary ring-2 ring-primary/40 shadow-[0_0_16px_hsl(var(--primary)/0.2)]'
+      ? 'border-2 border-primary ring-2 ring-primary/40 shadow-[0_0_16px_hsl(var(--primary)/0.2)]'
       : isHighlighted
-        ? 'border-primary ring-2 ring-primary/30'
-        : 'border-border';
+        ? 'border-2 border-primary ring-2 ring-primary/30'
+        : 'border border-border';
 
   const handleDotMouseDown = useCallback((side: AnchorSide, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -154,9 +154,9 @@ const MemberCard: React.FC<MemberCardProps> = ({
       <div
         className={`group
           relative overflow-visible flex items-center ${compact ? 'gap-2' : 'gap-3'} rounded-xl bg-card shadow-md transition-all
-          ${(isPlaceholder || isDraft) ? 'border-2 border-dashed' : 'border'}
+          ${(isPlaceholder || isDraft) ? 'border-dashed' : ''}
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
-          ${(isPlaceholder || isDraft) && !isHighlighted ? 'border-muted-foreground/30' : borderClasses}
+          ${(isPlaceholder || isDraft) && !isHighlighted ? 'border border-muted-foreground/30 border-dashed' : borderClasses}
           ${searchHighlighted ? 'border-2 border-primary ring-4 ring-primary/25' : ''}
           ${compact ? 'opacity-75' : ''}
         `}
