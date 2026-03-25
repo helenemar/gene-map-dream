@@ -229,14 +229,8 @@ const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
                       {t.onboarding.letsGo}
                     </button>
                     <button
-                      onClick={onFinish}
-                      className="w-full mt-2 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {t.onboarding.skipTutorial}
-                    </button>
-                    <button
                       onClick={onDismiss}
-                      className="w-full mt-1 py-1.5 text-xs text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+                      className="w-full mt-2 py-2 text-sm text-muted-foreground/70 hover:text-foreground transition-colors"
                     >
                       {t.onboarding.neverShow}
                     </button>
