@@ -163,6 +163,9 @@ export interface Translations {
     neverShow: string; previous: string; next: string; finish: string;
     steps: TranslationStep[];
     linkAnimSelect: string; linkAnimDrag: string; linkAnimChoose: string;
+    animClickPlus: string; animHoldAndDrag: string; animClick: string; animClickPencil: string;
+    animGuide: string; animSlide: string; animSpouse: string; animFound: string;
+    animUndoDesc: string; animTypeLien: string; animFusionnel: string;
   };
   familyLinks: {
     married: string; common_law: string; separated: string; divorced: string;

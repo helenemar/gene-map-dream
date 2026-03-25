@@ -493,6 +493,17 @@ export const de: Translations = {
     linkAnimSelect: 'Auswählen',
     linkAnimDrag: 'Ziehen',
     linkAnimChoose: 'Wählen',
+    animClickPlus: 'Klick auf ＋',
+    animHoldAndDrag: 'Halten + ziehen',
+    animClick: 'Klicken',
+    animClickPencil: 'Klick auf ✏️',
+    animGuide: 'Hilfslinie',
+    animSlide: 'Gleiten',
+    animSpouse: 'Partner',
+    animFound: '← gefunden!',
+    animUndoDesc: 'Letzte Aktion rückgängig',
+    animTypeLien: 'Verbindungstyp',
+    animFusionnel: 'Fusionell ▾',
   },
 
   // ── Family Link Types ──

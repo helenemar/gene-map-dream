@@ -1,7 +1,23 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-/** Animated mini-illustration for each onboarding step */
+/** Shared labels type for animation translations */
+export interface AnimLabels {
+  clickPlus: string;
+  holdAndDrag: string;
+  click: string;
+  clickPencil: string;
+  guide: string;
+  slide: string;
+  spouse: string;
+  found: string;
+  undoDesc: string;
+  typeLien: string;
+  fusionnel: string;
+  select: string;
+  drag: string;
+  choose: string;
+}
 
 const HAND = (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -47,88 +63,52 @@ const AnimLabel: React.FC<{ x: number; y: number; children: React.ReactNode; ani
 );
 
 const AnimBox: React.FC<{ children: React.ReactNode; height?: string }> = ({ children, height = '100px' }) => (
-  <div className={`relative w-full rounded-xl bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center`} style={{ height }}>
+  <div className="relative w-full rounded-xl bg-muted/30 border border-border/40 overflow-hidden flex items-center justify-center" style={{ height }}>
     {children}
   </div>
 );
 
-/* ── 1. Pan gesture: two fingers sliding the canvas ── */
-export const PanAnimation: React.FC = () => (
+/* ── 1. Pan gesture ── */
+export const PanAnimation: React.FC<{ labels?: AnimLabels }> = ({ labels }) => (
   <AnimBox height="110px">
     <svg width="200" height="90" viewBox="0 0 200 90">
-      {/* Grid dots (background) */}
       {Array.from({ length: 9 }).map((_, i) =>
         Array.from({ length: 5 }).map((_, j) => (
-          <motion.circle
-            key={`${i}-${j}`}
-            cx={10 + i * 22}
-            cy={6 + j * 18}
-            r={2}
-            fill="hsl(var(--border))"
-            animate={{ x: [0, -30, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-          />
+          <motion.circle key={`${i}-${j}`} cx={10 + i * 22} cy={6 + j * 18} r={2} fill="hsl(var(--border))"
+            animate={{ x: [0, -30, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }} />
         ))
       )}
-      {/* Cards sliding with the canvas */}
       <motion.g animate={{ x: [0, -30, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
         <MiniCard x={30} y={25} w={50} h={26} label="Marie" />
         <MiniCard x={110} y={25} w={50} h={26} label="Jean" />
       </motion.g>
-      {/* Hand icon */}
-      <motion.g
-        animate={{ x: [0, -30, 0] }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <g transform="translate(88, 52)">
-          {HAND}
-        </g>
+      <motion.g animate={{ x: [0, -30, 0] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
+        <g transform="translate(88, 52)">{HAND}</g>
       </motion.g>
-      {/* Direction arrows */}
       <motion.g animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 3, repeat: Infinity }}>
         <path d="M85 82 L75 82 M78 78 L74 82 L78 86" stroke="hsl(var(--primary))" strokeWidth={1.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
         <path d="M115 82 L125 82 M122 78 L126 82 L122 86" stroke="hsl(var(--primary))" strokeWidth={1.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
       </motion.g>
-      <text x={100} y={86} textAnchor="middle" fontSize={7} fill="hsl(var(--muted-foreground))" fontFamily="sans-serif">Glissez</text>
+      <text x={100} y={86} textAnchor="middle" fontSize={7} fill="hsl(var(--muted-foreground))" fontFamily="sans-serif">{labels?.slide || 'Glissez'}</text>
     </svg>
   </AnimBox>
 );
 
-/* ── 2. Zoom gesture: pinch in/out ── */
-export const ZoomAnimation: React.FC = () => (
+/* ── 2. Zoom gesture ── */
+export const ZoomAnimation: React.FC<{ labels?: AnimLabels }> = () => (
   <AnimBox height="110px">
     <svg width="200" height="90" viewBox="0 0 200 90">
-      {/* Card that scales */}
-      <motion.g
-        animate={{ scale: [0.6, 1.2, 0.6] }}
-        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-        style={{ transformOrigin: '100px 38px' }}
-      >
+      <motion.g animate={{ scale: [0.6, 1.2, 0.6] }} transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }} style={{ transformOrigin: '100px 38px' }}>
         <MiniCard x={74} y={24} w={52} h={28} label="Marie" />
       </motion.g>
-      {/* Two fingers pinching */}
-      <motion.g>
-        <motion.circle
-          cx={80} cy={38}
-          r={6}
-          fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary))" strokeWidth={1.5}
-          animate={{ cx: [80, 68, 80] }}
-          transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.circle
-          cx={120} cy={38}
-          r={6}
-          fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary))" strokeWidth={1.5}
-          animate={{ cx: [120, 132, 120] }}
-          transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        {/* Arrows showing direction */}
-        <motion.g animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 3.5, repeat: Infinity }}>
-          <path d="M74 38 L66 38" stroke="hsl(var(--primary) / 0.5)" strokeWidth={1} fill="none" strokeLinecap="round" />
-          <path d="M126 38 L134 38" stroke="hsl(var(--primary) / 0.5)" strokeWidth={1} fill="none" strokeLinecap="round" />
-        </motion.g>
+      <motion.circle cx={80} cy={38} r={6} fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary))" strokeWidth={1.5}
+        animate={{ cx: [80, 68, 80] }} transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }} />
+      <motion.circle cx={120} cy={38} r={6} fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary))" strokeWidth={1.5}
+        animate={{ cx: [120, 132, 120] }} transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }} />
+      <motion.g animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 3.5, repeat: Infinity }}>
+        <path d="M74 38 L66 38" stroke="hsl(var(--primary) / 0.5)" strokeWidth={1} fill="none" strokeLinecap="round" />
+        <path d="M126 38 L134 38" stroke="hsl(var(--primary) / 0.5)" strokeWidth={1} fill="none" strokeLinecap="round" />
       </motion.g>
-      {/* + / - buttons mock */}
       <motion.g animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 3.5, repeat: Infinity }}>
         <rect x={82} y={70} width={16} height={14} rx={3} fill="hsl(var(--card))" stroke="hsl(var(--border))" strokeWidth={1} />
         <text x={90} y={80} textAnchor="middle" fontSize={10} fill="hsl(var(--foreground))" fontFamily="sans-serif" fontWeight="bold">−</text>
@@ -139,350 +119,206 @@ export const ZoomAnimation: React.FC = () => (
   </AnimBox>
 );
 
-/* ── 3. Create member: hover → + button → new card ── */
-export const CreateMemberAnimation: React.FC = () => (
+/* ── 3. Create member ── */
+export const CreateMemberAnimation: React.FC<{ labels?: AnimLabels }> = ({ labels }) => (
   <AnimBox height="110px">
     <svg width="220" height="90" viewBox="0 0 220 90">
-      {/* Existing card */}
       <MiniCard x={30} y={22} w={56} h={30} label="Marie" />
-
-      {/* Cursor approaching */}
-      <motion.g
-        animate={{ x: [0, 30, 30, 30], y: [12, 0, 0, 0], opacity: [0, 1, 1, 0] }}
-        transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.25, 0.55, 0.75] }}
-      >
+      <motion.g animate={{ x: [0, 30, 30, 30], y: [12, 0, 0, 0], opacity: [0, 1, 1, 0] }}
+        transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.25, 0.55, 0.75] }}>
         <g transform="translate(60, 34)">{CURSOR}</g>
       </motion.g>
-
-      {/* + button appearing on hover */}
-      <motion.g
-        animate={{ opacity: [0, 0, 1, 1, 1, 0], scale: [0.5, 0.5, 1, 1, 1.15, 0.5] }}
+      <motion.g animate={{ opacity: [0, 0, 1, 1, 1, 0], scale: [0.5, 0.5, 1, 1, 1.15, 0.5] }}
         transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.2, 0.3, 0.5, 0.6, 0.75] }}
-        style={{ transformOrigin: '100px 37px' }}
-      >
+        style={{ transformOrigin: '100px 37px' }}>
         <circle cx={100} cy={37} r={11} fill="hsl(var(--primary))" />
         <text x={100} y={42} textAnchor="middle" fontSize={16} fill="hsl(var(--primary-foreground))" fontFamily="sans-serif" fontWeight="bold">+</text>
       </motion.g>
-
-      {/* Label "Cliquez ici" */}
       <AnimLabel x={100} y={17} animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.25, 0.32, 0.55, 0.65] }}>
-        Cliquez sur ＋
+        {labels?.clickPlus || 'Cliquez sur ＋'}
       </AnimLabel>
-
-      {/* Arrow → */}
       <motion.g animate={{ opacity: [0, 0, 0, 1, 1] }} transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.55, 0.6, 0.7, 1] }}>
         <path d="M116 37 L130 37 M127 33 L131 37 L127 41" stroke="hsl(var(--primary) / 0.5)" strokeWidth={1.5} fill="none" strokeLinecap="round" strokeLinejoin="round" />
       </motion.g>
-
-      {/* New card appearing */}
-      <motion.g
-        animate={{ opacity: [0, 0, 0, 1], y: [8, 8, 8, 0], scale: [0.8, 0.8, 0.8, 1] }}
+      <motion.g animate={{ opacity: [0, 0, 0, 1], y: [8, 8, 8, 0], scale: [0.8, 0.8, 0.8, 1] }}
         transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.55, 0.65, 0.85] }}
-        style={{ transformOrigin: '162px 37px' }}
-      >
-        <MiniCard x={136} y={22} w={52} h={30} label="Nouveau" highlight />
+        style={{ transformOrigin: '162px 37px' }}>
+        <MiniCard x={136} y={22} w={52} h={30} label="?" highlight />
       </motion.g>
     </svg>
   </AnimBox>
 );
 
-/* ── 4. Edit member: click card → pencil → panel opens ── */
-export const EditMemberAnimation: React.FC = () => (
+/* ── 4. Edit member ── */
+export const EditMemberAnimation: React.FC<{ labels?: AnimLabels }> = ({ labels }) => (
   <AnimBox height="110px">
     <div className="flex items-center gap-4">
-      {/* Step 1: Click the card */}
       <div className="flex flex-col items-center gap-1.5">
         <motion.div
           className="relative px-4 py-2.5 rounded-lg border text-xs font-medium"
           style={{ borderColor: 'hsl(var(--border))', color: 'hsl(var(--foreground))', backgroundColor: 'hsl(var(--card))' }}
-          animate={{
-            borderColor: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--primary))'],
-            boxShadow: ['0 0 0 0px transparent', '0 0 0 3px hsl(var(--primary) / 0.15)', '0 0 0 3px hsl(var(--primary) / 0.15)'],
-          }}
+          animate={{ borderColor: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--primary))'], boxShadow: ['0 0 0 0px transparent', '0 0 0 3px hsl(var(--primary) / 0.15)', '0 0 0 3px hsl(var(--primary) / 0.15)'] }}
           transition={{ duration: 3, repeat: Infinity, times: [0, 0.25, 1] }}
         >
           Jean
-          {/* Click ripple */}
-          <motion.div
-            className="absolute inset-0 rounded-lg border-2 border-primary"
-            animate={{ scale: [0.95, 1.1], opacity: [0.5, 0] }}
-            transition={{ duration: 1.2, repeat: Infinity }}
-          />
+          <motion.div className="absolute inset-0 rounded-lg border-2 border-primary" animate={{ scale: [0.95, 1.1], opacity: [0.5, 0] }} transition={{ duration: 1.2, repeat: Infinity }} />
         </motion.div>
-        <motion.span 
-          className="text-[9px] font-medium text-primary"
-          animate={{ opacity: [0, 1, 1, 0] }}
-          transition={{ duration: 3, repeat: Infinity, times: [0, 0.15, 0.35, 0.45] }}
-        >
-          ① Cliquez
+        <motion.span className="text-[9px] font-medium text-primary"
+          animate={{ opacity: [0, 1, 1, 0] }} transition={{ duration: 3, repeat: Infinity, times: [0, 0.15, 0.35, 0.45] }}>
+          ① {labels?.click || 'Cliquez'}
         </motion.span>
       </div>
-
-      {/* Arrow */}
-      <motion.div
-        animate={{ opacity: [0, 1, 1], x: [-4, 0, 0] }}
-        transition={{ duration: 3, repeat: Infinity, times: [0, 0.3, 1] }}
-      >
+      <motion.div animate={{ opacity: [0, 1, 1], x: [-4, 0, 0] }} transition={{ duration: 3, repeat: Infinity, times: [0, 0.3, 1] }}>
         <svg width="20" height="14" viewBox="0 0 20 14"><path d="M2 7h14M13 3l4 4-4 4" stroke="hsl(var(--primary))" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </motion.div>
-
-      {/* Step 2: Pencil icon + drawer mock */}
       <div className="flex flex-col items-center gap-1.5">
-        <motion.div
-          className="flex items-center gap-2 px-3 py-2.5 rounded-lg border"
+        <motion.div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border"
           style={{ borderColor: 'hsl(var(--border))', backgroundColor: 'hsl(var(--card))' }}
-          animate={{ opacity: [0, 0, 1], x: [8, 8, 0] }}
-          transition={{ duration: 3, repeat: Infinity, times: [0, 0.35, 0.55] }}
-        >
-          <motion.div
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: 1.5 }}
-          >
+          animate={{ opacity: [0, 0, 1], x: [8, 8, 0] }} transition={{ duration: 3, repeat: Infinity, times: [0, 0.35, 0.55] }}>
+          <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.5, repeat: Infinity, delay: 1.5 }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
           </motion.div>
           <span className="text-[10px] text-muted-foreground">Modifier</span>
         </motion.div>
-        <motion.span 
-          className="text-[9px] font-medium text-primary"
-          animate={{ opacity: [0, 0, 1, 1] }}
-          transition={{ duration: 3, repeat: Infinity, times: [0, 0.45, 0.55, 1] }}
-        >
-          ② Cliquez sur ✏️
+        <motion.span className="text-[9px] font-medium text-primary"
+          animate={{ opacity: [0, 0, 1, 1] }} transition={{ duration: 3, repeat: Infinity, times: [0, 0.45, 0.55, 1] }}>
+          ② {labels?.clickPencil || 'Cliquez sur ✏️'}
         </motion.span>
       </div>
     </div>
   </AnimBox>
 );
 
-/* ── 5. Drag member: card moves with cursor + smart guide ── */
-export const DragAnimation: React.FC = () => (
+/* ── 5. Drag member ── */
+export const DragAnimation: React.FC<{ labels?: AnimLabels }> = ({ labels }) => (
   <AnimBox height="110px">
     <svg width="220" height="90" viewBox="0 0 220 90">
-      {/* Ghost origin card */}
       <rect x={30} y={24} width={52} height={28} rx={5} fill="none" stroke="hsl(var(--border))" strokeWidth={1} strokeDasharray="4 3" />
       <text x={56} y={42} textAnchor="middle" fontSize={7} fill="hsl(var(--border))" fontFamily="sans-serif">Jean</text>
-
-      {/* Moving card */}
-      <motion.g
-        animate={{ x: [0, 80, 80, 0], y: [0, 0, 0, 0] }}
-        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.65, 1] }}
-      >
+      <motion.g animate={{ x: [0, 80, 80, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.65, 1] }}>
         <MiniCard x={30} y={24} w={52} h={28} label="Jean" highlight />
       </motion.g>
-
-      {/* Cursor following the card */}
-      <motion.g
-        animate={{ x: [0, 80, 80, 0] }}
-        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.65, 1] }}
-      >
+      <motion.g animate={{ x: [0, 80, 80, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.65, 1] }}>
         <g transform="translate(64, 38)">{CURSOR}</g>
       </motion.g>
-
-      {/* Smart guide line */}
-      <motion.line
-        x1={138} y1={8} x2={138} y2={82}
-        stroke="hsl(var(--primary) / 0.4)"
-        strokeWidth={1}
-        strokeDasharray="4 3"
-        animate={{ opacity: [0, 0, 1, 1, 0] }}
-        transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.3, 0.4, 0.6, 0.7] }}
-      />
-
-      {/* Guide label */}
-      <AnimLabel x={154} y={16}
-        animate={{ opacity: [0, 0, 1, 1, 0] }}
-        transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.3, 0.42, 0.6, 0.7] }}
-      >
-        Repère
+      <motion.line x1={138} y1={8} x2={138} y2={82} stroke="hsl(var(--primary) / 0.4)" strokeWidth={1} strokeDasharray="4 3"
+        animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.3, 0.4, 0.6, 0.7] }} />
+      <AnimLabel x={154} y={16} animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.3, 0.42, 0.6, 0.7] }}>
+        {labels?.guide || 'Repère'}
       </AnimLabel>
-
-      {/* Other card for alignment reference */}
       <MiniCard x={152} y={24} w={52} h={28} label="Marie" />
-
-      {/* Hand label */}
-      <text x={56} y={82} textAnchor="middle" fontSize={7} fill="hsl(var(--muted-foreground))" fontFamily="sans-serif">Maintenez + glissez</text>
+      <text x={56} y={82} textAnchor="middle" fontSize={7} fill="hsl(var(--muted-foreground))" fontFamily="sans-serif">{labels?.holdAndDrag || 'Maintenez + glissez'}</text>
     </svg>
   </AnimBox>
 );
 
-/* ── 6. Create emotional link: select → dots → drag → modal ── */
-export const LinkAnimation: React.FC<{ labels?: { select: string; drag: string; choose: string } }> = ({ labels }) => {
+/* ── 6. Create emotional link ── */
+export const LinkAnimation: React.FC<{ labels?: AnimLabels }> = ({ labels }) => {
   const selectLabel = labels?.select || 'Sélectionner';
   const dragLabel = labels?.drag || 'Glisser';
   const chooseLabel = labels?.choose || 'Choisir';
+  const typeLienLabel = labels?.typeLien || 'Type de lien';
+  const fusionnelLabel = labels?.fusionnel || 'Fusionnel ▾';
+
   const cardAX = 10, cardAY = 14, cardBX = 120, cardBY = 14;
   const cardW = 52, cardH = 30;
-
   const cornersA = [
-    { cx: cardAX, cy: cardAY },
-    { cx: cardAX + cardW, cy: cardAY },
-    { cx: cardAX, cy: cardAY + cardH },
-    { cx: cardAX + cardW, cy: cardAY + cardH },
+    { cx: cardAX, cy: cardAY }, { cx: cardAX + cardW, cy: cardAY },
+    { cx: cardAX, cy: cardAY + cardH }, { cx: cardAX + cardW, cy: cardAY + cardH },
   ];
   const cornersB = [
-    { cx: cardBX, cy: cardBY },
-    { cx: cardBX + cardW, cy: cardBY },
-    { cx: cardBX, cy: cardBY + cardH },
-    { cx: cardBX + cardW, cy: cardBY + cardH },
+    { cx: cardBX, cy: cardBY }, { cx: cardBX + cardW, cy: cardBY },
+    { cx: cardBX, cy: cardBY + cardH }, { cx: cardBX + cardW, cy: cardBY + cardH },
   ];
-
   const fromDot = cornersA[1];
   const toDot = cornersB[0];
 
   return (
     <AnimBox height="120px">
       <svg width="190" height="100" viewBox="0 0 190 100">
-        {/* Card A */}
-        <motion.rect
-          x={cardAX} y={cardAY} width={cardW} height={cardH} rx={5}
-          fill="hsl(var(--card))"
-          stroke="hsl(var(--primary))"
-          strokeWidth={1.5}
-          animate={{
-            stroke: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--primary))', 'hsl(var(--primary))', 'hsl(var(--border))'],
-          }}
-          transition={{ duration: 5, repeat: Infinity, times: [0, 0.08, 0.6, 0.82, 0.92] }}
-        />
+        <motion.rect x={cardAX} y={cardAY} width={cardW} height={cardH} rx={5} fill="hsl(var(--card))" stroke="hsl(var(--primary))" strokeWidth={1.5}
+          animate={{ stroke: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--primary))', 'hsl(var(--primary))', 'hsl(var(--border))'] }}
+          transition={{ duration: 5, repeat: Infinity, times: [0, 0.08, 0.6, 0.82, 0.92] }} />
         <text x={cardAX + cardW / 2} y={cardAY + cardH / 2 + 4} textAnchor="middle" fontSize={8} fill="hsl(var(--muted-foreground))" fontFamily="sans-serif" fontWeight="500">Marie</text>
 
-        {/* Card B */}
-        <motion.rect
-          x={cardBX} y={cardBY} width={cardW} height={cardH} rx={5}
-          fill="hsl(var(--card))"
-          strokeWidth={1.5}
-          animate={{
-            stroke: ['hsl(var(--border))', 'hsl(var(--border))', 'hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--primary))', 'hsl(var(--border))'],
-          }}
-          transition={{ duration: 5, repeat: Infinity, times: [0, 0.25, 0.38, 0.42, 0.6, 0.82] }}
-        />
+        <motion.rect x={cardBX} y={cardBY} width={cardW} height={cardH} rx={5} fill="hsl(var(--card))" strokeWidth={1.5}
+          animate={{ stroke: ['hsl(var(--border))', 'hsl(var(--border))', 'hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--primary))', 'hsl(var(--border))'] }}
+          transition={{ duration: 5, repeat: Infinity, times: [0, 0.25, 0.38, 0.42, 0.6, 0.82] }} />
         <text x={cardBX + cardW / 2} y={cardBY + cardH / 2 + 4} textAnchor="middle" fontSize={8} fill="hsl(var(--muted-foreground))" fontFamily="sans-serif" fontWeight="500">Paul</text>
 
-        {/* Target halo on card B */}
-        <motion.rect
-          x={cardBX - 4} y={cardBY - 4} width={cardW + 8} height={cardH + 8} rx={7}
-          fill="none" stroke="hsl(var(--primary))" strokeWidth={1.5}
+        <motion.rect x={cardBX - 4} y={cardBY - 4} width={cardW + 8} height={cardH + 8} rx={7} fill="none" stroke="hsl(var(--primary))" strokeWidth={1.5}
           animate={{ opacity: [0, 0, 0, 0.6, 0.8, 0], scale: [1, 1, 1, 1, 1.03, 1] }}
           transition={{ duration: 5, repeat: Infinity, times: [0, 0.25, 0.38, 0.42, 0.52, 0.6] }}
-          style={{ transformOrigin: `${cardBX + cardW / 2}px ${cardBY + cardH / 2}px` }}
-        />
+          style={{ transformOrigin: `${cardBX + cardW / 2}px ${cardBY + cardH / 2}px` }} />
 
-        {/* Corner dots on A */}
         {cornersA.map((dot, i) => (
-          <motion.circle
-            key={`ca-${i}`}
-            cx={dot.cx} cy={dot.cy} r={4}
-            fill={i === 1 ? 'hsl(var(--primary))' : 'hsl(var(--card))'}
-            stroke="hsl(var(--primary))" strokeWidth={1.3}
+          <motion.circle key={`ca-${i}`} cx={dot.cx} cy={dot.cy} r={4}
+            fill={i === 1 ? 'hsl(var(--primary))' : 'hsl(var(--card))'} stroke="hsl(var(--primary))" strokeWidth={1.3}
             animate={{ opacity: [0, 1, 1, 1, 0], scale: i === 1 ? [0, 1, 1.3, 1, 0] : [0, 1, 1, 1, 0] }}
-            transition={{ duration: 5, repeat: Infinity, times: [0, 0.1, 0.18, 0.6, 0.82] }}
-          />
+            transition={{ duration: 5, repeat: Infinity, times: [0, 0.1, 0.18, 0.6, 0.82] }} />
         ))}
-
-        {/* Corner dots on B */}
         {cornersB.map((dot, i) => (
-          <motion.circle
-            key={`cb-${i}`}
-            cx={dot.cx} cy={dot.cy} r={4}
+          <motion.circle key={`cb-${i}`} cx={dot.cx} cy={dot.cy} r={4}
             fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary))" strokeWidth={1}
             animate={{ opacity: [0, 0, 0, 0.5, 0.5, 0] }}
-            transition={{ duration: 5, repeat: Infinity, times: [0, 0.25, 0.38, 0.42, 0.56, 0.82] }}
-          />
+            transition={{ duration: 5, repeat: Infinity, times: [0, 0.25, 0.38, 0.42, 0.56, 0.82] }} />
         ))}
 
-        {/* Elastic line from A corner → B corner */}
-        <motion.line
-          x1={fromDot.cx} y1={fromDot.cy}
-          x2={fromDot.cx} y2={fromDot.cy}
+        <motion.line x1={fromDot.cx} y1={fromDot.cy} x2={fromDot.cx} y2={fromDot.cy}
           stroke="hsl(var(--primary))" strokeWidth={2.5} strokeLinecap="round"
-          animate={{
-            x2: [fromDot.cx, fromDot.cx, toDot.cx, toDot.cx, fromDot.cx],
-            y2: [fromDot.cy, fromDot.cy, toDot.cy, toDot.cy, fromDot.cy],
-            opacity: [0, 1, 1, 1, 0],
-          }}
-          transition={{ duration: 5, repeat: Infinity, times: [0, 0.18, 0.42, 0.56, 0.82] }}
-        />
+          animate={{ x2: [fromDot.cx, fromDot.cx, toDot.cx, toDot.cx, fromDot.cx], y2: [fromDot.cy, fromDot.cy, toDot.cy, toDot.cy, fromDot.cy], opacity: [0, 1, 1, 1, 0] }}
+          transition={{ duration: 5, repeat: Infinity, times: [0, 0.18, 0.42, 0.56, 0.82] }} />
 
-        {/* Cursor dragging */}
         <motion.g
-          animate={{
-            x: [0, 0, toDot.cx - fromDot.cx - 8, toDot.cx - fromDot.cx - 8, 0],
-            y: [0, 0, toDot.cy - fromDot.cy, toDot.cy - fromDot.cy, 0],
-            opacity: [0, 1, 1, 0.3, 0],
-          }}
-          transition={{ duration: 5, repeat: Infinity, times: [0, 0.15, 0.42, 0.56, 0.82] }}
-        >
+          animate={{ x: [0, 0, toDot.cx - fromDot.cx - 8, toDot.cx - fromDot.cx - 8, 0], y: [0, 0, toDot.cy - fromDot.cy, toDot.cy - fromDot.cy, 0], opacity: [0, 1, 1, 0.3, 0] }}
+          transition={{ duration: 5, repeat: Infinity, times: [0, 0.15, 0.42, 0.56, 0.82] }}>
           <g transform={`translate(${fromDot.cx + 2}, ${fromDot.cy + 2})`}>{CURSOR}</g>
         </motion.g>
 
-        {/* Mini modal */}
-        <motion.g
-          animate={{ opacity: [0, 0, 0, 0, 1, 1, 0], y: [6, 6, 6, 6, 0, 0, 6] }}
-          transition={{ duration: 5, repeat: Infinity, times: [0, 0.42, 0.48, 0.54, 0.6, 0.78, 0.85] }}
-        >
+        <motion.g animate={{ opacity: [0, 0, 0, 0, 1, 1, 0], y: [6, 6, 6, 6, 0, 0, 6] }}
+          transition={{ duration: 5, repeat: Infinity, times: [0, 0.42, 0.48, 0.54, 0.6, 0.78, 0.85] }}>
           <rect x={80} y={54} width={64} height={36} rx={5} fill="hsl(var(--card))" stroke="hsl(var(--border))" strokeWidth={1} />
-          <text x={112} y={66} textAnchor="middle" fontSize={7} fill="hsl(var(--foreground))" fontFamily="sans-serif" fontWeight="600">Type de lien</text>
+          <text x={112} y={66} textAnchor="middle" fontSize={7} fill="hsl(var(--foreground))" fontFamily="sans-serif" fontWeight="600">{typeLienLabel}</text>
           <rect x={84} y={72} width={56} height={14} rx={3} fill="hsl(var(--primary) / 0.08)" stroke="hsl(var(--primary) / 0.25)" strokeWidth={0.5} />
-          <text x={112} y={82} textAnchor="middle" fontSize={6.5} fill="hsl(var(--primary))" fontFamily="sans-serif">Fusionnel ▾</text>
+          <text x={112} y={82} textAnchor="middle" fontSize={6.5} fill="hsl(var(--primary))" fontFamily="sans-serif">{fusionnelLabel}</text>
         </motion.g>
 
-        {/* Step labels */}
         <AnimLabel x={cardAX + cardW / 2} y={cardAY + cardH + 16}
-          animate={{ opacity: [0, 1, 1, 0, 0] }}
-          transition={{ duration: 5, repeat: Infinity, times: [0, 0.06, 0.15, 0.2, 1] }}
-        >① {selectLabel}</AnimLabel>
-
+          animate={{ opacity: [0, 1, 1, 0, 0] }} transition={{ duration: 5, repeat: Infinity, times: [0, 0.06, 0.15, 0.2, 1] }}>
+          ① {selectLabel}
+        </AnimLabel>
         <AnimLabel x={95} y={10}
-          animate={{ opacity: [0, 0, 1, 1, 0] }}
-          transition={{ duration: 5, repeat: Infinity, times: [0, 0.18, 0.24, 0.4, 0.44] }}
-        >② {dragLabel}</AnimLabel>
-
+          animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: 5, repeat: Infinity, times: [0, 0.18, 0.24, 0.4, 0.44] }}>
+          ② {dragLabel}
+        </AnimLabel>
         <AnimLabel x={112} y={52}
-          animate={{ opacity: [0, 0, 0, 1, 1, 0] }}
-          transition={{ duration: 5, repeat: Infinity, times: [0, 0.52, 0.56, 0.6, 0.78, 0.85] }}
-        >③ {chooseLabel}</AnimLabel>
+          animate={{ opacity: [0, 0, 0, 1, 1, 0] }} transition={{ duration: 5, repeat: Infinity, times: [0, 0.52, 0.56, 0.6, 0.78, 0.85] }}>
+          ③ {chooseLabel}
+        </AnimLabel>
       </svg>
     </AnimBox>
   );
 };
 
-/* ── 7. Create union: + button → choose spouse → line appears ── */
-export const CreateUnionAnimation: React.FC = () => (
+/* ── 7. Create union ── */
+export const CreateUnionAnimation: React.FC<{ labels?: AnimLabels }> = ({ labels }) => (
   <AnimBox height="110px">
     <svg width="220" height="90" viewBox="0 0 220 90">
       <MiniCard x={24} y={22} w={52} h={30} label="Marie" />
       <MiniCard x={144} y={22} w={52} h={30} label="Jean" />
-
-      {/* + button on first card */}
-      <motion.g
-        animate={{ opacity: [0, 1, 1, 0.3, 0.3], scale: [0.5, 1, 1.1, 0.8, 0.8] }}
-        transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.15, 0.3, 0.45, 1] }}
-        style={{ transformOrigin: '88px 37px' }}
-      >
+      <motion.g animate={{ opacity: [0, 1, 1, 0.3, 0.3], scale: [0.5, 1, 1.1, 0.8, 0.8] }}
+        transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.15, 0.3, 0.45, 1] }} style={{ transformOrigin: '88px 37px' }}>
         <circle cx={88} cy={37} r={10} fill="hsl(var(--primary))" />
         <text x={88} y={41.5} textAnchor="middle" fontSize={14} fill="hsl(var(--primary-foreground))" fontFamily="sans-serif" fontWeight="bold">+</text>
       </motion.g>
-
-      {/* "Conjoint(e)" label */}
       <AnimLabel x={110} y={18}
-        animate={{ opacity: [0, 0, 1, 1, 0] }}
-        transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.25, 0.35, 0.5, 0.6] }}
-      >Conjoint(e)</AnimLabel>
-
-      {/* Union line appearing */}
-      <motion.line
-        x1={76} y1={37} x2={76} y2={37}
-        stroke="hsl(var(--foreground))"
-        strokeWidth={2}
-        animate={{ x2: [76, 76, 144, 144] }}
-        transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.45, 0.7, 1], ease: 'easeInOut' }}
-      />
-
-      {/* Heart icon */}
-      <motion.g
-        animate={{ opacity: [0, 0, 0, 1], scale: [0.3, 0.3, 0.3, 1] }}
-        transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.5, 0.65, 0.8] }}
-        style={{ transformOrigin: '110px 28px' }}
-      >
+        animate={{ opacity: [0, 0, 1, 1, 0] }} transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.25, 0.35, 0.5, 0.6] }}>
+        {labels?.spouse || 'Conjoint(e)'}
+      </AnimLabel>
+      <motion.line x1={76} y1={37} x2={76} y2={37} stroke="hsl(var(--foreground))" strokeWidth={2}
+        animate={{ x2: [76, 76, 144, 144] }} transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.45, 0.7, 1], ease: 'easeInOut' }} />
+      <motion.g animate={{ opacity: [0, 0, 0, 1], scale: [0.3, 0.3, 0.3, 1] }}
+        transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.5, 0.65, 0.8] }} style={{ transformOrigin: '110px 28px' }}>
         <text x={110} y={18} textAnchor="middle" fontSize={14} fill="hsl(var(--primary))">♥</text>
       </motion.g>
     </svg>
@@ -490,123 +326,71 @@ export const CreateUnionAnimation: React.FC = () => (
 );
 
 /* ── 8. Search & filter ── */
-export const SearchFilterAnimation: React.FC = () => (
+export const SearchFilterAnimation: React.FC<{ labels?: AnimLabels }> = ({ labels }) => (
   <AnimBox height="110px">
     <div className="flex flex-col items-center gap-3">
-      {/* Search bar mock */}
       <div className="flex items-center gap-3">
-        <motion.div
-          className="flex items-center gap-2 px-4 py-2 rounded-full border"
+        <motion.div className="flex items-center gap-2 px-4 py-2 rounded-full border"
           style={{ borderColor: 'hsl(var(--border))', backgroundColor: 'hsl(var(--card))' }}
-          animate={{
-            borderColor: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--primary))', 'hsl(var(--border))'],
-          }}
-          transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.2, 0.6, 0.8] }}
-        >
+          animate={{ borderColor: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--primary))', 'hsl(var(--border))'] }}
+          transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.2, 0.6, 0.8] }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <div className="w-16 relative h-4 overflow-hidden">
-            <motion.span
-              className="text-[11px] font-medium absolute left-0"
-              style={{ color: 'hsl(var(--foreground))' }}
-              animate={{ opacity: [0, 0, 1, 1] }}
-              transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.2, 0.4, 1] }}
-            >
+            <motion.span className="text-[11px] font-medium absolute left-0" style={{ color: 'hsl(var(--foreground))' }}
+              animate={{ opacity: [0, 0, 1, 1] }} transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.2, 0.4, 1] }}>
               Marie...
             </motion.span>
           </div>
         </motion.div>
-
-        {/* Cursor typing */}
-        <motion.div
-          animate={{ opacity: [0, 1, 1, 0] }}
-          transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.15, 0.5, 0.6] }}
-        >
+        <motion.div animate={{ opacity: [0, 1, 1, 0] }} transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.15, 0.5, 0.6] }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
         </motion.div>
       </div>
-
-      {/* Result card highlighted */}
-      <motion.div
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border"
+      <motion.div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border"
         style={{ borderColor: 'hsl(var(--border))', backgroundColor: 'hsl(var(--card))' }}
         animate={{ opacity: [0, 0, 0, 1], y: [4, 4, 4, 0], borderColor: ['hsl(var(--border))', 'hsl(var(--border))', 'hsl(var(--border))', 'hsl(var(--primary))'] }}
-        transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.35, 0.45, 0.6] }}
-      >
-        <motion.div
-          className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center"
-          animate={{ scale: [1, 1.15, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity, delay: 2 }}
-        >
+        transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.35, 0.45, 0.6] }}>
+        <motion.div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center"
+          animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 1.5, repeat: Infinity, delay: 2 }}>
           <span className="text-[8px] text-primary font-bold">M</span>
         </motion.div>
         <span className="text-[10px] text-foreground font-medium">Marie Dupont</span>
-        <motion.span
-          className="text-[8px] text-primary font-medium"
-          animate={{ opacity: [0, 0, 1, 1] }}
-          transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.55, 0.65, 1] }}
-        >
-          ← trouvé !
+        <motion.span className="text-[8px] text-primary font-medium"
+          animate={{ opacity: [0, 0, 1, 1] }} transition={{ duration: 3.5, repeat: Infinity, times: [0, 0.55, 0.65, 1] }}>
+          {labels?.found || '← trouvé !'}
         </motion.span>
       </motion.div>
     </div>
   </AnimBox>
 );
 
-/* ── 9. Undo/Redo: keyboard keys ── */
-export const UndoAnimation: React.FC = () => (
+/* ── 9. Undo/Redo ── */
+export const UndoAnimation: React.FC<{ labels?: AnimLabels }> = ({ labels }) => (
   <AnimBox height="110px">
     <div className="flex flex-col items-center gap-3">
       <div className="flex items-center gap-3">
-        {/* Ctrl key */}
-        <motion.div
-          className="px-3 py-2 rounded-lg border text-xs font-mono font-semibold"
+        <motion.div className="px-3 py-2 rounded-lg border text-xs font-mono font-semibold"
           style={{ borderColor: 'hsl(var(--border))', color: 'hsl(var(--muted-foreground))', backgroundColor: 'hsl(var(--muted))' }}
-          animate={{
-            borderColor: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--border))'],
-            color: ['hsl(var(--muted-foreground))', 'hsl(var(--primary))', 'hsl(var(--muted-foreground))'],
-            scale: [1, 0.92, 1],
-          }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 0.6] }}
-        >
+          animate={{ borderColor: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--border))'], color: ['hsl(var(--muted-foreground))', 'hsl(var(--primary))', 'hsl(var(--muted-foreground))'], scale: [1, 0.92, 1] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 0.6] }}>
           Ctrl
         </motion.div>
         <span className="text-muted-foreground/50 text-sm font-bold">+</span>
-        {/* Z key */}
-        <motion.div
-          className="w-9 h-9 rounded-lg border flex items-center justify-center text-sm font-mono font-bold"
+        <motion.div className="w-9 h-9 rounded-lg border flex items-center justify-center text-sm font-mono font-bold"
           style={{ borderColor: 'hsl(var(--border))', color: 'hsl(var(--muted-foreground))', backgroundColor: 'hsl(var(--muted))' }}
-          animate={{
-            borderColor: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--border))'],
-            color: ['hsl(var(--muted-foreground))', 'hsl(var(--primary))', 'hsl(var(--muted-foreground))'],
-            scale: [1, 0.88, 1],
-          }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 0.6], delay: 0.05 }}
-        >
+          animate={{ borderColor: ['hsl(var(--border))', 'hsl(var(--primary))', 'hsl(var(--border))'], color: ['hsl(var(--muted-foreground))', 'hsl(var(--primary))', 'hsl(var(--muted-foreground))'], scale: [1, 0.88, 1] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 0.6], delay: 0.05 }}>
           Z
         </motion.div>
-        {/* Undo arrow effect */}
-        <motion.div
-          animate={{ x: [0, -8, 0], opacity: [0.2, 1, 0.2] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 0.6] }}
-        >
+        <motion.div animate={{ x: [0, -8, 0], opacity: [0.2, 1, 0.2] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 0.6] }}>
           <svg width="30" height="20" viewBox="0 0 28 20">
-            <motion.path
-              d="M22 17C22 10 17 6 10 6L4 6M4 6L9 1M4 6L9 11"
-              stroke="hsl(var(--primary))"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-            />
+            <path d="M22 17C22 10 17 6 10 6L4 6M4 6L9 1M4 6L9 11" stroke="hsl(var(--primary))" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" fill="none" />
           </svg>
         </motion.div>
       </div>
-      <motion.p
-        className="text-[10px] text-muted-foreground font-medium text-center"
-        animate={{ opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 2.5, repeat: Infinity }}
-      >
-        Annule la dernière action
+      <motion.p className="text-[10px] text-muted-foreground font-medium text-center"
+        animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 2.5, repeat: Infinity }}>
+        {labels?.undoDesc || 'Annule la dernière action'}
       </motion.p>
     </div>
   </AnimBox>
