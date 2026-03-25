@@ -1003,13 +1003,11 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       return;
     }
 
-    // Select and open drawer for new child (existing union path, skip for perinatal)
+    // Select and open drawer for new child
     setSelectedMembers(new Set([newChild.id]));
-    if (!perinatal) {
-      setEditingNewMember(newChild);
-      setDrawerEditing(true);
-      setNewMemberDrawerOpen(true);
-    }
+    setEditingNewMember(newChild);
+    setDrawerEditing(true);
+    setNewMemberDrawerOpen(true);
     setTimeout(() => centerOnMember(newChild), 100);
   }, [members, unions, centerOnMember, pendingPerinatalType, pendingStillbornGender]);
 
