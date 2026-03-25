@@ -494,6 +494,17 @@ export const en: Translations = {
     linkAnimSelect: 'Select',
     linkAnimDrag: 'Drag',
     linkAnimChoose: 'Choose',
+    animClickPlus: 'Click on ＋',
+    animHoldAndDrag: 'Hold + drag',
+    animClick: 'Click',
+    animClickPencil: 'Click on ✏️',
+    animGuide: 'Guide',
+    animSlide: 'Slide',
+    animSpouse: 'Spouse',
+    animFound: '← found!',
+    animUndoDesc: 'Undoes the last action',
+    animTypeLien: 'Link type',
+    animFusionnel: 'Fusional ▾',
   },
 
   // ── Family Link Types ──
