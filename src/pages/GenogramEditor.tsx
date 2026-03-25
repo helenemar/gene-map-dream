@@ -1738,10 +1738,9 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                     const from = members.find(m => m.id === link.from);
                     const to = members.find(m => m.id === link.to);
                     if (!from || !to) return null;
-                    const key = [link.from, link.to].sort().join('|');
-                    const anchors = pairAnchors.get(key)!;
-                    const key = [link.from, link.to].sort().join('|');
-                    const group = pairMap.get(key)!;
+                    const pairKey = [link.from, link.to].sort().join('|');
+                    const anchors = pairAnchors.get(pairKey)!;
+                    const group = pairMap.get(pairKey)!;
                     const linkIndex = group.indexOf(globalIdx);
                     const isDimmed = !!hoveredMember && link.from !== hoveredMember && link.to !== hoveredMember;
                     const isSearchHighlighted = search.isActive && search.matchedEmotionalLinkIds.has(link.id);
