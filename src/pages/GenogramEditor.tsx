@@ -555,22 +555,30 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       const cursorX = (e.clientX - rect.left - pan.x) / zoom;
       const cursorY = (e.clientY - rect.top - pan.y) / zoom;
 
-      // Snap magnetism: find nearest corner of any target card within SNAP_RADIUS
+      // Snap magnetism: find nearest anchor of any target card within SNAP_RADIUS,
+      // OR snap to nearest edge center if cursor is anywhere inside the card bounds (with margin)
       const SNAP_RADIUS = 30; // world-space pixels
+      const CARD_MARGIN = 20; // expanded hit area around card
       let snapX: number | undefined;
       let snapY: number | undefined;
       let snapTargetId: string | undefined;
-      let bestDist = SNAP_RADIUS;
+      let bestDist = Infinity;
 
       for (const m of members) {
         if (m.id === linkDrag.fromId) continue;
-        const corners = cardCorners(m);
-        for (const c of corners) {
-          const d = Math.hypot(cursorX - c.x, cursorY - c.y);
-          if (d < bestDist) {
+
+        // Check if cursor is inside expanded card bounds
+        const insideCard = cursorX >= m.x - CARD_MARGIN && cursorX <= m.x + CARD_W + CARD_MARGIN &&
+                           cursorY >= m.y - CARD_MARGIN && cursorY <= m.y + CARD_H + CARD_MARGIN;
+
+        const anchors = cardAnchors(m);
+        for (const a of anchors) {
+          const d = Math.hypot(cursorX - a.x, cursorY - a.y);
+          // Snap if within radius OR if cursor is over the card
+          if ((d < SNAP_RADIUS || insideCard) && d < bestDist) {
             bestDist = d;
-            snapX = c.x;
-            snapY = c.y;
+            snapX = a.x;
+            snapY = a.y;
             snapTargetId = m.id;
           }
         }
