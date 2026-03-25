@@ -177,6 +177,14 @@ const MemberCard: React.FC<MemberCardProps> = ({
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
           />
         )}
+        {/* Link target pulse ring */}
+        {isLinkTarget && (
+          <motion.div
+            className="absolute -inset-2 rounded-2xl border-2 border-primary/40 pointer-events-none"
+            animate={{ scale: [1, 1.04, 1], opacity: [0.5, 0.2, 0.5] }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
         {/* Edge anchor dots — centered on each side, inverse-scaled to stay constant size */}
         {showDots && EDGE_DOTS.map(({ side, pos }) => {
           const invScale = 1 / zoom;
