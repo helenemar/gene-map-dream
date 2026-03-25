@@ -324,7 +324,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           <button
             onClick={(e) => { e.stopPropagation(); onView?.(member.id); }}
             className="w-10 h-10 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-accent transition-colors"
-            title={t.memberCard.viewLabel || 'Voir'}
+            title={t.memberCard.viewLabel}
           >
             <Eye className="w-4 h-4 text-foreground" />
           </button>
