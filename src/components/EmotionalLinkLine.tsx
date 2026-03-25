@@ -291,7 +291,7 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
       case 'cutoff': {
         const barGap = 4;
         const barH = 10;
-        const tang = perpOffset === 0 ? { ux, uy, px, py } : bezierTangent(0.5);
+        const tang = { ux, uy, px, py };
         return (
           <>
             <path d={mainPath} fill="none" stroke="hsl(var(--link-cutoff))" strokeWidth={2} strokeDasharray="4 3" />
