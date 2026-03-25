@@ -764,9 +764,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
               {/* ── Unions (editing) ── */}
               {memberUnions.length > 0 && (
-                <div className="flex flex-col gap-2">
-                  <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider flex items-center gap-1">
-                    <Heart className="w-3 h-3" />
+                <div className="flex flex-col gap-3">
+                  <span className="text-[11px] font-semibold text-foreground/70 uppercase tracking-wider flex items-center gap-1.5">
+                    <Heart className="w-3.5 h-3.5 text-primary/60" />
                     {t.memberEdit.relations} ({memberUnions.length})
                   </span>
                   {memberUnions.map(union => {
