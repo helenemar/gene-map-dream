@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, Move, ZoomIn, MousePointer2, Link, RotateCcw, UserPlus, Pencil, Heart, Search } from 'lucide-react';
-import STEP_ANIMATIONS, { LinkAnimation } from '@/components/OnboardingAnimations';
+import STEP_ANIMATIONS from '@/components/OnboardingAnimations';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const STEP_ICONS = [
