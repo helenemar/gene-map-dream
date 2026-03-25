@@ -349,22 +349,22 @@ const MemberCard: React.FC<MemberCardProps> = ({
       {/* Action menu — State: Anchor-Active */}
       {activeState === 'anchor-active' && !presentationMode && (
         <motion.div
-          className="flex items-center gap-1 justify-center mt-1.5"
+          className="flex items-center gap-1.5 justify-center mt-1.5"
           initial={{ opacity: 0, y: -6, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
-          <button
-            onMouseDown={(e) => {
-              e.stopPropagation();
-              onLinkDragStart?.(member.id, e);
-            }}
-            className="flex items-center gap-1.5 px-4 h-9 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-md hover:bg-primary/90 hover:shadow-lg active:scale-[0.97] transition-all cursor-crosshair whitespace-nowrap"
-            title={t.memberCard.dragHint}
+          <div
+            className="flex items-center gap-2 px-4 h-9 rounded-full bg-muted/80 border border-border/60 text-xs text-muted-foreground select-none whitespace-nowrap"
           >
-            <HeartHandshake className="w-3.5 h-3.5" />
-            {t.memberCard.createLink}
-          </button>
+            <motion.div
+              animate={{ x: [0, 4, 0] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <HeartHandshake className="w-3.5 h-3.5 text-primary" />
+            </motion.div>
+            <span>Glisser vers un membre</span>
+          </div>
           <button
             onClick={handleCancelAnchor}
             className="w-9 h-9 rounded-full bg-card border border-border/80 shadow-sm flex items-center justify-center hover:bg-destructive/10 hover:border-destructive/30 active:scale-[0.93] transition-all"
