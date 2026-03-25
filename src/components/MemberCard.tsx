@@ -154,9 +154,9 @@ const MemberCard: React.FC<MemberCardProps> = ({
       <div
         className={`group
           relative overflow-visible flex items-center ${compact ? 'gap-2' : 'gap-3'} rounded-xl bg-card shadow-md transition-all
-          ${(isPlaceholder || isDraft) ? 'border-2 border-dashed' : 'border'}
+          ${(isPlaceholder || isDraft) ? 'border-dashed' : ''}
           ${isStatic ? '' : 'cursor-grab active:cursor-grabbing'}
-          ${(isPlaceholder || isDraft) && !isHighlighted ? 'border-muted-foreground/30' : borderClasses}
+          ${(isPlaceholder || isDraft) && !isHighlighted ? 'border border-muted-foreground/30 border-dashed' : borderClasses}
           ${searchHighlighted ? 'border-2 border-primary ring-4 ring-primary/25' : ''}
           ${compact ? 'opacity-75' : ''}
         `}
