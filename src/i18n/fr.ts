@@ -530,7 +530,7 @@ export const fr: Translations = {
     violence: 'Violence',
     emotional_abuse: 'Abus émotionnel',
     physical_violence: 'Violence physique',
-    sexual_abuse: 'Abus sexuel',
+    sexual_abuse: 'Violences sexuelles',
     neglect: 'Négligence',
     controlling: 'Contrôlant',
   },

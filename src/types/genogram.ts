@@ -148,7 +148,7 @@ export const EMOTIONAL_LINK_TYPES: { id: EmotionalLinkType; label: string; color
   { id: 'violence', label: 'Violence', color: 'link-violence', description: 'Relation violente', category: 'abusive' },
   { id: 'emotional_abuse', label: 'Abus émotionnel', color: 'link-emotional-abuse', description: 'Manipulation, emprise psychologique', category: 'abusive' },
   { id: 'physical_violence', label: 'Violence physique', color: 'link-physical-violence', description: 'Violences corporelles', category: 'abusive' },
-  { id: 'sexual_abuse', label: 'Abus sexuel', color: 'link-sexual-abuse', description: 'Abus à caractère sexuel', category: 'abusive' },
+  { id: 'sexual_abuse', label: 'Violences sexuelles', color: 'link-sexual-abuse', description: 'Violences à caractère sexuel', category: 'abusive' },
   { id: 'neglect', label: 'Négligence', color: 'link-neglect', description: 'Manque de soins ou d\'attention', category: 'abusive' },
   { id: 'controlling', label: 'Contrôlant', color: 'link-controlling', description: 'Comportement de contrôle', category: 'abusive' },
 ];
