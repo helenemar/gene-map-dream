@@ -859,7 +859,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                 </div>
                               </div>
                               <div className="flex flex-col gap-0.5">
-                                <Label className="text-[9px] text-muted-foreground uppercase">{eventLabelMap[union.status]}</Label>
+                                <Label className="text-[9px] font-semibold text-muted-foreground/70 uppercase tracking-wider">{eventLabelMap[union.status]}</Label>
                                 <div className="flex items-center gap-1">
                                   <Input
                                     className="h-7 text-xs border-border/50 bg-card flex-1"
