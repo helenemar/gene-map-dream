@@ -862,9 +862,9 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                 <Label className="text-[9px] font-semibold text-muted-foreground/70 uppercase tracking-wider">{eventLabelMap[union.status]}</Label>
                                 <div className="flex items-center gap-1">
                                   <Input
-                                    className="h-7 text-xs border-border/50 bg-card flex-1"
+                                    className="h-8 text-xs border-border/60 bg-card flex-1"
                                     type="number"
-                                    placeholder="—"
+                                    placeholder="Année"
                                     value={(union.eventYear ?? union.marriageYear) || ''}
                                     onChange={(e) => onUpdateUnion?.(union.id, { eventYear: e.target.value ? parseInt(e.target.value) : undefined, marriageYear: e.target.value ? parseInt(e.target.value) : undefined })}
                                   />
