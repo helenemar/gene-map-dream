@@ -361,6 +361,23 @@ const Dashboard: React.FC = () => {
           </Button>
         </div>
 
+        {/* Beta feedback banner */}
+        <button
+          onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLScXWN4YvQ690jGl5BWHbq1Xg1I-OTUiZ0JZLjleFKNVFoCTUg/viewform?usp=publish-editor', '_blank')}
+          className="w-full mb-4 flex items-center justify-between gap-3 rounded-xl border border-brand/30 bg-gradient-to-r from-brand/10 via-brand/5 to-transparent px-5 sm:px-8 py-3.5 hover:from-brand/15 hover:via-brand/10 transition-colors group cursor-pointer"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-brand/15 flex items-center justify-center shrink-0">
+              <MessageSquarePlus className="w-4 h-4 text-brand" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-foreground">Donnez votre avis sur Genogy !</p>
+              <p className="text-xs text-muted-foreground">Aidez-nous à améliorer l'outil en répondant à notre court questionnaire.</p>
+            </div>
+          </div>
+          <span className="text-xs font-semibold text-brand group-hover:underline shrink-0 hidden sm:inline">Répondre →</span>
+        </button>
+
         <CreateGenogramModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
 
         <div className="bg-card border border-border rounded-xl px-4 sm:px-6 py-4 sm:py-5">
