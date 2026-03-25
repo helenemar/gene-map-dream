@@ -340,26 +340,31 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
       {/* Action menu — State: Anchor-Active */}
       {activeState === 'anchor-active' && !presentationMode && (
-        <div className="flex items-center gap-2 justify-center mt-2">
+        <motion.div
+          className="flex items-center gap-1 justify-center mt-1.5"
+          initial={{ opacity: 0, y: -6, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
           <button
             onMouseDown={(e) => {
               e.stopPropagation();
               onLinkDragStart?.(member.id, e);
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-soft hover:bg-primary/90 transition-colors cursor-crosshair"
+            className="flex items-center gap-1.5 px-4 h-9 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-md hover:bg-primary/90 hover:shadow-lg active:scale-[0.97] transition-all cursor-crosshair whitespace-nowrap"
             title={t.memberCard.dragHint}
           >
-            <Link className="w-3.5 h-3.5" />
+            <HeartHandshake className="w-3.5 h-3.5" />
             {t.memberCard.createLink}
           </button>
           <button
             onClick={handleCancelAnchor}
-            className="w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-destructive/10 hover:border-destructive/30 transition-colors"
+            className="w-9 h-9 rounded-full bg-card border border-border/80 shadow-sm flex items-center justify-center hover:bg-destructive/10 hover:border-destructive/30 active:scale-[0.93] transition-all"
             title={t.memberCard.cancelLabel}
           >
-            <X className="w-3.5 h-3.5 text-foreground" />
+            <X className="w-3.5 h-3.5 text-muted-foreground" />
           </button>
-        </div>
+        </motion.div>
       )}
     </>
   );
