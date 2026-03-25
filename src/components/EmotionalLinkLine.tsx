@@ -201,7 +201,7 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
   const [hovered, setHovered] = useState(false);
 
   // Apply perpendicular offset when multiple links share the same pair
-  const MULTI_LINK_GAP = 12; // px between each link
+  const MULTI_LINK_GAP = 20; // px between each link
   const offsetIndex = linkCount <= 1 ? 0 : linkIndex - (linkCount - 1) / 2;
   const rawDx = x2 - x1;
   const rawDy = y2 - y1;
