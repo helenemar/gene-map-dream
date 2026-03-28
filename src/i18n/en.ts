@@ -536,6 +536,7 @@ export const en: Translations = {
   cookieBanner: {
     message: 'This site uses cookies strictly necessary for the service (authentication, session).',
     accept: 'Got it',
+    reject: 'Decline',
     learnMore: 'Learn more',
   },
 };

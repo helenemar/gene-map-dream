@@ -46,7 +46,7 @@ const CookieBanner: React.FC = () => {
             </p>
             <div className="flex items-center gap-2 shrink-0">
               <Button size="sm" variant="outline" onClick={handleReject} className="rounded-xl">
-                {t.cookieBanner.reject ?? 'Refuser'}
+                {t.cookieBanner.reject}
               </Button>
               <Button size="sm" variant="outline" onClick={handleAccept} className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
                 {t.cookieBanner.accept}
