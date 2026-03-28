@@ -535,6 +535,7 @@ export const de: Translations = {
   cookieBanner: {
     message: 'Diese Website verwendet ausschließlich technisch notwendige Cookies (Authentifizierung, Sitzung).',
     accept: 'Verstanden',
+    reject: 'Ablehnen',
     learnMore: 'Mehr erfahren',
   },
 };

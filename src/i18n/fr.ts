@@ -539,6 +539,7 @@ export const fr: Translations = {
   cookieBanner: {
     message: 'Ce site utilise des cookies strictement nécessaires au fonctionnement du service (authentification, session).',
     accept: 'Compris',
+    reject: 'Refuser',
     learnMore: 'En savoir plus',
   },
 };

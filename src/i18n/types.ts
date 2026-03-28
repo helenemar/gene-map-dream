@@ -132,7 +132,7 @@ export interface Translations {
     exportSuccess: string; exportError: string;
   };
   cookieBanner: {
-    message: string; accept: string; learnMore: string;
+    message: string; accept: string; reject: string; learnMore: string;
   };
   resetPassword: {
     newPassword: string; chooseSecure: string; newPasswordLabel: string;
