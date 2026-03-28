@@ -88,8 +88,8 @@ export const en: Translations = {
       { q: 'What symbols are used in a genogram?', a: 'Genogy uses standardized McGoldrick symbols: squares for men, circles for women, crosses for deaths, solid lines for unions, dashed lines for separations, and specific strokes for emotional links (fusional, conflictual, distant, cutoff, violent, etc.).' },
     ],
     ctaTitle: 'Ready to create your genogram online?',
-    ctaSub: 'Join the professionals using Genogy to map their patients\' family and emotional relationships. Free, no commitment.',
-    ctaButton: 'Create my genogram for free',
+    ctaSub: 'Join the professionals using Genogy to map their patients\' family and emotional relationships. Free access during beta.',
+    ctaButton: 'Try Genogy for free',
   },
 
   // ── Footer ──

@@ -73,7 +73,7 @@ const LandingPage: React.FC = () => {
       <Helmet>
         <title>{t.landing.metaTitle}</title>
         <meta name="description" content={t.landing.metaDesc} />
-        <meta name="keywords" content="génogramme, génogramme en ligne, faire un génogramme, comment faire un génogramme, outil génogramme gratuit, génogramme site web, génogramme psychologie, arbre familial émotionnel, genogram online" />
+        <meta name="keywords" content="génogramme, génogramme en ligne, faire un génogramme, comment faire un génogramme, outil génogramme, génogramme site web, génogramme psychologie, arbre familial émotionnel, genogram online" />
         <link rel="canonical" href="https://genogy.app/" />
         <meta property="og:title" content={t.landing.metaTitle} />
         <meta property="og:description" content={t.landing.metaDesc} />

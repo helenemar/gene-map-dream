@@ -88,8 +88,8 @@ export const de: Translations = {
       { q: 'Welche Symbole werden in einem Genogramm verwendet?', a: 'Genogy verwendet standardisierte McGoldrick-Symbole: Quadrate für Männer, Kreise für Frauen, Kreuze für Todesfälle, durchgezogene Linien für Verbindungen, gestrichelte Linien für Trennungen und spezifische Striche für emotionale Verbindungen (fusional, konflikthaft, distanziert, abgebrochen, gewalttätig usw.).' },
     ],
     ctaTitle: 'Bereit, Ihr Genogramm online zu erstellen?',
-    ctaSub: 'Schließen Sie sich den Fachkräften an, die Genogy nutzen, um die familiären und emotionalen Beziehungen ihrer Patienten abzubilden. Kostenlos und unverbindlich.',
-    ctaButton: 'Mein Genogramm kostenlos erstellen',
+    ctaSub: 'Schließen Sie sich den Fachkräften an, die Genogy nutzen. Kostenloser Zugang während der Beta.',
+    ctaButton: 'Genogy kostenlos testen',
   },
 
   // ── Footer ──

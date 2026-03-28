@@ -88,8 +88,8 @@ export const fr: Translations = {
       { q: 'Quels symboles sont utilisés dans un génogramme ?', a: 'Genogy utilise les symboles standardisés de McGoldrick : carrés pour les hommes, cercles pour les femmes, croix pour les décès, lignes pleines pour les unions, lignes pointillées pour les séparations, et des tracés spécifiques pour les liens émotionnels (fusionnel, conflictuel, distant, coupé, violent, etc.).' },
     ],
     ctaTitle: 'Prêt à créer votre génogramme en ligne ?',
-    ctaSub: 'Rejoignez les professionnels qui utilisent Genogy pour cartographier les relations familiales et émotionnelles de leurs patients. Gratuit et sans engagement.',
-    ctaButton: 'Créer mon génogramme gratuitement',
+    ctaSub: 'Rejoignez les professionnels qui utilisent Genogy pour cartographier les relations familiales et émotionnelles de leurs patients. Accès gratuit pendant la bêta.',
+    ctaButton: 'Essayer Genogy gratuitement',
   },
 
   // ── Footer ──
