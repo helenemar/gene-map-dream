@@ -37,7 +37,7 @@ const SECTIONS = [
   },
   {
     title: '8. Tarification',
-    content: `Genogy est actuellement proposé en accès gratuit pendant la phase bêta. L'éditeur se réserve le droit d'introduire des offres payantes à l'avenir. Les utilisateurs seront informés de tout changement tarifaire avec un préavis raisonnable.`,
+    content: `Genogy est actuellement en phase bêta avec un accès gratuit à l'ensemble des fonctionnalités. L'éditeur se réserve le droit d'introduire des offres payantes à la fin de la phase bêta. Les utilisateurs seront informés de tout changement tarifaire avec un préavis raisonnable.`,
   },
   {
     title: '9. Résiliation',
