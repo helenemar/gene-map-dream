@@ -17,7 +17,12 @@ const CookieBanner: React.FC = () => {
   }, []);
 
   const handleAccept = () => {
-    localStorage.setItem(COOKIE_KEY, 'true');
+    localStorage.setItem(COOKIE_KEY, 'accepted');
+    setVisible(false);
+  };
+
+  const handleReject = () => {
+    localStorage.setItem(COOKIE_KEY, 'rejected');
     setVisible(false);
   };
 
