@@ -71,6 +71,8 @@ interface MemberCardProps {
   isLinkDragging?: boolean;
   /** Force a simple click to select even for draft/placeholder cards */
   forceSelectOnClick?: boolean;
+  /** Tutorial: highlight create dropdown items */
+  tutorialCreateHighlight?: boolean;
 }
 
 const EDGE_DOTS: { side: AnchorSide; pos: React.CSSProperties }[] = [
