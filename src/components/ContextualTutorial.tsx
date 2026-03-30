@@ -406,7 +406,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[100] pointer-events-none"
         >
-          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && (
+          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-parent' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <mask id="ctx-tuto-mask">
