@@ -658,56 +658,113 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                 left: '35%',
               }}
             >
-              {/* Cursor hand that moves diagonally to draw rectangle */}
+              {/* Phase 1: Cursor clicks down, drags diagonally, releases */}
               <motion.div
                 animate={{
-                  x: [0, 120, 120, 0],
-                  y: [0, 80, 80, 0],
+                  x: [0, 0, 160, 160, 160, 0],
+                  y: [0, 0, 100, 100, 100, 0],
+                  scale: [1, 0.85, 0.85, 0.85, 1, 1],
                 }}
                 transition={{
-                  duration: 3,
+                  duration: 4,
                   repeat: Infinity,
                   ease: 'easeInOut',
-                  times: [0, 0.4, 0.7, 1],
+                  times: [0, 0.08, 0.45, 0.6, 0.65, 1],
                 }}
               >
-                <div className="relative" style={{ filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.35))' }}>
+                <div className="relative" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))' }}>
                   <MousePointerClick
                     className="text-white"
-                    style={{ width: 36, height: 36 }}
-                    strokeWidth={4}
+                    style={{ width: 32, height: 32 }}
+                    strokeWidth={3.5}
                   />
                   <MousePointerClick
                     className="absolute inset-0 text-foreground"
-                    style={{ width: 36, height: 36 }}
+                    style={{ width: 32, height: 32 }}
                     strokeWidth={2}
                   />
                 </div>
               </motion.div>
-              {/* Animated selection rectangle */}
-              <svg className="absolute top-0 left-0 overflow-visible" width="1" height="1" style={{ pointerEvents: 'none' }}>
+              {/* Animated selection rectangle with gradient fill */}
+              <svg className="absolute top-0 left-0 overflow-visible" width="200" height="140" style={{ pointerEvents: 'none' }}>
+                <defs>
+                  <linearGradient id="marquee-grad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.12" />
+                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.04" />
+                  </linearGradient>
+                </defs>
                 <motion.rect
-                  x={4}
-                  y={4}
+                  x={8}
+                  y={8}
+                  rx={6}
                   initial={{ width: 0, height: 0, opacity: 0 }}
                   animate={{
-                    width: [0, 120, 120, 0],
-                    height: [0, 80, 80, 0],
-                    opacity: [0, 1, 1, 0],
+                    width: [0, 0, 160, 160, 160, 0],
+                    height: [0, 0, 100, 100, 100, 0],
+                    opacity: [0, 0, 1, 1, 0.6, 0],
                   }}
                   transition={{
-                    duration: 3,
+                    duration: 4,
                     repeat: Infinity,
                     ease: 'easeInOut',
-                    times: [0, 0.4, 0.7, 1],
+                    times: [0, 0.08, 0.45, 0.6, 0.65, 1],
                   }}
-                  fill="hsl(var(--primary) / 0.08)"
+                  fill="url(#marquee-grad)"
                   stroke="hsl(var(--primary))"
                   strokeWidth={1.5}
-                  strokeDasharray="6 3"
-                  rx={4}
-                />
+                  strokeDasharray="8 4"
+                  strokeLinecap="round"
+                >
+                  <animate
+                    attributeName="stroke-dashoffset"
+                    from="0" to="-24"
+                    dur="1.5s"
+                    repeatCount="indefinite"
+                  />
+                </motion.rect>
+                {/* Corner dots that appear when rectangle is drawn */}
+                {[[8, 8], [168, 8], [8, 108], [168, 108]].map(([cx, cy], i) => (
+                  <motion.circle
+                    key={i}
+                    cx={cx}
+                    cy={cy}
+                    r={3}
+                    fill="hsl(var(--primary))"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{
+                      opacity: [0, 0, 0, 1, 1, 0],
+                      scale: [0, 0, 0, 1, 1, 0],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      times: [0, 0.08, 0.42, 0.48, 0.6, 0.65],
+                      delay: i * 0.03,
+                    }}
+                  />
+                ))}
               </svg>
+              {/* "Sélectionné !" label that pops in after rectangle completes */}
+              <motion.div
+                className="absolute pointer-events-none"
+                style={{ top: 50, left: 60 }}
+                animate={{
+                  opacity: [0, 0, 0, 1, 1, 0],
+                  scale: [0.6, 0.6, 0.6, 1, 1, 0.8],
+                  y: [4, 4, 4, 0, 0, 4],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  times: [0, 0.08, 0.47, 0.55, 0.62, 0.7],
+                }}
+              >
+                <span className="px-2.5 py-1 rounded-full bg-primary/90 text-primary-foreground text-[11px] font-medium shadow-lg backdrop-blur-sm">
+                  ✓ Sélection
+                </span>
+              </motion.div>
             </motion.div>
           )}
 
