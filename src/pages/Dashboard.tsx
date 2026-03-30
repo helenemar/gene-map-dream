@@ -63,6 +63,7 @@ const Dashboard: React.FC = () => {
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [betaModalOpen, setBetaModalOpen] = useState(false);
+  const [betaLimitOpen, setBetaLimitOpen] = useState(false);
   const [notesModal, setNotesModal] = useState<{ open: boolean; genogramId: string; genogramName: string }>({ open: false, genogramId: '', genogramName: '' });
   const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
   const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
