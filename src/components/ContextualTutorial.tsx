@@ -80,7 +80,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
 
   // Track DOM element position
   useEffect(() => {
-    if (!currentStep || !targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
+    if (!currentStep) { setSpotlight(null); setEditBtnPos(null); setLinkDragPositions(null); return; }
 
     const padding = tip?.padding ?? 14;
 
@@ -100,7 +100,36 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           setSpotlight(null);
         }
         setEditBtnPos(null);
+        setLinkDragPositions(null);
+      } else if (currentStep === 'link-demo') {
+        // Highlight area encompassing both PI and father cards
+        if (firstMember && fatherMember) {
+          const piEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
+          const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
+          if (piEl && fatherEl) {
+            const piRect = piEl.getBoundingClientRect();
+            const fatherRect = fatherEl.getBoundingClientRect();
+            const minX = Math.min(piRect.left, fatherRect.left) - padding;
+            const minY = Math.min(piRect.top, fatherRect.top) - padding;
+            const maxX = Math.max(piRect.right, fatherRect.right) + padding;
+            const maxY = Math.max(piRect.bottom, fatherRect.bottom) + padding;
+            setSpotlight({ top: minY, left: minX, width: maxX - minX, height: maxY - minY });
+
+            // Anchor positions: from PI right-side dot to father center
+            setLinkDragPositions({
+              fromX: piRect.right,
+              fromY: piRect.top + piRect.height / 2,
+              toX: fatherRect.left + fatherRect.width / 2,
+              toY: fatherRect.top + fatherRect.height / 2,
+            });
+          } else {
+            setSpotlight(null);
+            setLinkDragPositions(null);
+          }
+        }
+        setEditBtnPos(null);
       } else {
+        if (!targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
         const el = document.querySelector(`[data-member-card="${targetMember.id}"]`);
         if (el) {
           const rect = el.getBoundingClientRect();
@@ -126,12 +155,13 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         } else {
           setEditBtnPos(null);
         }
+        setLinkDragPositions(null);
       }
       rafRef.current = requestAnimationFrame(update);
     };
     update();
     return () => cancelAnimationFrame(rafRef.current);
-  }, [currentStep, targetMember, tip]);
+  }, [currentStep, targetMember, firstMember, fatherMember, tip]);
 
   // Tooltip position
   const cardStyle = useMemo((): React.CSSProperties => {
