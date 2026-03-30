@@ -300,14 +300,14 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
   }
 
   // ═══ PHASE 3: Render with crossing avoidance ═══
-  const badgeData: { unionObj: Union; midX: number; midY: number }[] = [];
+  const badgeData: { unionObj: Union; midX: number; midY: number; leftX: number; rightX: number }[] = [];
 
   const linesContent = geometries.map((geo) => {
     const { union, leftAnchor, rightAnchor, unionLineY, unionMidX,
             childMembers, childAnchors, combY, combLeftX, combRightX,
             effectiveDropCount, nonTwinCount, twinForkXs } = geo;
 
-    badgeData.push({ unionObj: union, midX: unionMidX, midY: unionLineY });
+    badgeData.push({ unionObj: union, midX: unionMidX, midY: unionLineY, leftX: leftAnchor.x, rightX: rightAnchor.x });
 
     if (childMembers.length === 0) {
       return (
