@@ -176,6 +176,7 @@ export function useContextualTutorial(
     setCurrentStep(null);
     startedRef.current = false;
     parentEditFlowRef.current = false;
+    siblingEditFlowRef.current = false;
   }, [doneStorageKey]);
 
   const active = currentStep !== null;
