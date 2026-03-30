@@ -188,6 +188,27 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
               />
             </motion.div>
           )}
+
+          {/* Animated pointing hand for card-intro */}
+          {spotlight && currentStep === 'card-intro' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 20 }}
+              className="absolute pointer-events-none z-[102]"
+              style={{
+                top: spotlight.top + spotlight.height - 28,
+                left: spotlight.left + spotlight.width / 2 + 10,
+              }}
+            >
+              <motion.div
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <span className="text-3xl drop-shadow-lg" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>👆</span>
+              </motion.div>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Tooltip */}
