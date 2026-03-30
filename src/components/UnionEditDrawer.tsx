@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { Union, UnionStatus, FAMILY_LINK_TYPES } from '@/types/genogram';
 import { Trash2 } from 'lucide-react';
+import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   Select,
   SelectContent,
