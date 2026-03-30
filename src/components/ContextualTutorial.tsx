@@ -59,6 +59,24 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Maintenez le clic et glissez vers la carte de l\'enfant, puis relâchez pour créer le lien émotionnel.',
     padding: 24,
   },
+  'create-select-parent': {
+    icon: <UserRound className="w-5 h-5" />,
+    title: 'Sélectionnez le parent 1',
+    description: 'Cliquez sur la carte du parent 1 pour le sélectionner.',
+    padding: 14,
+  },
+  'create-click-button': {
+    icon: <UserPlus className="w-5 h-5" />,
+    title: 'Créer un membre',
+    description: 'Cliquez sur le bouton « Créer un membre » sous la carte.',
+    padding: 8,
+  },
+  'create-pick-parent': {
+    icon: <User className="w-5 h-5" />,
+    title: 'Choisissez « Parent »',
+    description: 'Sélectionnez « Parent » dans le menu déroulant pour ajouter un parent 2.',
+    padding: 8,
+  },
 };
 
 interface ContextualTutorialProps {
