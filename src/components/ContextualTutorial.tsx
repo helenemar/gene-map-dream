@@ -44,7 +44,7 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
   'parent-selected': {
     icon: <Pencil className="w-5 h-5" />,
     title: 'Modifier le père',
-    description: 'Double-cliquez sur la carte ou cliquez sur l\'icône ✏️ pour modifier ses informations.',
+    description: 'Cliquez sur l\'icône ✏️ pour modifier ses informations.',
     padding: 14,
   },
   'link-demo': {
