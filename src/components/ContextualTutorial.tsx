@@ -52,11 +52,12 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
 interface ContextualTutorialProps {
   currentStep: ContextualTutoStep;
   firstMember: FamilyMember | null;
+  fatherMember: FamilyMember | null;
   onFinish: () => void;
 }
 
 const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
-  currentStep, firstMember, onFinish,
+  currentStep, firstMember, fatherMember, onFinish,
 }) => {
   const [spotlight, setSpotlight] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [editBtnPos, setEditBtnPos] = useState<{ top: number; left: number } | null>(null);
