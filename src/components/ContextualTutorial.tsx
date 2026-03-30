@@ -811,7 +811,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         </motion.div>
 
         {/* Tooltip — hidden during link-drag-release (only spotlight on child) */}
-        {currentStep !== 'link-drag-release' && (
+        {currentStep !== 'link-drag-release' && !tipHidden && (
         <motion.div
           initial={{ opacity: 0, scale: 0.92, y: 8 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
