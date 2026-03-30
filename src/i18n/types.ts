@@ -201,4 +201,22 @@ export interface Translations {
     multiDragTitle: string; multiDragDesc: string;
   };
   pathologyNames: Record<string, string>;
+  howToGenogram: {
+    metaTitle: string; metaDesc: string;
+    badge: string;
+    heroTitle: string; heroDesc: string;
+    ctaCreate: string; ctaWhat: string;
+    whyTitle: string; whyDesc: string;
+    whyItems: string[];
+    whyImgAlt: string;
+    stepsTitle: string; stepsSub: string;
+    stepLabel: string;
+    steps: { title: string; content: string; listItems?: string[]; gridItems?: { label: string; desc: string }[] }[];
+    tipsTitle: string; tips: string[];
+    ctaEndTitle: string; ctaEndDesc: string;
+    ctaEndButton: string; ctaEndLink: string;
+    emotionalLabels: { label: string; color: string }[];
+    pathologyTags: string[];
+    exportItems: { label: string; desc: string }[];
+  };
 }
