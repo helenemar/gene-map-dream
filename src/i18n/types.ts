@@ -197,6 +197,8 @@ export interface Translations {
     parentSelectedTitle: string; parentSelectedDesc: string;
     linkClickDotTitle: string; linkClickDotDesc: string;
     linkDragReleaseTitle: string; linkDragReleaseDesc: string;
+    createMemberTitle: string; createMemberDesc: string;
+    dragSingleTitle: string; dragSingleDesc: string;
     multiSelectTitle: string; multiSelectDesc: string;
     multiDragTitle: string; multiDragDesc: string;
   };
