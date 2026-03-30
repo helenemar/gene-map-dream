@@ -15,6 +15,8 @@ import ResetPassword from "./pages/ResetPassword";
 import SharedGenogram from "./pages/SharedGenogram";
 import SharedEditor from "./pages/SharedEditor";
 import NotFound from "./pages/NotFound";
+import GenogramDefinition from "./pages/GenogramDefinition";
+import HowToGenogram from "./pages/HowToGenogram";
 import Account from "./pages/Account";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import LegalNotice from "./pages/LegalNotice";
