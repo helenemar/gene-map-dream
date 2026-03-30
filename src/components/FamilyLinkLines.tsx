@@ -634,14 +634,15 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
         })}
       </svg>
 
-      {/* Union line hover delete zones */}
-      {variant === 'default' && onDeleteUnion && badgeData.map(({ unionObj, midX, midY, leftX, rightX }) => {
+      {/* Union line hover action zones */}
+      {variant === 'default' && badgeData.map(({ unionObj, midX, midY, leftX, rightX }) => {
         const lineWidth = rightX - leftX;
         if (lineWidth < 20) return null;
         const isHovered = hoveredUnionId === unionObj.id;
+        const hasChildren = unionObj.children && unionObj.children.length > 0;
         return (
           <div
-            key={`delete-zone-${unionObj.id}`}
+            key={`action-zone-${unionObj.id}`}
             className="absolute"
             style={{
               left: leftX,
@@ -654,7 +655,19 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
             onMouseEnter={() => setHoveredUnionId(unionObj.id)}
             onMouseLeave={() => setHoveredUnionId(null)}
           >
-            {isHovered && (
+            {isHovered && hasChildren && onEditUnion && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditUnion(unionObj.id);
+                }}
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md hover:bg-primary/90 transition-all duration-150 animate-scale-in"
+                title="Modifier l'union"
+              >
+                <Pencil className="w-3 h-3" />
+              </button>
+            )}
+            {isHovered && !hasChildren && onDeleteUnion && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
