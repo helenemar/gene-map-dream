@@ -137,7 +137,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   return (
     <AnimatePresence mode="wait">
       <React.Fragment key={currentStep}>
-        {/* Overlay with spotlight cutout */}
+        {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -145,26 +145,28 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[100] pointer-events-none"
         >
-          <svg className="w-full h-full" preserveAspectRatio="none">
-            <defs>
-              <mask id="ctx-tuto-mask">
-                <rect width="100%" height="100%" fill="white" />
-                {spotlight && (
-                  <motion.rect
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    x={spotlight.left}
-                    y={spotlight.top}
-                    width={spotlight.width}
-                    height={spotlight.height}
-                    rx={16}
-                    fill="black"
-                  />
-                )}
-              </mask>
-            </defs>
-            <rect width="100%" height="100%" fill="rgba(0,0,0,0.5)" mask="url(#ctx-tuto-mask)" />
-          </svg>
+          {currentStep !== 'edit-hint' && (
+            <svg className="w-full h-full" preserveAspectRatio="none">
+              <defs>
+                <mask id="ctx-tuto-mask">
+                  <rect width="100%" height="100%" fill="white" />
+                  {spotlight && (
+                    <motion.rect
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      x={spotlight.left}
+                      y={spotlight.top}
+                      width={spotlight.width}
+                      height={spotlight.height}
+                      rx={16}
+                      fill="black"
+                    />
+                  )}
+                </mask>
+              </defs>
+              <rect width="100%" height="100%" fill="rgba(0,0,0,0.5)" mask="url(#ctx-tuto-mask)" />
+            </svg>
+          )}
 
           {/* Tutorial-specific highlight — dashed animated border */}
           {spotlight && (
