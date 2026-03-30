@@ -427,23 +427,55 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
 
           {/* Animated pointing cursor for link-click-dot → points at a dot on the card */}
           {currentStep === 'link-click-dot' && closestDotPos && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 20 }}
-              className="absolute pointer-events-none z-[102]"
-              style={{
-                top: closestDotPos.y + 4,
-                left: closestDotPos.x + 4,
-              }}
-            >
+            <>
+              {/* Pulsing ring on the anchor dot */}
               <motion.div
-                animate={{ x: [-4, 2, -4] }}
-                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute pointer-events-none z-[102]"
+                style={{
+                  top: closestDotPos.y,
+                  left: closestDotPos.x,
+                  transform: 'translate(-50%, -50%)',
+                }}
               >
-                <MousePointerClick className="w-9 h-9 text-primary drop-shadow-lg" strokeWidth={2.2} />
+                <motion.div
+                  animate={{ scale: [1, 1.8, 1], opacity: [0.7, 0, 0.7] }}
+                  transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="w-6 h-6 rounded-full border-2 border-primary"
+                />
               </motion.div>
-            </motion.div>
+              <motion.div
+                className="absolute pointer-events-none z-[102]"
+                style={{
+                  top: closestDotPos.y,
+                  left: closestDotPos.x,
+                  transform: 'translate(-50%, -50%)',
+                }}
+              >
+                <motion.div
+                  animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.4, 0.8, 0.4] }}
+                  transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="w-4 h-4 rounded-full bg-primary"
+                />
+              </motion.div>
+              {/* Cursor pointing at the dot */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 20 }}
+                className="absolute pointer-events-none z-[102]"
+                style={{
+                  top: closestDotPos.y + 10,
+                  left: closestDotPos.x + 10,
+                }}
+              >
+                <motion.div
+                  animate={{ x: [-2, 2, -2], y: [-2, 2, -2] }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <MousePointerClick className="w-8 h-8 text-primary drop-shadow-lg" strokeWidth={2.2} />
+                </motion.div>
+              </motion.div>
+            </>
           )}
 
           {/* Animated drag cursor for link-drag-release: shows drag from anchor to target */}
