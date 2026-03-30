@@ -13,7 +13,7 @@ export function useContextualTutorial(memberCount: number, drawerOpen: boolean, 
 
   const [active, setActive] = useState(false);
   const [step, setStep] = useState(0);
-  const [done, setDone] = useState(() => localStorage.getItem(CONTEXTUAL_TUTO_DONE_KEY) === '1');
+  const [done, setDone] = useState(() => !isAllowedUser || localStorage.getItem(CONTEXTUAL_TUTO_DONE_KEY) === '1');
   const prevCount = useRef(memberCount);
   const waitingForDrawerClose = useRef(false);
 
