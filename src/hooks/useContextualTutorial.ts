@@ -7,7 +7,7 @@ export type ContextualTutoStep =
   | 'parent-intro' | 'parent-selected'
   | 'link-click-dot' | 'link-drag-release'
   | 'create-select-pi' | 'create-click-button' | 'create-pick-sibling'
-  | 'drag-card'
+  | 'drag-card' | 'multi-select'
   | 'union-select-both' | 'union-click-button'
   | null;
 
