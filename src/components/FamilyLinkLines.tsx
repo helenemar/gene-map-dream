@@ -633,6 +633,42 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
           );
         })}
       </svg>
+
+      {/* Union line hover delete zones */}
+      {variant === 'default' && onDeleteUnion && badgeData.map(({ unionObj, midX, midY, leftX, rightX }) => {
+        const lineWidth = rightX - leftX;
+        if (lineWidth < 20) return null;
+        const isHovered = hoveredUnionId === unionObj.id;
+        return (
+          <div
+            key={`delete-zone-${unionObj.id}`}
+            className="absolute"
+            style={{
+              left: leftX,
+              top: midY - 12,
+              width: lineWidth,
+              height: 24,
+              zIndex: 101,
+              cursor: 'default',
+            }}
+            onMouseEnter={() => setHoveredUnionId(unionObj.id)}
+            onMouseLeave={() => setHoveredUnionId(null)}
+          >
+            {isHovered && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteUnion(unionObj.id);
+                }}
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-md hover:bg-destructive/90 transition-all duration-150 animate-scale-in"
+                title="Supprimer l'union"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        );
+      })}
     </>
   );
 };
