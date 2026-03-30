@@ -81,7 +81,7 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
           transition={{ duration: 0.15 }}
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={(e) => { e.stopPropagation(); onClose(); }} />
 
           {/* Modal */}
           <motion.div
