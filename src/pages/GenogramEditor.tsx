@@ -1504,16 +1504,22 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   }, []);
 
   // ─── Link drag handlers ───
-  const handleLinkDragStart = useCallback((fromId: string, e: React.MouseEvent) => {
+  const handleLinkDragStart = useCallback((fromId: string, e: React.MouseEvent, side?: 'top' | 'bottom' | 'left' | 'right') => {
     setAnchorActiveMember(fromId);
     const member = members.find(m => m.id === fromId);
     if (!member) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    // Source anchor = center of card in world space
-    const cx = member.x + CARD_W / 2;
-    const cy = member.y + CARD_H / 2;
+    // Source anchor based on the side the user clicked
+    let cx: number, cy: number;
+    switch (side) {
+      case 'top':    cx = member.x + CARD_W / 2; cy = member.y; break;
+      case 'bottom': cx = member.x + CARD_W / 2; cy = member.y + CARD_H; break;
+      case 'left':   cx = member.x;               cy = member.y + CARD_H / 2; break;
+      case 'right':  cx = member.x + CARD_W;      cy = member.y + CARD_H / 2; break;
+      default:       cx = member.x + CARD_W / 2;  cy = member.y + CARD_H / 2; break;
+    }
     // Cursor in world space
     const cursorWorldX = (e.clientX - rect.left - pan.x) / zoom;
     const cursorWorldY = (e.clientY - rect.top - pan.y) / zoom;

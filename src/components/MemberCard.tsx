@@ -139,7 +139,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       return;
     }
     // Direct drag start from any visible dot state (hover, selected, or anchor-active)
-    onLinkDragStart?.(member.id, e);
+    onLinkDragStart?.(member.id, e, side);
   }, [isStatic, member.id, onLinkDragStart]);
 
   const handleCancelAnchor = useCallback((e: React.MouseEvent) => {
