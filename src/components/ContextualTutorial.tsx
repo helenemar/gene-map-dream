@@ -861,7 +861,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.05 }}
-                    className={currentStep === 'edit-hint' ? 'text-[13px] text-muted-foreground leading-relaxed' : 'text-xs text-muted-foreground/80 leading-snug'}
+                    className={currentStep === 'edit-hint' ? 'text-[13px] text-muted-foreground leading-relaxed' : 'text-[12px] text-muted-foreground/80 leading-snug'}
                   >
                     {tip.description}
                   </motion.p>
