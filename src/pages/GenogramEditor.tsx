@@ -799,14 +799,6 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   const [newMemberDrawerOpen, setNewMemberDrawerOpen] = useState(false);
   const contextualTutorial = useContextualTutorial(members.length, newMemberDrawerOpen, user?.email);
 
-  // Advance contextual tutorial when edit drawer opens/closes
-  useEffect(() => {
-    if (newMemberDrawerOpen && drawerEditing) contextualTutorial.onEditClicked();
-  }, [newMemberDrawerOpen, drawerEditing]);
-
-  useEffect(() => {
-    if (!newMemberDrawerOpen) contextualTutorial.onDrawerClosed();
-  }, [newMemberDrawerOpen]);
 
   // ─── Parent picker state (for child creation with multiple unions) ───
   const [parentPickerState, setParentPickerState] = useState<{
