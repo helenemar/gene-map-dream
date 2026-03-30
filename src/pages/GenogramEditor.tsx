@@ -2049,6 +2049,31 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
             open={!!editingUnionId}
             onClose={() => setEditingUnionId(null)}
             onUpdate={(updated) => { recordSnapshot(); setUnions(prev => prev.map(u => u.id === updated.id ? updated : u)); }}
+            onDelete={(unionId) => {
+              recordSnapshot();
+              const deletedUnion = unions.find(u => u.id === unionId);
+              if (deletedUnion) {
+                // Find which partner is orphaned (not connected to any other union or as a child)
+                const otherUnions = unions.filter(u => u.id !== unionId);
+                const connectedMemberIds = new Set<string>();
+                for (const u of otherUnions) {
+                  connectedMemberIds.add(u.partner1);
+                  connectedMemberIds.add(u.partner2);
+                  u.children.forEach(c => connectedMemberIds.add(c));
+                }
+                // Also check emotional links
+                for (const el of emotionalLinks) {
+                  connectedMemberIds.add(el.from);
+                  connectedMemberIds.add(el.to);
+                }
+                const orphanIds = [deletedUnion.partner1, deletedUnion.partner2].filter(id => !connectedMemberIds.has(id));
+                setUnions(prev => prev.filter(u => u.id !== unionId));
+                if (orphanIds.length > 0) {
+                  setMembers(prev => prev.filter(m => !orphanIds.includes(m.id)));
+                }
+              }
+              setEditingUnionId(null);
+            }}
             getMemberName={(id) => {
               const m = members.find(m => m.id === id);
               return m ? `${m.firstName} ${m.lastName}` : id;
