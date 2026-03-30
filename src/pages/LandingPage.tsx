@@ -14,10 +14,18 @@ import FaqSection from '@/components/landing/FaqSection';
 import CtaSection from '@/components/landing/CtaSection';
 import Footer from '@/components/Footer';
 
-const LandingPage: React.FC = () => {
+interface LandingPageProps {
+  forceLang?: 'en' | 'de';
+}
+
+const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const { t } = useLanguage();
+  const { t, lang, setLang } = useLanguage();
+
+  React.useEffect(() => {
+    if (forceLang && lang !== forceLang) setLang(forceLang);
+  }, [forceLang]);
   const [authModal, setAuthModal] = useState<{ open: boolean; view: 'login' | 'signup' }>({ open: false, view: 'login' });
 
   React.useEffect(() => {
@@ -74,10 +82,14 @@ const LandingPage: React.FC = () => {
         <title>{t.landing.metaTitle}</title>
         <meta name="description" content={t.landing.metaDesc} />
         <meta name="keywords" content="génogramme, génogramme en ligne, faire un génogramme, comment faire un génogramme, outil génogramme, génogramme site web, génogramme psychologie, arbre familial émotionnel, genogram online" />
-        <link rel="canonical" href="https://genogy.app/" />
+        <link rel="canonical" href={`https://genogy.app${forceLang ? `/${forceLang}` : '/'}`} />
+        <link rel="alternate" hrefLang="fr" href="https://genogy.app/" />
+        <link rel="alternate" hrefLang="en" href="https://genogy.app/en" />
+        <link rel="alternate" hrefLang="de" href="https://genogy.app/de" />
+        <link rel="alternate" hrefLang="x-default" href="https://genogy.app/" />
         <meta property="og:title" content={t.landing.metaTitle} />
         <meta property="og:description" content={t.landing.metaDesc} />
-        <meta property="og:url" content="https://genogy.app/" />
+        <meta property="og:url" content={`https://genogy.app${forceLang ? `/${forceLang}` : '/'}`} />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(howToJsonLd)}</script>
