@@ -222,36 +222,6 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         setEditBtnPos(null);
         setLinkDragPositions(null);
       } else if (currentStep === 'create-click-button') {
-        // Spotlight the "Créer un membre" button under the father card
-        if (fatherMember) {
-          const el = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
-          if (el) {
-            // Find the "Créer un membre" button (it's the one with UserPlus icon)
-            const btns = el.parentElement?.querySelectorAll('button');
-            let createBtn: Element | null = null;
-            btns?.forEach(b => {
-              if (b.textContent?.includes('Créer')) createBtn = b;
-            });
-            if (createBtn) {
-              const btnRect = (createBtn as HTMLElement).getBoundingClientRect();
-              setSpotlight({
-                top: btnRect.top - padding,
-                left: btnRect.left - padding,
-                width: btnRect.width + padding * 2,
-                height: btnRect.height + padding * 2,
-              });
-              setEditBtnPos({ top: btnRect.top + btnRect.height / 2, left: btnRect.left + btnRect.width / 2 });
-            } else {
-              // Fallback: highlight the card
-              const rect = el.getBoundingClientRect();
-              setSpotlight({ top: rect.top - padding, left: rect.left - padding, width: rect.width + padding * 2, height: rect.height + padding * 2 });
-              setEditBtnPos(null);
-            }
-          } else {
-            setSpotlight(null);
-          }
-        }
-        setLinkDragPositions(null);
       } else {
         if (!targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
         const el = document.querySelector(`[data-member-card="${targetMember.id}"]`);
