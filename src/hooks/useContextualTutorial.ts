@@ -7,6 +7,7 @@ export type ContextualTutoStep =
   | 'parent-intro' | 'parent-selected'
   | 'link-click-dot' | 'link-drag-release'
   | 'create-select-parent' | 'create-click-button' | 'create-pick-parent'
+  | 'union-select-both' | 'union-click-button'
   | null;
 
 /**
@@ -124,9 +125,23 @@ export function useContextualTutorial(
     }
   }, [currentStep]);
 
-  // Called when user picks "Parent" in the dropdown (step 10)
+  // Called when user picks "Parent" in the dropdown (step 10) → move to union flow
   const onCreateParentPicked = useCallback(() => {
     if (currentStep === 'create-pick-parent') {
+      setCurrentStep('union-select-both');
+    }
+  }, [currentStep]);
+
+  // Called when 2 members are selected (step 11)
+  const onTwoMembersSelected = useCallback(() => {
+    if (currentStep === 'union-select-both') {
+      setCurrentStep('union-click-button');
+    }
+  }, [currentStep]);
+
+  // Called when user clicks "Créer une union" (step 12)
+  const onUnionCreated = useCallback(() => {
+    if (currentStep === 'union-click-button') {
       finish();
     }
   }, [currentStep, finish]);
@@ -147,6 +162,7 @@ export function useContextualTutorial(
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
     onCreateMemberClicked, onCreateParentPicked,
+    onTwoMembersSelected, onUnionCreated,
     finish, restart,
   };
 }

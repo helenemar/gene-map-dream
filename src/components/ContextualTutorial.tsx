@@ -95,6 +95,18 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Sélectionnez « Parent » dans le menu déroulant pour ajouter un parent 2.',
     padding: 8,
   },
+  'union-select-both': {
+    icon: <Link2 className="w-5 h-5" />,
+    title: 'Sélectionnez les deux parents',
+    description: 'Cliquez sur le parent 1, puis maintenez ⇧ Shift et cliquez sur le parent 2.',
+    padding: 14,
+  },
+  'union-click-button': {
+    icon: <Link2 className="w-5 h-5" />,
+    title: 'Créer l\'union',
+    description: 'Cliquez sur le bouton « Créer une union » qui apparaît entre les deux cartes.',
+    padding: 8,
+  },
 };
 
 interface ContextualTutorialProps {
@@ -254,6 +266,47 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         }
         setEditBtnPos(null);
         setLinkDragPositions(null);
+      } else if (currentStep === 'union-select-both') {
+        // Highlight both parent cards
+        if (firstMember && fatherMember) {
+          const piEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
+          const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
+          if (piEl && fatherEl) {
+            const piRect = piEl.getBoundingClientRect();
+            const fatherRect = fatherEl.getBoundingClientRect();
+            const minX = Math.min(piRect.left, fatherRect.left) - padding;
+            const minY = Math.min(piRect.top, fatherRect.top) - padding;
+            const maxX = Math.max(piRect.right, fatherRect.right) + padding;
+            const maxY = Math.max(piRect.bottom, fatherRect.bottom) + padding;
+            setSpotlight({ top: minY, left: minX, width: maxX - minX, height: maxY - minY });
+          } else {
+            setSpotlight(null);
+          }
+        }
+        setEditBtnPos(null);
+        setLinkDragPositions(null);
+      } else if (currentStep === 'union-click-button') {
+        // Highlight the floating "Créer une union" button
+        // It's a fixed-position button with text "Créer une union"
+        const allBtns = document.querySelectorAll('button');
+        let unionBtn: Element | null = null;
+        allBtns.forEach(b => {
+          if (b.textContent?.includes('Créer une union') || b.textContent?.includes("Modifier l'union")) unionBtn = b;
+        });
+        if (unionBtn) {
+          const rect = (unionBtn as HTMLElement).getBoundingClientRect();
+          setSpotlight({
+            top: rect.top - padding,
+            left: rect.left - padding,
+            width: rect.width + padding * 2,
+            height: rect.height + padding * 2,
+          });
+          setEditBtnPos({ top: rect.top + rect.height / 2, left: rect.left + rect.width / 2 });
+        } else {
+          setSpotlight(null);
+          setEditBtnPos(null);
+        }
+        setLinkDragPositions(null);
       } else {
         if (!targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
         const el = document.querySelector(`[data-member-card="${targetMember.id}"]`);
@@ -360,7 +413,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-parent' && !drawerOpen && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-parent' && currentStep !== 'union-click-button' && !drawerOpen && (
           spotlight ? (
             <>
               <button
@@ -424,7 +477,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[100] pointer-events-none"
         >
-          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-parent' && (
+          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-parent' && currentStep !== 'union-click-button' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <mask id="ctx-tuto-mask">
@@ -513,7 +566,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           )}
 
           {/* Animated pointing cursor for card-selected / parent-selected → points at edit button */}
-          {editBtnPos && (currentStep === 'card-selected' || currentStep === 'parent-selected' || currentStep === 'create-click-button') && (
+          {editBtnPos && (currentStep === 'card-selected' || currentStep === 'parent-selected' || currentStep === 'create-click-button' || currentStep === 'union-click-button') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
