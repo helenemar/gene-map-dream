@@ -135,7 +135,8 @@ export function useContextualTutorial(
   // Called when user picks "Frère/Sœur" in the dropdown → move to drag step
   const onCreateSiblingPicked = useCallback(() => {
     if (currentStep === 'create-pick-sibling') {
-      setCurrentStep('drag-card');
+      siblingEditFlowRef.current = true;
+      setCurrentStep('edit-hint');
     }
   }, [currentStep]);
 
