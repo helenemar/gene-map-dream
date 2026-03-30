@@ -49,8 +49,8 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
   },
   'edit-hint': {
     icon: <CheckCircle className="w-5 h-5" />,
-    title: 'Panneau d\'édition',
-    description: 'Complétez les informations ici : prénom, dates, pathologies… Cliquez sur Enregistrer pour continuer.',
+    title: 'Remplissez les informations',
+    description: 'Complétez les champs (prénom, dates, profession…) puis fermez le panneau pour continuer.',
     padding: 14,
   },
   'parent-intro': {
@@ -499,6 +499,28 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[100] pointer-events-none"
         >
+          {/* Dark overlay with spotlight cutout for edit-hint (drawer highlight) */}
+          {currentStep === 'edit-hint' && spotlight && (
+            <svg className="w-full h-full" preserveAspectRatio="none">
+              <defs>
+                <mask id="ctx-tuto-mask-edit">
+                  <rect width="100%" height="100%" fill="white" />
+                  <motion.rect
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    x={spotlight.left}
+                    y={spotlight.top}
+                    width={spotlight.width}
+                    height={spotlight.height}
+                    rx={12}
+                    fill="black"
+                  />
+                </mask>
+              </defs>
+              <rect width="100%" height="100%" fill="rgba(0,0,0,0.45)" mask="url(#ctx-tuto-mask-edit)" />
+            </svg>
+          )}
+
           {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'multi-select' && currentStep !== 'union-click-button' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
