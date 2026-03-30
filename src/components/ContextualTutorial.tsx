@@ -142,6 +142,15 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
 
   const tip = currentStep ? TIPS[currentStep] : null;
 
+  // Reset tipHidden when step changes
+  const prevStepRef = useRef(currentStep);
+  useEffect(() => {
+    if (currentStep !== prevStepRef.current) {
+      setTipHidden(false);
+      prevStepRef.current = currentStep;
+    }
+  }, [currentStep]);
+
   // Determine which member to target based on step
   const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected')
     ? fatherMember
