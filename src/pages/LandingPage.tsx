@@ -57,12 +57,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: 'Genogy',
-    url: 'https://genogy.app/',
+    url: 'https://genogy-app.com/',
     applicationCategory: 'HealthApplication',
     operatingSystem: 'Web',
     description: t.landing.metaDesc,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
-    screenshot: 'https://genogy.app/og-image.png',
+    screenshot: 'https://genogy-app.com/og-image.png',
     aggregateRating: undefined,
   };
 
@@ -98,14 +98,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
         <title>{t.landing.metaTitle}</title>
         <meta name="description" content={t.landing.metaDesc} />
         <meta name="keywords" content="génogramme, génogramme en ligne, faire un génogramme, comment faire un génogramme, outil génogramme, génogramme site web, génogramme psychologie, arbre familial émotionnel, genogram online" />
-        <link rel="canonical" href={`https://genogy.app${forceLang ? `/${forceLang}` : '/'}`} />
-        <link rel="alternate" hrefLang="fr" href="https://genogy.app/" />
-        <link rel="alternate" hrefLang="en" href="https://genogy.app/en" />
-        <link rel="alternate" hrefLang="de" href="https://genogy.app/de" />
-        <link rel="alternate" hrefLang="x-default" href="https://genogy.app/" />
+        <link rel="canonical" href={`https://genogy-app.com${forceLang ? `/${forceLang}` : '/'}`} />
+        <link rel="alternate" hrefLang="fr" href="https://genogy-app.com/" />
+        <link rel="alternate" hrefLang="en" href="https://genogy-app.com/en" />
+        <link rel="alternate" hrefLang="de" href="https://genogy-app.com/de" />
+        <link rel="alternate" hrefLang="x-default" href="https://genogy-app.com/" />
         <meta property="og:title" content={t.landing.metaTitle} />
         <meta property="og:description" content={t.landing.metaDesc} />
-        <meta property="og:url" content={`https://genogy.app${forceLang ? `/${forceLang}` : '/'}`} />
+        <meta property="og:url" content={`https://genogy-app.com${forceLang ? `/${forceLang}` : '/'}`} />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(howToJsonLd)}</script>

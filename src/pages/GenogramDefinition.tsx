@@ -18,20 +18,20 @@ const GenogramDefinition: React.FC = () => {
       <Helmet>
         <title>Qu'est-ce qu'un génogramme ? Définition, symboles et exemples | Genogy</title>
         <meta name="description" content="Découvrez ce qu'est un génogramme : définition, symboles standardisés McGoldrick, différences avec l'arbre généalogique, et comment créer un génogramme en ligne avec Genogy." />
-        <link rel="canonical" href="https://genogy.app/genogramme" />
+        <link rel="canonical" href="https://genogy-app.com/genogramme" />
         <meta property="og:title" content="Qu'est-ce qu'un génogramme ? Définition et symboles | Genogy" />
         <meta property="og:description" content="Tout savoir sur le génogramme : définition, symboles, utilisation en psychologie et travail social. Créez le vôtre en ligne avec Genogy." />
-        <meta property="og:url" content="https://genogy.app/genogramme" />
+        <meta property="og:url" content="https://genogy-app.com/genogramme" />
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'Article',
           headline: "Qu'est-ce qu'un génogramme ? Définition, symboles et exemples",
           description: "Guide complet sur le génogramme : définition, symboles McGoldrick, différences avec l'arbre généalogique, et utilisation en psychologie clinique.",
           author: { '@type': 'Organization', name: 'Genogy' },
-          publisher: { '@type': 'Organization', name: 'Genogy', url: 'https://genogy.app' },
+          publisher: { '@type': 'Organization', name: 'Genogy', url: 'https://genogy-app.com' },
           datePublished: '2025-01-15',
           dateModified: '2026-03-30',
-          mainEntityOfPage: 'https://genogy.app/genogramme',
+          mainEntityOfPage: 'https://genogy-app.com/genogramme',
         })}</script>
       </Helmet>
 

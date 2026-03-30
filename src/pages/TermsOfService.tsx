@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 const SECTIONS = [
   {
     title: '1. Objet',
-    content: `Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») ont pour objet de définir les modalités d'accès et d'utilisation du service **Genogy**, accessible à l'adresse genogy.app.\n\nEn créant un compte ou en utilisant le service, l'utilisateur accepte sans réserve les présentes CGU.`,
+    content: `Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») ont pour objet de définir les modalités d'accès et d'utilisation du service **Genogy**, accessible à l'adresse genogy-app.com.\n\nEn créant un compte ou en utilisant le service, l'utilisateur accepte sans réserve les présentes CGU.`,
   },
   {
     title: '2. Description du service',
@@ -75,10 +75,10 @@ const TermsOfService: React.FC = () => {
       <Helmet>
         <title>Conditions Générales d'Utilisation — Genogy</title>
         <meta name="description" content="Conditions Générales d'Utilisation de Genogy. Modalités d'accès, obligations et responsabilités des utilisateurs." />
-        <link rel="canonical" href="https://genogy.app/terms" />
+        <link rel="canonical" href="https://genogy-app.com/terms" />
         <meta property="og:title" content="CGU — Genogy" />
         <meta property="og:description" content="Conditions Générales d'Utilisation de Genogy." />
-        <meta property="og:url" content="https://genogy.app/terms" />
+        <meta property="og:url" content="https://genogy-app.com/terms" />
       </Helmet>
 
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
@@ -121,8 +121,8 @@ const TermsOfService: React.FC = () => {
           <div className="mt-16 pt-8 border-t border-border">
             <p className="text-sm text-muted-foreground">
               Pour toute question, contactez-nous à{' '}
-              <a href="mailto:contact@genogy.app" className="text-primary hover:underline">
-                contact@genogy.app
+              <a href="mailto:contact@genogy-app.com" className="text-primary hover:underline">
+                contact@genogy-app.com
               </a>.
             </p>
           </div>
