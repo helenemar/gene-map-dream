@@ -144,6 +144,14 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
     <AnimatePresence mode="wait">
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
+        {/* Clickable overlay to catch clicks outside spotlight */}
+        {currentStep !== 'edit-hint' && (
+          <div
+            className="fixed inset-0 z-[99] pointer-events-auto"
+            onClick={() => setShowConfirm(true)}
+          />
+        )}
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
