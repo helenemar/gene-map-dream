@@ -222,7 +222,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
               {dynamicPathologies.map(p => (
                 <div key={p.id} className="flex items-center gap-2.5 text-sm">
                   <div className="w-4 h-4 rounded-[4px] shrink-0" style={{ backgroundColor: p.color_hex }} />
-                  <span className="text-foreground/80">{p.name}</span>
+                  <span className="text-foreground/80">{t.pathologyNames[p.name] ?? p.name}</span>
                 </div>
               ))}
               {dynamicPathologies.length === 0 && (
