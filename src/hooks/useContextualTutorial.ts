@@ -29,6 +29,7 @@ export function useContextualTutorial(
   const [currentStep, setCurrentStep] = useState<ContextualTutoStep>(null);
   const [done, setDone] = useState(() => !isAllowedUser || localStorage.getItem(doneStorageKey) === '1');
   const startedRef = useRef(false);
+  const parentEditFlowRef = useRef(false);
 
   // Reset tutorial state when changing genogram/account scope
   useEffect(() => {
@@ -36,6 +37,7 @@ export function useContextualTutorial(
     setDone(alreadyDone);
     setCurrentStep(null);
     startedRef.current = false;
+    parentEditFlowRef.current = false;
   }, [doneStorageKey, isAllowedUser]);
 
   // Start tutorial as soon as first member exists and no drawer is open
@@ -58,6 +60,7 @@ export function useContextualTutorial(
   // Called when user clicks the edit button on the PI card (step 2)
   const onEditClicked = useCallback(() => {
     if (currentStep === 'card-selected') {
+      parentEditFlowRef.current = false;
       setCurrentStep('edit-hint');
     }
   }, [currentStep]);
@@ -65,10 +68,12 @@ export function useContextualTutorial(
   // Called when the edit drawer is closed
   const onDrawerClosed = useCallback(() => {
     if (currentStep === 'edit-hint') {
-      setCurrentStep('parent-intro');
-    } else if (currentStep === 'parent-selected') {
-      // Father was edited and drawer closed → show link demo
-      setCurrentStep('link-demo');
+      if (parentEditFlowRef.current) {
+        parentEditFlowRef.current = false;
+        setCurrentStep('link-demo');
+      } else {
+        setCurrentStep('parent-intro');
+      }
     }
   }, [currentStep]);
 
@@ -81,8 +86,11 @@ export function useContextualTutorial(
 
   // Called when user opens edit on the father (step 5)
   const onParentEditClicked = useCallback(() => {
-    // No-op: transition to link-demo happens on drawer close via onDrawerClosed
-  }, []);
+    if (currentStep === 'parent-selected') {
+      parentEditFlowRef.current = true;
+      setCurrentStep('edit-hint');
+    }
+  }, [currentStep]);
 
   // Called when user creates their first emotional link
   const onLinkCreated = useCallback(() => {
@@ -94,6 +102,7 @@ export function useContextualTutorial(
   const finish = useCallback(() => {
     setCurrentStep(null);
     setDone(true);
+    parentEditFlowRef.current = false;
     localStorage.setItem(doneStorageKey, '1');
   }, [doneStorageKey]);
 
@@ -102,6 +111,7 @@ export function useContextualTutorial(
     setDone(false);
     setCurrentStep(null);
     startedRef.current = false;
+    parentEditFlowRef.current = false;
   }, [doneStorageKey]);
 
   const active = currentStep !== null;
