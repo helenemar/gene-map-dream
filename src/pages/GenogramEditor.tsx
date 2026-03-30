@@ -566,6 +566,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       let snapX: number | undefined;
       let snapY: number | undefined;
       let snapTargetId: string | undefined;
+      let snapAnchorSide: 'top' | 'bottom' | 'left' | 'right' | undefined;
       let bestDist = Infinity;
 
       const srcX = linkDrag.startX;
