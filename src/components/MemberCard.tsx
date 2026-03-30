@@ -56,7 +56,7 @@ interface MemberCardProps {
   isAdopted?: boolean;
   onView?: (id: string) => void;
   onHover?: (id: string | null) => void;
-  onLinkDragStart?: (id: string, e: React.MouseEvent) => void;
+  onLinkDragStart?: (id: string, e: React.MouseEvent, side?: AnchorSide) => void;
   /** Called when user wants to cancel anchor-active and go back to selected */
   onCancelAnchor?: (id: string) => void;
   /** Show a pulsing ring around this card (onboarding hint) */
