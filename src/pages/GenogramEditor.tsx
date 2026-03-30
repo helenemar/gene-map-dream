@@ -1676,7 +1676,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     <div className="flex flex-col h-screen bg-background">
       <EditorHeader
         searchQuery={search.query}
-        onSearchChange={search.setQuery}
+        onSearchChange={(q) => { search.setQuery(q); if (q.length > 0) contextualTutorial.onSearchUsed(); }}
         onSearchClear={search.clear}
         suggestions={search.suggestions}
         isSearchActive={search.isActive}
