@@ -83,10 +83,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
         <meta name="description" content={t.landing.metaDesc} />
         <meta name="keywords" content="génogramme, génogramme en ligne, faire un génogramme, comment faire un génogramme, outil génogramme, génogramme site web, génogramme psychologie, arbre familial émotionnel, genogram online" />
         <link rel="canonical" href={`https://genogy.app${forceLang ? `/${forceLang}` : '/'}`} />
-        <link rel="alternate" hreflang="fr" href="https://genogy.app/" />
-        <link rel="alternate" hreflang="en" href="https://genogy.app/en" />
-        <link rel="alternate" hreflang="de" href="https://genogy.app/de" />
-        <link rel="alternate" hreflang="x-default" href="https://genogy.app/" />
+        <link rel="alternate" hrefLang="fr" href="https://genogy.app/" />
+        <link rel="alternate" hrefLang="en" href="https://genogy.app/en" />
+        <link rel="alternate" hrefLang="de" href="https://genogy.app/de" />
+        <link rel="alternate" hrefLang="x-default" href="https://genogy.app/" />
         <meta property="og:title" content={t.landing.metaTitle} />
         <meta property="og:description" content={t.landing.metaDesc} />
         <meta property="og:url" content={`https://genogy.app${forceLang ? `/${forceLang}` : '/'}`} />
