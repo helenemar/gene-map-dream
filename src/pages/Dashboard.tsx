@@ -721,6 +721,39 @@ const Dashboard: React.FC = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Beta limit dialog */}
+        <AlertDialog open={betaLimitOpen} onOpenChange={setBetaLimitOpen}>
+          <AlertDialogContent className="max-w-md">
+            <AlertDialogHeader>
+              <div className="flex justify-center mb-2">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <Rocket className="w-7 h-7 text-primary" />
+                </div>
+              </div>
+              <AlertDialogTitle className="text-center text-lg">
+                Limite bêta atteinte
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center space-y-3">
+                <p>
+                  Pendant la version bêta, vous pouvez créer jusqu'à <span className="font-semibold text-foreground">{MAX_GENOGRAMS} génogrammes</span>.
+                </p>
+                <p>
+                  La version complète arrive très bientôt avec <span className="font-semibold text-foreground">autant de génogrammes et de partages que vous le souhaitez</span> !
+                </p>
+                <div className="flex items-center justify-center gap-1.5 pt-1">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-primary">Restez connecté, ça arrive vite !</span>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="sm:justify-center">
+              <AlertDialogAction onClick={() => setBetaLimitOpen(false)}>
+                J'ai compris
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </div>
   );
