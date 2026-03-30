@@ -618,16 +618,15 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           )}
 
           {/* Animated drag cursor for drag-card step */}
-          {currentStep === 'drag-card' && (
+          {currentStep === 'drag-card' && spotlight && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
               className="fixed pointer-events-none z-[102]"
               style={{
-                top: '50%',
-                left: '40%',
-                transform: 'translate(-50%, -50%)',
+                top: spotlight.top + spotlight.height / 2,
+                left: spotlight.left + spotlight.width / 2,
               }}
             >
               <motion.div
