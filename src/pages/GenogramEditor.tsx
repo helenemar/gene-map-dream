@@ -2064,6 +2064,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
             <ContextualTutorial
               currentStep={contextualTutorial.currentStep}
               firstMember={members[0] || null}
+              fatherMember={members[1] || null}
               onFinish={contextualTutorial.finish}
             />
           )}

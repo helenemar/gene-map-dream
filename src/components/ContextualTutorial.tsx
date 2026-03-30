@@ -294,8 +294,8 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </motion.div>
           )}
 
-          {/* Animated pointing cursor for card-intro */}
-          {spotlight && currentStep === 'card-intro' && (
+          {/* Animated pointing cursor for card-intro and parent-intro */}
+          {spotlight && (currentStep === 'card-intro' || currentStep === 'parent-intro') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
