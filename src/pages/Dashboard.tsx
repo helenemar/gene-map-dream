@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Bell, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText, MessageSquarePlus } from 'lucide-react';
+import { Plus, Search, Bell, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText, MessageSquarePlus, Rocket, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -63,6 +63,7 @@ const Dashboard: React.FC = () => {
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [betaModalOpen, setBetaModalOpen] = useState(false);
+  const [betaLimitOpen, setBetaLimitOpen] = useState(false);
   const [notesModal, setNotesModal] = useState<{ open: boolean; genogramId: string; genogramName: string }>({ open: false, genogramId: '', genogramName: '' });
   const [noteCounts, setNoteCounts] = useState<Record<string, number>>({});
   const [latestNoteDates, setLatestNoteDates] = useState<Record<string, string>>({});
@@ -209,7 +210,7 @@ const Dashboard: React.FC = () => {
   const handleCreate = () => {
     const ownCount = (ownGenograms || []).length;
     if (ownCount >= MAX_GENOGRAMS) {
-      toast.error(t.dashboard.limitReached.replace('{max}', String(MAX_GENOGRAMS)), { duration: 3000 });
+      setBetaLimitOpen(true);
       return;
     }
     setCreateModalOpen(true);
@@ -716,6 +717,39 @@ const Dashboard: React.FC = () => {
               <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
               <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                 {t.common.delete}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Beta limit dialog */}
+        <AlertDialog open={betaLimitOpen} onOpenChange={setBetaLimitOpen}>
+          <AlertDialogContent className="max-w-md">
+            <AlertDialogHeader>
+              <div className="flex justify-center mb-2">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <Rocket className="w-7 h-7 text-primary" />
+                </div>
+              </div>
+              <AlertDialogTitle className="text-center text-lg">
+                Limite bêta atteinte
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center space-y-3">
+                <p>
+                  Pendant la version bêta, vous pouvez créer jusqu'à <span className="font-semibold text-foreground">{MAX_GENOGRAMS} génogrammes</span>.
+                </p>
+                <p>
+                  La version complète arrive très bientôt avec <span className="font-semibold text-foreground">autant de génogrammes et de partages que vous le souhaitez</span> !
+                </p>
+                <div className="flex items-center justify-center gap-1.5 pt-1">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-primary">Restez connecté, ça arrive vite !</span>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="sm:justify-center">
+              <AlertDialogAction onClick={() => setBetaLimitOpen(false)}>
+                J'ai compris
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
