@@ -80,10 +80,11 @@ export function useContextualTutorial(
   }, [currentStep]);
 
   // Called when user opens edit on the father (step 5)
-  // Now we just let it open — transition happens on drawer close
   const onParentEditClicked = useCallback(() => {
-    // No-op: we wait for onDrawerClosed to transition
-  }, []);
+    if (currentStep === 'parent-selected') {
+      setCurrentStep('link-demo');
+    }
+  }, [currentStep]);
 
   // Called when user creates their first emotional link
   const onLinkCreated = useCallback(() => {
