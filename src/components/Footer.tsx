@@ -2,8 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import gogyIcon from '@/assets/genogy-icon.svg';
 import { Mail, Twitter, Linkedin } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Footer: React.FC = () => {
+  const { t } = useLanguage();
+
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -19,64 +22,64 @@ const Footer: React.FC = () => {
               <span className="text-[15px] font-semibold text-background tracking-tight">Genogy</span>
             </Link>
             <p className="text-sm leading-relaxed text-background/50 max-w-[240px]">
-              La cartographie systémique au service des professionnels.
+              {t.footer.tagline}
             </p>
           </div>
 
-          {/* Column 2 – Produit */}
+          {/* Column 2 – Product */}
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-widest text-background/40 mb-4">
-              Produit
+              {t.footer.product}
             </h4>
             <ul className="space-y-3">
               <li>
                 <button onClick={() => scrollToSection('features')} className="text-sm hover:text-primary transition-colors">
-                  Fonctionnalités
+                  {t.footer.features}
                 </button>
               </li>
               <li>
                 <Link to="/genogramme" className="text-sm hover:text-primary transition-colors">
-                  Qu'est-ce qu'un génogramme ?
+                  {t.footer.whatIsGenogram}
                 </Link>
               </li>
               <li>
                 <Link to="/comment-faire-un-genogramme" className="text-sm hover:text-primary transition-colors">
-                  Comment faire un génogramme
+                  {t.footer.howToGenogram}
                 </Link>
               </li>
               <li>
                 <span className="text-sm inline-flex items-center gap-1.5">
-                  Tarifs
+                  {t.footer.pricing}
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary px-1.5 py-0.5 rounded">
-                    Bêta
+                    {t.footer.pricingBeta}
                   </span>
                 </span>
               </li>
               <li>
                 <button onClick={() => scrollToSection('faq')} className="text-sm hover:text-primary transition-colors">
-                  FAQ
+                  {t.footer.faq}
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Column 3 – Juridique */}
+          {/* Column 3 – Legal */}
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-widest text-background/40 mb-4">
-              Juridique
+              {t.footer.legal}
             </h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/legal" className="text-sm hover:text-primary transition-colors">Mentions légales</Link>
+                <Link to="/legal" className="text-sm hover:text-primary transition-colors">{t.footer.legalNotice}</Link>
               </li>
               <li>
-                <Link to="/privacy" className="text-sm hover:text-primary transition-colors">Politique de confidentialité (RGPD)</Link>
+                <Link to="/privacy" className="text-sm hover:text-primary transition-colors">{t.footer.privacy}</Link>
               </li>
               <li>
-                <Link to="/terms" className="text-sm hover:text-primary transition-colors">Conditions Générales d'Utilisation</Link>
+                <Link to="/terms" className="text-sm hover:text-primary transition-colors">{t.footer.terms}</Link>
               </li>
               <li>
-                <Link to="/disclaimer" className="text-sm hover:text-primary transition-colors">Avertissement légal</Link>
+                <Link to="/disclaimer" className="text-sm hover:text-primary transition-colors">{t.footer.disclaimer}</Link>
               </li>
             </ul>
           </div>
@@ -84,7 +87,7 @@ const Footer: React.FC = () => {
           {/* Column 4 – Contact */}
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-widest text-background/40 mb-4">
-              Contact
+              {t.footer.contact}
             </h4>
             <ul className="space-y-3">
               <li>
@@ -110,10 +113,10 @@ const Footer: React.FC = () => {
       <div className="border-t border-background/10">
         <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <span className="text-xs text-background/35">
-            © {new Date().getFullYear()} Genogy. Tous droits réservés.
+            {t.footer.copyright}
           </span>
           <span className="text-xs text-background/25">
-            Conçu avec soin pour les professionnels de santé.
+            {t.footer.madeWith}
           </span>
         </div>
       </div>
