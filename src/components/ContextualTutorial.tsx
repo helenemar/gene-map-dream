@@ -59,11 +59,12 @@ interface ContextualTutorialProps {
   currentStep: ContextualTutoStep;
   firstMember: FamilyMember | null;
   fatherMember: FamilyMember | null;
+  drawerOpen?: boolean;
   onFinish: () => void;
 }
 
 const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
-  currentStep, firstMember, fatherMember, onFinish,
+  currentStep, firstMember, fatherMember, drawerOpen = false, onFinish,
 }) => {
   const [spotlight, setSpotlight] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [editBtnPos, setEditBtnPos] = useState<{ top: number; left: number } | null>(null);
@@ -200,7 +201,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && currentStep !== 'link-demo' && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-demo' && !drawerOpen && (
           spotlight ? (
             <>
               <button
