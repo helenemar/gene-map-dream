@@ -14,10 +14,18 @@ import FaqSection from '@/components/landing/FaqSection';
 import CtaSection from '@/components/landing/CtaSection';
 import Footer from '@/components/Footer';
 
-const LandingPage: React.FC = () => {
+interface LandingPageProps {
+  forceLang?: 'en' | 'de';
+}
+
+const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const { t } = useLanguage();
+  const { t, lang, setLang } = useLanguage();
+
+  React.useEffect(() => {
+    if (forceLang && lang !== forceLang) setLang(forceLang);
+  }, [forceLang]);
   const [authModal, setAuthModal] = useState<{ open: boolean; view: 'login' | 'signup' }>({ open: false, view: 'login' });
 
   React.useEffect(() => {
