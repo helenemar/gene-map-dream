@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { X } from 'lucide-react';
 import { FamilyMember, Union, UnionStatus } from '@/types/genogram';
 import UnionBadge from './UnionBadge';
 
