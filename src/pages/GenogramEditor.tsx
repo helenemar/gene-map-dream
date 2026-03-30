@@ -812,6 +812,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   // ─── New member state ───
   const [editingNewMember, setEditingNewMember] = useState<FamilyMember | null>(null);
   const [newMemberDrawerOpen, setNewMemberDrawerOpen] = useState(false);
+  const [lastCreatedSibling, setLastCreatedSibling] = useState<FamilyMember | null>(null);
   const contextualTutorial = useContextualTutorial(
     members.length,
     newMemberDrawerOpen,
