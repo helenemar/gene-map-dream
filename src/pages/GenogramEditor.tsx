@@ -754,10 +754,6 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     }
     if (dragInfo) {
       contextualTutorial.onCardDragged();
-      // If multi-dragging (group), advance tutorial
-      if (dragInfo.groupOffsets && Object.keys(dragInfo.groupOffsets).length > 1) {
-        contextualTutorial.onMultiDragged();
-      }
     }
     setSmartGuides([]);
     setDragInfo(null);
@@ -836,9 +832,6 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       if (members[0] && selectedMembers.has(members[0].id)) {
         contextualTutorial.onPiSelectedForCreation();
       }
-    }
-    if (selectedMembers.size >= 2) {
-      contextualTutorial.onMultiSelected();
     }
   }, [selectedMembers, members, contextualTutorial.currentStep]);
 
@@ -1317,12 +1310,10 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     setEditingNewMember(newMember);
     setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
-    if (relationship === 'sibling') {
-      contextualTutorial.onCreateSiblingPicked();
-      setLastCreatedSibling(newMember);
-    }
+    if (relationship === 'sibling') setLastCreatedSibling(newMember);
+    contextualTutorial.onCreateMemberClicked();
     setTimeout(() => centerOnMember(newMember), 100);
-  }, [members, unions, getViewportCenter, centerOnMember, recordSnapshot]);
+  }, [members, unions, getViewportCenter, centerOnMember, recordSnapshot, contextualTutorial]);
 
   const handleToggleLock = useCallback((id: string) => {
     setMembers(prev => prev.map(m => m.id === id ? { ...m, locked: !m.locked } : m));
@@ -1676,7 +1667,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     <div className="flex flex-col h-screen bg-background">
       <EditorHeader
         searchQuery={search.query}
-        onSearchChange={(q) => { search.setQuery(q); if (q.length > 0) contextualTutorial.onSearchUsed(); }}
+        onSearchChange={(q) => { search.setQuery(q); }}
         onSearchClear={search.clear}
         suggestions={search.suggestions}
         isSearchActive={search.isActive}
@@ -1905,7 +1896,6 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 snapAnchorSide={linkDrag?.snapTargetId === member.id ? linkDrag.snapAnchorSide : null}
                 isLinkDragging={!!linkDrag && linkDrag.fromId === member.id}
                 forceSelectOnClick={!!(members[1] && member.id === members[1].id && contextualTutorial.currentStep === 'parent-intro')}
-                onCreateDropdownOpen={(open) => { if (open) contextualTutorial.onCreateMemberClicked(); }}
               />
               );
             })}

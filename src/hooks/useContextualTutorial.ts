@@ -6,14 +6,13 @@ export type ContextualTutoStep =
   | 'card-intro' | 'card-selected' | 'edit-hint'
   | 'parent-intro' | 'parent-selected'
   | 'link-click-dot' | 'link-drag-release'
-  | 'create-select-pi' | 'create-click-button' | 'create-pick-sibling'
-  | 'drag-card' | 'multi-select' | 'multi-drag' | 'search-bar'
+  | 'create-select-pi' | 'create-click-button'
+  | 'drag-card'
   | null;
 
 /**
  * Event-driven contextual tutorial.
- * Flow: card select → edit → parent → link creation → sibling creation →
- *       drag card → multi-select → multi-drag → search bar
+ * Flow: card select → edit → parent → link creation → create member → drag card → finish
  */
 export function useContextualTutorial(
   memberCount: number,
@@ -28,7 +27,7 @@ export function useContextualTutorial(
   const [done, setDone] = useState(() => !isAllowedUser || localStorage.getItem(doneStorageKey) === '1');
   const startedRef = useRef(false);
   const parentEditFlowRef = useRef(false);
-  const siblingEditFlowRef = useRef(false);
+  const memberCreatedFlowRef = useRef(false);
 
   // Reset tutorial state when changing genogram/account scope
   useEffect(() => {
@@ -37,7 +36,7 @@ export function useContextualTutorial(
     setCurrentStep(null);
     startedRef.current = false;
     parentEditFlowRef.current = false;
-    siblingEditFlowRef.current = false;
+    memberCreatedFlowRef.current = false;
   }, [doneStorageKey, isAllowedUser]);
 
   // Start tutorial as soon as first member exists and no drawer is open
@@ -57,7 +56,7 @@ export function useContextualTutorial(
   const onEditClicked = useCallback(() => {
     if (currentStep === 'card-selected') {
       parentEditFlowRef.current = false;
-      siblingEditFlowRef.current = false;
+      memberCreatedFlowRef.current = false;
       setCurrentStep('edit-hint');
     }
   }, [currentStep]);
@@ -66,15 +65,15 @@ export function useContextualTutorial(
     setCurrentStep(prev => {
       if (prev !== 'card-selected') return prev;
       parentEditFlowRef.current = false;
-      siblingEditFlowRef.current = false;
+      memberCreatedFlowRef.current = false;
       return 'edit-hint';
     });
   }, []);
 
   const onDrawerClosed = useCallback(() => {
     if (currentStep === 'edit-hint') {
-      if (siblingEditFlowRef.current) {
-        siblingEditFlowRef.current = false;
+      if (memberCreatedFlowRef.current) {
+        memberCreatedFlowRef.current = false;
         setCurrentStep('drag-card');
       } else if (parentEditFlowRef.current) {
         parentEditFlowRef.current = false;
@@ -92,7 +91,7 @@ export function useContextualTutorial(
   const onParentEditClicked = useCallback(() => {
     if (currentStep === 'parent-selected') {
       parentEditFlowRef.current = true;
-      siblingEditFlowRef.current = false;
+      memberCreatedFlowRef.current = false;
       setCurrentStep('edit-hint');
     }
   }, [currentStep]);
@@ -101,7 +100,7 @@ export function useContextualTutorial(
     setCurrentStep(prev => {
       if (prev !== 'parent-selected') return prev;
       parentEditFlowRef.current = true;
-      siblingEditFlowRef.current = false;
+      memberCreatedFlowRef.current = false;
       return 'edit-hint';
     });
   }, []);
@@ -110,7 +109,7 @@ export function useContextualTutorial(
     setCurrentStep(null);
     setDone(true);
     parentEditFlowRef.current = false;
-    siblingEditFlowRef.current = false;
+    memberCreatedFlowRef.current = false;
     localStorage.setItem(doneStorageKey, '1');
   }, [doneStorageKey]);
 
@@ -129,34 +128,15 @@ export function useContextualTutorial(
   }, [currentStep]);
 
   const onCreateMemberClicked = useCallback(() => {
-    if (currentStep === 'create-click-button') setCurrentStep('create-pick-sibling');
-  }, [currentStep]);
-
-  const onCreateSiblingPicked = useCallback(() => {
-    if (currentStep === 'create-pick-sibling') {
-      siblingEditFlowRef.current = true;
+    if (currentStep === 'create-click-button') {
+      memberCreatedFlowRef.current = true;
       setCurrentStep('edit-hint');
     }
   }, [currentStep]);
 
-  // drag-card → multi-select
+  // drag-card → finish
   const onCardDragged = useCallback(() => {
-    if (currentStep === 'drag-card') setCurrentStep('multi-select');
-  }, [currentStep]);
-
-  // multi-select → multi-drag (user did a marquee or shift-click selection)
-  const onMultiSelected = useCallback(() => {
-    if (currentStep === 'multi-select') setCurrentStep('multi-drag');
-  }, [currentStep]);
-
-  // multi-drag → search-bar (user dragged the group)
-  const onMultiDragged = useCallback(() => {
-    if (currentStep === 'multi-drag') setCurrentStep('search-bar');
-  }, [currentStep]);
-
-  // search-bar → finish (user typed something in search)
-  const onSearchUsed = useCallback(() => {
-    if (currentStep === 'search-bar') finish();
+    if (currentStep === 'drag-card') finish();
   }, [currentStep, finish]);
 
   const restart = useCallback(() => {
@@ -165,7 +145,7 @@ export function useContextualTutorial(
     setCurrentStep(null);
     startedRef.current = false;
     parentEditFlowRef.current = false;
-    siblingEditFlowRef.current = false;
+    memberCreatedFlowRef.current = false;
   }, [doneStorageKey]);
 
   const active = currentStep !== null;
@@ -175,8 +155,8 @@ export function useContextualTutorial(
     onCardSelected, onEditClicked, onDrawerClosed,
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
-    onPiSelectedForCreation, onCreateMemberClicked, onCreateSiblingPicked,
-    onCardDragged, onMultiSelected, onMultiDragged, onSearchUsed,
+    onPiSelectedForCreation, onCreateMemberClicked,
+    onCardDragged,
     openPrimaryEditHint, openParentEditHint,
     finish, restart,
   };

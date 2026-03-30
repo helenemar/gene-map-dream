@@ -84,38 +84,14 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
   'create-click-button': {
     icon: <UserPlus className="w-5 h-5" />,
     title: 'Créer un membre',
-    description: 'Cliquez sur le bouton « Créer un membre » sous la carte.',
-    padding: 8,
-  },
-  'create-pick-sibling': {
-    icon: <User className="w-5 h-5" />,
-    title: 'Choisissez « Frère/Sœur »',
-    description: 'Sélectionnez « Frère/Sœur » dans le menu déroulant.',
+    description: 'Cliquez sur « Créer un membre » puis choisissez le type de relation souhaité.',
     padding: 8,
   },
   'drag-card': {
     icon: <Move className="w-5 h-5" />,
-    title: 'Déplacez une carte',
-    description: 'Cliquez et maintenez sur une carte, puis glissez-la pour la repositionner sur le canevas.',
+    title: 'Déplacez la carte',
+    description: 'Cliquez et maintenez sur la carte du nouveau membre, puis glissez-la pour la repositionner.',
     padding: 14,
-  },
-  'multi-select': {
-    icon: <BoxSelect className="w-5 h-5" />,
-    title: 'Sélection multiple',
-    description: 'Tracez un rectangle sur le canevas avec la souris, ou maintenez ⇧ Shift et cliquez sur plusieurs cartes pour les sélectionner.',
-    padding: 14,
-  },
-  'multi-drag': {
-    icon: <Move className="w-5 h-5" />,
-    title: 'Déplacez le groupe',
-    description: 'Glissez une des cartes sélectionnées pour déplacer tout le groupe en même temps.',
-    padding: 14,
-  },
-  'search-bar': {
-    icon: <BoxSelect className="w-5 h-5" />,
-    title: 'Barre de recherche',
-    description: 'Tapez un nom, une profession ou une pathologie dans la barre de recherche pour filtrer les membres du génogramme.',
-    padding: 8,
   },
 };
 
@@ -276,58 +252,6 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           }
         }
         setLinkDragPositions(null);
-      } else if (currentStep === 'create-pick-sibling') {
-        // Spotlight the dropdown menu content
-        const dropdownContent = document.querySelector('[role="menu"]');
-        if (dropdownContent) {
-          const rect = dropdownContent.getBoundingClientRect();
-          setSpotlight({
-            top: rect.top - padding,
-            left: rect.left - padding,
-            width: rect.width + padding * 2,
-            height: rect.height + padding * 2,
-          });
-        } else {
-          setSpotlight(null);
-        }
-        setEditBtnPos(null);
-        setLinkDragPositions(null);
-      } else if (currentStep === 'multi-drag') {
-        // Highlight all member cards (same as multi-select but waiting for drag)
-        if (firstMember && fatherMember) {
-          const allCards = document.querySelectorAll('[data-member-card]');
-          let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-          allCards.forEach(el => {
-            const rect = el.getBoundingClientRect();
-            if (rect.left < minX) minX = rect.left;
-            if (rect.top < minY) minY = rect.top;
-            if (rect.right > maxX) maxX = rect.right;
-            if (rect.bottom > maxY) maxY = rect.bottom;
-          });
-          if (minX < Infinity) {
-            setSpotlight({ top: minY - padding, left: minX - padding, width: maxX - minX + padding * 2, height: maxY - minY + padding * 2 });
-          } else {
-            setSpotlight(null);
-          }
-        }
-        setEditBtnPos(null);
-        setLinkDragPositions(null);
-      } else if (currentStep === 'search-bar') {
-        // Highlight the search bar
-        const searchEl = document.querySelector('[data-onboarding="search-bar"]');
-        if (searchEl) {
-          const rect = searchEl.getBoundingClientRect();
-          setSpotlight({
-            top: rect.top - padding,
-            left: rect.left - padding,
-            width: rect.width + padding * 2,
-            height: rect.height + padding * 2,
-          });
-        } else {
-          setSpotlight(null);
-        }
-        setEditBtnPos(null);
-        setLinkDragPositions(null);
       } else {
         if (!targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
         const el = document.querySelector(`[data-member-card="${targetMember.id}"]`);
@@ -398,7 +322,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && currentStep !== 'search-bar' && !drawerOpen && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'drag-card' && !drawerOpen && (
           spotlight ? (
             <>
               <button
@@ -484,7 +408,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </svg>
           )}
 
-          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && currentStep !== 'search-bar' && (
+          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'drag-card' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <mask id="ctx-tuto-mask">
@@ -642,128 +566,6 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                     strokeWidth={2}
                   />
                 </div>
-              </motion.div>
-            </motion.div>
-          )}
-
-          {/* Animated marquee rectangle for multi-select step */}
-          {currentStep === 'multi-select' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="fixed pointer-events-none z-[102]"
-              style={{
-                top: '45%',
-                left: '35%',
-              }}
-            >
-              {/* Phase 1: Cursor clicks down, drags diagonally, releases */}
-              <motion.div
-                animate={{
-                  x: [0, 0, 160, 160, 160, 0],
-                  y: [0, 0, 100, 100, 100, 0],
-                  scale: [1, 0.85, 0.85, 0.85, 1, 1],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  times: [0, 0.08, 0.45, 0.6, 0.65, 1],
-                }}
-              >
-                <div className="relative" style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))' }}>
-                  <MousePointerClick
-                    className="text-white"
-                    style={{ width: 32, height: 32 }}
-                    strokeWidth={3.5}
-                  />
-                  <MousePointerClick
-                    className="absolute inset-0 text-foreground"
-                    style={{ width: 32, height: 32 }}
-                    strokeWidth={2}
-                  />
-                </div>
-              </motion.div>
-              {/* Animated selection rectangle with gradient fill */}
-              <svg className="absolute top-0 left-0 overflow-visible" width="200" height="140" style={{ pointerEvents: 'none' }}>
-                <defs>
-                  <linearGradient id="marquee-grad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.12" />
-                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.04" />
-                  </linearGradient>
-                </defs>
-                <motion.rect
-                  x={8}
-                  y={8}
-                  rx={6}
-                  initial={{ width: 0, height: 0, opacity: 0 }}
-                  animate={{
-                    width: [0, 0, 160, 160, 160, 0],
-                    height: [0, 0, 100, 100, 100, 0],
-                    opacity: [0, 0, 1, 1, 0.6, 0],
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                    times: [0, 0.08, 0.45, 0.6, 0.65, 1],
-                  }}
-                  fill="url(#marquee-grad)"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={1.5}
-                  strokeDasharray="8 4"
-                  strokeLinecap="round"
-                >
-                  <animate
-                    attributeName="stroke-dashoffset"
-                    from="0" to="-24"
-                    dur="1.5s"
-                    repeatCount="indefinite"
-                  />
-                </motion.rect>
-                {/* Corner dots that appear when rectangle is drawn */}
-                {[[8, 8], [168, 8], [8, 108], [168, 108]].map(([cx, cy], i) => (
-                  <motion.circle
-                    key={i}
-                    cx={cx}
-                    cy={cy}
-                    r={3}
-                    fill="hsl(var(--primary))"
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{
-                      opacity: [0, 0, 0, 1, 1, 0],
-                      scale: [0, 0, 0, 1, 1, 0],
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                      times: [0, 0.08, 0.42, 0.48, 0.6, 0.65],
-                      delay: i * 0.03,
-                    }}
-                  />
-                ))}
-              </svg>
-              {/* "Sélectionné !" label that pops in after rectangle completes */}
-              <motion.div
-                className="absolute pointer-events-none"
-                style={{ top: 50, left: 60 }}
-                animate={{
-                  opacity: [0, 0, 0, 1, 1, 0],
-                  scale: [0.6, 0.6, 0.6, 1, 1, 0.8],
-                  y: [4, 4, 4, 0, 0, 4],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  times: [0, 0.08, 0.47, 0.55, 0.62, 0.7],
-                }}
-              >
-                <span className="px-2.5 py-1 rounded-full bg-primary/90 text-primary-foreground text-[11px] font-medium shadow-lg backdrop-blur-sm">
-                  ✓ Sélection
-                </span>
               </motion.div>
             </motion.div>
           )}
