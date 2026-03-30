@@ -813,7 +813,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
         contextualTutorial.onParentSelected();
       }
     }
-  }, [selectedMembers.size]);
+  }, [selectedMembers, members]);
 
   // ─── Parent picker state (for child creation with multiple unions) ───
   const [parentPickerState, setParentPickerState] = useState<{
