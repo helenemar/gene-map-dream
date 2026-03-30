@@ -266,6 +266,47 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         }
         setEditBtnPos(null);
         setLinkDragPositions(null);
+      } else if (currentStep === 'union-select-both') {
+        // Highlight both parent cards
+        if (firstMember && fatherMember) {
+          const piEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
+          const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
+          if (piEl && fatherEl) {
+            const piRect = piEl.getBoundingClientRect();
+            const fatherRect = fatherEl.getBoundingClientRect();
+            const minX = Math.min(piRect.left, fatherRect.left) - padding;
+            const minY = Math.min(piRect.top, fatherRect.top) - padding;
+            const maxX = Math.max(piRect.right, fatherRect.right) + padding;
+            const maxY = Math.max(piRect.bottom, fatherRect.bottom) + padding;
+            setSpotlight({ top: minY, left: minX, width: maxX - minX, height: maxY - minY });
+          } else {
+            setSpotlight(null);
+          }
+        }
+        setEditBtnPos(null);
+        setLinkDragPositions(null);
+      } else if (currentStep === 'union-click-button') {
+        // Highlight the floating "Créer une union" button
+        // It's a fixed-position button with text "Créer une union"
+        const allBtns = document.querySelectorAll('button');
+        let unionBtn: Element | null = null;
+        allBtns.forEach(b => {
+          if (b.textContent?.includes('Créer une union') || b.textContent?.includes("Modifier l'union")) unionBtn = b;
+        });
+        if (unionBtn) {
+          const rect = (unionBtn as HTMLElement).getBoundingClientRect();
+          setSpotlight({
+            top: rect.top - padding,
+            left: rect.left - padding,
+            width: rect.width + padding * 2,
+            height: rect.height + padding * 2,
+          });
+          setEditBtnPos({ top: rect.top + rect.height / 2, left: rect.left + rect.width / 2 });
+        } else {
+          setSpotlight(null);
+          setEditBtnPos(null);
+        }
+        setLinkDragPositions(null);
       } else {
         if (!targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
         const el = document.querySelector(`[data-member-card="${targetMember.id}"]`);
