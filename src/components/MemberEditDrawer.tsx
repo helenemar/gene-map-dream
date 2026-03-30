@@ -659,7 +659,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                                   className="w-3.5 h-3.5 rounded shrink-0"
                                   style={{ backgroundColor: p.color_hex }}
                                 />
-                                <span className="text-sm text-foreground whitespace-nowrap">{p.name}</span>
+                                <span className="text-sm text-foreground whitespace-nowrap">{t.pathologyNames[p.name] ?? p.name}</span>
                               </label>
                               {onDeletePathology && (
                                 <button
