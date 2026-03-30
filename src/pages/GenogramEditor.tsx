@@ -1325,6 +1325,19 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
 
   const [drawerEditing, setDrawerEditing] = useState(true);
 
+  useEffect(() => {
+    if (!newMemberDrawerOpen || !drawerEditing || !editingNewMember) return;
+
+    if (members[0] && editingNewMember.id === members[0].id) {
+      contextualTutorial.openPrimaryEditHint();
+      return;
+    }
+
+    if (members[1] && editingNewMember.id === members[1].id) {
+      contextualTutorial.openParentEditHint();
+    }
+  }, [newMemberDrawerOpen, drawerEditing, editingNewMember, members, contextualTutorial]);
+
   const drawerClosedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (drawerClosedTimerRef.current) clearTimeout(drawerClosedTimerRef.current);
@@ -1341,13 +1354,11 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   const handleEdit = useCallback((id: string) => {
     const member = members.find(m => m.id === id);
     if (member) {
-      contextualTutorial.onEditClicked();
-      contextualTutorial.onParentEditClicked();
       setEditingNewMember(member);
       setDrawerEditing(true);
       setNewMemberDrawerOpen(true);
     }
-  }, [members, contextualTutorial]);
+  }, [members]);
 
   const handleView = useCallback((id: string) => {
     const member = members.find(m => m.id === id);

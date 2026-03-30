@@ -209,6 +209,7 @@ export function useContextualTutorial(
     onPiSelectedForCreation, onCreateMemberClicked, onCreateSiblingPicked,
     onCardDragged, onMultiSelected,
     onTwoMembersSelected, onUnionCreated,
+    openPrimaryEditHint, openParentEditHint,
     finish, restart,
   };
 }
