@@ -414,6 +414,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   * Le prénom et le nom du patient index ne sont pas modifiables pendant la bêta.
                 </p>
               )}
+replaced with:
+                  {t.memberEdit.indexPatientNote}
+                </p>
+              )}
 
               <div className="flex flex-col gap-1">
                 <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
