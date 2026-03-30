@@ -848,7 +848,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                   initial={{ scale: 0.6, opacity: 0, rotate: -20 }}
                   animate={{ scale: 1, opacity: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 350, damping: 18 }}
-                  className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 text-primary"
+                  className={`rounded-xl bg-primary/10 flex items-center justify-center shrink-0 text-primary ${currentStep === 'edit-hint' ? 'w-10 h-10' : 'w-8 h-8'}`}
                 >
                   {tip.icon}
                 </motion.div>
