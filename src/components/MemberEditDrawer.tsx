@@ -411,10 +411,6 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               </div>
               {member.isIndexPatient && (
                 <p className="text-[9px] text-muted-foreground/60 italic -mt-3 leading-tight">
-                  * Le prénom et le nom du patient index ne sont pas modifiables pendant la bêta.
-                </p>
-              )}
-replaced with:
                   {t.memberEdit.indexPatientNote}
                 </p>
               )}
