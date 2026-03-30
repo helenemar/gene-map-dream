@@ -14,6 +14,8 @@ import LinkTypeModal from '@/components/LinkTypeModal';
 import FloatingControls from '@/components/FloatingControls';
 import OnboardingTutorial from '@/components/OnboardingTutorial';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import ContextualTutorial from '@/components/ContextualTutorial';
+import { useContextualTutorial } from '@/hooks/useContextualTutorial';
 import UnionEditDrawer from '@/components/UnionEditDrawer';
 import MemberEditDrawer from '@/components/MemberEditDrawer';
 import { RelationshipChoice } from '@/components/CreateMemberDropdown';
