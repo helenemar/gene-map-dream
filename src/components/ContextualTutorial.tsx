@@ -823,7 +823,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         >
           <div className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
             <button
-              onClick={onFinish}
+              onClick={() => setTipHidden(true)}
               className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors z-10"
             >
               <X className="w-4 h-4" />
