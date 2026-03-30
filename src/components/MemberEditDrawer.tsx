@@ -376,7 +376,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
         <Separator />
 
-        <ScrollArea className="flex-1 px-3">
+        <ScrollArea className="flex-1 px-3 [&>div>div[data-radix-scroll-area-scrollbar]]:w-2 [&>div>div[data-radix-scroll-area-scrollbar]>div]:bg-border">
           {isEditing ? (
             <div className="flex flex-col gap-5 py-4 px-3">
               {/* ── Photo ── */}
