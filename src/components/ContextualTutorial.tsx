@@ -9,6 +9,24 @@ import {
   AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+/** Reusable cursor icon — dark fill, white stroke outline, soft shadow */
+const TutoCursor = ({ size = 36 }: { size?: number }) => (
+  <div className="relative" style={{ width: size, height: size, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))' }}>
+    {/* White outline layer behind */}
+    <MousePointerClick
+      className="absolute inset-0 text-white"
+      style={{ width: size, height: size }}
+      strokeWidth={4}
+    />
+    {/* Dark foreground layer */}
+    <MousePointerClick
+      className="absolute inset-0 text-foreground"
+      style={{ width: size, height: size }}
+      strokeWidth={2}
+    />
+  </div>
+);
+
 interface TipConfig {
   icon: React.ReactNode;
   title: string;
@@ -489,7 +507,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <MousePointerClick className="w-9 h-9 text-primary drop-shadow-lg" strokeWidth={2.2} />
+                <TutoCursor />
               </motion.div>
             </motion.div>
           )}
@@ -510,7 +528,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <MousePointerClick className="w-9 h-9 text-primary drop-shadow-lg" strokeWidth={2.2} />
+                <TutoCursor />
               </motion.div>
             </motion.div>
           )}
@@ -562,7 +580,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                   animate={{ x: [-2, 2, -2], y: [-2, 2, -2] }}
                   transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  <MousePointerClick className="w-8 h-8 text-primary drop-shadow-lg" strokeWidth={2.2} />
+                  <TutoCursor size={32} />
                 </motion.div>
               </motion.div>
             </>
