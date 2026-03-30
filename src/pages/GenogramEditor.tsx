@@ -1311,8 +1311,9 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
     if (relationship === 'sibling') setLastCreatedSibling(newMember);
+    contextualTutorial.onCreateMemberClicked();
     setTimeout(() => centerOnMember(newMember), 100);
-  }, [members, unions, getViewportCenter, centerOnMember, recordSnapshot]);
+  }, [members, unions, getViewportCenter, centerOnMember, recordSnapshot, contextualTutorial]);
 
   const handleToggleLock = useCallback((id: string) => {
     setMembers(prev => prev.map(m => m.id === id ? { ...m, locked: !m.locked } : m));
@@ -1896,6 +1897,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 isLinkDragging={!!linkDrag && linkDrag.fromId === member.id}
                 forceSelectOnClick={!!(members[1] && member.id === members[1].id && contextualTutorial.currentStep === 'parent-intro')}
                 onCreateDropdownOpen={(open) => { if (open) contextualTutorial.onCreateMemberClicked(); }}
+
               />
               );
             })}
