@@ -558,13 +558,17 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       const cursorY = (e.clientY - rect.top - pan.y) / zoom;
 
       // Snap magnetism: find nearest anchor of any target card within SNAP_RADIUS,
-      // OR snap to nearest edge center if cursor is anywhere inside the card bounds (with margin)
+      // OR snap to nearest edge center if cursor is anywhere inside the card bounds (with margin).
+      // We pick the target anchor closest to the SOURCE anchor (not cursor) for a natural connection.
       const SNAP_RADIUS = 30; // world-space pixels
       const CARD_MARGIN = 20; // expanded hit area around card
       let snapX: number | undefined;
       let snapY: number | undefined;
       let snapTargetId: string | undefined;
       let bestDist = Infinity;
+
+      const srcX = linkDrag.startX;
+      const srcY = linkDrag.startY;
 
       for (const m of members) {
         if (m.id === linkDrag.fromId) continue;
@@ -573,15 +577,20 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
         const insideCard = cursorX >= m.x - CARD_MARGIN && cursorX <= m.x + CARD_W + CARD_MARGIN &&
                            cursorY >= m.y - CARD_MARGIN && cursorY <= m.y + CARD_H + CARD_MARGIN;
 
+        // First check if cursor is close enough to any anchor or inside the card
         const anchors = cardAnchors(m);
-        for (const a of anchors) {
-          const d = Math.hypot(cursorX - a.x, cursorY - a.y);
-          // Snap if within radius OR if cursor is over the card
-          if ((d < SNAP_RADIUS || insideCard) && d < bestDist) {
-            bestDist = d;
-            snapX = a.x;
-            snapY = a.y;
-            snapTargetId = m.id;
+        const cursorClose = anchors.some(a => Math.hypot(cursorX - a.x, cursorY - a.y) < SNAP_RADIUS) || insideCard;
+
+        if (cursorClose) {
+          // Pick the anchor closest to the SOURCE point for a natural-looking connection
+          for (const a of anchors) {
+            const d = Math.hypot(srcX - a.x, srcY - a.y);
+            if (d < bestDist) {
+              bestDist = d;
+              snapX = a.x;
+              snapY = a.y;
+              snapTargetId = m.id;
+            }
           }
         }
       }
