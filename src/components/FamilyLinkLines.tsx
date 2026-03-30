@@ -655,7 +655,7 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
             onMouseEnter={() => setHoveredUnionId(unionObj.id)}
             onMouseLeave={() => setHoveredUnionId(null)}
           >
-            {isHovered && hasChildren && onEditUnion && (
+            {isHovered && onEditUnion && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -665,18 +665,6 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
                 title="Modifier l'union"
               >
                 <Pencil className="w-3 h-3" />
-              </button>
-            )}
-            {isHovered && !hasChildren && onDeleteUnion && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDeleteUnion(unionObj.id);
-                }}
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-md hover:bg-destructive/90 transition-all duration-150 animate-scale-in"
-                title="Supprimer l'union"
-              >
-                <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
