@@ -867,7 +867,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             window.addEventListener('mouseup', onUp);
           }}
         >
-          <div className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
+          <div className="bg-card/85 backdrop-blur-sm border border-border rounded-2xl shadow-2xl overflow-hidden">
             <button
               onClick={() => setTipHidden(true)}
               className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors z-10"
