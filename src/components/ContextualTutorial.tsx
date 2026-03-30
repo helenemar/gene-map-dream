@@ -151,32 +151,23 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         setEditBtnPos(null);
         setLinkDragPositions(null);
       } else if (currentStep === 'link-drag-release') {
-        // Highlight area encompassing both PI and father cards
-        if (firstMember && fatherMember) {
+        // Highlight only the child card to show where to drop
+        if (firstMember) {
           const piEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
-          const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
-          if (piEl && fatherEl) {
+          if (piEl) {
             const piRect = piEl.getBoundingClientRect();
-            const fatherRect = fatherEl.getBoundingClientRect();
-            const minX = Math.min(piRect.left, fatherRect.left) - padding;
-            const minY = Math.min(piRect.top, fatherRect.top) - padding;
-            const maxX = Math.max(piRect.right, fatherRect.right) + padding;
-            const maxY = Math.max(piRect.bottom, fatherRect.bottom) + padding;
-            setSpotlight({ top: minY, left: minX, width: maxX - minX, height: maxY - minY });
-
-            // Use the dot the user clicked on (closestDotPos from previous step) as start
-            const startX = closestDotPos?.x ?? (fatherRect.left + fatherRect.width / 2);
-            const startY = closestDotPos?.y ?? fatherRect.bottom;
-            // Target: center of child card
-            const childCx = piRect.left + piRect.width / 2;
-            const childCy = piRect.top + piRect.height / 2;
-            setLinkDragPositions({ fromX: startX, fromY: startY, toX: childCx, toY: childCy });
+            setSpotlight({
+              top: piRect.top - padding,
+              left: piRect.left - padding,
+              width: piRect.width + padding * 2,
+              height: piRect.height + padding * 2,
+            });
           } else {
             setSpotlight(null);
-            setLinkDragPositions(null);
           }
         }
         setEditBtnPos(null);
+        setLinkDragPositions(null);
       } else {
         if (!targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
         const el = document.querySelector(`[data-member-card="${targetMember.id}"]`);
