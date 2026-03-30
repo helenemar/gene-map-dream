@@ -812,6 +812,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   // ─── New member state ───
   const [editingNewMember, setEditingNewMember] = useState<FamilyMember | null>(null);
   const [newMemberDrawerOpen, setNewMemberDrawerOpen] = useState(false);
+  const [lastCreatedSibling, setLastCreatedSibling] = useState<FamilyMember | null>(null);
   const contextualTutorial = useContextualTutorial(
     members.length,
     newMemberDrawerOpen,
@@ -1147,9 +1148,6 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     }
 
     // ── Non-child relationships (spouse, parent, sibling) ──
-    if (relationship === 'sibling') {
-      contextualTutorial.onCreateSiblingPicked();
-    }
     const pos = getViewportCenter();
     const source = members.find(m => m.id === sourceId);
     const currentYear = new Date().getFullYear();
@@ -1316,6 +1314,10 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     setEditingNewMember(newMember);
     setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
+    if (relationship === 'sibling') {
+      contextualTutorial.onCreateSiblingPicked();
+      setLastCreatedSibling(newMember);
+    }
     setTimeout(() => centerOnMember(newMember), 100);
   }, [members, unions, getViewportCenter, centerOnMember, recordSnapshot]);
 
@@ -2132,6 +2134,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
               currentStep={linkModalTarget ? null : contextualTutorial.currentStep}
               firstMember={members[0] || null}
               fatherMember={members[1] || null}
+              siblingMember={lastCreatedSibling}
               drawerOpen={newMemberDrawerOpen}
               onFinish={contextualTutorial.finish}
             />

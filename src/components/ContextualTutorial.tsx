@@ -125,12 +125,13 @@ interface ContextualTutorialProps {
   currentStep: ContextualTutoStep;
   firstMember: FamilyMember | null;
   fatherMember: FamilyMember | null;
+  siblingMember?: FamilyMember | null;
   drawerOpen?: boolean;
   onFinish: () => void;
 }
 
 const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
-  currentStep, firstMember, fatherMember, drawerOpen = false, onFinish,
+  currentStep, firstMember, fatherMember, siblingMember, drawerOpen = false, onFinish,
 }) => {
   const [tipHidden, setTipHidden] = useState(false);
   const [spotlight, setSpotlight] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
@@ -157,7 +158,9 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   // Determine which member to target based on step
   const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected')
     ? fatherMember
-    : firstMember;
+    : (currentStep === 'drag-card' && siblingMember)
+      ? siblingMember
+      : firstMember;
 
   // Track DOM element position
   useEffect(() => {
@@ -615,16 +618,15 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           )}
 
           {/* Animated drag cursor for drag-card step */}
-          {currentStep === 'drag-card' && (
+          {currentStep === 'drag-card' && spotlight && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
               className="fixed pointer-events-none z-[102]"
               style={{
-                top: '50%',
-                left: '40%',
-                transform: 'translate(-50%, -50%)',
+                top: spotlight.top + spotlight.height / 2,
+                left: spotlight.left + spotlight.width / 2,
               }}
             >
               <motion.div
