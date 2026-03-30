@@ -115,6 +115,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   const tipDragRef = useRef<{ startX: number; startY: number; origLeft: number; origTop: number } | null>(null);
   const rafRef = useRef(0);
 
+  const TIPS = useTips();
   const tip = currentStep ? TIPS[currentStep] : null;
 
   // Reset tipHidden when step changes
