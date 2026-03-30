@@ -383,7 +383,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
 
   return (
     <motion.div
-      data-member-card
+      data-member-card={member.id}
       className="absolute select-none"
       animate={{
         left: member.x,
