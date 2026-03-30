@@ -320,6 +320,24 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           </div>
         </motion.div>
       </React.Fragment>
+
+      {/* Confirmation dialog */}
+      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+        <AlertDialogContent className="z-[110]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Quitter le tutoriel ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Voulez-vous vraiment quitter le tutoriel ? Vous pourrez toujours le revoir plus tard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Continuer le tutoriel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setShowConfirm(false); onFinish(); }}>
+              Quitter
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AnimatePresence>
   );
 };
