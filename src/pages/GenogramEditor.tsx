@@ -2099,7 +2099,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
 
           {!isMobileReadOnly && (
             <ContextualTutorial
-              currentStep={contextualTutorial.currentStep}
+              currentStep={linkModalTarget ? null : contextualTutorial.currentStep}
               firstMember={members[0] || null}
               fatherMember={members[1] || null}
               drawerOpen={newMemberDrawerOpen}
