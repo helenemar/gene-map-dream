@@ -69,7 +69,10 @@ export function useContextualTutorial(
   // Called when the edit drawer is closed
   const onDrawerClosed = useCallback(() => {
     if (currentStep === 'edit-hint') {
-      if (parentEditFlowRef.current) {
+      if (siblingEditFlowRef.current) {
+        siblingEditFlowRef.current = false;
+        setCurrentStep('drag-card');
+      } else if (parentEditFlowRef.current) {
         parentEditFlowRef.current = false;
         setCurrentStep('link-click-dot');
       } else {
