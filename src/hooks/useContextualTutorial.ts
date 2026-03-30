@@ -129,9 +129,16 @@ export function useContextualTutorial(
     }
   }, [currentStep]);
 
-  // Called when user picks "Frère/Sœur" in the dropdown (step 10) → move to union flow
+  // Called when user picks "Frère/Sœur" in the dropdown → move to drag step
   const onCreateSiblingPicked = useCallback(() => {
     if (currentStep === 'create-pick-sibling') {
+      setCurrentStep('drag-card');
+    }
+  }, [currentStep]);
+
+  // Called when user drags a card → move to union flow
+  const onCardDragged = useCallback(() => {
+    if (currentStep === 'drag-card') {
       setCurrentStep('union-select-both');
     }
   }, [currentStep]);
