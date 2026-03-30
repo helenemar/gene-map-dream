@@ -15,7 +15,13 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
   'card-intro': {
     icon: <MousePointerClick className="w-5 h-5" />,
     title: 'Sélectionnez le membre',
-    description: 'Cliquez sur la carte pour la sélectionner, puis sur le bouton ✏️ pour modifier ses informations.',
+    description: 'Cliquez sur la carte pour la sélectionner.',
+    padding: 14,
+  },
+  'card-selected': {
+    icon: <Pencil className="w-5 h-5" />,
+    title: 'Modifier les informations',
+    description: 'Cliquez sur le bouton ✏️ pour ouvrir le panneau d\'édition.',
     padding: 14,
   },
   'edit-hint': {
@@ -36,13 +42,14 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   currentStep, firstMember, onFinish,
 }) => {
   const [spotlight, setSpotlight] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
+  const [editBtnPos, setEditBtnPos] = useState<{ top: number; left: number } | null>(null);
   const rafRef = useRef(0);
 
   const tip = currentStep ? TIPS[currentStep] : null;
 
   // Track DOM element position
   useEffect(() => {
-    if (!currentStep || !firstMember) { setSpotlight(null); return; }
+    if (!currentStep || !firstMember) { setSpotlight(null); setEditBtnPos(null); return; }
 
     const padding = tip?.padding ?? 14;
 
@@ -61,6 +68,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         } else {
           setSpotlight(null);
         }
+        setEditBtnPos(null);
       } else {
         const el = document.querySelector(`[data-member-card="${firstMember.id}"]`);
         if (el) {
@@ -73,6 +81,19 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           });
         } else {
           setSpotlight(null);
+        }
+
+        // Track edit button position for card-selected step
+        if (currentStep === 'card-selected') {
+          const btn = document.querySelector(`[data-edit-button="${firstMember.id}"]`);
+          if (btn) {
+            const btnRect = btn.getBoundingClientRect();
+            setEditBtnPos({ top: btnRect.top + btnRect.height / 2, left: btnRect.left + btnRect.width / 2 });
+          } else {
+            setEditBtnPos(null);
+          }
+        } else {
+          setEditBtnPos(null);
         }
       }
       rafRef.current = requestAnimationFrame(update);
@@ -199,6 +220,27 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
               style={{
                 top: spotlight.top + spotlight.height - 24,
                 left: spotlight.left + spotlight.width / 2 + 8,
+              }}
+            >
+              <motion.div
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <MousePointerClick className="w-7 h-7 text-primary drop-shadow-md" strokeWidth={2} />
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* Animated pointing cursor for card-selected → points at edit button */}
+          {editBtnPos && currentStep === 'card-selected' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
+              className="absolute pointer-events-none z-[102]"
+              style={{
+                top: editBtnPos.top + 4,
+                left: editBtnPos.left + 4,
               }}
             >
               <motion.div

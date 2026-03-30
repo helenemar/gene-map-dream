@@ -2,12 +2,13 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 const CONTEXTUAL_TUTO_DONE_KEY = 'genogy-contextual-tuto-done';
 
-export type ContextualTutoStep = 'card-intro' | 'edit-hint' | null;
+export type ContextualTutoStep = 'card-intro' | 'card-selected' | 'edit-hint' | null;
 
 /**
- * Event-driven contextual tutorial. 
- * Step 1 (card-intro): Highlights card immediately, tells user to click edit button.
- * Step 2 (edit-hint): Once edit drawer opens, shows hint about editing in the sidesheet.
+ * Event-driven contextual tutorial.
+ * Step 1 (card-intro): Highlight card, cursor points at it → user clicks to select.
+ * Step 2 (card-selected): Card selected, cursor points at edit button → user clicks edit.
+ * Step 3 (edit-hint): Edit drawer open, hint about editing in the sidesheet.
  */
 export function useContextualTutorial(
   memberCount: number,
@@ -39,9 +40,16 @@ export function useContextualTutorial(
     }
   }, [drawerOpen]);
 
+  // Called when user selects the card
+  const onCardSelected = useCallback(() => {
+    if (currentStep === 'card-intro') {
+      setCurrentStep('card-selected');
+    }
+  }, [currentStep]);
+
   // Called when user clicks the edit button on the card
   const onEditClicked = useCallback(() => {
-    if (currentStep === 'card-intro') {
+    if (currentStep === 'card-selected') {
       setCurrentStep('edit-hint');
     }
   }, [currentStep]);
@@ -61,5 +69,5 @@ export function useContextualTutorial(
 
   const active = currentStep !== null;
 
-  return { active, currentStep, onEditClicked, onDrawerClosed, finish };
+  return { active, currentStep, onCardSelected, onEditClicked, onDrawerClosed, finish };
 }
