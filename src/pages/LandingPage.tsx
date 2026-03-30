@@ -98,6 +98,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
 
       <LandingHeader onAuth={openAuth} />
       <HeroSection onAuth={openAuth} />
+      <GuideBlock />
       <FeaturesSection />
       <StepsSection />
       <AboutSection />
