@@ -101,6 +101,12 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Cliquez et maintenez sur une carte, puis glissez-la pour la repositionner sur le canevas.',
     padding: 14,
   },
+  'multi-select': {
+    icon: <BoxSelect className="w-5 h-5" />,
+    title: 'Sélection multiple',
+    description: 'Tracez un rectangle sur le canevas avec la souris, ou maintenez ⇧ Shift et cliquez sur plusieurs cartes pour les sélectionner.',
+    padding: 14,
+  },
   'union-select-both': {
     icon: <Link2 className="w-5 h-5" />,
     title: 'Sélectionnez les deux parents',
