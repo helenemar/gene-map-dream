@@ -683,6 +683,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
 
       if (targetId) {
         setLinkModalTarget({ fromId: linkDrag.fromId, toId: targetId });
+        contextualTutorial.onLinkCreated();
       }
       setLinkDrag(null);
       return;
