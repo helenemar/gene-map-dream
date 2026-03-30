@@ -1511,6 +1511,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     const cursorWorldX = (e.clientX - rect.left - pan.x) / zoom;
     const cursorWorldY = (e.clientY - rect.top - pan.y) / zoom;
     setLinkDrag({ fromId, startX: cx, startY: cy, cursorX: cursorWorldX, cursorY: cursorWorldY });
+    contextualTutorial.onLinkDragStarted();
   }, [members, pan, zoom]);
 
 
