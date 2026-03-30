@@ -854,7 +854,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                 </motion.div>
                 <div className={`flex-1 min-w-0 ${currentStep === 'edit-hint' ? 'pr-6' : 'pr-4'}`}>
                   <div className="flex items-center gap-1.5 mb-0.5">
-                    <span className="text-[10px] uppercase tracking-wider font-semibold text-primary bg-primary/15 px-2 py-0.5 rounded-sm">Tutoriel</span>
+                    <span className="text-[10px] uppercase tracking-widest font-bold text-white bg-primary/80 px-2 py-0.5 rounded-sm">Tutoriel</span>
                   </div>
                   <motion.h3
                     initial={{ opacity: 0, x: -8 }}
