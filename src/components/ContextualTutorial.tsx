@@ -577,7 +577,66 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </motion.div>
           )}
 
-          {/* Animated pointing cursor for card-selected / parent-selected → points at edit button */}
+          {/* Animated drag cursor for drag-card step */}
+          {currentStep === 'drag-card' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="fixed pointer-events-none z-[102]"
+              style={{
+                top: '50%',
+                left: '40%',
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <motion.div
+                animate={{
+                  x: [0, 80, 80, 0],
+                  y: [0, -30, -30, 0],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  times: [0, 0.4, 0.6, 1],
+                }}
+              >
+                <div className="relative" style={{ filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.35))' }}>
+                  <Hand
+                    className="text-white"
+                    style={{ width: 40, height: 40 }}
+                    strokeWidth={3.5}
+                  />
+                  <Hand
+                    className="absolute inset-0 text-foreground"
+                    style={{ width: 40, height: 40 }}
+                    strokeWidth={2}
+                  />
+                </div>
+              </motion.div>
+              {/* Trail line showing drag path */}
+              <svg className="absolute top-0 left-0 overflow-visible" width="1" height="1" style={{ pointerEvents: 'none' }}>
+                <motion.line
+                  x1={20} y1={20}
+                  x2={100} y2={-10}
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  strokeDasharray="6 4"
+                  strokeLinecap="round"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 0.4, 0.4, 0] }}
+                  transition={{
+                    duration: 2.5,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    times: [0, 0.3, 0.6, 1],
+                  }}
+                />
+              </svg>
+            </motion.div>
+          )}
+
           {editBtnPos && (currentStep === 'card-selected' || currentStep === 'parent-selected' || currentStep === 'create-click-button' || currentStep === 'union-click-button') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
