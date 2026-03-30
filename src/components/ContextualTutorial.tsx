@@ -489,11 +489,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <MousePointerClick className="w-9 h-9 text-foreground/90" strokeWidth={1.8} style={{ filter: 'drop-shadow(0 0 0 white) drop-shadow(0 2px 6px rgba(0,0,0,0.35))', paintOrder: 'stroke', WebkitTextStroke: '0' }} />
-                <svg className="absolute inset-0 w-9 h-9 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" style={{ zIndex: -1 }}>
-                  <path d="M7.243 2.249 6.106 19.29a.2.2 0 0 0 .337.163l4.205-3.874a.2.2 0 0 1 .257-.023l4.727 3.065a.2.2 0 0 0 .305-.112l4.373-13.07" />
-                  <path d="m13.373 13.06 5.267 5.636" />
-                </svg>
+                <TutoCursor />
               </motion.div>
             </motion.div>
           )}
