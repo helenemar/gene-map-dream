@@ -162,13 +162,13 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             const maxY = Math.max(piRect.bottom, fatherRect.bottom) + padding;
             setSpotlight({ top: minY, left: minX, width: maxX - minX, height: maxY - minY });
 
-            // Anchor positions: from PI right-side dot to father center
-            setLinkDragPositions({
-              fromX: piRect.right,
-              fromY: piRect.top + piRect.height / 2,
-              toX: fatherRect.left + fatherRect.width / 2,
-              toY: fatherRect.top + fatherRect.height / 2,
-            });
+            // Use the dot the user clicked on (closestDotPos from previous step) as start
+            const startX = closestDotPos?.x ?? (fatherRect.left + fatherRect.width / 2);
+            const startY = closestDotPos?.y ?? fatherRect.bottom;
+            // Target: center of child card
+            const childCx = piRect.left + piRect.width / 2;
+            const childCy = piRect.top + piRect.height / 2;
+            setLinkDragPositions({ fromX: startX, fromY: startY, toX: childCx, toY: childCy });
           } else {
             setSpotlight(null);
             setLinkDragPositions(null);
@@ -508,7 +508,6 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.7, 1] }}
                   stroke="hsl(var(--primary))"
                   strokeWidth={2}
-                  strokeDasharray="6 4"
                   strokeLinecap="round"
                 />
                 {/* Target snap ring */}
