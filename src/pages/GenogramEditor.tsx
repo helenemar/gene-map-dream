@@ -1934,6 +1934,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                   type,
                 };
                 setEmotionalLinks(prev => [...prev, newLink]);
+                contextualTutorial.onLinkCreated();
               }
               setLinkModalTarget(null);
             }}
