@@ -56,7 +56,7 @@ export function useContextualTutorial(
   const onEditClicked = useCallback(() => {
     if (currentStep === 'card-selected') {
       parentEditFlowRef.current = false;
-      siblingEditFlowRef.current = false;
+      memberCreatedFlowRef.current = false;
       setCurrentStep('edit-hint');
     }
   }, [currentStep]);
@@ -65,7 +65,7 @@ export function useContextualTutorial(
     setCurrentStep(prev => {
       if (prev !== 'card-selected') return prev;
       parentEditFlowRef.current = false;
-      siblingEditFlowRef.current = false;
+      memberCreatedFlowRef.current = false;
       return 'edit-hint';
     });
   }, []);
@@ -91,7 +91,7 @@ export function useContextualTutorial(
   const onParentEditClicked = useCallback(() => {
     if (currentStep === 'parent-selected') {
       parentEditFlowRef.current = true;
-      siblingEditFlowRef.current = false;
+      memberCreatedFlowRef.current = false;
       setCurrentStep('edit-hint');
     }
   }, [currentStep]);
@@ -100,7 +100,7 @@ export function useContextualTutorial(
     setCurrentStep(prev => {
       if (prev !== 'parent-selected') return prev;
       parentEditFlowRef.current = true;
-      siblingEditFlowRef.current = false;
+      memberCreatedFlowRef.current = false;
       return 'edit-hint';
     });
   }, []);
