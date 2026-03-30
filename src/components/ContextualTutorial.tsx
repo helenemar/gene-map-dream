@@ -221,17 +221,29 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       };
     }
 
-    // For link-click-dot, position below all cards to avoid overlap
+    // For link-click-dot, prefer right of cards, fallback below
     if (currentStep === 'link-click-dot' && firstMember && fatherMember) {
       const piEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
       const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
       if (piEl && fatherEl) {
         const piRect = piEl.getBoundingClientRect();
         const fatherRect = fatherEl.getBoundingClientRect();
+        const rightEdge = Math.max(piRect.right, fatherRect.right);
+        const topY = Math.min(piRect.top, fatherRect.top);
+        const sheetW = drawerOpen ? 400 : 0;
+        const rightAvail = window.innerWidth - rightEdge - sheetW;
+        if (rightAvail > 350) {
+          return {
+            left: rightEdge + 20,
+            top: Math.max(16, topY),
+            transform: 'none',
+          };
+        }
+        // Fallback: below cards
         const bottomY = Math.max(piRect.bottom, fatherRect.bottom) + 24;
         const centerX = (Math.min(piRect.left, fatherRect.left) + Math.max(piRect.right, fatherRect.right)) / 2;
         return {
-          left: Math.max(16, Math.min(centerX - 160, window.innerWidth - 340)),
+          left: Math.max(16, Math.min(centerX - 160, window.innerWidth - sheetW - 340)),
           top: Math.min(bottomY, window.innerHeight - 120),
           transform: 'none',
         };
