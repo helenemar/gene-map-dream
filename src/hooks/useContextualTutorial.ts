@@ -109,10 +109,10 @@ export function useContextualTutorial(
   // Called when user creates their first emotional link (released on target)
   const onLinkCreated = useCallback(() => {
     if (currentStep === 'link-drag-release' || currentStep === 'link-click-dot') {
-      // Move to member creation flow instead of finishing
-      setCurrentStep('create-select-parent');
+      // Move to sibling creation flow: select the PI card
+      setCurrentStep('create-select-pi');
     }
-  }, [currentStep, finish]);
+  }, [currentStep]);
 
   // Called when user clicks the "Créer un membre" button (step 9)
   const onCreateMemberClicked = useCallback(() => {
