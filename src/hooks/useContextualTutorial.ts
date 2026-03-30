@@ -39,6 +39,7 @@ export function useContextualTutorial(
     setCurrentStep(null);
     startedRef.current = false;
     parentEditFlowRef.current = false;
+    siblingEditFlowRef.current = false;
   }, [doneStorageKey, isAllowedUser]);
 
   // Start tutorial as soon as first member exists and no drawer is open
