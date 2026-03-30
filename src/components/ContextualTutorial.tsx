@@ -76,6 +76,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   // Determine which member to target based on step
   const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected')
     ? fatherMember
+    : (currentStep === 'link-demo' ? firstMember : firstMember);
     : firstMember;
 
   // Track DOM element position
