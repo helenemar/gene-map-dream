@@ -598,7 +598,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
         }
       }
 
-      setLinkDrag(prev => prev ? { ...prev, cursorX, cursorY, snapX, snapY, snapTargetId } : null);
+      setLinkDrag(prev => prev ? { ...prev, cursorX, cursorY, snapX, snapY, snapTargetId, snapAnchorSide } : null);
       return;
     }
     if (dragInfo) {
