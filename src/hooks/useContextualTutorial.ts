@@ -7,6 +7,7 @@ export type ContextualTutoStep =
   | 'parent-intro' | 'parent-selected'
   | 'link-click-dot' | 'link-drag-release'
   | 'create-select-pi' | 'create-click-button' | 'create-pick-sibling'
+  | 'drag-card'
   | 'union-select-both' | 'union-click-button'
   | null;
 
@@ -128,9 +129,16 @@ export function useContextualTutorial(
     }
   }, [currentStep]);
 
-  // Called when user picks "Frère/Sœur" in the dropdown (step 10) → move to union flow
+  // Called when user picks "Frère/Sœur" in the dropdown → move to drag step
   const onCreateSiblingPicked = useCallback(() => {
     if (currentStep === 'create-pick-sibling') {
+      setCurrentStep('drag-card');
+    }
+  }, [currentStep]);
+
+  // Called when user drags a card → move to union flow
+  const onCardDragged = useCallback(() => {
+    if (currentStep === 'drag-card') {
       setCurrentStep('union-select-both');
     }
   }, [currentStep]);
@@ -165,6 +173,7 @@ export function useContextualTutorial(
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
     onPiSelectedForCreation, onCreateMemberClicked, onCreateSiblingPicked,
+    onCardDragged,
     onTwoMembersSelected, onUnionCreated,
     finish, restart,
   };
