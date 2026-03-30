@@ -372,6 +372,69 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
               </motion.div>
             </motion.div>
           )}
+
+          {/* Animated drag cursor for link-demo: shows drag from anchor to target */}
+          {currentStep === 'link-demo' && linkDragPositions && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="absolute pointer-events-none z-[102]"
+              style={{ top: 0, left: 0, width: '100%', height: '100%' }}
+            >
+              {/* Animated drag line */}
+              <svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible' }}>
+                {/* Static start dot (anchor point) */}
+                <circle
+                  cx={linkDragPositions.fromX}
+                  cy={linkDragPositions.fromY}
+                  r={6}
+                  fill="hsl(var(--primary))"
+                  className="animate-pulse"
+                />
+                {/* Animated drag path */}
+                <motion.line
+                  x1={linkDragPositions.fromX}
+                  y1={linkDragPositions.fromY}
+                  animate={{
+                    x2: [linkDragPositions.fromX, linkDragPositions.toX, linkDragPositions.toX, linkDragPositions.fromX],
+                    y2: [linkDragPositions.fromY, linkDragPositions.toY, linkDragPositions.toY, linkDragPositions.fromY],
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.7, 1] }}
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  strokeDasharray="6 4"
+                  strokeLinecap="round"
+                />
+                {/* Target snap ring */}
+                <motion.circle
+                  cx={linkDragPositions.toX}
+                  cy={linkDragPositions.toY}
+                  r={20}
+                  fill="none"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  animate={{
+                    opacity: [0, 0, 0.6, 0.6, 0],
+                    scale: [0.5, 0.5, 1, 1, 0.5],
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, times: [0, 0.3, 0.4, 0.7, 1] }}
+                />
+              </svg>
+              {/* Moving cursor */}
+              <motion.div
+                className="absolute"
+                animate={{
+                  left: [linkDragPositions.fromX, linkDragPositions.toX, linkDragPositions.toX, linkDragPositions.fromX],
+                  top: [linkDragPositions.fromY, linkDragPositions.toY, linkDragPositions.toY, linkDragPositions.fromY],
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.7, 1] }}
+                style={{ marginLeft: 4, marginTop: 4 }}
+              >
+                <MousePointerClick className="w-8 h-8 text-primary drop-shadow-lg" strokeWidth={2.2} />
+              </motion.div>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Tooltip */}
