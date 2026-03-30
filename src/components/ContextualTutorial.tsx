@@ -254,24 +254,24 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                   height={spotlight.height - 2}
                   rx={17}
                   fill="none"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={2.5}
-                  strokeDasharray="8 6"
+                  stroke="hsl(var(--primary) / 0.35)"
+                  strokeWidth={1.5}
+                  strokeDasharray="6 5"
                   strokeLinecap="round"
                 >
                   <animate
                     attributeName="stroke-dashoffset"
-                    from="0" to="-28"
-                    dur="1.5s"
+                    from="0" to="-22"
+                    dur="2s"
                     repeatCount="indefinite"
                   />
                 </rect>
               </svg>
               <motion.div
-                animate={{ opacity: [0.3, 0.12, 0.3] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                animate={{ opacity: [0.15, 0.05, 0.15] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
                 className="absolute -inset-1 rounded-[20px]"
-                style={{ boxShadow: '0 0 28px 8px hsl(var(--primary) / 0.2)' }}
+                style={{ boxShadow: '0 0 20px 6px hsl(var(--primary) / 0.1)' }}
               />
             </motion.div>
           )}
