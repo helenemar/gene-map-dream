@@ -24,8 +24,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
   const { user, loading } = useAuth();
   const { t, lang, setLang } = useLanguage();
 
+  // Auto-detect browser language and redirect new visitors
   React.useEffect(() => {
-    if (forceLang && lang !== forceLang) setLang(forceLang);
+    if (forceLang) {
+      if (lang !== forceLang) setLang(forceLang);
+      return;
+    }
+    // Only auto-redirect if user hasn't manually chosen a language before
+    const stored = localStorage.getItem('genogy-lang');
+    if (stored) return;
+    const browserLang = (navigator.language || '').slice(0, 2).toLowerCase();
+    if (browserLang === 'en') {
+      setLang('en');
+      navigate('/en', { replace: true });
+    } else if (browserLang === 'de') {
+      setLang('de');
+      navigate('/de', { replace: true });
+    }
   }, [forceLang]);
   const [authModal, setAuthModal] = useState<{ open: boolean; view: 'login' | 'signup' }>({ open: false, view: 'login' });
 
