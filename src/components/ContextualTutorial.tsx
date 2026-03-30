@@ -95,6 +95,12 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Sélectionnez « Frère/Sœur » dans le menu déroulant.',
     padding: 8,
   },
+  'drag-card': {
+    icon: <Move className="w-5 h-5" />,
+    title: 'Déplacez une carte',
+    description: 'Cliquez et maintenez sur une carte, puis glissez-la pour la repositionner sur le canevas.',
+    padding: 14,
+  },
   'union-select-both': {
     icon: <Link2 className="w-5 h-5" />,
     title: 'Sélectionnez les deux parents',
