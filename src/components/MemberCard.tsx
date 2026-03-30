@@ -323,7 +323,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)} disabledOptions={disabledOptions} showParentSplit={showParentSplit}>
             <button
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 px-4 h-9 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-md hover:bg-primary/90 hover:shadow-lg active:scale-[0.97] transition-all whitespace-nowrap"
+              className="flex items-center gap-1.5 px-4 h-9 rounded-full bg-foreground/85 text-background text-xs font-semibold shadow-md hover:bg-foreground/75 hover:shadow-lg active:scale-[0.97] transition-all whitespace-nowrap"
             >
               <UserPlus className="w-3.5 h-3.5" />
               {t.memberCard.createMember}
