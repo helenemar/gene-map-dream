@@ -9,6 +9,24 @@ import {
   AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+/** Reusable cursor icon — dark fill, white stroke outline, soft shadow */
+const TutoCursor = ({ size = 36 }: { size?: number }) => (
+  <div className="relative" style={{ width: size, height: size, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))' }}>
+    {/* White outline layer behind */}
+    <MousePointerClick
+      className="absolute inset-0 text-white"
+      style={{ width: size, height: size }}
+      strokeWidth={4}
+    />
+    {/* Dark foreground layer */}
+    <MousePointerClick
+      className="absolute inset-0 text-foreground"
+      style={{ width: size, height: size }}
+      strokeWidth={2}
+    />
+  </div>
+);
+
 interface TipConfig {
   icon: React.ReactNode;
   title: string;
