@@ -755,6 +755,8 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     if (dragInfo) {
       if (dragInfo.groupOffsets && Object.keys(dragInfo.groupOffsets).length > 1) {
         contextualTutorial.onMultiDragged();
+      } else {
+        contextualTutorial.onCardDragged();
       }
     }
     setSmartGuides([]);
@@ -1303,6 +1305,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       setEditingNewMember(newMember);
       setDrawerEditing(true);
       setNewMemberDrawerOpen(true);
+      contextualTutorial.onMemberCreated();
       setTimeout(() => centerOnMember(newMember), 100);
       return;
     }
@@ -1313,8 +1316,9 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
     if (relationship === 'sibling') setLastCreatedSibling(newMember);
+    contextualTutorial.onMemberCreated();
     setTimeout(() => centerOnMember(newMember), 100);
-  }, [members, unions, getViewportCenter, centerOnMember, recordSnapshot]);
+  }, [members, unions, getViewportCenter, centerOnMember, recordSnapshot, contextualTutorial]);
 
   const handleToggleLock = useCallback((id: string) => {
     setMembers(prev => prev.map(m => m.id === id ? { ...m, locked: !m.locked } : m));

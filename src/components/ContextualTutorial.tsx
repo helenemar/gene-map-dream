@@ -90,6 +90,18 @@ function useTips(): Record<Exclude<ContextualTutoStep, null>, TipConfig> {
       description: t.contextualTutorial.multiDragDesc,
       padding: 14,
     },
+    'create-member': {
+      icon: <UserPlus className="w-5 h-5" />,
+      title: t.contextualTutorial.createMemberTitle,
+      description: t.contextualTutorial.createMemberDesc,
+      padding: 14,
+    },
+    'drag-single': {
+      icon: <Hand className="w-5 h-5" />,
+      title: t.contextualTutorial.dragSingleTitle,
+      description: t.contextualTutorial.dragSingleDesc,
+      padding: 14,
+    },
   }), [t]);
 }
 

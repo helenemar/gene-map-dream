@@ -6,12 +6,13 @@ export type ContextualTutoStep =
   | 'card-intro' | 'card-selected' | 'edit-hint'
   | 'parent-intro' | 'parent-selected'
   | 'link-click-dot' | 'link-drag-release'
+  | 'create-member' | 'drag-single'
   | 'multi-select' | 'multi-drag'
   | null;
 
 /**
  * Event-driven contextual tutorial.
- * Flow: card select → edit → parent → link creation → multi-select → multi-drag → finish
+ * Flow: card select → edit → parent → link creation → create member → drag single → multi-select → multi-drag → finish
  */
 export function useContextualTutorial(
   memberCount: number,
@@ -26,6 +27,7 @@ export function useContextualTutorial(
   const [done, setDone] = useState(() => !isAllowedUser || localStorage.getItem(doneStorageKey) === '1');
   const startedRef = useRef(false);
   const parentEditFlowRef = useRef(false);
+  const memberCountAtCreateRef = useRef(0);
 
   // Reset tutorial state when changing genogram/account scope
   useEffect(() => {
@@ -74,6 +76,10 @@ export function useContextualTutorial(
         setCurrentStep('parent-intro');
       }
     }
+    // After creating a new member, advance to drag-single
+    if (currentStep === 'create-member') {
+      setCurrentStep('drag-single');
+    }
   }, [currentStep]);
 
   const onParentSelected = useCallback(() => {
@@ -108,8 +114,20 @@ export function useContextualTutorial(
 
   const onLinkCreated = useCallback(() => {
     if (currentStep === 'link-drag-release' || currentStep === 'link-click-dot') {
-      setCurrentStep('multi-select');
+      memberCountAtCreateRef.current = memberCount;
+      setCurrentStep('create-member');
     }
+  }, [currentStep, memberCount]);
+
+  /** Called when a new member is created via the + menu */
+  const onMemberCreated = useCallback(() => {
+    if (currentStep === 'create-member') {
+      // The drawer will open for the new member; onDrawerClosed will advance to drag-single
+    }
+  }, [currentStep]);
+
+  const onCardDragged = useCallback(() => {
+    if (currentStep === 'drag-single') setCurrentStep('multi-select');
   }, [currentStep]);
 
   const onMultiSelected = useCallback(() => {
@@ -135,6 +153,7 @@ export function useContextualTutorial(
     onCardSelected, onEditClicked, onDrawerClosed,
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
+    onMemberCreated, onCardDragged,
     onMultiSelected, onMultiDragged,
     openPrimaryEditHint, openParentEditHint,
     finish, restart,

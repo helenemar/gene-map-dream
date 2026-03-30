@@ -588,6 +588,10 @@ export const fr: Translations = {
     multiSelectDesc: 'Tracez un rectangle sur le canevas ou maintenez ⇧ Shift et cliquez sur plusieurs cartes.',
     multiDragTitle: 'Déplacez le groupe',
     multiDragDesc: 'Glissez une des cartes sélectionnées pour déplacer tout le groupe.',
+    createMemberTitle: 'Créer un nouveau membre',
+    createMemberDesc: 'Cliquez sur le bouton ＋ d\'un membre pour ajouter un parent, conjoint ou frère/sœur.',
+    dragSingleTitle: 'Déplacez la carte',
+    dragSingleDesc: 'Glissez la carte du nouveau membre pour la repositionner sur le canevas.',
   },
   pathologyNames: {
     'Maladie cardiovasculaire': 'Maladie cardiovasculaire',
