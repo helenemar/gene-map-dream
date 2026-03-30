@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pencil, CheckCircle } from 'lucide-react';
+import { X, Pencil, CheckCircle, MousePointerClick } from 'lucide-react';
 import { FamilyMember } from '@/types/genogram';
 import type { ContextualTutoStep } from '@/hooks/useContextualTutorial';
 
@@ -13,9 +13,9 @@ interface TipConfig {
 
 const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
   'card-intro': {
-    icon: <Pencil className="w-5 h-5" />,
-    title: 'Modifier les informations',
-    description: 'Cliquez sur le bouton ✏️ pour ouvrir le panneau d\'édition et compléter les informations du membre.',
+    icon: <MousePointerClick className="w-5 h-5" />,
+    title: 'Sélectionnez le membre',
+    description: 'Cliquez sur la carte pour la sélectionner, puis sur le bouton ✏️ pour modifier ses informations.',
     padding: 14,
   },
   'edit-hint': {
@@ -186,6 +186,27 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                 className="absolute -inset-1 rounded-[20px]"
                 style={{ boxShadow: '0 0 28px 8px hsl(var(--primary) / 0.2)' }}
               />
+            </motion.div>
+          )}
+
+          {/* Animated pointing hand for card-intro */}
+          {spotlight && currentStep === 'card-intro' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 20 }}
+              className="absolute pointer-events-none z-[102]"
+              style={{
+                top: spotlight.top + spotlight.height - 28,
+                left: spotlight.left + spotlight.width / 2 + 10,
+              }}
+            >
+              <motion.div
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <span className="text-3xl drop-shadow-lg" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>👆</span>
+              </motion.div>
             </motion.div>
           )}
         </motion.div>
