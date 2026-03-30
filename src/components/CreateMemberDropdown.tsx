@@ -133,7 +133,7 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={onOpenChange}>
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
         <DropdownMenuContent align="center" sideOffset={4} collisionPadding={16} className="w-56">
           {showParentSplit && (
