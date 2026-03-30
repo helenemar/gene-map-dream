@@ -707,14 +707,14 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </>
           )}
 
-          {/* drag-single: animated hand dragging a card */}
-          {currentStep === 'drag-single' && (
+          {/* drag-single: animated hand dragging a card — positioned on the target card */}
+          {currentStep === 'drag-single' && spotlight && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
               className="fixed pointer-events-none z-[102]"
-              style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+              style={{ top: spotlight.top + spotlight.height * 0.4, left: spotlight.left + spotlight.width * 0.35 }}
             >
               {/* Trail path */}
               <svg className="absolute overflow-visible" width="1" height="1" style={{ pointerEvents: 'none', top: 24, left: 60 }}>
