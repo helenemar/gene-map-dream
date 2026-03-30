@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pencil, CheckCircle, MousePointerClick, UserRound } from 'lucide-react';
+import { X, Pencil, CheckCircle, MousePointerClick, UserRound, Link2 } from 'lucide-react';
 import { FamilyMember } from '@/types/genogram';
 import type { ContextualTutoStep } from '@/hooks/useContextualTutorial';
 import {
@@ -47,6 +47,12 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Double-cliquez sur la carte ou cliquez sur l\'icône ✏️ pour modifier ses informations.',
     padding: 14,
   },
+  'link-demo': {
+    icon: <Link2 className="w-5 h-5" />,
+    title: 'Créer un lien émotionnel',
+    description: 'Cliquez sur un point d\'ancrage (●) d\'un membre, maintenez et glissez vers un autre membre pour créer un lien émotionnel.',
+    padding: 24,
+  },
 };
 
 interface ContextualTutorialProps {
@@ -61,6 +67,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
 }) => {
   const [spotlight, setSpotlight] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [editBtnPos, setEditBtnPos] = useState<{ top: number; left: number } | null>(null);
+  const [linkDragPositions, setLinkDragPositions] = useState<{ fromX: number; fromY: number; toX: number; toY: number } | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const rafRef = useRef(0);
 
@@ -73,7 +80,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
 
   // Track DOM element position
   useEffect(() => {
-    if (!currentStep || !targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
+    if (!currentStep) { setSpotlight(null); setEditBtnPos(null); setLinkDragPositions(null); return; }
 
     const padding = tip?.padding ?? 14;
 
@@ -93,7 +100,36 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           setSpotlight(null);
         }
         setEditBtnPos(null);
+        setLinkDragPositions(null);
+      } else if (currentStep === 'link-demo') {
+        // Highlight area encompassing both PI and father cards
+        if (firstMember && fatherMember) {
+          const piEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
+          const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
+          if (piEl && fatherEl) {
+            const piRect = piEl.getBoundingClientRect();
+            const fatherRect = fatherEl.getBoundingClientRect();
+            const minX = Math.min(piRect.left, fatherRect.left) - padding;
+            const minY = Math.min(piRect.top, fatherRect.top) - padding;
+            const maxX = Math.max(piRect.right, fatherRect.right) + padding;
+            const maxY = Math.max(piRect.bottom, fatherRect.bottom) + padding;
+            setSpotlight({ top: minY, left: minX, width: maxX - minX, height: maxY - minY });
+
+            // Anchor positions: from PI right-side dot to father center
+            setLinkDragPositions({
+              fromX: piRect.right,
+              fromY: piRect.top + piRect.height / 2,
+              toX: fatherRect.left + fatherRect.width / 2,
+              toY: fatherRect.top + fatherRect.height / 2,
+            });
+          } else {
+            setSpotlight(null);
+            setLinkDragPositions(null);
+          }
+        }
+        setEditBtnPos(null);
       } else {
+        if (!targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
         const el = document.querySelector(`[data-member-card="${targetMember.id}"]`);
         if (el) {
           const rect = el.getBoundingClientRect();
@@ -119,12 +155,13 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         } else {
           setEditBtnPos(null);
         }
+        setLinkDragPositions(null);
       }
       rafRef.current = requestAnimationFrame(update);
     };
     update();
     return () => cancelAnimationFrame(rafRef.current);
-  }, [currentStep, targetMember, tip]);
+  }, [currentStep, targetMember, firstMember, fatherMember, tip]);
 
   // Tooltip position
   const cardStyle = useMemo((): React.CSSProperties => {
@@ -163,7 +200,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-demo' && (
           spotlight ? (
             <>
               <button
@@ -227,7 +264,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[100] pointer-events-none"
         >
-          {currentStep !== 'edit-hint' && (
+          {currentStep !== 'edit-hint' && currentStep !== 'link-demo' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <mask id="ctx-tuto-mask">
@@ -332,6 +369,69 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                 transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
               >
                 <MousePointerClick className="w-9 h-9 text-primary drop-shadow-lg" strokeWidth={2.2} />
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* Animated drag cursor for link-demo: shows drag from anchor to target */}
+          {currentStep === 'link-demo' && linkDragPositions && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="absolute pointer-events-none z-[102]"
+              style={{ top: 0, left: 0, width: '100%', height: '100%' }}
+            >
+              {/* Animated drag line */}
+              <svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible' }}>
+                {/* Static start dot (anchor point) */}
+                <circle
+                  cx={linkDragPositions.fromX}
+                  cy={linkDragPositions.fromY}
+                  r={6}
+                  fill="hsl(var(--primary))"
+                  className="animate-pulse"
+                />
+                {/* Animated drag path */}
+                <motion.line
+                  x1={linkDragPositions.fromX}
+                  y1={linkDragPositions.fromY}
+                  animate={{
+                    x2: [linkDragPositions.fromX, linkDragPositions.toX, linkDragPositions.toX, linkDragPositions.fromX],
+                    y2: [linkDragPositions.fromY, linkDragPositions.toY, linkDragPositions.toY, linkDragPositions.fromY],
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.7, 1] }}
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  strokeDasharray="6 4"
+                  strokeLinecap="round"
+                />
+                {/* Target snap ring */}
+                <motion.circle
+                  cx={linkDragPositions.toX}
+                  cy={linkDragPositions.toY}
+                  r={20}
+                  fill="none"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  animate={{
+                    opacity: [0, 0, 0.6, 0.6, 0],
+                    scale: [0.5, 0.5, 1, 1, 0.5],
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, times: [0, 0.3, 0.4, 0.7, 1] }}
+                />
+              </svg>
+              {/* Moving cursor */}
+              <motion.div
+                className="absolute"
+                animate={{
+                  left: [linkDragPositions.fromX, linkDragPositions.toX, linkDragPositions.toX, linkDragPositions.fromX],
+                  top: [linkDragPositions.fromY, linkDragPositions.toY, linkDragPositions.toY, linkDragPositions.fromY],
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.7, 1] }}
+                style={{ marginLeft: 4, marginTop: 4 }}
+              >
+                <MousePointerClick className="w-8 h-8 text-primary drop-shadow-lg" strokeWidth={2.2} />
               </motion.div>
             </motion.div>
           )}
