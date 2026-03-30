@@ -177,4 +177,14 @@ export interface Translations {
     cutoff: string; violence: string; emotional_abuse: string; physical_violence: string;
     sexual_abuse: string; neglect: string; controlling: string;
   };
+  emotionalLinkDescriptions: {
+    fusional: string; distant: string; conflictual: string; ambivalent: string;
+    cutoff: string; violence: string; emotional_abuse: string; physical_violence: string;
+    sexual_abuse: string; neglect: string; controlling: string;
+  };
+  linkTypeModal: {
+    title: string; subtitle: string; editTitle: string; editSubtitle: string;
+    categoryRelational: string; categoryViolence: string;
+    alreadyUsed: string; deleteLink: string;
+  };
 }
