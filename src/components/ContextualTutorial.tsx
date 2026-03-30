@@ -366,7 +366,9 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   // Tooltip position
   const cardStyle = useMemo((): React.CSSProperties => {
     if (!spotlight) {
-      return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
+      // Default: top-right of the canvas (same as normal steps)
+      const sheetWidth = drawerOpen ? 400 : 0;
+      return { right: sheetWidth + 24, top: 80, transform: 'none' };
     }
     
     // For edit-hint, position tooltip just left of the drawer, vertically centered on drawer
