@@ -154,7 +154,6 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   const { user } = useAuth();
   const [dbLoaded, setDbLoaded] = useState(false);
   const onboarding = useOnboarding(isSharedMode ? undefined : genogramId);
-  const contextualTutorial = useContextualTutorial(members.length, newMemberDrawerOpen);
 
   // Initialize with empty state — will be populated from DB, shared data, or sample data
   const [members, setMembers] = useState<FamilyMember[]>(() => {
