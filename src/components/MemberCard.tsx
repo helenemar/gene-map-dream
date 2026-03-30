@@ -115,6 +115,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onCreateDropdownOpen,
   isLinkDragging = false,
   forceSelectOnClick = false,
+  tutorialCreateHighlight = false,
 }) => {
   const { t } = useLanguage();
   const isDeceased = !!member.deathYear;
