@@ -2,13 +2,18 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 const CONTEXTUAL_TUTO_DONE_KEY = 'genogy-contextual-tuto-done';
 
-export type ContextualTutoStep = 'card-intro' | 'card-selected' | 'edit-hint' | null;
+export type ContextualTutoStep =
+  | 'card-intro' | 'card-selected' | 'edit-hint'
+  | 'parent-intro' | 'parent-selected'
+  | null;
 
 /**
  * Event-driven contextual tutorial.
- * Step 1 (card-intro): Highlight card, cursor points at it → user clicks to select.
- * Step 2 (card-selected): Card selected, cursor points at edit button → user clicks edit.
- * Step 3 (edit-hint): Edit drawer open, hint about editing in the sidesheet.
+ * Step 1 (card-intro): Highlight PI card → user clicks to select.
+ * Step 2 (card-selected): Card selected → user clicks edit button.
+ * Step 3 (edit-hint): Edit drawer open → user fills info & closes drawer.
+ * Step 4 (parent-intro): Highlight father card → user clicks to select.
+ * Step 5 (parent-selected): Father selected → user double-clicks or clicks edit.
  */
 export function useContextualTutorial(
   memberCount: number,
@@ -32,7 +37,6 @@ export function useContextualTutorial(
   }, [doneStorageKey, isAllowedUser]);
 
   // Start tutorial as soon as first member exists and no drawer is open
-  // (works both after creation and when opening a freshly created genogram)
   useEffect(() => {
     if (done || startedRef.current || currentStep !== null) return;
     if (memberCount < 1) return;
@@ -42,23 +46,41 @@ export function useContextualTutorial(
     setCurrentStep('card-intro');
   }, [done, currentStep, memberCount, drawerOpen]);
 
-  // Called when user selects the card
+  // Called when user selects the PI card (step 1)
   const onCardSelected = useCallback(() => {
     if (currentStep === 'card-intro') {
       setCurrentStep('card-selected');
     }
   }, [currentStep]);
 
-  // Called when user clicks the edit button on the card
+  // Called when user clicks the edit button on the PI card (step 2)
   const onEditClicked = useCallback(() => {
     if (currentStep === 'card-selected') {
       setCurrentStep('edit-hint');
     }
   }, [currentStep]);
 
-  // Called when the edit drawer is closed after seeing the hint
+  // Called when the edit drawer is closed after PI editing (step 3 → 4)
   const onDrawerClosed = useCallback(() => {
     if (currentStep === 'edit-hint') {
+      // Move to parent phase instead of finishing
+      setCurrentStep('parent-intro');
+    } else if (currentStep === 'parent-selected') {
+      // Father edited and drawer closed → tutorial done
+      finish();
+    }
+  }, [currentStep]);
+
+  // Called when user selects the father card (step 4)
+  const onParentSelected = useCallback(() => {
+    if (currentStep === 'parent-intro') {
+      setCurrentStep('parent-selected');
+    }
+  }, [currentStep]);
+
+  // Called when user opens edit on the father (step 5 → done)
+  const onParentEditClicked = useCallback(() => {
+    if (currentStep === 'parent-selected') {
       finish();
     }
   }, [currentStep]);
@@ -78,5 +100,10 @@ export function useContextualTutorial(
 
   const active = currentStep !== null;
 
-  return { active, currentStep, onCardSelected, onEditClicked, onDrawerClosed, finish, restart };
+  return {
+    active, currentStep,
+    onCardSelected, onEditClicked, onDrawerClosed,
+    onParentSelected, onParentEditClicked,
+    finish, restart,
+  };
 }

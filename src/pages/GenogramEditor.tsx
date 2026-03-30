@@ -806,7 +806,13 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
 
   // Advance contextual tutorial when card is selected
   useEffect(() => {
-    if (selectedMembers.size > 0) contextualTutorial.onCardSelected();
+    if (selectedMembers.size > 0) {
+      contextualTutorial.onCardSelected();
+      // Check if the selected member is the father (members[1]) for parent phase
+      if (members[1] && selectedMembers.has(members[1].id)) {
+        contextualTutorial.onParentSelected();
+      }
+    }
   }, [selectedMembers.size]);
 
   // ─── Parent picker state (for child creation with multiple unions) ───
@@ -1295,7 +1301,10 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
 
   // Advance contextual tutorial when edit drawer opens/closes
   useEffect(() => {
-    if (newMemberDrawerOpen && drawerEditing) contextualTutorial.onEditClicked();
+    if (newMemberDrawerOpen && drawerEditing) {
+      contextualTutorial.onEditClicked();
+      contextualTutorial.onParentEditClicked();
+    }
   }, [newMemberDrawerOpen, drawerEditing]);
 
   const drawerClosedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -2064,6 +2073,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
             <ContextualTutorial
               currentStep={contextualTutorial.currentStep}
               firstMember={members[0] || null}
+              fatherMember={members[1] || null}
               onFinish={contextualTutorial.finish}
             />
           )}

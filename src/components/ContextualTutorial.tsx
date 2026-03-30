@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pencil, CheckCircle, MousePointerClick } from 'lucide-react';
+import { X, Pencil, CheckCircle, MousePointerClick, UserRound } from 'lucide-react';
 import { FamilyMember } from '@/types/genogram';
 import type { ContextualTutoStep } from '@/hooks/useContextualTutorial';
 import {
@@ -35,16 +35,29 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Complétez les informations ici : prénom, dates, pathologies… Fermez le panneau quand vous avez terminé.',
     padding: 14,
   },
+  'parent-intro': {
+    icon: <UserRound className="w-5 h-5" />,
+    title: 'Passez au père',
+    description: 'Cliquez maintenant sur la carte du père (à gauche) pour le sélectionner.',
+    padding: 14,
+  },
+  'parent-selected': {
+    icon: <Pencil className="w-5 h-5" />,
+    title: 'Modifier le père',
+    description: 'Double-cliquez sur la carte ou cliquez sur l\'icône ✏️ pour modifier ses informations.',
+    padding: 14,
+  },
 };
 
 interface ContextualTutorialProps {
   currentStep: ContextualTutoStep;
   firstMember: FamilyMember | null;
+  fatherMember: FamilyMember | null;
   onFinish: () => void;
 }
 
 const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
-  currentStep, firstMember, onFinish,
+  currentStep, firstMember, fatherMember, onFinish,
 }) => {
   const [spotlight, setSpotlight] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [editBtnPos, setEditBtnPos] = useState<{ top: number; left: number } | null>(null);
@@ -53,9 +66,14 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
 
   const tip = currentStep ? TIPS[currentStep] : null;
 
+  // Determine which member to target based on step
+  const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected')
+    ? fatherMember
+    : firstMember;
+
   // Track DOM element position
   useEffect(() => {
-    if (!currentStep || !firstMember) { setSpotlight(null); setEditBtnPos(null); return; }
+    if (!currentStep || !targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
 
     const padding = tip?.padding ?? 14;
 
@@ -76,7 +94,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         }
         setEditBtnPos(null);
       } else {
-        const el = document.querySelector(`[data-member-card="${firstMember.id}"]`);
+        const el = document.querySelector(`[data-member-card="${targetMember.id}"]`);
         if (el) {
           const rect = el.getBoundingClientRect();
           setSpotlight({
@@ -89,9 +107,9 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           setSpotlight(null);
         }
 
-        // Track edit button position for card-selected step
-        if (currentStep === 'card-selected') {
-          const btn = document.querySelector(`[data-edit-button="${firstMember.id}"]`);
+        // Track edit button position for card-selected or parent-selected step
+        if (currentStep === 'card-selected' || currentStep === 'parent-selected') {
+          const btn = document.querySelector(`[data-edit-button="${targetMember.id}"]`);
           if (btn) {
             const btnRect = btn.getBoundingClientRect();
             setEditBtnPos({ top: btnRect.top + btnRect.height / 2, left: btnRect.left + btnRect.width / 2 });
@@ -106,7 +124,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
     };
     update();
     return () => cancelAnimationFrame(rafRef.current);
-  }, [currentStep, firstMember, tip]);
+  }, [currentStep, targetMember, tip]);
 
   // Tooltip position
   const cardStyle = useMemo((): React.CSSProperties => {
@@ -276,8 +294,8 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </motion.div>
           )}
 
-          {/* Animated pointing cursor for card-intro */}
-          {spotlight && currentStep === 'card-intro' && (
+          {/* Animated pointing cursor for card-intro and parent-intro */}
+          {spotlight && (currentStep === 'card-intro' || currentStep === 'parent-intro') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -297,8 +315,8 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </motion.div>
           )}
 
-          {/* Animated pointing cursor for card-selected → points at edit button */}
-          {editBtnPos && currentStep === 'card-selected' && (
+          {/* Animated pointing cursor for card-selected / parent-selected → points at edit button */}
+          {editBtnPos && (currentStep === 'card-selected' || currentStep === 'parent-selected') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
