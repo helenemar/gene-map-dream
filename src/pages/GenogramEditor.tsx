@@ -797,7 +797,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   // ─── New member state ───
   const [editingNewMember, setEditingNewMember] = useState<FamilyMember | null>(null);
   const [newMemberDrawerOpen, setNewMemberDrawerOpen] = useState(false);
-  const contextualTutorial = useContextualTutorial(members.length, newMemberDrawerOpen);
+  const contextualTutorial = useContextualTutorial(members.length, newMemberDrawerOpen, user?.email);
 
   // ─── Parent picker state (for child creation with multiple unions) ───
   const [parentPickerState, setParentPickerState] = useState<{
