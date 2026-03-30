@@ -144,12 +144,62 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
     <AnimatePresence mode="wait">
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
-        {/* Clickable overlay to catch clicks outside spotlight */}
+        {/* Click-outside catchers (without blocking spotlight target) */}
         {currentStep !== 'edit-hint' && (
-          <div
-            className="fixed inset-0 z-[99] pointer-events-auto"
-            onClick={() => setShowConfirm(true)}
-          />
+          spotlight ? (
+            <>
+              <button
+                type="button"
+                aria-label="Quitter le tutoriel"
+                className="fixed z-[99] pointer-events-auto bg-transparent border-0 p-0 m-0 appearance-none"
+                style={{ top: 0, left: 0, width: '100vw', height: Math.max(0, spotlight.top) }}
+                onClick={() => setShowConfirm(true)}
+              />
+              <button
+                type="button"
+                aria-label="Quitter le tutoriel"
+                className="fixed z-[99] pointer-events-auto bg-transparent border-0 p-0 m-0 appearance-none"
+                style={{
+                  top: spotlight.top + spotlight.height,
+                  left: 0,
+                  width: '100vw',
+                  height: Math.max(0, window.innerHeight - (spotlight.top + spotlight.height)),
+                }}
+                onClick={() => setShowConfirm(true)}
+              />
+              <button
+                type="button"
+                aria-label="Quitter le tutoriel"
+                className="fixed z-[99] pointer-events-auto bg-transparent border-0 p-0 m-0 appearance-none"
+                style={{
+                  top: spotlight.top,
+                  left: 0,
+                  width: Math.max(0, spotlight.left),
+                  height: spotlight.height,
+                }}
+                onClick={() => setShowConfirm(true)}
+              />
+              <button
+                type="button"
+                aria-label="Quitter le tutoriel"
+                className="fixed z-[99] pointer-events-auto bg-transparent border-0 p-0 m-0 appearance-none"
+                style={{
+                  top: spotlight.top,
+                  left: spotlight.left + spotlight.width,
+                  width: Math.max(0, window.innerWidth - (spotlight.left + spotlight.width)),
+                  height: spotlight.height,
+                }}
+                onClick={() => setShowConfirm(true)}
+              />
+            </>
+          ) : (
+            <button
+              type="button"
+              aria-label="Quitter le tutoriel"
+              className="fixed inset-0 z-[99] pointer-events-auto bg-transparent border-0 p-0 m-0 appearance-none"
+              onClick={() => setShowConfirm(true)}
+            />
+          )
         )}
 
         <motion.div
