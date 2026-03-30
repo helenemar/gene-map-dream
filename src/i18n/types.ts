@@ -38,6 +38,7 @@ export interface Translations {
     tagline: string; product: string; features: string; pricing: string; pricingBeta: string;
     faq: string; legal: string; legalNotice: string; privacy: string; terms: string;
     contact: string; copyright: string; madeWith: string;
+    whatIsGenogram: string; howToGenogram: string; disclaimer: string;
   };
   auth: {
     welcomeBack: string; accessGenograms: string; continueGoogle: string; orByEmail: string;
