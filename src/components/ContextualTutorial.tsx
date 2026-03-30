@@ -90,6 +90,12 @@ function useTips(): Record<Exclude<ContextualTutoStep, null>, TipConfig> {
       description: t.contextualTutorial.multiDragDesc,
       padding: 14,
     },
+    'select-for-create': {
+      icon: <MousePointerClick className="w-5 h-5" />,
+      title: t.contextualTutorial.selectForCreateTitle,
+      description: t.contextualTutorial.selectForCreateDesc,
+      padding: 14,
+    },
     'create-member': {
       icon: <UserPlus className="w-5 h-5" />,
       title: t.contextualTutorial.createMemberTitle,
