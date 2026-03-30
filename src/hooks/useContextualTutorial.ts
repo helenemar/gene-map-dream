@@ -164,7 +164,7 @@ export function useContextualTutorial(
     onCardSelected, onEditClicked, onDrawerClosed,
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
-    onCreateMemberClicked, onCreateParentPicked,
+    onPiSelectedForCreation, onCreateMemberClicked, onCreateSiblingPicked,
     onTwoMembersSelected, onUnionCreated,
     finish, restart,
   };
