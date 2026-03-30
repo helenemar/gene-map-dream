@@ -125,12 +125,13 @@ interface ContextualTutorialProps {
   currentStep: ContextualTutoStep;
   firstMember: FamilyMember | null;
   fatherMember: FamilyMember | null;
+  siblingMember?: FamilyMember | null;
   drawerOpen?: boolean;
   onFinish: () => void;
 }
 
 const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
-  currentStep, firstMember, fatherMember, drawerOpen = false, onFinish,
+  currentStep, firstMember, fatherMember, siblingMember, drawerOpen = false, onFinish,
 }) => {
   const [tipHidden, setTipHidden] = useState(false);
   const [spotlight, setSpotlight] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
