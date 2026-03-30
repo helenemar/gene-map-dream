@@ -143,7 +143,7 @@ const CreateGenogramModal: React.FC<Props> = ({ open, onOpenChange }) => {
       resetForm();
       onOpenChange(false);
 
-      toast.success(`${t.createModal.created} ${firstName.trim()} ${lastName.trim()}`);
+      toast.success(`${t.createModal.created} ${firstName.trim()} ${lastName.trim()}`, { duration: 2500 });
       navigate(`/editor/${data.id}`);
     } catch (err: any) {
       toast.error(err.message || t.createModal.createError);
