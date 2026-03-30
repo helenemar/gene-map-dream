@@ -35,6 +35,16 @@ const Footer: React.FC = () => {
                 </button>
               </li>
               <li>
+                <Link to="/genogramme" className="text-sm hover:text-primary transition-colors">
+                  Qu'est-ce qu'un génogramme ?
+                </Link>
+              </li>
+              <li>
+                <Link to="/comment-faire-un-genogramme" className="text-sm hover:text-primary transition-colors">
+                  Comment faire un génogramme
+                </Link>
+              </li>
+              <li>
                 <span className="text-sm inline-flex items-center gap-1.5">
                   Tarifs
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary px-1.5 py-0.5 rounded">
