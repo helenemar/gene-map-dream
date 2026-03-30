@@ -553,7 +553,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                       <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" />
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent side="left" align="start" sideOffset={8} collisionPadding={16} className="w-[240px] p-3 flex flex-col gap-3">
+                  <PopoverContent side="left" align="start" sideOffset={8} collisionPadding={16} className="w-[240px] p-3 flex flex-col gap-3 z-[200]">
                     <div className="flex flex-col gap-2">
                       <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">{t.memberEdit.genderIdentity}</span>
                       <div className="flex flex-wrap gap-1.5">
@@ -633,7 +633,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   align="start"
                   sideOffset={8}
                   collisionPadding={16}
-                  className="w-auto min-w-[280px] max-w-[380px] max-h-[calc(100vh-32px)] p-3 flex flex-col"
+                  className="w-auto min-w-[280px] max-w-[380px] max-h-[calc(100vh-32px)] p-3 flex flex-col z-[200]"
                 >
                   <div className="flex min-h-0 flex-col gap-2">
                     <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
