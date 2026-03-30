@@ -1084,7 +1084,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                         .map(p => (
                           <span key={p.id} className="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs border border-border/50 bg-accent/20 text-foreground">
                             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color_hex }} />
-                            {p.name}
+                            {t.pathologyNames[p.name] ?? p.name}
                           </span>
                         ))}
                     </div>
