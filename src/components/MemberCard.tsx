@@ -63,6 +63,8 @@ interface MemberCardProps {
   onboardingPulse?: boolean;
   /** Current canvas zoom level — used to keep dots at constant visual size */
   zoom?: number;
+  /** Called when the "Créer un membre" dropdown opens/closes */
+  onCreateDropdownOpen?: (open: boolean) => void;
 }
 
 const EDGE_DOTS: { side: AnchorSide; pos: React.CSSProperties }[] = [
