@@ -33,62 +33,65 @@ interface TipConfig {
   padding: number;
 }
 
-const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
-  'card-intro': {
-    icon: <MousePointerClick className="w-5 h-5" />,
-    title: 'Sélectionnez le membre',
-    description: 'Cliquez sur la carte pour la sélectionner.',
-    padding: 14,
-  },
-  'card-selected': {
-    icon: <Pencil className="w-5 h-5" />,
-    title: 'Modifier les informations',
-    description: 'Cliquez sur le bouton ✏️ pour ouvrir le panneau d\'édition.',
-    padding: 14,
-  },
-  'edit-hint': {
-    icon: <CheckCircle className="w-5 h-5" />,
-    title: 'Remplissez les informations',
-    description: 'Complétez les champs (prénom, dates, profession…) puis fermez le panneau pour continuer.',
-    padding: 14,
-  },
-  'parent-intro': {
-    icon: <UserRound className="w-5 h-5" />,
-    title: 'Passez au parent 1',
-    description: 'Cliquez maintenant sur la carte du parent 1 pour le sélectionner.',
-    padding: 14,
-  },
-  'parent-selected': {
-    icon: <Pencil className="w-5 h-5" />,
-    title: 'Modifier le parent 1',
-    description: 'Cliquez sur l\'icône ✏️ pour modifier ses informations.',
-    padding: 14,
-  },
-  'link-click-dot': {
-    icon: <Link2 className="w-5 h-5" />,
-    title: 'Cliquez sur un point d\'ancrage',
-    description: 'Cliquez sur un des points (●) sur le bord de la carte du parent 1 et maintenez le clic.',
-    padding: 14,
-  },
-  'link-drag-release': {
-    icon: <Link2 className="w-5 h-5" />,
-    title: 'Glissez vers l\'enfant',
-    description: 'Maintenez le clic et glissez vers la carte de l\'enfant, puis relâchez pour créer le lien émotionnel.',
-    padding: 24,
-  },
-  'multi-select': {
-    icon: <BoxSelect className="w-5 h-5" />,
-    title: 'Sélection multiple',
-    description: 'Tracez un rectangle sur le canevas ou maintenez ⇧ Shift et cliquez sur plusieurs cartes.',
-    padding: 14,
-  },
-  'multi-drag': {
-    icon: <Move className="w-5 h-5" />,
-    title: 'Déplacez le groupe',
-    description: 'Glissez une des cartes sélectionnées pour déplacer tout le groupe.',
-    padding: 14,
-  },
-};
+function useTips(): Record<Exclude<ContextualTutoStep, null>, TipConfig> {
+  const { t } = useLanguage();
+  return useMemo(() => ({
+    'card-intro': {
+      icon: <MousePointerClick className="w-5 h-5" />,
+      title: t.contextualTutorial.cardIntroTitle,
+      description: t.contextualTutorial.cardIntroDesc,
+      padding: 14,
+    },
+    'card-selected': {
+      icon: <Pencil className="w-5 h-5" />,
+      title: t.contextualTutorial.cardSelectedTitle,
+      description: t.contextualTutorial.cardSelectedDesc,
+      padding: 14,
+    },
+    'edit-hint': {
+      icon: <CheckCircle className="w-5 h-5" />,
+      title: t.contextualTutorial.editHintTitle,
+      description: t.contextualTutorial.editHintDesc,
+      padding: 14,
+    },
+    'parent-intro': {
+      icon: <UserRound className="w-5 h-5" />,
+      title: t.contextualTutorial.parentIntroTitle,
+      description: t.contextualTutorial.parentIntroDesc,
+      padding: 14,
+    },
+    'parent-selected': {
+      icon: <Pencil className="w-5 h-5" />,
+      title: t.contextualTutorial.parentSelectedTitle,
+      description: t.contextualTutorial.parentSelectedDesc,
+      padding: 14,
+    },
+    'link-click-dot': {
+      icon: <Link2 className="w-5 h-5" />,
+      title: t.contextualTutorial.linkClickDotTitle,
+      description: t.contextualTutorial.linkClickDotDesc,
+      padding: 14,
+    },
+    'link-drag-release': {
+      icon: <Link2 className="w-5 h-5" />,
+      title: t.contextualTutorial.linkDragReleaseTitle,
+      description: t.contextualTutorial.linkDragReleaseDesc,
+      padding: 24,
+    },
+    'multi-select': {
+      icon: <BoxSelect className="w-5 h-5" />,
+      title: t.contextualTutorial.multiSelectTitle,
+      description: t.contextualTutorial.multiSelectDesc,
+      padding: 14,
+    },
+    'multi-drag': {
+      icon: <Move className="w-5 h-5" />,
+      title: t.contextualTutorial.multiDragTitle,
+      description: t.contextualTutorial.multiDragDesc,
+      padding: 14,
+    },
+  }), [t]);
+}
 
 interface ContextualTutorialProps {
   currentStep: ContextualTutoStep;
