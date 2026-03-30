@@ -3,7 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Pencil, CheckCircle, MousePointerClick, UserRound, Link2, UserPlus, User, Move, BoxSelect, Hand } from 'lucide-react';
 import { FamilyMember } from '@/types/genogram';
 import type { ContextualTutoStep } from '@/hooks/useContextualTutorial';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
   AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
