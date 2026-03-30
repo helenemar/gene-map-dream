@@ -387,51 +387,11 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       };
     }
 
-    // For link-click-dot, prefer right of cards, fallback below
-    if (currentStep === 'link-click-dot' && firstMember && fatherMember) {
-      const piEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
-      const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
-      if (piEl && fatherEl) {
-        const piRect = piEl.getBoundingClientRect();
-        const fatherRect = fatherEl.getBoundingClientRect();
-        const rightEdge = Math.max(piRect.right, fatherRect.right);
-        const topY = Math.min(piRect.top, fatherRect.top);
-        const sheetW = drawerOpen ? 400 : 0;
-        const rightAvail = window.innerWidth - rightEdge - sheetW;
-        if (rightAvail > 350) {
-          return {
-            left: rightEdge + 20,
-            top: Math.max(16, topY),
-            transform: 'none',
-          };
-        }
-        // Fallback: below cards
-        const bottomY = Math.max(piRect.bottom, fatherRect.bottom) + 24;
-        const centerX = (Math.min(piRect.left, fatherRect.left) + Math.max(piRect.right, fatherRect.right)) / 2;
-        return {
-          left: Math.max(16, Math.min(centerX - 160, window.innerWidth - sheetW - 340)),
-          top: Math.min(bottomY, window.innerHeight - 120),
-          transform: 'none',
-        };
-      }
-    }
-
-    // When the sidesheet is open, keep tooltip away from the right panel (~400px)
+    // For all non-drawer steps: fixed top-right of the canvas
     const sheetWidth = drawerOpen ? 400 : 0;
-    const availableWidth = window.innerWidth - sheetWidth;
-
-    const rightSpace = window.innerWidth - (spotlight.left + spotlight.width);
-    if (rightSpace - sheetWidth > 370) {
-      return {
-        left: spotlight.left + spotlight.width + 16,
-        top: Math.max(16, spotlight.top),
-        transform: 'none',
-      };
-    }
-    // Place below the spotlight, but clamp horizontally to avoid overlapping the sidesheet
     return {
-      left: Math.max(16, Math.min(spotlight.left, availableWidth - 340)),
-      top: spotlight.top + spotlight.height + 16,
+      right: sheetWidth + 24,
+      top: 80,
       transform: 'none',
     };
   }, [spotlight, currentStep, drawerOpen]);
