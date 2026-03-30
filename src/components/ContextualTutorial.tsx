@@ -47,10 +47,16 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Cliquez sur l\'icône ✏️ pour modifier ses informations.',
     padding: 14,
   },
-  'link-demo': {
+  'link-click-dot': {
     icon: <Link2 className="w-5 h-5" />,
-    title: 'Créer un lien émotionnel',
-    description: 'Cliquez sur un point d\'ancrage (●) d\'un membre, maintenez et glissez vers un autre membre pour créer un lien émotionnel.',
+    title: 'Cliquez sur un point d\'ancrage',
+    description: 'Cliquez sur un des points (●) sur le bord de la carte du parent 1 et maintenez le clic.',
+    padding: 14,
+  },
+  'link-drag-release': {
+    icon: <Link2 className="w-5 h-5" />,
+    title: 'Glissez vers l\'enfant',
+    description: 'Maintenez le clic et glissez vers la carte de l\'enfant, puis relâchez pour créer le lien émotionnel.',
     padding: 24,
   },
 };
@@ -102,7 +108,25 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         }
         setEditBtnPos(null);
         setLinkDragPositions(null);
-      } else if (currentStep === 'link-demo') {
+      } else if (currentStep === 'link-click-dot') {
+        // Highlight parent 1 card with its dots
+        if (fatherMember) {
+          const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
+          if (fatherEl) {
+            const fatherRect = fatherEl.getBoundingClientRect();
+            setSpotlight({
+              top: fatherRect.top - padding,
+              left: fatherRect.left - padding,
+              width: fatherRect.width + padding * 2,
+              height: fatherRect.height + padding * 2,
+            });
+          } else {
+            setSpotlight(null);
+          }
+        }
+        setEditBtnPos(null);
+        setLinkDragPositions(null);
+      } else if (currentStep === 'link-drag-release') {
         // Highlight area encompassing both PI and father cards
         if (firstMember && fatherMember) {
           const piEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
@@ -206,7 +230,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && currentStep !== 'link-demo' && !drawerOpen && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && !drawerOpen && (
           spotlight ? (
             <>
               <button
@@ -270,7 +294,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[100] pointer-events-none"
         >
-          {currentStep !== 'edit-hint' && currentStep !== 'link-demo' && (
+          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <mask id="ctx-tuto-mask">
@@ -379,8 +403,29 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </motion.div>
           )}
 
-          {/* Animated drag cursor for link-demo: shows drag from anchor to target */}
-          {currentStep === 'link-demo' && linkDragPositions && (
+          {/* Animated pointing cursor for link-click-dot → points at a dot on the card */}
+          {currentStep === 'link-click-dot' && spotlight && fatherMember && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 20 }}
+              className="absolute pointer-events-none z-[102]"
+              style={{
+                top: spotlight.top + spotlight.height / 2 + 8,
+                left: spotlight.left + spotlight.width + 4,
+              }}
+            >
+              <motion.div
+                animate={{ x: [-4, 2, -4] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <MousePointerClick className="w-9 h-9 text-primary drop-shadow-lg" strokeWidth={2.2} />
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* Animated drag cursor for link-drag-release: shows drag from anchor to target */}
+          {currentStep === 'link-drag-release' && linkDragPositions && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

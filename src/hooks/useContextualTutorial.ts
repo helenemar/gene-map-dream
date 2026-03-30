@@ -5,7 +5,7 @@ const CONTEXTUAL_TUTO_DONE_KEY = 'genogy-contextual-tuto-done';
 export type ContextualTutoStep =
   | 'card-intro' | 'card-selected' | 'edit-hint'
   | 'parent-intro' | 'parent-selected'
-  | 'link-demo'
+  | 'link-click-dot' | 'link-drag-release'
   | null;
 
 /**
@@ -15,7 +15,8 @@ export type ContextualTutoStep =
  * Step 3 (edit-hint): Edit drawer open → user fills info & closes drawer.
  * Step 4 (parent-intro): Highlight father card → user clicks to select.
  * Step 5 (parent-selected): Father selected → user double-clicks or clicks edit.
- * Step 6 (link-demo): Show how to drag from anchor point to create an emotional link.
+ * Step 6 (link-click-dot): Show user to click on an anchor dot of parent 1.
+ * Step 7 (link-drag-release): Show drag animation to child and tell user to release.
  */
 export function useContextualTutorial(
   memberCount: number,
@@ -70,7 +71,7 @@ export function useContextualTutorial(
     if (currentStep === 'edit-hint') {
       if (parentEditFlowRef.current) {
         parentEditFlowRef.current = false;
-        setCurrentStep('link-demo');
+        setCurrentStep('link-click-dot');
       } else {
         setCurrentStep('parent-intro');
       }
@@ -92,9 +93,16 @@ export function useContextualTutorial(
     }
   }, [currentStep]);
 
-  // Called when user creates their first emotional link
+  // Called when user starts a link drag (clicked on a dot)
+  const onLinkDragStarted = useCallback(() => {
+    if (currentStep === 'link-click-dot') {
+      setCurrentStep('link-drag-release');
+    }
+  }, [currentStep]);
+
+  // Called when user creates their first emotional link (released on target)
   const onLinkCreated = useCallback(() => {
-    if (currentStep === 'link-demo') {
+    if (currentStep === 'link-drag-release' || currentStep === 'link-click-dot') {
       finish();
     }
   }, [currentStep]);
@@ -120,7 +128,7 @@ export function useContextualTutorial(
     active, currentStep,
     onCardSelected, onEditClicked, onDrawerClosed,
     onParentSelected, onParentEditClicked,
-    onLinkCreated,
+    onLinkDragStarted, onLinkCreated,
     finish, restart,
   };
 }
