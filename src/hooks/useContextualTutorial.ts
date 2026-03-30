@@ -2,11 +2,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 const CONTEXTUAL_TUTO_DONE_KEY = 'genogy-contextual-tuto-done';
 
-export type ContextualTutoStep = 'card-intro' | 'card-selected' | 'anchor-hint' | null;
+export type ContextualTutoStep = 'card-intro' | 'edit-hint' | null;
 
 /**
- * Event-driven contextual tutorial. Advances based on user actions,
- * not manual "next" buttons.
+ * Event-driven contextual tutorial. 
+ * Step 1 (card-intro): Highlights card immediately, tells user to click edit button.
+ * Step 2 (edit-hint): Once edit drawer opens, shows hint about editing in the sidesheet.
  */
 export function useContextualTutorial(
   memberCount: number,
@@ -29,7 +30,7 @@ export function useContextualTutorial(
     prevCount.current = memberCount;
   }, [memberCount, done]);
 
-  // Start tutorial once drawer closes
+  // Start tutorial once drawer closes after first member creation
   useEffect(() => {
     if (!waitingForDrawerClose.current) return;
     if (!drawerOpen) {
@@ -38,23 +39,16 @@ export function useContextualTutorial(
     }
   }, [drawerOpen]);
 
-  // Called when user selects the first card
-  const onCardSelected = useCallback(() => {
+  // Called when user clicks the edit button on the card
+  const onEditClicked = useCallback(() => {
     if (currentStep === 'card-intro') {
-      setCurrentStep('card-selected');
+      setCurrentStep('edit-hint');
     }
   }, [currentStep]);
 
-  // Called when user clicks edit, view, or create on the card
-  const onCardAction = useCallback(() => {
-    if (currentStep === 'card-selected') {
-      setCurrentStep('anchor-hint');
-    }
-  }, [currentStep]);
-
-  // Called when user starts a link drag or after anchor hint is seen
-  const onLinkAction = useCallback(() => {
-    if (currentStep === 'anchor-hint') {
+  // Called when the edit drawer is closed after seeing the hint
+  const onDrawerClosed = useCallback(() => {
+    if (currentStep === 'edit-hint') {
       finish();
     }
   }, [currentStep]);
@@ -67,5 +61,5 @@ export function useContextualTutorial(
 
   const active = currentStep !== null;
 
-  return { active, currentStep, onCardSelected, onCardAction, onLinkAction, finish };
+  return { active, currentStep, onEditClicked, onDrawerClosed, finish };
 }
