@@ -5,6 +5,7 @@ const CONTEXTUAL_TUTO_DONE_KEY = 'genogy-contextual-tuto-done';
 export type ContextualTutoStep =
   | 'card-intro' | 'card-selected' | 'edit-hint'
   | 'parent-intro' | 'parent-selected'
+  | 'link-demo'
   | null;
 
 /**
@@ -14,6 +15,7 @@ export type ContextualTutoStep =
  * Step 3 (edit-hint): Edit drawer open → user fills info & closes drawer.
  * Step 4 (parent-intro): Highlight father card → user clicks to select.
  * Step 5 (parent-selected): Father selected → user double-clicks or clicks edit.
+ * Step 6 (link-demo): Show how to drag from anchor point to create an emotional link.
  */
 export function useContextualTutorial(
   memberCount: number,
@@ -60,14 +62,10 @@ export function useContextualTutorial(
     }
   }, [currentStep]);
 
-  // Called when the edit drawer is closed after PI editing (step 3 → 4)
+  // Called when the edit drawer is closed (step 3 → 4, or link-demo after parent)
   const onDrawerClosed = useCallback(() => {
     if (currentStep === 'edit-hint') {
-      // Move to parent phase instead of finishing
       setCurrentStep('parent-intro');
-    } else if (currentStep === 'parent-selected') {
-      // Father edited and drawer closed → tutorial done
-      finish();
     }
   }, [currentStep]);
 
@@ -78,9 +76,16 @@ export function useContextualTutorial(
     }
   }, [currentStep]);
 
-  // Called when user opens edit on the father (step 5 → done)
+  // Called when user opens edit on the father (step 5 → link-demo)
   const onParentEditClicked = useCallback(() => {
     if (currentStep === 'parent-selected') {
+      setCurrentStep('link-demo');
+    }
+  }, [currentStep]);
+
+  // Called when user creates their first emotional link
+  const onLinkCreated = useCallback(() => {
+    if (currentStep === 'link-demo') {
       finish();
     }
   }, [currentStep]);
@@ -104,6 +109,7 @@ export function useContextualTutorial(
     active, currentStep,
     onCardSelected, onEditClicked, onDrawerClosed,
     onParentSelected, onParentEditClicked,
+    onLinkCreated,
     finish, restart,
   };
 }
