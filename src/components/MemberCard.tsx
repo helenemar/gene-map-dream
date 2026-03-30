@@ -375,7 +375,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       {/* Action menu — State: Anchor-Active */}
       {activeState === 'anchor-active' && !presentationMode && (
         <motion.div
-          className="flex items-center gap-1.5 justify-center mt-1.5"
+          className="flex items-center gap-1.5 justify-center mt-4"
           initial={{ opacity: 0, y: -6, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
@@ -389,7 +389,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
             >
               <HeartHandshake className="w-3.5 h-3.5 text-primary" />
             </motion.div>
-            <span>Glisser vers un membre</span>
+            <span>{isLinkDragging ? 'Relâchez sur un membre' : 'Glisser vers un membre'}</span>
           </div>
           <button
             onClick={handleCancelAnchor}
