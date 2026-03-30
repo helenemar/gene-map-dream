@@ -109,6 +109,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   zoom = 1,
   snapAnchorSide = null,
   onCreateDropdownOpen,
+  isLinkDragging = false,
 }) => {
   const { t } = useLanguage();
   const isDeceased = !!member.deathYear;
