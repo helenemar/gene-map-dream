@@ -1301,7 +1301,10 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
 
   // Advance contextual tutorial when edit drawer opens/closes
   useEffect(() => {
-    if (newMemberDrawerOpen && drawerEditing) contextualTutorial.onEditClicked();
+    if (newMemberDrawerOpen && drawerEditing) {
+      contextualTutorial.onEditClicked();
+      contextualTutorial.onParentEditClicked();
+    }
   }, [newMemberDrawerOpen, drawerEditing]);
 
   const drawerClosedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
