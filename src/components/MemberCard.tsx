@@ -71,6 +71,8 @@ interface MemberCardProps {
   isLinkDragging?: boolean;
   /** Force a simple click to select even for draft/placeholder cards */
   forceSelectOnClick?: boolean;
+  /** Tutorial: highlight create dropdown items */
+  tutorialCreateHighlight?: boolean;
 }
 
 const EDGE_DOTS: { side: AnchorSide; pos: React.CSSProperties }[] = [
@@ -113,6 +115,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onCreateDropdownOpen,
   isLinkDragging = false,
   forceSelectOnClick = false,
+  tutorialCreateHighlight = false,
 }) => {
   const { t } = useLanguage();
   const isDeceased = !!member.deathYear;
@@ -348,7 +351,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
-          <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)} disabledOptions={disabledOptions} showParentSplit={showParentSplit} onOpenChange={onCreateDropdownOpen}>
+          <CreateMemberDropdown onSelect={(choice) => onCreateRelated?.(member.id, choice)} disabledOptions={disabledOptions} showParentSplit={showParentSplit} onOpenChange={onCreateDropdownOpen} tutorialHighlight={tutorialCreateHighlight}>
             <button
               onClick={(e) => e.stopPropagation()}
               data-create-button={member.id}

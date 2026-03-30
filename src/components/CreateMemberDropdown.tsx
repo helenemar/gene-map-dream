@@ -84,6 +84,8 @@ interface CreateMemberDropdownProps {
   showParentSplit?: boolean;
   /** Called when the dropdown opens */
   onOpenChange?: (open: boolean) => void;
+  /** When true, items pulse to guide the user */
+  tutorialHighlight?: boolean;
 }
 
 const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
@@ -92,6 +94,7 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
   disabledOptions,
   showParentSplit = false,
   onOpenChange,
+  tutorialHighlight = false,
 }) => {
   const [perinatalOpen, setPerinatalOpen] = useState(false);
   // Build option list: replace 'parent' with sub-options when split is active
@@ -123,7 +126,7 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
       <DropdownMenuItem
         key={opt.id}
         onClick={() => onSelect(opt.id)}
-        className="flex items-center gap-2.5 py-2 cursor-pointer"
+        className={`flex items-center gap-2.5 py-2 cursor-pointer ${tutorialHighlight ? 'animate-[pulse_2s_ease-in-out_infinite] ring-1 ring-primary/20' : ''}`}
       >
         <span className="text-muted-foreground">{opt.icon}</span>
         <span className="text-sm font-medium">{opt.label}</span>

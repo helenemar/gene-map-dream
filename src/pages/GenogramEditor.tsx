@@ -1901,6 +1901,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 snapAnchorSide={linkDrag?.snapTargetId === member.id ? linkDrag.snapAnchorSide : null}
                 isLinkDragging={!!linkDrag && linkDrag.fromId === member.id}
                 forceSelectOnClick={!!(members[1] && member.id === members[1].id && contextualTutorial.currentStep === 'parent-intro')}
+                tutorialCreateHighlight={contextualTutorial.currentStep === 'create-member' && member.id === members[0]?.id}
               />
               );
             })}
