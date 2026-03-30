@@ -103,6 +103,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   isAdopted = false,
   onboardingPulse = false,
   zoom = 1,
+  onCreateDropdownOpen,
 }) => {
   const { t } = useLanguage();
   const isDeceased = !!member.deathYear;
