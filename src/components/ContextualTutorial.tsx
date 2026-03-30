@@ -178,7 +178,6 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             const childCx = childRect.left + childRect.width / 2;
             const childCy = childRect.top + childRect.height / 2;
 
-            // Query actual rendered dot elements inside the father card
             const dotEls = fatherEl.querySelectorAll('.rounded-full.cursor-crosshair');
             let best: { x: number; y: number } | null = null;
             let bestDist = Infinity;
@@ -223,6 +222,23 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
               left: piRect.left - padding,
               width: piRect.width + padding * 2,
               height: piRect.height + padding * 2,
+            });
+          } else {
+            setSpotlight(null);
+          }
+        }
+        setEditBtnPos(null);
+        setLinkDragPositions(null);
+      } else if (currentStep === 'create-member') {
+        if (firstMember) {
+          const createBtn = document.querySelector(`[data-create-button="${firstMember.id}"]`);
+          if (createBtn) {
+            const rect = createBtn.getBoundingClientRect();
+            setSpotlight({
+              top: rect.top - 10,
+              left: rect.left - 10,
+              width: rect.width + 20,
+              height: rect.height + 20,
             });
           } else {
             setSpotlight(null);
