@@ -173,6 +173,7 @@ export function useContextualTutorial(
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
     onPiSelectedForCreation, onCreateMemberClicked, onCreateSiblingPicked,
+    onCardDragged,
     onTwoMembersSelected, onUnionCreated,
     finish, restart,
   };
