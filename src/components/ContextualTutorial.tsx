@@ -637,6 +637,72 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </motion.div>
           )}
 
+          {/* Animated marquee rectangle for multi-select step */}
+          {currentStep === 'multi-select' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="fixed pointer-events-none z-[102]"
+              style={{
+                top: '45%',
+                left: '35%',
+              }}
+            >
+              {/* Cursor hand that moves diagonally to draw rectangle */}
+              <motion.div
+                animate={{
+                  x: [0, 120, 120, 0],
+                  y: [0, 80, 80, 0],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  times: [0, 0.4, 0.7, 1],
+                }}
+              >
+                <div className="relative" style={{ filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.35))' }}>
+                  <MousePointerClick
+                    className="text-white"
+                    style={{ width: 36, height: 36 }}
+                    strokeWidth={4}
+                  />
+                  <MousePointerClick
+                    className="absolute inset-0 text-foreground"
+                    style={{ width: 36, height: 36 }}
+                    strokeWidth={2}
+                  />
+                </div>
+              </motion.div>
+              {/* Animated selection rectangle */}
+              <svg className="absolute top-0 left-0 overflow-visible" width="1" height="1" style={{ pointerEvents: 'none' }}>
+                <motion.rect
+                  x={4}
+                  y={4}
+                  initial={{ width: 0, height: 0, opacity: 0 }}
+                  animate={{
+                    width: [0, 120, 120, 0],
+                    height: [0, 80, 80, 0],
+                    opacity: [0, 1, 1, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    times: [0, 0.4, 0.7, 1],
+                  }}
+                  fill="hsl(var(--primary) / 0.08)"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={1.5}
+                  strokeDasharray="6 3"
+                  rx={4}
+                />
+              </svg>
+            </motion.div>
+          )}
+
+          {/* Animated pointing cursor for card-selected / parent-selected → points at edit button */}
           {editBtnPos && (currentStep === 'card-selected' || currentStep === 'parent-selected' || currentStep === 'create-click-button' || currentStep === 'union-click-button') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
