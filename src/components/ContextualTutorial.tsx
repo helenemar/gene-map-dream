@@ -178,7 +178,6 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             const childCx = childRect.left + childRect.width / 2;
             const childCy = childRect.top + childRect.height / 2;
 
-            // Query actual rendered dot elements inside the father card
             const dotEls = fatherEl.querySelectorAll('.rounded-full.cursor-crosshair');
             let best: { x: number; y: number } | null = null;
             let bestDist = Infinity;
@@ -223,6 +222,23 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
               left: piRect.left - padding,
               width: piRect.width + padding * 2,
               height: piRect.height + padding * 2,
+            });
+          } else {
+            setSpotlight(null);
+          }
+        }
+        setEditBtnPos(null);
+        setLinkDragPositions(null);
+      } else if (currentStep === 'create-member') {
+        if (firstMember) {
+          const createBtn = document.querySelector(`[data-create-button="${firstMember.id}"]`);
+          if (createBtn) {
+            const rect = createBtn.getBoundingClientRect();
+            setSpotlight({
+              top: rect.top - 10,
+              left: rect.left - 10,
+              width: rect.width + 20,
+              height: rect.height + 20,
             });
           } else {
             setSpotlight(null);
@@ -645,43 +661,42 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </motion.div>
           )}
 
-          {/* create-member: animated + button with cursor clicking */}
-          {currentStep === 'create-member' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="fixed pointer-events-none z-[102]"
-              style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
-            >
-              {/* Simulated mini card with + button */}
-              <div className="relative flex items-center gap-3 px-4 py-3 rounded-xl bg-card/90 border border-border shadow-lg">
-                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-                  <User className="w-4 h-4 text-muted-foreground" />
-                </div>
-                <span className="text-xs font-medium text-muted-foreground">Hélène</span>
-                {/* + button */}
-                <motion.div
-                  animate={{ scale: [1, 1.15, 1], boxShadow: ['0 0 0 0 hsl(var(--primary) / 0)', '0 0 0 8px hsl(var(--primary) / 0.15)', '0 0 0 0 hsl(var(--primary) / 0)'] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-                  className="w-6 h-6 rounded-full bg-primary flex items-center justify-center ml-1"
-                >
-                  <span className="text-primary-foreground text-sm font-bold leading-none">＋</span>
-                </motion.div>
-              </div>
-              {/* Cursor clicking on the + */}
+          {/* create-member: cursor points at the real create button */}
+          {currentStep === 'create-member' && spotlight && (
+            <>
               <motion.div
-                className="absolute pointer-events-none"
-                style={{ right: -4, bottom: -8 }}
+                className="absolute pointer-events-none z-[102]"
+                style={{
+                  top: spotlight.top + spotlight.height / 2,
+                  left: spotlight.left + spotlight.width / 2,
+                  transform: 'translate(-50%, -50%)',
+                }}
               >
                 <motion.div
-                  animate={{ y: [0, -4, 0], scale: [1, 0.9, 1] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 1] }}
+                  animate={{ scale: [1, 1.08, 1], opacity: [0.45, 0.15, 0.45] }}
+                  transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="rounded-full border-2 border-primary"
+                  style={{ width: spotlight.width + 10, height: spotlight.height + 10 }}
+                />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 20 }}
+                className="absolute pointer-events-none z-[102]"
+                style={{
+                  top: spotlight.top + spotlight.height - 6,
+                  left: spotlight.left + spotlight.width - 2,
+                }}
+              >
+                <motion.div
+                  animate={{ y: [0, -5, 0], scale: [1, 0.94, 1] }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  <TutoCursor size={24} />
+                  <TutoCursor size={28} />
                 </motion.div>
               </motion.div>
-            </motion.div>
+            </>
           )}
 
           {/* drag-single: animated hand dragging a card */}
