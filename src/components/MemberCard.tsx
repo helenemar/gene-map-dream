@@ -340,6 +340,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
             onClick={(e) => { e.stopPropagation(); onEdit?.(member.id); }}
             className="w-9 h-9 rounded-full bg-card border border-border/80 shadow-sm flex items-center justify-center hover:bg-primary/10 hover:border-primary/30 active:scale-[0.93] transition-all"
             title={t.memberCard.editLabel}
+            data-edit-button={member.id}
           >
             <PencilLine className="w-4 h-4 text-muted-foreground" />
           </button>
