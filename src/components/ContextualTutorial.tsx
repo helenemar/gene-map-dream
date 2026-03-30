@@ -806,7 +806,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.92, y: 8 }}
           transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-          className={`fixed z-[101] max-w-[90vw] pointer-events-auto cursor-grab active:cursor-grabbing ${currentStep === 'edit-hint' ? 'w-[320px]' : 'w-[280px]'}`}
+          className={`fixed z-[101] max-w-[90vw] pointer-events-auto cursor-grab active:cursor-grabbing ${currentStep === 'edit-hint' ? 'w-[320px]' : 'w-[240px]'}`}
           style={tipDragOffset ? { left: tipDragOffset.x, top: tipDragOffset.y, transform: 'none' } : cardStyle}
           onClick={e => e.stopPropagation()}
           onMouseDown={(e) => {
@@ -829,30 +829,30 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             window.addEventListener('mouseup', onUp);
           }}
         >
-          <div className={`backdrop-blur-sm border border-border overflow-hidden ${currentStep === 'edit-hint' ? 'bg-card/85 rounded-2xl shadow-2xl' : 'bg-card/70 rounded-xl shadow-lg'}`}>
+          <div className={`backdrop-blur-md border overflow-hidden ${currentStep === 'edit-hint' ? 'bg-card/85 border-border rounded-2xl shadow-2xl' : 'bg-card/50 border-border/50 rounded-lg shadow-md'}`}>
             {/* Drag handle indicator */}
             <div className="flex justify-center pt-2 pb-0">
               <div className="w-8 h-1 rounded-full bg-muted-foreground/20" />
             </div>
             <button
               onClick={() => setTipHidden(true)}
-              className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors z-10"
+              className={`absolute flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors z-10 ${currentStep === 'edit-hint' ? 'top-3 right-3 w-7 h-7' : 'top-2 right-2 w-5 h-5'}`}
             >
-              <X className="w-4 h-4" />
+              <X className={currentStep === 'edit-hint' ? 'w-4 h-4' : 'w-3 h-3'} />
             </button>
 
-            <div className={currentStep === 'edit-hint' ? 'px-5 pb-5 pt-2' : 'px-4 pb-4 pt-1.5'}>
+            <div className={currentStep === 'edit-hint' ? 'px-5 pb-5 pt-2' : 'px-3 pb-3 pt-1'}>
               <div className="flex items-start gap-3">
                 <motion.div
                   key={`icon-${currentStep}`}
                   initial={{ scale: 0.6, opacity: 0, rotate: -20 }}
                   animate={{ scale: 1, opacity: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 350, damping: 18 }}
-                  className={`rounded-xl bg-primary/10 flex items-center justify-center shrink-0 text-primary ${currentStep === 'edit-hint' ? 'w-10 h-10' : 'w-8 h-8'}`}
+                  className={`flex items-center justify-center shrink-0 text-primary ${currentStep === 'edit-hint' ? 'w-10 h-10 rounded-xl bg-primary/10' : 'w-6 h-6 rounded-md bg-primary/8'}`}
                 >
-                  {tip.icon}
+                  {currentStep === 'edit-hint' ? tip.icon : <span className="scale-75">{tip.icon}</span>}
                 </motion.div>
-                <div className="flex-1 min-w-0 pr-6">
+                <div className={`flex-1 min-w-0 ${currentStep === 'edit-hint' ? 'pr-6' : 'pr-4'}`}>
                   <motion.h3
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
