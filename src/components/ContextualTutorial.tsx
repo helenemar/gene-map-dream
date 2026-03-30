@@ -484,9 +484,13 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                 transform: 'translate(-50%, -100%)',
               }}
             >
-              <span className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium shadow-lg">
+              <motion.span
+                animate={{ scale: [1, 1.08, 1], opacity: [0.9, 1, 0.9] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium shadow-lg"
+              >
                 Relâchez ici
-              </span>
+              </motion.span>
             </motion.div>
           )}
         </motion.div>
