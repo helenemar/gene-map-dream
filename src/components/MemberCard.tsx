@@ -67,6 +67,8 @@ interface MemberCardProps {
   snapAnchorSide?: AnchorSide | null;
   /** Called when the "Créer un membre" dropdown opens/closes */
   onCreateDropdownOpen?: (open: boolean) => void;
+  /** Whether a link drag is currently in progress from this card */
+  isLinkDragging?: boolean;
 }
 
 const EDGE_DOTS: { side: AnchorSide; pos: React.CSSProperties }[] = [
