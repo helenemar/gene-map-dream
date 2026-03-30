@@ -799,6 +799,10 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   const [newMemberDrawerOpen, setNewMemberDrawerOpen] = useState(false);
   const contextualTutorial = useContextualTutorial(members.length, newMemberDrawerOpen, user?.email);
 
+  // Advance contextual tutorial when card is selected
+  useEffect(() => {
+    if (selectedMembers.size > 0) contextualTutorial.onCardSelected();
+  }, [selectedMembers.size]);
 
   // ─── Parent picker state (for child creation with multiple unions) ───
   const [parentPickerState, setParentPickerState] = useState<{
