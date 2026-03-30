@@ -370,11 +370,13 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
     }
     
-    // For edit-hint, position tooltip at top-left of the canvas (away from drawer and popovers)
+    // For edit-hint, position tooltip just left of the drawer, vertically centered on drawer
     if (currentStep === 'edit-hint') {
+      const drawerLeft = spotlight.left;
+      const tooltipW = 320;
       return {
-        left: 16,
-        top: 80,
+        left: Math.max(16, drawerLeft - tooltipW - 16),
+        top: Math.max(80, spotlight.top + spotlight.height / 2 - 60),
         transform: 'none',
       };
     }
