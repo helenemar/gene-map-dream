@@ -867,7 +867,11 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             window.addEventListener('mouseup', onUp);
           }}
         >
-          <div className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
+          <div className="bg-card/85 backdrop-blur-sm border border-border rounded-2xl shadow-2xl overflow-hidden">
+            {/* Drag handle indicator */}
+            <div className="flex justify-center pt-2 pb-0">
+              <div className="w-8 h-1 rounded-full bg-muted-foreground/20" />
+            </div>
             <button
               onClick={() => setTipHidden(true)}
               className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors z-10"
@@ -875,7 +879,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
               <X className="w-4 h-4" />
             </button>
 
-            <div className="p-5">
+            <div className="px-5 pb-5 pt-2">
               <div className="flex items-start gap-3">
                 <motion.div
                   key={`icon-${currentStep}`}
