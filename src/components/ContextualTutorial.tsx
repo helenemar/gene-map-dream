@@ -230,6 +230,27 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
               </motion.div>
             </motion.div>
           )}
+
+          {/* Animated pointing cursor for card-selected → points at edit button */}
+          {editBtnPos && currentStep === 'card-selected' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 20 }}
+              className="absolute pointer-events-none z-[102]"
+              style={{
+                top: editBtnPos.top + 4,
+                left: editBtnPos.left + 4,
+              }}
+            >
+              <motion.div
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <MousePointerClick className="w-7 h-7 text-primary drop-shadow-md" strokeWidth={2} />
+              </motion.div>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Tooltip */}
