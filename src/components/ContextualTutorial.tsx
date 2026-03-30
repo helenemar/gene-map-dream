@@ -806,7 +806,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.92, y: 8 }}
           transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-          className="fixed z-[101] w-[320px] max-w-[90vw] pointer-events-auto cursor-grab active:cursor-grabbing"
+          className={`fixed z-[101] max-w-[90vw] pointer-events-auto cursor-grab active:cursor-grabbing ${currentStep === 'edit-hint' ? 'w-[320px]' : 'w-[280px]'}`}
           style={tipDragOffset ? { left: tipDragOffset.x, top: tipDragOffset.y, transform: 'none' } : cardStyle}
           onClick={e => e.stopPropagation()}
           onMouseDown={(e) => {
@@ -829,7 +829,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             window.addEventListener('mouseup', onUp);
           }}
         >
-          <div className="bg-card/85 backdrop-blur-sm border border-border rounded-2xl shadow-2xl overflow-hidden">
+          <div className={`backdrop-blur-sm border border-border overflow-hidden ${currentStep === 'edit-hint' ? 'bg-card/85 rounded-2xl shadow-2xl' : 'bg-card/70 rounded-xl shadow-lg'}`}>
             {/* Drag handle indicator */}
             <div className="flex justify-center pt-2 pb-0">
               <div className="w-8 h-1 rounded-full bg-muted-foreground/20" />
@@ -841,14 +841,14 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
               <X className="w-4 h-4" />
             </button>
 
-            <div className="px-5 pb-5 pt-2">
+            <div className={currentStep === 'edit-hint' ? 'px-5 pb-5 pt-2' : 'px-4 pb-4 pt-1.5'}>
               <div className="flex items-start gap-3">
                 <motion.div
                   key={`icon-${currentStep}`}
                   initial={{ scale: 0.6, opacity: 0, rotate: -20 }}
                   animate={{ scale: 1, opacity: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 350, damping: 18 }}
-                  className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 text-primary"
+                  className={`rounded-xl bg-primary/10 flex items-center justify-center shrink-0 text-primary ${currentStep === 'edit-hint' ? 'w-10 h-10' : 'w-8 h-8'}`}
                 >
                   {tip.icon}
                 </motion.div>
@@ -856,7 +856,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                   <motion.h3
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="text-sm font-semibold text-foreground mb-1"
+                    className={currentStep === 'edit-hint' ? 'text-sm font-semibold text-foreground mb-1' : 'text-xs font-semibold text-foreground mb-0.5'}
                   >
                     {tip.title}
                   </motion.h3>
@@ -864,7 +864,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.05 }}
-                    className="text-[13px] text-muted-foreground leading-relaxed"
+                    className={currentStep === 'edit-hint' ? 'text-[13px] text-muted-foreground leading-relaxed' : 'text-xs text-muted-foreground/80 leading-snug'}
                   >
                     {tip.description}
                   </motion.p>
