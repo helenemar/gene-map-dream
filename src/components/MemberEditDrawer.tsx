@@ -409,6 +409,11 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   <Input className="h-8 text-sm border-border/50 bg-card focus-visible:ring-primary/30" placeholder="ex: Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={member.isIndexPatient} />
                 </div>
               </div>
+              {member.isIndexPatient && (
+                <p className="text-[10px] text-muted-foreground/70 italic -mt-1">
+                  Le prénom et le nom du patient index ne sont pas modifiables pendant la bêta.
+                </p>
+              )}
 
               <div className="flex flex-col gap-1">
                 <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
