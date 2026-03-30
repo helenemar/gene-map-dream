@@ -110,19 +110,13 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         setEditBtnPos(null);
         setLinkDragPositions(null);
       } else if (currentStep === 'link-click-dot') {
-        // Highlight parent 1 card with its dots
+        // Highlight only the closest anchor dot, not the whole card
         if (fatherMember && firstMember) {
           const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
           const childEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
           if (fatherEl && childEl) {
             const fatherRect = fatherEl.getBoundingClientRect();
             const childRect = childEl.getBoundingClientRect();
-            setSpotlight({
-              top: fatherRect.top - padding,
-              left: fatherRect.left - padding,
-              width: fatherRect.width + padding * 2,
-              height: fatherRect.height + padding * 2,
-            });
             // Find the dot (edge midpoint) closest to the child card center
             const childCx = childRect.left + childRect.width / 2;
             const childCy = childRect.top + childRect.height / 2;
@@ -139,6 +133,14 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
               if (dist < bestDist) { bestDist = dist; best = d; }
             }
             setClosestDotPos(best);
+            // Spotlight centered on the dot
+            const dotRadius = 24;
+            setSpotlight({
+              top: best.y - dotRadius,
+              left: best.x - dotRadius,
+              width: dotRadius * 2,
+              height: dotRadius * 2,
+            });
           } else {
             setSpotlight(null);
             setClosestDotPos(null);
