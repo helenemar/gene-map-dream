@@ -752,6 +752,9 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       setMarquee(null);
       return;
     }
+    if (dragInfo) {
+      contextualTutorial.onCardDragged();
+    }
     setSmartGuides([]);
     setDragInfo(null);
     setIsPanning(false);
