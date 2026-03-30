@@ -37,13 +37,13 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
   },
   'parent-intro': {
     icon: <UserRound className="w-5 h-5" />,
-    title: 'Passez au père',
-    description: 'Cliquez maintenant sur la carte du père (à gauche) pour le sélectionner.',
+    title: 'Passez au parent 1',
+    description: 'Cliquez maintenant sur la carte du parent 1 (à gauche) pour le sélectionner.',
     padding: 14,
   },
   'parent-selected': {
     icon: <Pencil className="w-5 h-5" />,
-    title: 'Modifier le père',
+    title: 'Modifier le parent 1',
     description: 'Cliquez sur l\'icône ✏️ pour modifier ses informations.',
     padding: 14,
   },
