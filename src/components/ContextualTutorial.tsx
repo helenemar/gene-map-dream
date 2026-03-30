@@ -35,6 +35,18 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Complétez les informations ici : prénom, dates, pathologies… Fermez le panneau quand vous avez terminé.',
     padding: 14,
   },
+  'parent-intro': {
+    icon: <UserRound className="w-5 h-5" />,
+    title: 'Passez au père',
+    description: 'Cliquez maintenant sur la carte du père (à gauche) pour le sélectionner.',
+    padding: 14,
+  },
+  'parent-selected': {
+    icon: <Pencil className="w-5 h-5" />,
+    title: 'Modifier le père',
+    description: 'Double-cliquez sur la carte ou cliquez sur l\'icône ✏️ pour modifier ses informations.',
+    padding: 14,
+  },
 };
 
 interface ContextualTutorialProps {
