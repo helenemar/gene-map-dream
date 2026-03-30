@@ -9,20 +9,14 @@ import {
   AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-/** Reusable cursor icon — dark fill, white stroke outline, soft shadow */
-const TutoCursor = ({ size = 36 }: { size?: number }) => (
-  <div className="relative" style={{ width: size, height: size, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))' }}>
-    {/* White outline layer behind */}
+/** Reusable cursor icon — primary fill with glow effect */
+const TutoCursor = ({ size = 32 }: { size?: number }) => (
+  <div className="relative" style={{ width: size, height: size, filter: 'drop-shadow(0 0 12px hsl(var(--primary) / 0.5)) drop-shadow(0 2px 6px rgba(0,0,0,0.2))' }}>
     <MousePointerClick
-      className="absolute inset-0 text-white"
+      className="absolute inset-0 text-primary"
       style={{ width: size, height: size }}
-      strokeWidth={4}
-    />
-    {/* Dark foreground layer */}
-    <MousePointerClick
-      className="absolute inset-0 text-foreground"
-      style={{ width: size, height: size }}
-      strokeWidth={2}
+      strokeWidth={2.5}
+      fill="hsl(var(--primary) / 0.15)"
     />
   </div>
 );
