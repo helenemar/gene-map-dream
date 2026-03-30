@@ -77,10 +77,10 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Maintenez le clic et glissez vers la carte de l\'enfant, puis relâchez pour créer le lien émotionnel.',
     padding: 24,
   },
-  'create-select-parent': {
+  'create-select-pi': {
     icon: <UserRound className="w-5 h-5" />,
-    title: 'Sélectionnez le parent 1',
-    description: 'Cliquez sur la carte du parent 1 pour le sélectionner.',
+    title: 'Sélectionnez le membre de base',
+    description: 'Cliquez sur la carte du membre de base pour le sélectionner.',
     padding: 14,
   },
   'create-click-button': {
@@ -89,10 +89,10 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Cliquez sur le bouton « Créer un membre » sous la carte.',
     padding: 8,
   },
-  'create-pick-parent': {
+  'create-pick-sibling': {
     icon: <User className="w-5 h-5" />,
-    title: 'Choisissez « Parent »',
-    description: 'Sélectionnez « Parent » dans le menu déroulant pour ajouter un parent 2.',
+    title: 'Choisissez « Frère/Sœur »',
+    description: 'Sélectionnez « Frère/Sœur » dans le menu déroulant.',
     padding: 8,
   },
   'union-select-both': {
@@ -130,7 +130,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   const tip = currentStep ? TIPS[currentStep] : null;
 
   // Determine which member to target based on step
-  const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected' || currentStep === 'create-select-parent' || currentStep === 'create-click-button' || currentStep === 'create-pick-parent')
+  const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected')
     ? fatherMember
     : firstMember;
 
@@ -250,7 +250,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           }
         }
         setLinkDragPositions(null);
-      } else if (currentStep === 'create-pick-parent') {
+      } else if (currentStep === 'create-pick-sibling') {
         // Spotlight the dropdown menu content
         const dropdownContent = document.querySelector('[role="menu"]');
         if (dropdownContent) {
@@ -413,7 +413,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-parent' && currentStep !== 'union-click-button' && !drawerOpen && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'union-click-button' && !drawerOpen && (
           spotlight ? (
             <>
               <button
@@ -477,7 +477,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[100] pointer-events-none"
         >
-          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-parent' && currentStep !== 'union-click-button' && (
+          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'union-click-button' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <mask id="ctx-tuto-mask">
@@ -545,7 +545,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           )}
 
           {/* Animated pointing cursor for card-intro and parent-intro */}
-          {spotlight && (currentStep === 'card-intro' || currentStep === 'parent-intro' || currentStep === 'create-select-parent') && (
+          {spotlight && (currentStep === 'card-intro' || currentStep === 'parent-intro' || currentStep === 'create-select-pi') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}

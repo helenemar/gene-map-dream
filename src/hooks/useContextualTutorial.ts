@@ -6,16 +6,16 @@ export type ContextualTutoStep =
   | 'card-intro' | 'card-selected' | 'edit-hint'
   | 'parent-intro' | 'parent-selected'
   | 'link-click-dot' | 'link-drag-release'
-  | 'create-select-parent' | 'create-click-button' | 'create-pick-parent'
+  | 'create-select-pi' | 'create-click-button' | 'create-pick-sibling'
   | 'union-select-both' | 'union-click-button'
   | null;
 
 /**
  * Event-driven contextual tutorial.
  * Steps 1-7: existing flow (card select → edit → parent → link creation)
- * Step 8 (create-select-parent): Re-select parent 1 card.
+ * Step 8 (create-select-pi): Re-select the base member (PI) card.
  * Step 9 (create-click-button): Click "Créer un membre" button.
- * Step 10 (create-pick-parent): Click "Parent" in the dropdown.
+ * Step 10 (create-pick-sibling): Click "Frère/Sœur" in the dropdown.
  */
 export function useContextualTutorial(
   memberCount: number,
@@ -82,10 +82,6 @@ export function useContextualTutorial(
     if (currentStep === 'parent-intro') {
       setCurrentStep('parent-selected');
     }
-    // Step 8: re-select parent 1 for member creation flow
-    if (currentStep === 'create-select-parent') {
-      setCurrentStep('create-click-button');
-    }
   }, [currentStep]);
 
   // Called when user opens edit on the father (step 5)
@@ -113,21 +109,28 @@ export function useContextualTutorial(
   // Called when user creates their first emotional link (released on target)
   const onLinkCreated = useCallback(() => {
     if (currentStep === 'link-drag-release' || currentStep === 'link-click-dot') {
-      // Move to member creation flow instead of finishing
-      setCurrentStep('create-select-parent');
+      // Move to sibling creation flow: select the PI card
+      setCurrentStep('create-select-pi');
     }
-  }, [currentStep, finish]);
+  }, [currentStep]);
+
+  // Called when PI card is selected during sibling creation flow
+  const onPiSelectedForCreation = useCallback(() => {
+    if (currentStep === 'create-select-pi') {
+      setCurrentStep('create-click-button');
+    }
+  }, [currentStep]);
 
   // Called when user clicks the "Créer un membre" button (step 9)
   const onCreateMemberClicked = useCallback(() => {
     if (currentStep === 'create-click-button') {
-      setCurrentStep('create-pick-parent');
+      setCurrentStep('create-pick-sibling');
     }
   }, [currentStep]);
 
-  // Called when user picks "Parent" in the dropdown (step 10) → move to union flow
-  const onCreateParentPicked = useCallback(() => {
-    if (currentStep === 'create-pick-parent') {
+  // Called when user picks "Frère/Sœur" in the dropdown (step 10) → move to union flow
+  const onCreateSiblingPicked = useCallback(() => {
+    if (currentStep === 'create-pick-sibling') {
       setCurrentStep('union-select-both');
     }
   }, [currentStep]);
@@ -161,7 +164,7 @@ export function useContextualTutorial(
     onCardSelected, onEditClicked, onDrawerClosed,
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
-    onCreateMemberClicked, onCreateParentPicked,
+    onPiSelectedForCreation, onCreateMemberClicked, onCreateSiblingPicked,
     onTwoMembersSelected, onUnionCreated,
     finish, restart,
   };

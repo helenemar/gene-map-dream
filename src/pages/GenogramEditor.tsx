@@ -824,6 +824,10 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       if (members[1] && selectedMembers.has(members[1].id)) {
         contextualTutorial.onParentSelected();
       }
+      // Check if PI (members[0]) is selected for sibling creation flow
+      if (members[0] && selectedMembers.has(members[0].id)) {
+        contextualTutorial.onPiSelectedForCreation();
+      }
     }
     if (selectedMembers.size === 2) {
       contextualTutorial.onTwoMembersSelected();
@@ -1139,8 +1143,8 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     }
 
     // ── Non-child relationships (spouse, parent, sibling) ──
-    if (relationship === 'parent') {
-      contextualTutorial.onCreateParentPicked();
+    if (relationship === 'sibling') {
+      contextualTutorial.onCreateSiblingPicked();
     }
     const pos = getViewportCenter();
     const source = members.find(m => m.id === sourceId);
