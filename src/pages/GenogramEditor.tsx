@@ -2134,6 +2134,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
               currentStep={linkModalTarget ? null : contextualTutorial.currentStep}
               firstMember={members[0] || null}
               fatherMember={members[1] || null}
+              siblingMember={lastCreatedSibling}
               drawerOpen={newMemberDrawerOpen}
               onFinish={contextualTutorial.finish}
             />
