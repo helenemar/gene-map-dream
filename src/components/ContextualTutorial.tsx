@@ -138,6 +138,8 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   const [linkDragPositions, setLinkDragPositions] = useState<{ fromX: number; fromY: number; toX: number; toY: number } | null>(null);
   const [closestDotPos, setClosestDotPos] = useState<{ x: number; y: number } | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [tipDragOffset, setTipDragOffset] = useState<{ x: number; y: number } | null>(null);
+  const tipDragRef = useRef<{ startX: number; startY: number; origLeft: number; origTop: number } | null>(null);
   const rafRef = useRef(0);
 
   const tip = currentStep ? TIPS[currentStep] : null;
@@ -147,6 +149,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   useEffect(() => {
     if (currentStep !== prevStepRef.current) {
       setTipHidden(false);
+      setTipDragOffset(null);
       prevStepRef.current = currentStep;
     }
   }, [currentStep]);
@@ -841,9 +844,28 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.92, y: 8 }}
           transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-          className="fixed z-[101] w-[320px] max-w-[90vw] pointer-events-auto"
-          style={cardStyle}
+          className="fixed z-[101] w-[320px] max-w-[90vw] pointer-events-auto cursor-grab active:cursor-grabbing"
+          style={tipDragOffset ? { left: tipDragOffset.x, top: tipDragOffset.y, transform: 'none' } : cardStyle}
           onClick={e => e.stopPropagation()}
+          onMouseDown={(e) => {
+            if ((e.target as HTMLElement).closest('button')) return;
+            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+            tipDragRef.current = { startX: e.clientX, startY: e.clientY, origLeft: rect.left, origTop: rect.top };
+            const onMove = (ev: MouseEvent) => {
+              if (!tipDragRef.current) return;
+              setTipDragOffset({
+                x: tipDragRef.current.origLeft + (ev.clientX - tipDragRef.current.startX),
+                y: tipDragRef.current.origTop + (ev.clientY - tipDragRef.current.startY),
+              });
+            };
+            const onUp = () => {
+              tipDragRef.current = null;
+              window.removeEventListener('mousemove', onMove);
+              window.removeEventListener('mouseup', onUp);
+            };
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+          }}
         >
           <div className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
             <button
