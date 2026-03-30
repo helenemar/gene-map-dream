@@ -107,6 +107,9 @@ export const fr: Translations = {
     contact: 'Contact',
     copyright: `© ${new Date().getFullYear()} Genogy. Tous droits réservés.`,
     madeWith: 'Conçu avec soin pour les professionnels de santé.',
+    whatIsGenogram: 'Qu\'est-ce qu\'un génogramme ?',
+    howToGenogram: 'Comment faire un génogramme',
+    disclaimer: 'Avertissement légal',
   },
 
   // ── Auth ──
