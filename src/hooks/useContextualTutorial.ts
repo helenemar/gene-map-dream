@@ -100,6 +100,7 @@ export function useContextualTutorial(
     setCurrentStep(null);
     setDone(true);
     parentEditFlowRef.current = false;
+    siblingEditFlowRef.current = false;
     localStorage.setItem(doneStorageKey, '1');
   }, [doneStorageKey]);
 
