@@ -2086,6 +2086,16 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
             onHelp={isMobileReadOnly ? undefined : onboarding.restart}
           />
 
+          {/* Stop tutorial button — visible when tutorial is active */}
+          {!isMobileReadOnly && contextualTutorial.active && (
+            <button
+              onClick={contextualTutorial.finish}
+              className="fixed bottom-4 right-4 z-[110] bg-card border border-border rounded-lg px-4 py-2 text-xs text-muted-foreground hover:text-foreground shadow-lg transition-colors flex items-center gap-1.5"
+            >
+              ✕ Arrêter le tuto
+            </button>
+          )}
+
           {/* Dev: replay contextual tutorial button (test accounts only) */}
           {!isMobileReadOnly && ['contact.genogy@gmail.com', 'contact@genogy.fr'].includes((user?.email ?? '').toLowerCase()) && !contextualTutorial.active && (
             <button
