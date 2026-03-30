@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { X } from 'lucide-react';
 import { FamilyMember, Union, UnionStatus } from '@/types/genogram';
 import UnionBadge from './UnionBadge';
 
@@ -11,6 +12,7 @@ interface FamilyLinkLinesProps {
   members: FamilyMember[];
   unions: Union[];
   onEditUnion?: (unionId: string) => void;
+  onDeleteUnion?: (unionId: string) => void;
   searchMatchedUnionIds?: Set<string>;
   isSearchActive?: boolean;
   highlightedUnionStatus?: UnionStatus | null;
@@ -110,7 +112,8 @@ function buildAvoidingVerticalPath(
   return d;
 }
 
-const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, searchMatchedUnionIds, isSearchActive, highlightedUnionStatus, variant = 'default' }) => {
+const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, onDeleteUnion, searchMatchedUnionIds, isSearchActive, highlightedUnionStatus, variant = 'default' }) => {
+  const [hoveredUnionId, setHoveredUnionId] = useState<string | null>(null);
   const getMember = (id: string) => members.find(m => m.id === id);
 
   const isSharedVariant = variant === 'shared';
@@ -297,14 +300,14 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
   }
 
   // ═══ PHASE 3: Render with crossing avoidance ═══
-  const badgeData: { unionObj: Union; midX: number; midY: number }[] = [];
+  const badgeData: { unionObj: Union; midX: number; midY: number; leftX: number; rightX: number }[] = [];
 
   const linesContent = geometries.map((geo) => {
     const { union, leftAnchor, rightAnchor, unionLineY, unionMidX,
             childMembers, childAnchors, combY, combLeftX, combRightX,
             effectiveDropCount, nonTwinCount, twinForkXs } = geo;
 
-    badgeData.push({ unionObj: union, midX: unionMidX, midY: unionLineY });
+    badgeData.push({ unionObj: union, midX: unionMidX, midY: unionLineY, leftX: leftAnchor.x, rightX: rightAnchor.x });
 
     if (childMembers.length === 0) {
       return (
@@ -630,6 +633,42 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
           );
         })}
       </svg>
+
+      {/* Union line hover delete zones */}
+      {variant === 'default' && onDeleteUnion && badgeData.map(({ unionObj, midX, midY, leftX, rightX }) => {
+        const lineWidth = rightX - leftX;
+        if (lineWidth < 20) return null;
+        const isHovered = hoveredUnionId === unionObj.id;
+        return (
+          <div
+            key={`delete-zone-${unionObj.id}`}
+            className="absolute"
+            style={{
+              left: leftX,
+              top: midY - 12,
+              width: lineWidth,
+              height: 24,
+              zIndex: 101,
+              cursor: 'default',
+            }}
+            onMouseEnter={() => setHoveredUnionId(unionObj.id)}
+            onMouseLeave={() => setHoveredUnionId(null)}
+          >
+            {isHovered && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteUnion(unionObj.id);
+                }}
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center shadow-md hover:bg-destructive/90 transition-all duration-150 animate-scale-in"
+                title="Supprimer l'union"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        );
+      })}
     </>
   );
 };

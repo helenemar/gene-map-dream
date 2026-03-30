@@ -1766,7 +1766,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 )}
               </svg>
             )}
-            <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} searchMatchedUnionIds={search.matchedUnionIds} isSearchActive={search.isActive} highlightedUnionStatus={highlightedUnionStatus} />
+            <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} onDeleteUnion={(id) => { recordSnapshot(); setUnions(prev => prev.filter(u => u.id !== id)); }} searchMatchedUnionIds={search.matchedUnionIds} isSearchActive={search.isActive} highlightedUnionStatus={highlightedUnionStatus} />
             {/* All children go through unions now */}
             <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: presentationMode ? 1 : (search.isActive && search.matchedEmotionalLinkIds.size === 0) ? 0.5 : 1, transition: 'opacity 0.3s' }}>
               {/* Over-card transparency mask: full opacity in void, reduced over cards & union badges */}
