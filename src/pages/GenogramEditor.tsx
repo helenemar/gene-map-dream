@@ -2056,7 +2056,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
             member={editingNewMember}
             open={newMemberDrawerOpen}
             initialEditing={drawerEditing}
-            onClose={() => { setNewMemberDrawerOpen(false); setEditingNewMember(null); }}
+            onClose={() => { setDrawerEditing(false); setNewMemberDrawerOpen(false); setEditingNewMember(null); }}
             onSave={handleSaveMember}
             onDelete={handleDeleteMember}
             emotionalLinks={emotionalLinks}
