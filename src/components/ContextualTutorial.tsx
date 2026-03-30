@@ -77,10 +77,10 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Maintenez le clic et glissez vers la carte de l\'enfant, puis relâchez pour créer le lien émotionnel.',
     padding: 24,
   },
-  'create-select-parent': {
+  'create-select-pi': {
     icon: <UserRound className="w-5 h-5" />,
-    title: 'Sélectionnez le parent 1',
-    description: 'Cliquez sur la carte du parent 1 pour le sélectionner.',
+    title: 'Sélectionnez le membre de base',
+    description: 'Cliquez sur la carte du membre de base pour le sélectionner.',
     padding: 14,
   },
   'create-click-button': {
@@ -89,10 +89,10 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Cliquez sur le bouton « Créer un membre » sous la carte.',
     padding: 8,
   },
-  'create-pick-parent': {
+  'create-pick-sibling': {
     icon: <User className="w-5 h-5" />,
-    title: 'Choisissez « Parent »',
-    description: 'Sélectionnez « Parent » dans le menu déroulant pour ajouter un parent 2.',
+    title: 'Choisissez « Frère/Sœur »',
+    description: 'Sélectionnez « Frère/Sœur » dans le menu déroulant.',
     padding: 8,
   },
   'union-select-both': {
