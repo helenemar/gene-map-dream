@@ -250,7 +250,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           }
         }
         setLinkDragPositions(null);
-      } else if (currentStep === 'create-pick-parent') {
+      } else if (currentStep === 'create-pick-sibling') {
         // Spotlight the dropdown menu content
         const dropdownContent = document.querySelector('[role="menu"]');
         if (dropdownContent) {
