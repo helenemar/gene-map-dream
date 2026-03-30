@@ -850,7 +850,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                   transition={{ type: 'spring', stiffness: 350, damping: 18 }}
                   className={`flex items-center justify-center shrink-0 text-primary ${currentStep === 'edit-hint' ? 'w-10 h-10 rounded-xl bg-primary/10' : 'w-6 h-6 rounded-md bg-primary/8'}`}
                 >
-                  {tip.icon}
+                  {currentStep === 'edit-hint' ? tip.icon : <span className="scale-75">{tip.icon}</span>}
                 </motion.div>
                 <div className="flex-1 min-w-0 pr-6">
                   <motion.h3
