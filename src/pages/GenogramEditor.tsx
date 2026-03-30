@@ -832,7 +832,8 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
         contextualTutorial.onPiSelectedForCreation();
       }
     }
-    if (selectedMembers.size === 2) {
+    if (selectedMembers.size >= 2) {
+      contextualTutorial.onMultiSelected();
       contextualTutorial.onTwoMembersSelected();
     }
   }, [selectedMembers, members]);
