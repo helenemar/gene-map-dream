@@ -132,6 +132,7 @@ interface ContextualTutorialProps {
 const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   currentStep, firstMember, fatherMember, drawerOpen = false, onFinish,
 }) => {
+  const [tipHidden, setTipHidden] = useState(false);
   const [spotlight, setSpotlight] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [editBtnPos, setEditBtnPos] = useState<{ top: number; left: number } | null>(null);
   const [linkDragPositions, setLinkDragPositions] = useState<{ fromX: number; fromY: number; toX: number; toY: number } | null>(null);
