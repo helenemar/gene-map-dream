@@ -84,6 +84,8 @@ interface CreateMemberDropdownProps {
   showParentSplit?: boolean;
   /** Called when the dropdown opens */
   onOpenChange?: (open: boolean) => void;
+  /** When true, items pulse to guide the user */
+  tutorialHighlight?: boolean;
 }
 
 const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
