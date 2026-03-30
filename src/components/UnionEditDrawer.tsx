@@ -223,8 +223,48 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
               onChange={(e) => onUpdate({ ...union, notes: e.target.value })}
             />
           </div>
+
+          {/* Delete union */}
+          {onDelete && (
+            <div className="pt-4 border-t border-border/50">
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                className="flex items-center gap-2 text-sm text-destructive hover:text-destructive/80 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                Supprimer cette union
+              </button>
+            </div>
+          )}
         </div>
       </SheetContent>
+
+      {/* Confirmation dialog */}
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer l'union ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              L'union entre {getMemberName(union.partner1)} et {getMemberName(union.partner2)} sera supprimée.
+              Le membre non rattaché au reste de la famille sera également supprimé.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                onDelete(union.id);
+                setConfirmDelete(false);
+                onClose();
+              }}
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Sheet>
   );
 };
