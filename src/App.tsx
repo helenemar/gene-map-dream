@@ -15,6 +15,8 @@ import ResetPassword from "./pages/ResetPassword";
 import SharedGenogram from "./pages/SharedGenogram";
 import SharedEditor from "./pages/SharedEditor";
 import NotFound from "./pages/NotFound";
+import GenogramDefinition from "./pages/GenogramDefinition";
+import HowToGenogram from "./pages/HowToGenogram";
 import Account from "./pages/Account";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import LegalNotice from "./pages/LegalNotice";
@@ -51,6 +53,8 @@ const App = () => {
                   <Route path="/legal" element={<LegalNotice />} />
                   <Route path="/terms" element={<TermsOfService />} />
                   <Route path="/disclaimer" element={<Disclaimer />} />
+                  <Route path="/genogramme" element={<GenogramDefinition />} />
+                  <Route path="/comment-faire-un-genogramme" element={<HowToGenogram />} />
                   <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
