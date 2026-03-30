@@ -42,13 +42,14 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   currentStep, firstMember, onFinish,
 }) => {
   const [spotlight, setSpotlight] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
+  const [editBtnPos, setEditBtnPos] = useState<{ top: number; left: number } | null>(null);
   const rafRef = useRef(0);
 
   const tip = currentStep ? TIPS[currentStep] : null;
 
   // Track DOM element position
   useEffect(() => {
-    if (!currentStep || !firstMember) { setSpotlight(null); return; }
+    if (!currentStep || !firstMember) { setSpotlight(null); setEditBtnPos(null); return; }
 
     const padding = tip?.padding ?? 14;
 
@@ -67,6 +68,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         } else {
           setSpotlight(null);
         }
+        setEditBtnPos(null);
       } else {
         const el = document.querySelector(`[data-member-card="${firstMember.id}"]`);
         if (el) {
@@ -79,6 +81,19 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           });
         } else {
           setSpotlight(null);
+        }
+
+        // Track edit button position for card-selected step
+        if (currentStep === 'card-selected') {
+          const btn = document.querySelector(`[data-edit-button="${firstMember.id}"]`);
+          if (btn) {
+            const btnRect = btn.getBoundingClientRect();
+            setEditBtnPos({ top: btnRect.top + btnRect.height / 2, left: btnRect.left + btnRect.width / 2 });
+          } else {
+            setEditBtnPos(null);
+          }
+        } else {
+          setEditBtnPos(null);
         }
       }
       rafRef.current = requestAnimationFrame(update);
