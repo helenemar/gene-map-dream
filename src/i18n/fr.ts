@@ -305,6 +305,7 @@ export const fr: Translations = {
     widowYear: 'Année de veuvage',
     loveAffairYear: 'Année de la liaison',
     endYear: 'Fin',
+    indexPatientNote: '* Le prénom et le nom du patient index ne sont pas modifiables pendant la bêta.',
   },
 
   // ── Union Edit Drawer ──

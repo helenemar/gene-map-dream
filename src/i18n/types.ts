@@ -94,6 +94,7 @@ export interface Translations {
     stillborn: string; eventYear: string; deleteEvent: string; irreversible: string;
     meetingYear: string; marriageYear: string; commonLawYear: string; separationYear: string;
     divorceYear: string; widowYear: string; loveAffairYear: string; endYear: string;
+    indexPatientNote: string;
   };
   unionEdit: {
     title: string; relationType: string; meetingYear: string; endYear: string;
