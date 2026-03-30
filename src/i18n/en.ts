@@ -630,7 +630,7 @@ export const en: Translations = {
     stepsSub: 'Follow this step-by-step guide to create a complete and professional genogram.',
     stepLabel: 'Step',
     steps: [
-      { title: 'Create your Genogy account', content: 'Go to genogy.app and sign up in seconds with your email or Google account. Access is free during the beta phase. From your dashboard, click "New genogram" to get started.' },
+      { title: 'Create your Genogy account', content: 'Go to genogy-app.com and sign up in seconds with your email or Google account. Access is free during the beta phase. From your dashboard, click "New genogram" to get started.' },
       { title: 'Identify the index patient', content: 'The index patient (or propositus) is the person at the centre of the genogram, the one for whom you are conducting the clinical analysis. Enter the basic information: surname, first name, date of birth, profession.' },
       { title: 'Add family members', content: 'A genogram typically covers at least three generations. Gradually add:', listItems: ['The index patient\'s parents', 'Maternal and paternal grandparents', 'Siblings (brothers and sisters)', 'Spouse and children', 'Uncles, aunts, cousins if relevant'] },
       { title: 'Define unions and lineage', content: 'Link members together with different types of unions. Children are connected to unions by descending vertical lines. Genogy automatically handles generational positioning.', gridItems: [{ label: 'Marriage', desc: 'Solid horizontal line' }, { label: 'Common-law', desc: 'Dashed horizontal line' }, { label: 'Separation', desc: 'One diagonal bar' }, { label: 'Divorce', desc: 'Two diagonal bars' }] },

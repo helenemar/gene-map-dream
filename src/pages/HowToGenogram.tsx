@@ -32,10 +32,10 @@ const HowToGenogram: React.FC = () => {
       <Helmet>
         <title>{h.metaTitle}</title>
         <meta name="description" content={h.metaDesc} />
-        <link rel="canonical" href="https://genogy.app/comment-faire-un-genogramme" />
+        <link rel="canonical" href="https://genogy-app.com/comment-faire-un-genogramme" />
         <meta property="og:title" content={h.metaTitle} />
         <meta property="og:description" content={h.metaDesc} />
-        <meta property="og:url" content="https://genogy.app/comment-faire-un-genogramme" />
+        <meta property="og:url" content="https://genogy-app.com/comment-faire-un-genogramme" />
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'HowTo',

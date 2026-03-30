@@ -72,10 +72,10 @@ const PrivacyPolicy: React.FC = () => {
       <Helmet>
         <title>Politique de confidentialité — Genogy</title>
         <meta name="description" content="Politique de confidentialité et protection des données personnelles de Genogy, conforme au RGPD." />
-        <link rel="canonical" href="https://genogy.app/privacy" />
+        <link rel="canonical" href="https://genogy-app.com/privacy" />
         <meta property="og:title" content="Politique de confidentialité — Genogy" />
         <meta property="og:description" content="Politique de confidentialité et protection des données personnelles de Genogy, conforme au RGPD." />
-        <meta property="og:url" content="https://genogy.app/privacy" />
+        <meta property="og:url" content="https://genogy-app.com/privacy" />
       </Helmet>
 
       {/* Header */}

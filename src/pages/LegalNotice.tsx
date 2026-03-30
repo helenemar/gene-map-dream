@@ -61,10 +61,10 @@ const LegalNotice: React.FC = () => {
       <Helmet>
         <title>Mentions légales — Genogy</title>
         <meta name="description" content="Mentions légales du site Genogy, éditeur, hébergement, propriété intellectuelle et droit applicable." />
-        <link rel="canonical" href="https://genogy.app/legal" />
+        <link rel="canonical" href="https://genogy-app.com/legal" />
         <meta property="og:title" content="Mentions légales — Genogy" />
         <meta property="og:description" content="Mentions légales du site Genogy." />
-        <meta property="og:url" content="https://genogy.app/legal" />
+        <meta property="og:url" content="https://genogy-app.com/legal" />
       </Helmet>
 
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
@@ -107,8 +107,8 @@ const LegalNotice: React.FC = () => {
           <div className="mt-16 pt-8 border-t border-border">
             <p className="text-sm text-muted-foreground">
               Pour toute question, contactez-nous à{' '}
-              <a href="mailto:contact@genogy.app" className="text-primary hover:underline">
-                contact@genogy.app
+              <a href="mailto:contact@genogy-app.com" className="text-primary hover:underline">
+                contact@genogy-app.com
               </a>.
             </p>
           </div>
