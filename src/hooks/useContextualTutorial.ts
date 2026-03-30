@@ -115,9 +115,14 @@ export function useContextualTutorial(
   const onLinkCreated = useCallback(() => {
     if (currentStep === 'link-drag-release' || currentStep === 'link-click-dot') {
       memberCountAtCreateRef.current = memberCount;
-      setCurrentStep('create-member');
+      setCurrentStep('select-for-create');
     }
   }, [currentStep, memberCount]);
+
+  /** Called when the user selects the primary member during the select-for-create step */
+  const onCardSelectedForCreate = useCallback(() => {
+    if (currentStep === 'select-for-create') setCurrentStep('create-member');
+  }, [currentStep]);
 
   /** Called when a new member is created via the + menu */
   const onMemberCreated = useCallback(() => {
