@@ -820,7 +820,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     isSharedMode ? undefined : genogramId,
   );
 
-  // Advance contextual tutorial when card is selected
+  // Advance contextual tutorial when selection exists, including when the tutorial step changes after a delayed drawer close
   useEffect(() => {
     if (selectedMembers.size > 0) {
       contextualTutorial.onCardSelected();
@@ -837,7 +837,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       contextualTutorial.onMultiSelected();
       contextualTutorial.onTwoMembersSelected();
     }
-  }, [selectedMembers, members]);
+  }, [selectedMembers, members, contextualTutorial.currentStep]);
 
   // ─── Parent picker state (for child creation with multiple unions) ───
   const [parentPickerState, setParentPickerState] = useState<{
