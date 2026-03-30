@@ -7,7 +7,7 @@ export type ContextualTutoStep =
   | 'parent-intro' | 'parent-selected'
   | 'link-click-dot' | 'link-drag-release'
   | 'create-select-pi' | 'create-click-button' | 'create-pick-sibling'
-  | 'drag-card'
+  | 'drag-card' | 'multi-select'
   | 'union-select-both' | 'union-click-button'
   | null;
 
@@ -139,6 +139,13 @@ export function useContextualTutorial(
   // Called when user drags a card → move to union flow
   const onCardDragged = useCallback(() => {
     if (currentStep === 'drag-card') {
+      setCurrentStep('multi-select');
+    }
+  }, [currentStep]);
+
+  // Called when 2+ members are selected via marquee or shift-click
+  const onMultiSelected = useCallback(() => {
+    if (currentStep === 'multi-select') {
       setCurrentStep('union-select-both');
     }
   }, [currentStep]);
@@ -173,7 +180,7 @@ export function useContextualTutorial(
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
     onPiSelectedForCreation, onCreateMemberClicked, onCreateSiblingPicked,
-    onCardDragged,
+    onCardDragged, onMultiSelected,
     onTwoMembersSelected, onUnionCreated,
     finish, restart,
   };

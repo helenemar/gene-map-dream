@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pencil, CheckCircle, MousePointerClick, UserRound, Link2, UserPlus, User, Move } from 'lucide-react';
+import { X, Pencil, CheckCircle, MousePointerClick, UserRound, Link2, UserPlus, User, Move, BoxSelect } from 'lucide-react';
 import { FamilyMember } from '@/types/genogram';
 import type { ContextualTutoStep } from '@/hooks/useContextualTutorial';
 import {
@@ -99,6 +99,12 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     icon: <Move className="w-5 h-5" />,
     title: 'Déplacez une carte',
     description: 'Cliquez et maintenez sur une carte, puis glissez-la pour la repositionner sur le canevas.',
+    padding: 14,
+  },
+  'multi-select': {
+    icon: <BoxSelect className="w-5 h-5" />,
+    title: 'Sélection multiple',
+    description: 'Tracez un rectangle sur le canevas avec la souris, ou maintenez ⇧ Shift et cliquez sur plusieurs cartes pour les sélectionner.',
     padding: 14,
   },
   'union-select-both': {
@@ -419,7 +425,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'union-click-button' && !drawerOpen && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'multi-select' && currentStep !== 'union-click-button' && !drawerOpen && (
           spotlight ? (
             <>
               <button
@@ -483,7 +489,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[100] pointer-events-none"
         >
-          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'union-click-button' && (
+          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'multi-select' && currentStep !== 'union-click-button' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <mask id="ctx-tuto-mask">
