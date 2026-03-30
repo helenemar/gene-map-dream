@@ -8,6 +8,7 @@ import LandingHeader from '@/components/landing/LandingHeader';
 import HeroSection from '@/components/landing/HeroSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import StepsSection from '@/components/landing/StepsSection';
+import GuideBlock from '@/components/landing/GuideBlock';
 import AboutSection from '@/components/landing/AboutSection';
 import AudienceSection from '@/components/landing/AudienceSection';
 import FaqSection from '@/components/landing/FaqSection';
@@ -97,6 +98,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
 
       <LandingHeader onAuth={openAuth} />
       <HeroSection onAuth={openAuth} />
+      <GuideBlock />
       <FeaturesSection />
       <StepsSection />
       <AboutSection />

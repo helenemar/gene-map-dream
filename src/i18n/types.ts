@@ -29,6 +29,7 @@ export interface Translations {
     ctaBeta: string; ctaDiscover: string; heroImgAlt: string;
     featuresTitle: string; featuresSub: string; features: TranslationFeature[];
     stepsTitle: string; stepsSub: string; stepsGuideLink: string; steps: TranslationFeature[];
+    guideBlockTitle: string; guideBlockDesc: string; guideBlockCta: string;
     aboutTitle: string; aboutP1: string; aboutP2: string; aboutP3: string; aboutP4: string; aboutP5: string;
     aboutImgAlt: string; audienceLabel: string; audienceTitle: string; audience: string[];
     faqTitle: string; faqSub: string; faq: TranslationFaq[];
