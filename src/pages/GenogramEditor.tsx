@@ -212,6 +212,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     cursorX: number; cursorY: number;
     snapX?: number; snapY?: number; // snapped target point
     snapTargetId?: string;
+    snapAnchorSide?: 'top' | 'bottom' | 'left' | 'right';
   } | null>(null);
   const [linkModalTarget, setLinkModalTarget] = useState<{ fromId: string; toId: string } | null>(null);
   const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
