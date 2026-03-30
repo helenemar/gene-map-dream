@@ -63,9 +63,19 @@ export function useContextualTutorial(
   const onEditClicked = useCallback(() => {
     if (currentStep === 'card-selected') {
       parentEditFlowRef.current = false;
+      siblingEditFlowRef.current = false;
       setCurrentStep('edit-hint');
     }
   }, [currentStep]);
+
+  const openPrimaryEditHint = useCallback(() => {
+    setCurrentStep(prev => {
+      if (prev !== 'card-selected') return prev;
+      parentEditFlowRef.current = false;
+      siblingEditFlowRef.current = false;
+      return 'edit-hint';
+    });
+  }, []);
 
   // Called when the edit drawer is closed
   const onDrawerClosed = useCallback(() => {
@@ -93,9 +103,19 @@ export function useContextualTutorial(
   const onParentEditClicked = useCallback(() => {
     if (currentStep === 'parent-selected') {
       parentEditFlowRef.current = true;
+      siblingEditFlowRef.current = false;
       setCurrentStep('edit-hint');
     }
   }, [currentStep]);
+
+  const openParentEditHint = useCallback(() => {
+    setCurrentStep(prev => {
+      if (prev !== 'parent-selected') return prev;
+      parentEditFlowRef.current = true;
+      siblingEditFlowRef.current = false;
+      return 'edit-hint';
+    });
+  }, []);
 
   const finish = useCallback(() => {
     setCurrentStep(null);
