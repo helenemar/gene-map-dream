@@ -841,7 +841,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
               <X className="w-4 h-4" />
             </button>
 
-            <div className="px-5 pb-5 pt-2">
+            <div className={currentStep === 'edit-hint' ? 'px-5 pb-5 pt-2' : 'px-4 pb-4 pt-1.5'}>
               <div className="flex items-start gap-3">
                 <motion.div
                   key={`icon-${currentStep}`}
