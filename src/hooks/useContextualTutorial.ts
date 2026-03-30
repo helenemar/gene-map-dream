@@ -93,6 +93,13 @@ export function useContextualTutorial(
     }
   }, [currentStep]);
 
+  const finish = useCallback(() => {
+    setCurrentStep(null);
+    setDone(true);
+    parentEditFlowRef.current = false;
+    localStorage.setItem(doneStorageKey, '1');
+  }, [doneStorageKey]);
+
   // Called when user starts a link drag (clicked on a dot)
   const onLinkDragStarted = useCallback(() => {
     if (currentStep === 'link-click-dot') {
@@ -106,13 +113,6 @@ export function useContextualTutorial(
       finish();
     }
   }, [currentStep, finish]);
-
-  const finish = useCallback(() => {
-    setCurrentStep(null);
-    setDone(true);
-    parentEditFlowRef.current = false;
-    localStorage.setItem(doneStorageKey, '1');
-  }, [doneStorageKey]);
 
   const restart = useCallback(() => {
     localStorage.removeItem(doneStorageKey);
