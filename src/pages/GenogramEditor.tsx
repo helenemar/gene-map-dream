@@ -797,7 +797,12 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   // ─── New member state ───
   const [editingNewMember, setEditingNewMember] = useState<FamilyMember | null>(null);
   const [newMemberDrawerOpen, setNewMemberDrawerOpen] = useState(false);
-  const contextualTutorial = useContextualTutorial(members.length, newMemberDrawerOpen, user?.email);
+  const contextualTutorial = useContextualTutorial(
+    members.length,
+    newMemberDrawerOpen,
+    user?.email,
+    isSharedMode ? undefined : genogramId,
+  );
 
   // Advance contextual tutorial when card is selected
   useEffect(() => {
