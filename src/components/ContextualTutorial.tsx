@@ -113,6 +113,8 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
     };
   }, [spotlight]);
 
+  if (!active || !currentStep) return null;
+
   return (
     <AnimatePresence mode="wait">
       {active && (
