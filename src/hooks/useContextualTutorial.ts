@@ -62,10 +62,13 @@ export function useContextualTutorial(
     }
   }, [currentStep]);
 
-  // Called when the edit drawer is closed (step 3 → 4, or link-demo after parent)
+  // Called when the edit drawer is closed
   const onDrawerClosed = useCallback(() => {
     if (currentStep === 'edit-hint') {
       setCurrentStep('parent-intro');
+    } else if (currentStep === 'parent-selected') {
+      // Father was edited and drawer closed → show link demo
+      setCurrentStep('link-demo');
     }
   }, [currentStep]);
 
@@ -76,12 +79,11 @@ export function useContextualTutorial(
     }
   }, [currentStep]);
 
-  // Called when user opens edit on the father (step 5 → link-demo)
+  // Called when user opens edit on the father (step 5)
+  // Now we just let it open — transition happens on drawer close
   const onParentEditClicked = useCallback(() => {
-    if (currentStep === 'parent-selected') {
-      setCurrentStep('link-demo');
-    }
-  }, [currentStep]);
+    // No-op: we wait for onDrawerClosed to transition
+  }, []);
 
   // Called when user creates their first emotional link
   const onLinkCreated = useCallback(() => {
