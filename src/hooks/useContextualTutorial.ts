@@ -6,7 +6,7 @@ export type ContextualTutoStep =
   | 'card-intro' | 'card-selected' | 'edit-hint'
   | 'parent-intro' | 'parent-selected'
   | 'link-click-dot' | 'link-drag-release'
-  | 'create-select-parent' | 'create-click-button' | 'create-pick-parent'
+  | 'create-select-pi' | 'create-click-button' | 'create-pick-sibling'
   | 'union-select-both' | 'union-click-button'
   | null;
 
