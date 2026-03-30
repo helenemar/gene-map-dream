@@ -581,4 +581,16 @@ export const de: Translations = {
     multiDragTitle: 'Gruppe verschieben',
     multiDragDesc: 'Ziehen Sie eine der ausgewählten Karten, um die gesamte Gruppe zu verschieben.',
   },
+  pathologyNames: {
+    'Maladie cardiovasculaire': 'Herz-Kreislauf-Erkrankung',
+    'Diabète': 'Diabetes',
+    'Cancer': 'Krebs',
+    'Maladie neurodégénérative': 'Neurodegenerative Erkrankung',
+    'Dépression': 'Depression',
+    'Trouble bipolaire': 'Bipolare Störung',
+    'Trouble anxieux': 'Angststörung',
+    'Trouble du comportement alimentaire': 'Essstörung',
+    'Trouble lié à l\'usage de substances': 'Substanzgebrauchsstörung',
+    'Trouble psychotique': 'Psychotische Störung',
+  },
 };

@@ -198,4 +198,5 @@ export interface Translations {
     multiSelectTitle: string; multiSelectDesc: string;
     multiDragTitle: string; multiDragDesc: string;
   };
+  pathologyNames: Record<string, string>;
 }

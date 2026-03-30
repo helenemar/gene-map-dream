@@ -582,4 +582,16 @@ export const en: Translations = {
     multiDragTitle: 'Move the group',
     multiDragDesc: 'Drag one of the selected cards to move the whole group.',
   },
+  pathologyNames: {
+    'Maladie cardiovasculaire': 'Cardiovascular disease',
+    'Diabète': 'Diabetes',
+    'Cancer': 'Cancer',
+    'Maladie neurodégénérative': 'Neurodegenerative disease',
+    'Dépression': 'Depression',
+    'Trouble bipolaire': 'Bipolar disorder',
+    'Trouble anxieux': 'Anxiety disorder',
+    'Trouble du comportement alimentaire': 'Eating disorder',
+    'Trouble lié à l\'usage de substances': 'Substance use disorder',
+    'Trouble psychotique': 'Psychotic disorder',
+  },
 };
