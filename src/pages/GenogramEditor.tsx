@@ -1143,8 +1143,8 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     }
 
     // ── Non-child relationships (spouse, parent, sibling) ──
-    if (relationship === 'parent') {
-      contextualTutorial.onCreateParentPicked();
+    if (relationship === 'sibling') {
+      contextualTutorial.onCreateSiblingPicked();
     }
     const pos = getViewportCenter();
     const source = members.find(m => m.id === sourceId);
