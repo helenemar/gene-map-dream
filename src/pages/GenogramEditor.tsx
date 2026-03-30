@@ -592,6 +592,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
               snapX = a.x;
               snapY = a.y;
               snapTargetId = m.id;
+              snapAnchorSide = a.side as 'top' | 'bottom' | 'left' | 'right';
             }
           }
         }
