@@ -2071,7 +2071,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
             onFitToScreen={handleFitToScreen}
-            onAutoLayout={undefined}
+            onAutoLayout={handleAutoLayout}
             zoom={zoom}
             presentationMode={isMobileReadOnly || presentationMode}
             onTogglePresentation={isMobileReadOnly ? undefined : () => {
