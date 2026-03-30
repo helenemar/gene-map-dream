@@ -212,6 +212,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     cursorX: number; cursorY: number;
     snapX?: number; snapY?: number; // snapped target point
     snapTargetId?: string;
+    snapAnchorSide?: 'top' | 'bottom' | 'left' | 'right';
   } | null>(null);
   const [linkModalTarget, setLinkModalTarget] = useState<{ fromId: string; toId: string } | null>(null);
   const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
@@ -565,6 +566,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       let snapX: number | undefined;
       let snapY: number | undefined;
       let snapTargetId: string | undefined;
+      let snapAnchorSide: 'top' | 'bottom' | 'left' | 'right' | undefined;
       let bestDist = Infinity;
 
       const srcX = linkDrag.startX;
@@ -590,12 +592,13 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
               snapX = a.x;
               snapY = a.y;
               snapTargetId = m.id;
+              snapAnchorSide = a.side as 'top' | 'bottom' | 'left' | 'right';
             }
           }
         }
       }
 
-      setLinkDrag(prev => prev ? { ...prev, cursorX, cursorY, snapX, snapY, snapTargetId } : null);
+      setLinkDrag(prev => prev ? { ...prev, cursorX, cursorY, snapX, snapY, snapTargetId, snapAnchorSide } : null);
       return;
     }
     if (dragInfo) {
@@ -1870,6 +1873,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 isAdopted={isMemberAdopted(member.id)}
                 onboardingPulse={false}
                 zoom={zoom}
+                snapAnchorSide={linkDrag?.snapTargetId === member.id ? linkDrag.snapAnchorSide : null}
                 onCreateDropdownOpen={(open) => { if (open) contextualTutorial.onCreateMemberClicked(); }}
               />
               );

@@ -63,6 +63,8 @@ interface MemberCardProps {
   onboardingPulse?: boolean;
   /** Current canvas zoom level — used to keep dots at constant visual size */
   zoom?: number;
+  /** Which anchor side is currently snapped (highlight that dot) */
+  snapAnchorSide?: AnchorSide | null;
   /** Called when the "Créer un membre" dropdown opens/closes */
   onCreateDropdownOpen?: (open: boolean) => void;
 }
@@ -103,6 +105,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   isAdopted = false,
   onboardingPulse = false,
   zoom = 1,
+  snapAnchorSide = null,
   onCreateDropdownOpen,
 }) => {
   const { t } = useLanguage();
@@ -191,6 +194,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         {/* Edge anchor dots — centered on each side, inverse-scaled to stay constant size */}
         {showDots && EDGE_DOTS.map(({ side, pos }) => {
           const invScale = 1 / zoom;
+          const isSnappedDot = snapAnchorSide === side;
           const sideTranslate =
             side === 'right'
               ? 'translate(50%, -50%)'
@@ -199,16 +203,18 @@ const MemberCard: React.FC<MemberCardProps> = ({
                 : 'translate(-50%, -50%)';
 
           return (
+          <React.Fragment key={side}>
           <div
-            key={side}
-            className={`absolute w-3 h-3 rounded-full border-[1.5px] border-primary cursor-crosshair transition-all duration-150 ${
-              dotsFilled
-                ? 'bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.5)]'
-                : isLinkTarget
-                  ? 'bg-primary/20 opacity-50 hover:opacity-100 hover:bg-primary/40 hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
-                  : dotsSubtle
-                    ? 'bg-card/80 border-primary/40 opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-primary/30 hover:border-primary hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
-                    : 'bg-card hover:bg-primary/30 hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
+            className={`absolute rounded-full border-[1.5px] cursor-crosshair transition-all duration-150 ${
+              isSnappedDot
+                ? 'w-4 h-4 bg-primary border-primary shadow-[0_0_12px_hsl(var(--primary)/0.6)] scale-125'
+                : dotsFilled
+                  ? 'w-3 h-3 bg-primary border-primary shadow-[0_0_8px_hsl(var(--primary)/0.5)]'
+                  : isLinkTarget
+                    ? 'w-3 h-3 bg-primary/20 border-primary opacity-50 hover:opacity-100 hover:bg-primary/40 hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
+                    : dotsSubtle
+                      ? 'w-3 h-3 bg-card/80 border-primary/40 opacity-0 group-hover:opacity-60 hover:!opacity-100 hover:bg-primary/30 hover:border-primary hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
+                      : 'w-3 h-3 bg-card border-primary hover:bg-primary/30 hover:scale-[1.3] hover:shadow-[0_0_10px_hsl(var(--primary)/0.4)]'
             }`}
             style={{
               ...pos,
@@ -216,6 +222,19 @@ const MemberCard: React.FC<MemberCardProps> = ({
             }}
             onMouseDown={(e) => handleDotMouseDown(side, e)}
           />
+          {isSnappedDot && (
+            <div
+              className="absolute rounded-full border-2 border-primary/40 animate-ping"
+              style={{
+                ...pos,
+                width: '20px',
+                height: '20px',
+                transform: `${sideTranslate} scale(${Math.max(invScale, 1)})`,
+                animationDuration: '1.5s',
+              }}
+            />
+          )}
+          </React.Fragment>
           );
         })}
 
