@@ -221,6 +221,23 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       };
     }
 
+    // For link-click-dot, position below all cards to avoid overlap
+    if (currentStep === 'link-click-dot' && firstMember && fatherMember) {
+      const piEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
+      const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
+      if (piEl && fatherEl) {
+        const piRect = piEl.getBoundingClientRect();
+        const fatherRect = fatherEl.getBoundingClientRect();
+        const bottomY = Math.max(piRect.bottom, fatherRect.bottom) + 24;
+        const centerX = (Math.min(piRect.left, fatherRect.left) + Math.max(piRect.right, fatherRect.right)) / 2;
+        return {
+          left: Math.max(16, Math.min(centerX - 160, window.innerWidth - 340)),
+          top: Math.min(bottomY, window.innerHeight - 120),
+          transform: 'none',
+        };
+      }
+    }
+
     // When the sidesheet is open, keep tooltip away from the right panel (~400px)
     const sheetWidth = drawerOpen ? 400 : 0;
     const availableWidth = window.innerWidth - sheetWidth;
