@@ -75,6 +75,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   const [spotlight, setSpotlight] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [editBtnPos, setEditBtnPos] = useState<{ top: number; left: number } | null>(null);
   const [linkDragPositions, setLinkDragPositions] = useState<{ fromX: number; fromY: number; toX: number; toY: number } | null>(null);
+  const [closestDotPos, setClosestDotPos] = useState<{ x: number; y: number } | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const rafRef = useRef(0);
 
@@ -110,19 +111,40 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         setLinkDragPositions(null);
       } else if (currentStep === 'link-click-dot') {
         // Highlight parent 1 card with its dots
-        if (fatherMember) {
+        if (fatherMember && firstMember) {
           const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
-          if (fatherEl) {
+          const childEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
+          if (fatherEl && childEl) {
             const fatherRect = fatherEl.getBoundingClientRect();
+            const childRect = childEl.getBoundingClientRect();
             setSpotlight({
               top: fatherRect.top - padding,
               left: fatherRect.left - padding,
               width: fatherRect.width + padding * 2,
               height: fatherRect.height + padding * 2,
             });
+            // Find the dot (edge midpoint) closest to the child card center
+            const childCx = childRect.left + childRect.width / 2;
+            const childCy = childRect.top + childRect.height / 2;
+            const dots = [
+              { x: fatherRect.left + fatherRect.width / 2, y: fatherRect.top },           // top
+              { x: fatherRect.right,                        y: fatherRect.top + fatherRect.height / 2 }, // right
+              { x: fatherRect.left + fatherRect.width / 2, y: fatherRect.bottom },        // bottom
+              { x: fatherRect.left,                         y: fatherRect.top + fatherRect.height / 2 }, // left
+            ];
+            let best = dots[0];
+            let bestDist = Infinity;
+            for (const d of dots) {
+              const dist = Math.hypot(d.x - childCx, d.y - childCy);
+              if (dist < bestDist) { bestDist = dist; best = d; }
+            }
+            setClosestDotPos(best);
           } else {
             setSpotlight(null);
+            setClosestDotPos(null);
           }
+        } else {
+          setClosestDotPos(null);
         }
         setEditBtnPos(null);
         setLinkDragPositions(null);
@@ -404,15 +426,15 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           )}
 
           {/* Animated pointing cursor for link-click-dot → points at a dot on the card */}
-          {currentStep === 'link-click-dot' && spotlight && fatherMember && (
+          {currentStep === 'link-click-dot' && closestDotPos && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 20 }}
               className="absolute pointer-events-none z-[102]"
               style={{
-                top: spotlight.top + spotlight.height / 2 + 8,
-                left: spotlight.left + spotlight.width + 4,
+                top: closestDotPos.y + 4,
+                left: closestDotPos.x + 4,
               }}
             >
               <motion.div
