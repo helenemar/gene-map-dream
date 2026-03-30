@@ -105,6 +105,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   isAdopted = false,
   onboardingPulse = false,
   zoom = 1,
+  snapAnchorSide = null,
   onCreateDropdownOpen,
 }) => {
   const { t } = useLanguage();
