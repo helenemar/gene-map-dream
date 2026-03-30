@@ -2143,7 +2143,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
           )}
 
           {/* Dev: replay contextual tutorial button (test accounts only) */}
-          {!isMobileReadOnly && ['contact.genogy@gmail.com', 'contact@genogy.fr'].includes((user?.email ?? '').toLowerCase()) && !contextualTutorial.active && (
+          {!isMobileReadOnly && !contextualTutorial.active && (
             <button
               onClick={contextualTutorial.restart}
               className="fixed bottom-4 left-4 z-50 bg-card border border-border rounded-lg px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground shadow-md transition-colors"

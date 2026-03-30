@@ -20,7 +20,7 @@ export function useContextualTutorial(
   userEmail?: string | null,
   genogramId?: string,
 ) {
-  const isAllowedUser = ['contact.genogy@gmail.com', 'contact@genogy.fr'].includes((userEmail ?? '').toLowerCase());
+  const isAllowedUser = true;
   const doneStorageKey = `${CONTEXTUAL_TUTO_DONE_KEY}-${genogramId ?? 'global'}`;
 
   const [currentStep, setCurrentStep] = useState<ContextualTutoStep>(null);
