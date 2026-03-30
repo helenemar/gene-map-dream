@@ -584,6 +584,10 @@ export const de: Translations = {
     multiSelectDesc: 'Zeichnen Sie ein Rechteck oder halten Sie ⇧ Shift und klicken Sie auf mehrere Karten.',
     multiDragTitle: 'Gruppe verschieben',
     multiDragDesc: 'Ziehen Sie eine der ausgewählten Karten, um die gesamte Gruppe zu verschieben.',
+    createMemberTitle: 'Neues Mitglied erstellen',
+    createMemberDesc: 'Klicken Sie auf ＋ eines Mitglieds, um Eltern, Partner oder Geschwister hinzuzufügen.',
+    dragSingleTitle: 'Karte verschieben',
+    dragSingleDesc: 'Ziehen Sie die Karte des neuen Mitglieds, um sie auf der Leinwand zu positionieren.',
   },
   pathologyNames: {
     'Maladie cardiovasculaire': 'Herz-Kreislauf-Erkrankung',

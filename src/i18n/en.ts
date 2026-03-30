@@ -585,6 +585,10 @@ export const en: Translations = {
     multiSelectDesc: 'Draw a rectangle on the canvas or hold ⇧ Shift and click on multiple cards.',
     multiDragTitle: 'Move the group',
     multiDragDesc: 'Drag one of the selected cards to move the whole group.',
+    createMemberTitle: 'Create a new member',
+    createMemberDesc: 'Click the ＋ button on a member to add a parent, spouse or sibling.',
+    dragSingleTitle: 'Move the card',
+    dragSingleDesc: 'Drag the new member\'s card to reposition it on the canvas.',
   },
   pathologyNames: {
     'Maladie cardiovasculaire': 'Cardiovascular disease',
