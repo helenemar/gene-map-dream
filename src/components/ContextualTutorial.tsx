@@ -580,57 +580,72 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.3 }}
               className="fixed pointer-events-none z-[102]"
               style={{
-                top: spotlight.top + spotlight.height / 2,
-                left: spotlight.left + spotlight.width / 2,
+                top: spotlight.top + spotlight.height * 0.45,
+                left: spotlight.left + spotlight.width * 0.4,
               }}
             >
+              {/* Curved trail path */}
+              <svg className="absolute overflow-visible" width="1" height="1" style={{ pointerEvents: 'none', top: 14, left: 14 }}>
+                <motion.path
+                  d="M 0,0 C 30,-40 80,-50 120,-20"
+                  fill="none"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  strokeDasharray="5 4"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: [0, 1, 1, 0], opacity: [0, 0.5, 0.5, 0] }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    times: [0, 0.35, 0.65, 1],
+                  }}
+                />
+                {/* Destination dot */}
+                <motion.circle
+                  cx={120} cy={-20} r={4}
+                  fill="hsl(var(--primary))"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: [0, 0, 0.6, 0.6, 0], scale: [0, 0, 1, 1, 0] }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    times: [0, 0.3, 0.4, 0.65, 1],
+                  }}
+                />
+              </svg>
+              {/* Hand cursor following the curve */}
               <motion.div
                 animate={{
-                  x: [0, 80, 80, 0],
-                  y: [0, -30, -30, 0],
+                  x: [0, 30, 80, 120, 120, 0],
+                  y: [0, -25, -45, -20, -20, 0],
+                  rotate: [0, -8, -5, 0, 0, 0],
                 }}
                 transition={{
-                  duration: 2.5,
+                  duration: 3,
                   repeat: Infinity,
                   ease: 'easeInOut',
-                  times: [0, 0.4, 0.6, 1],
+                  times: [0, 0.15, 0.25, 0.35, 0.65, 1],
                 }}
               >
-                <div className="relative" style={{ filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.35))' }}>
+                <div className="relative" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.25))' }}>
                   <Hand
                     className="text-white"
-                    style={{ width: 40, height: 40 }}
+                    style={{ width: 32, height: 32 }}
                     strokeWidth={3.5}
                   />
                   <Hand
                     className="absolute inset-0 text-foreground"
-                    style={{ width: 40, height: 40 }}
+                    style={{ width: 32, height: 32 }}
                     strokeWidth={2}
                   />
                 </div>
               </motion.div>
-              {/* Trail line showing drag path */}
-              <svg className="absolute top-0 left-0 overflow-visible" width="1" height="1" style={{ pointerEvents: 'none' }}>
-                <motion.line
-                  x1={20} y1={20}
-                  x2={100} y2={-10}
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={2}
-                  strokeDasharray="6 4"
-                  strokeLinecap="round"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 0.4, 0.4, 0] }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                    times: [0, 0.3, 0.6, 1],
-                  }}
-                />
-              </svg>
             </motion.div>
           )}
 
