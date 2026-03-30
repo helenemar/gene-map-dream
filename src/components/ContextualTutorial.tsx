@@ -90,6 +90,12 @@ function useTips(): Record<Exclude<ContextualTutoStep, null>, TipConfig> {
       description: t.contextualTutorial.multiDragDesc,
       padding: 14,
     },
+    'select-for-create': {
+      icon: <MousePointerClick className="w-5 h-5" />,
+      title: t.contextualTutorial.selectForCreateTitle,
+      description: t.contextualTutorial.selectForCreateDesc,
+      padding: 14,
+    },
     'create-member': {
       icon: <UserPlus className="w-5 h-5" />,
       title: t.contextualTutorial.createMemberTitle,
@@ -470,7 +476,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           )}
 
           {/* Animated pointing cursor for card-intro and parent-intro */}
-          {spotlight && (currentStep === 'card-intro' || currentStep === 'parent-intro') && (
+          {spotlight && (currentStep === 'card-intro' || currentStep === 'parent-intro' || currentStep === 'select-for-create') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}

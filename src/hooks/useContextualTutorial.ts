@@ -6,7 +6,7 @@ export type ContextualTutoStep =
   | 'card-intro' | 'card-selected' | 'edit-hint'
   | 'parent-intro' | 'parent-selected'
   | 'link-click-dot' | 'link-drag-release'
-  | 'create-member' | 'drag-single'
+  | 'select-for-create' | 'create-member' | 'drag-single'
   | 'multi-select' | 'multi-drag'
   | null;
 
@@ -115,9 +115,14 @@ export function useContextualTutorial(
   const onLinkCreated = useCallback(() => {
     if (currentStep === 'link-drag-release' || currentStep === 'link-click-dot') {
       memberCountAtCreateRef.current = memberCount;
-      setCurrentStep('create-member');
+      setCurrentStep('select-for-create');
     }
   }, [currentStep, memberCount]);
+
+  /** Called when the user selects the primary member during the select-for-create step */
+  const onCardSelectedForCreate = useCallback(() => {
+    if (currentStep === 'select-for-create') setCurrentStep('create-member');
+  }, [currentStep]);
 
   /** Called when a new member is created via the + menu */
   const onMemberCreated = useCallback(() => {
@@ -153,6 +158,7 @@ export function useContextualTutorial(
     onCardSelected, onEditClicked, onDrawerClosed,
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
+    onCardSelectedForCreate,
     onMemberCreated, onCardDragged,
     onMultiSelected, onMultiDragged,
     openPrimaryEditHint, openParentEditHint,

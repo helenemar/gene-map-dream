@@ -832,7 +832,10 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       if (members[1] && selectedMembers.has(members[1].id)) {
         contextualTutorial.onParentSelected();
       }
-      // Check if PI (members[0]) is selected for sibling creation flow
+      // Check if PI (members[0]) is selected for select-for-create phase
+      if (members[0] && selectedMembers.has(members[0].id)) {
+        contextualTutorial.onCardSelectedForCreate();
+      }
     }
     if (selectedMembers.size >= 2) {
       contextualTutorial.onMultiSelected();

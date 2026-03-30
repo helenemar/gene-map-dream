@@ -589,6 +589,8 @@ export const en: Translations = {
     multiSelectDesc: 'Draw a rectangle on the canvas or hold ⇧ Shift and click on multiple cards.',
     multiDragTitle: 'Move the group',
     multiDragDesc: 'Drag one of the selected cards to move the whole group.',
+    selectForCreateTitle: 'Select the main member',
+    selectForCreateDesc: 'Click on the main member to see creation options.',
     createMemberTitle: 'Create a new member',
     createMemberDesc: 'Click the ＋ button on a member to add a parent, spouse or sibling.',
     dragSingleTitle: 'Move the card',
