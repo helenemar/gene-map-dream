@@ -2124,6 +2124,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                   };
                   setUnions(prev => [...prev, newUnion]);
                   setSelectedMembers(new Set());
+                  contextualTutorial.onUnionCreated();
                   toast('Union créée', { duration: 2000 });
                 }}
               >
