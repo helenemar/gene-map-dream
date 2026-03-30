@@ -7,7 +7,10 @@ const CONTEXTUAL_TUTO_DONE_KEY = 'genogy-contextual-tuto-done';
  * very first member (members goes from 0 to ≥1).  It never shows again once
  * completed or dismissed.
  */
-export function useContextualTutorial(memberCount: number, drawerOpen: boolean) {
+export function useContextualTutorial(memberCount: number, drawerOpen: boolean, userEmail?: string | null) {
+  // Only enable for the test account during beta
+  const isAllowedUser = userEmail === 'contact@genogy.fr';
+
   const [active, setActive] = useState(false);
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(() => localStorage.getItem(CONTEXTUAL_TUTO_DONE_KEY) === '1');
