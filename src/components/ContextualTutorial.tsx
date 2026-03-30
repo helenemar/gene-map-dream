@@ -386,7 +386,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </svg>
           )}
 
-          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && (
+          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && currentStep !== 'create-member' && currentStep !== 'drag-single' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <mask id="ctx-tuto-mask">
