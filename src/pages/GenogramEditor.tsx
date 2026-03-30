@@ -2090,7 +2090,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
           {!isMobileReadOnly && contextualTutorial.active && (
             <button
               onClick={contextualTutorial.finish}
-              className="fixed bottom-6 right-6 z-[110] bg-destructive text-destructive-foreground rounded-full px-5 py-2.5 text-sm font-medium shadow-xl hover:bg-destructive/90 transition-colors flex items-center gap-2"
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] bg-destructive text-destructive-foreground rounded-full px-5 py-2.5 text-sm font-medium shadow-xl hover:bg-destructive/90 transition-colors flex items-center gap-2"
             >
               ✕ Arrêter le tuto
             </button>
