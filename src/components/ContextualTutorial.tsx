@@ -213,7 +213,6 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         }
         setEditBtnPos(null);
         setLinkDragPositions(null);
-      } else if (currentStep === 'create-click-button') {
       } else {
         if (!targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
         const el = document.querySelector(`[data-member-card="${targetMember.id}"]`);
@@ -284,7 +283,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'drag-card' && !drawerOpen && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && !drawerOpen && (
           spotlight ? (
             <>
               <button
@@ -370,7 +369,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </svg>
           )}
 
-          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'drag-card' && (
+          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <mask id="ctx-tuto-mask">
