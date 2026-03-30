@@ -12,6 +12,7 @@ interface FamilyLinkLinesProps {
   members: FamilyMember[];
   unions: Union[];
   onEditUnion?: (unionId: string) => void;
+  onDeleteUnion?: (unionId: string) => void;
   searchMatchedUnionIds?: Set<string>;
   isSearchActive?: boolean;
   highlightedUnionStatus?: UnionStatus | null;
