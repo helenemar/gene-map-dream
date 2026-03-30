@@ -358,14 +358,14 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               <SheetTitle className="text-sm font-semibold">
                 {!isEditing ? t.memberEdit.memberSheet : isExisting ? t.memberEdit.editMember : t.memberEdit.newMember}
               </SheetTitle>
-              {!isEditing && isExisting && (
+              {!isEditing && (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  className="text-xs gap-1.5 h-7 text-muted-foreground hover:text-foreground mr-1"
+                  className="text-xs gap-1.5 h-8 font-medium border-primary/30 text-primary hover:bg-primary/10 hover:text-primary mr-1"
                   onClick={() => setIsEditing(true)}
                 >
-                  <Pencil className="w-3 h-3" />
+                  <Pencil className="w-3.5 h-3.5" />
                   {t.memberEdit.edit}
                 </Button>
               )}
