@@ -1314,6 +1314,10 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     setEditingNewMember(newMember);
     setDrawerEditing(true);
     setNewMemberDrawerOpen(true);
+    if (relationship === 'sibling') {
+      contextualTutorial.onCreateSiblingPicked();
+      setLastCreatedSibling(newMember);
+    }
     setTimeout(() => centerOnMember(newMember), 100);
   }, [members, unions, getViewportCenter, centerOnMember, recordSnapshot]);
 
