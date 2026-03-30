@@ -201,7 +201,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && currentStep !== 'link-demo' && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-demo' && !drawerOpen && (
           spotlight ? (
             <>
               <button
