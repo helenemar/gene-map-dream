@@ -14,31 +14,33 @@ export function useContextualTutorial(
   memberCount: number,
   drawerOpen: boolean,
   userEmail?: string | null,
+  genogramId?: string,
 ) {
   const isAllowedUser = userEmail === 'contact@genogy.fr';
+  const doneStorageKey = `${CONTEXTUAL_TUTO_DONE_KEY}-${genogramId ?? 'global'}`;
 
   const [currentStep, setCurrentStep] = useState<ContextualTutoStep>(null);
-  const [done, setDone] = useState(() => !isAllowedUser || localStorage.getItem(CONTEXTUAL_TUTO_DONE_KEY) === '1');
-  const prevCount = useRef(memberCount);
-  const waitingForDrawerClose = useRef(false);
+  const [done, setDone] = useState(() => !isAllowedUser || localStorage.getItem(doneStorageKey) === '1');
+  const startedRef = useRef(false);
 
-  // Detect first member creation
+  // Reset tutorial state when changing genogram/account scope
   useEffect(() => {
-    if (done) return;
-    if (prevCount.current === 0 && memberCount >= 1) {
-      waitingForDrawerClose.current = true;
-    }
-    prevCount.current = memberCount;
-  }, [memberCount, done]);
+    const alreadyDone = !isAllowedUser || localStorage.getItem(doneStorageKey) === '1';
+    setDone(alreadyDone);
+    setCurrentStep(null);
+    startedRef.current = false;
+  }, [doneStorageKey, isAllowedUser]);
 
-  // Start tutorial once drawer closes after first member creation
+  // Start tutorial as soon as first member exists and no drawer is open
+  // (works both after creation and when opening a freshly created genogram)
   useEffect(() => {
-    if (!waitingForDrawerClose.current) return;
-    if (!drawerOpen) {
-      waitingForDrawerClose.current = false;
-      setCurrentStep('card-intro');
-    }
-  }, [drawerOpen]);
+    if (done || startedRef.current || currentStep !== null) return;
+    if (memberCount < 1) return;
+    if (drawerOpen) return;
+
+    startedRef.current = true;
+    setCurrentStep('card-intro');
+  }, [done, currentStep, memberCount, drawerOpen]);
 
   // Called when user selects the card
   const onCardSelected = useCallback(() => {
@@ -64,8 +66,8 @@ export function useContextualTutorial(
   const finish = useCallback(() => {
     setCurrentStep(null);
     setDone(true);
-    localStorage.setItem(CONTEXTUAL_TUTO_DONE_KEY, '1');
-  }, []);
+    localStorage.setItem(doneStorageKey, '1');
+  }, [doneStorageKey]);
 
   const active = currentStep !== null;
 
