@@ -65,8 +65,10 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
   open,
   onClose,
   onUpdate,
+  onDelete,
   getMemberName,
 }) => {
+  const [confirmDelete, setConfirmDelete] = useState(false);
   if (!union) return null;
 
   const eff = getEffectiveYears(union);
