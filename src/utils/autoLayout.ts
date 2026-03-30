@@ -92,12 +92,30 @@ function countAncestors(
 
 function coupleGap(union: Union): number {
   let labelLen = 0;
-  if (union.meetingYear) labelLen += `R: ${union.meetingYear}`.length;
-  if (union.eventYear ?? union.marriageYear) labelLen += `   E: ${union.eventYear ?? union.marriageYear}`.length;
-  if (union.endYear ?? union.divorceYear) labelLen += `   F: ${union.endYear ?? union.divorceYear}`.length;
+  if (union.meetingYear) {
+    const unsure = union.meetingYearUnsure ? '~' : '';
+    labelLen += `R: ${unsure}${union.meetingYear}`.length;
+  }
+  const eventYear = union.eventYear ?? union.marriageYear;
+  if (eventYear) {
+    const prefix =
+      union.status === 'married' ? 'M' :
+      union.status === 'divorced' ? 'D' :
+      union.status === 'separated' ? 'S' :
+      union.status === 'widowed' ? 'V' :
+      union.status === 'common_law' ? 'UL' :
+      union.status === 'love_affair' ? 'L' : 'E';
+    const unsure = union.eventYearUnsure ? '~' : '';
+    labelLen += `   ${prefix}: ${unsure}${eventYear}`.length;
+  }
+  const endYear = union.endYear ?? union.divorceYear;
+  if (endYear && !['separated', 'divorced', 'widowed'].includes(union.status)) {
+    const unsure = union.endYearUnsure ? '~' : '';
+    labelLen += `   F: ${unsure}${endYear}`.length;
+  }
   if (labelLen > 0) {
     const badgeW = Math.max(labelLen * 7.2 + 24, 56);
-    return Math.max(badgeW + BADGE_SAFETY, MIN_BADGE_GAP);
+    return Math.max(badgeW + BADGE_SAFETY + 20, MIN_BADGE_GAP);
   }
   const hasIcon = ['divorced', 'separated', 'widowed', 'love_affair', 'common_law'].includes(union.status);
   return hasIcon ? Math.max(BASE_COUPLE_GAP, 160) : BASE_COUPLE_GAP;
