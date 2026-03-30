@@ -3,6 +3,7 @@ import { EMOTIONAL_LINK_TYPES, EmotionalLinkType } from '@/types/genogram';
 import { X, Trash2, Heart, AlertTriangle, Check } from 'lucide-react';
 import { EmotionalLinkPreview } from '@/components/EmotionalLinkLine';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface LinkTypeModalProps {
   open: boolean;
@@ -15,6 +16,7 @@ interface LinkTypeModalProps {
 }
 
 const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, currentType, onDelete, existingTypes = [] }) => {
+  const { t } = useLanguage();
   React.useEffect(() => {
     if (open) window.getSelection()?.removeAllRanges();
   }, [open]);
@@ -55,8 +57,8 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
           <EmotionalLinkPreview type={lt.id} width={48} height={20} strokeScale={0.8} />
         </div>
         <div className="flex flex-col min-w-0 flex-1">
-          <span className={`text-sm font-medium leading-tight ${isActive ? 'text-primary' : 'text-foreground'}`}>{lt.label}</span>
-          <span className="text-[11px] text-muted-foreground leading-tight">{lt.description}</span>
+          <span className={`text-sm font-medium leading-tight ${isActive ? 'text-primary' : 'text-foreground'}`}>{t.emotionalLinkTypes[lt.id as keyof typeof t.emotionalLinkTypes] ?? lt.label}</span>
+          <span className="text-[11px] text-muted-foreground leading-tight">{t.emotionalLinkDescriptions[lt.id as keyof typeof t.emotionalLinkDescriptions] ?? lt.description}</span>
         </div>
         {isActive && (
           <span className="w-5 h-5 rounded-full bg-primary flex items-center justify-center shrink-0">
@@ -64,7 +66,7 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
           </span>
         )}
         {isAlreadyUsed && (
-          <span className="text-[10px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">Déjà utilisé</span>
+                 <span className="text-[10px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full shrink-0">{t.linkTypeModal.alreadyUsed}</span>
         )}
       </motion.button>
     );
@@ -96,10 +98,10 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
             <div className="flex items-center justify-between mb-4 shrink-0 px-1">
               <div className="flex flex-col">
                 <h3 className="font-semibold text-foreground text-base">
-                  {isEditing ? 'Modifier le lien' : 'Type de lien émotionnel'}
+                  {isEditing ? t.linkTypeModal.editTitle : t.linkTypeModal.title}
                 </h3>
                 <span className="text-[11px] text-muted-foreground mt-0.5">
-                  {isEditing ? 'Changez le type ou supprimez le lien' : 'Choisissez le type de relation'}
+                  {isEditing ? t.linkTypeModal.editSubtitle : t.linkTypeModal.subtitle}
                 </span>
               </div>
               <button
@@ -118,7 +120,7 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
               {/* Relational category */}
               <div className="flex items-center gap-2 px-2 pt-1 pb-2">
                 <Heart className="w-3.5 h-3.5 text-primary/60" />
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Relationnels</span>
+                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{t.linkTypeModal.categoryRelational}</span>
                 <div className="flex-1 h-px bg-border/50" />
               </div>
               {relationalLinks.map(renderItem)}
@@ -129,7 +131,7 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
               {/* Abusive category */}
               <div className="flex items-center gap-2 px-2 pt-1 pb-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-destructive/60" />
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Violences</span>
+                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{t.linkTypeModal.categoryViolence}</span>
                 <div className="flex-1 h-px bg-border/50" />
               </div>
               {abusiveLinks.map(renderItem)}
@@ -145,7 +147,7 @@ const LinkTypeModal: React.FC<LinkTypeModalProps> = ({ open, onSelect, onClose, 
                 className="flex items-center justify-center gap-2 w-full mt-3 h-10 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-all active:scale-[0.97] shrink-0 border border-destructive/20"
               >
                 <Trash2 className="w-4 h-4" />
-                Supprimer ce lien
+                {t.linkTypeModal.deleteLink}
               </motion.button>
             )}
           </motion.div>
