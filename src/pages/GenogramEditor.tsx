@@ -1325,11 +1325,6 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
 
   const [drawerEditing, setDrawerEditing] = useState(true);
 
-  // Advance contextual tutorial when edit drawer opens/closes
-  useEffect(() => {
-    // Step transition is triggered directly on edit button click for instant tooltip update
-  }, []);
-
   const drawerClosedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (drawerClosedTimerRef.current) clearTimeout(drawerClosedTimerRef.current);
