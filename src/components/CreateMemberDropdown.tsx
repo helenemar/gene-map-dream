@@ -126,7 +126,7 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
       <DropdownMenuItem
         key={opt.id}
         onClick={() => onSelect(opt.id)}
-        className="flex items-center gap-2.5 py-2 cursor-pointer"
+        className={`flex items-center gap-2.5 py-2 cursor-pointer ${tutorialHighlight ? 'animate-[pulse_2s_ease-in-out_infinite] ring-1 ring-primary/20' : ''}`}
       >
         <span className="text-muted-foreground">{opt.icon}</span>
         <span className="text-sm font-medium">{opt.label}</span>
