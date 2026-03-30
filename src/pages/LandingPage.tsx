@@ -89,7 +89,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
         <link rel="alternate" hreflang="x-default" href="https://genogy.app/" />
         <meta property="og:title" content={t.landing.metaTitle} />
         <meta property="og:description" content={t.landing.metaDesc} />
-        <meta property="og:url" content="https://genogy.app/" />
+        <meta property="og:url" content={`https://genogy.app${forceLang ? `/${forceLang}` : '/'}`} />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(howToJsonLd)}</script>

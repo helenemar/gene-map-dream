@@ -40,6 +40,8 @@ const App = () => {
                 <Routes>
                 
                   <Route path="/" element={<LandingPage />} />
+                  <Route path="/en" element={<LandingPage forceLang="en" />} />
+                  <Route path="/de" element={<LandingPage forceLang="de" />} />
                   <Route path="/auth" element={<Navigate to="/" replace />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
