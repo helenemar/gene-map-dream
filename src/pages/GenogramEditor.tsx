@@ -2021,6 +2021,21 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
             />
           )}
 
+          {!isMobileReadOnly && (
+            <ContextualTutorial
+              active={contextualTutorial.active}
+              step={contextualTutorial.step}
+              totalSteps={contextualTutorial.totalSteps}
+              firstMember={members[0] || null}
+              zoom={zoom}
+              pan={pan}
+              canvasRef={canvasRef as React.RefObject<HTMLDivElement>}
+              onNext={contextualTutorial.next}
+              onPrev={contextualTutorial.prev}
+              onFinish={contextualTutorial.finish}
+            />
+          )}
+
           {/* Union action between 2 selected members */}
           {!isMobileReadOnly && !presentationMode && selectedMembers.size === 2 && (() => {
             const [idA, idB] = Array.from(selectedMembers);
