@@ -210,7 +210,7 @@ const Dashboard: React.FC = () => {
   const handleCreate = () => {
     const ownCount = (ownGenograms || []).length;
     if (ownCount >= MAX_GENOGRAMS) {
-      toast.error(t.dashboard.limitReached.replace('{max}', String(MAX_GENOGRAMS)), { duration: 3000 });
+      setBetaLimitOpen(true);
       return;
     }
     setCreateModalOpen(true);
