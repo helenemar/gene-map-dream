@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pencil, CheckCircle } from 'lucide-react';
+import { X, Pencil, CheckCircle, MousePointerClick } from 'lucide-react';
 import { FamilyMember } from '@/types/genogram';
 import type { ContextualTutoStep } from '@/hooks/useContextualTutorial';
 
@@ -13,9 +13,9 @@ interface TipConfig {
 
 const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
   'card-intro': {
-    icon: <Pencil className="w-5 h-5" />,
-    title: 'Modifier les informations',
-    description: 'Cliquez sur le bouton ✏️ pour ouvrir le panneau d\'édition et compléter les informations du membre.',
+    icon: <MousePointerClick className="w-5 h-5" />,
+    title: 'Sélectionnez le membre',
+    description: 'Cliquez sur la carte pour la sélectionner, puis sur le bouton ✏️ pour modifier ses informations.',
     padding: 14,
   },
   'edit-hint': {
