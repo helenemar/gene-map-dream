@@ -100,7 +100,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   const tip = currentStep ? TIPS[currentStep] : null;
 
   // Determine which member to target based on step
-  const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected')
+  const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected' || currentStep === 'create-select-parent' || currentStep === 'create-click-button' || currentStep === 'create-pick-parent')
     ? fatherMember
     : firstMember;
 
