@@ -66,9 +66,14 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
 
   const tip = currentStep ? TIPS[currentStep] : null;
 
+  // Determine which member to target based on step
+  const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected')
+    ? fatherMember
+    : firstMember;
+
   // Track DOM element position
   useEffect(() => {
-    if (!currentStep || !firstMember) { setSpotlight(null); setEditBtnPos(null); return; }
+    if (!currentStep || !targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
 
     const padding = tip?.padding ?? 14;
 
@@ -89,7 +94,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         }
         setEditBtnPos(null);
       } else {
-        const el = document.querySelector(`[data-member-card="${firstMember.id}"]`);
+        const el = document.querySelector(`[data-member-card="${targetMember.id}"]`);
         if (el) {
           const rect = el.getBoundingClientRect();
           setSpotlight({
@@ -102,9 +107,9 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           setSpotlight(null);
         }
 
-        // Track edit button position for card-selected step
-        if (currentStep === 'card-selected') {
-          const btn = document.querySelector(`[data-edit-button="${firstMember.id}"]`);
+        // Track edit button position for card-selected or parent-selected step
+        if (currentStep === 'card-selected' || currentStep === 'parent-selected') {
+          const btn = document.querySelector(`[data-edit-button="${targetMember.id}"]`);
           if (btn) {
             const btnRect = btn.getBoundingClientRect();
             setEditBtnPos({ top: btnRect.top + btnRect.height / 2, left: btnRect.left + btnRect.width / 2 });
@@ -119,7 +124,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
     };
     update();
     return () => cancelAnimationFrame(rafRef.current);
-  }, [currentStep, firstMember, tip]);
+  }, [currentStep, targetMember, tip]);
 
   // Tooltip position
   const cardStyle = useMemo((): React.CSSProperties => {
