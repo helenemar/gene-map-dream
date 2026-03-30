@@ -48,6 +48,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
 }) => {
   const [spotlight, setSpotlight] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [editBtnPos, setEditBtnPos] = useState<{ top: number; left: number } | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
   const rafRef = useRef(0);
 
   const tip = currentStep ? TIPS[currentStep] : null;
