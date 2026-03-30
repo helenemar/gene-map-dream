@@ -162,6 +162,7 @@ export function useContextualTutorial(
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
     onCreateMemberClicked, onCreateParentPicked,
+    onTwoMembersSelected, onUnionCreated,
     finish, restart,
   };
 }
