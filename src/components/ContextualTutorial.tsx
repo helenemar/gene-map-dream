@@ -394,7 +394,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
     };
   }, [spotlight, currentStep, drawerOpen]);
 
-  if (!currentStep || !tip) return null;
+  if (!currentStep || !tip || (drawerOpen && currentStep !== 'edit-hint')) return null;
 
   return (
     <AnimatePresence mode="wait">
