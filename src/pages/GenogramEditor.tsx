@@ -806,7 +806,13 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
 
   // Advance contextual tutorial when card is selected
   useEffect(() => {
-    if (selectedMembers.size > 0) contextualTutorial.onCardSelected();
+    if (selectedMembers.size > 0) {
+      contextualTutorial.onCardSelected();
+      // Check if the selected member is the father (members[1]) for parent phase
+      if (members[1] && selectedMembers.has(members[1].id)) {
+        contextualTutorial.onParentSelected();
+      }
+    }
   }, [selectedMembers.size]);
 
   // ─── Parent picker state (for child creation with multiple unions) ───
