@@ -1964,8 +1964,10 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 contextualTutorial.onLinkCreated();
               }
               setLinkModalTarget(null);
+              setSelectedMembers(new Set());
+              setAnchorActiveMember(null);
             }}
-            onClose={() => setLinkModalTarget(null)}
+            onClose={() => { setLinkModalTarget(null); setSelectedMembers(new Set()); setAnchorActiveMember(null); }}
           />
 
           {/* Edit existing emotional link modal */}
