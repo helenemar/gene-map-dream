@@ -1349,11 +1349,13 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   const handleEdit = useCallback((id: string) => {
     const member = members.find(m => m.id === id);
     if (member) {
+      contextualTutorial.onEditClicked();
+      contextualTutorial.onParentEditClicked();
       setEditingNewMember(member);
       setDrawerEditing(true);
       setNewMemberDrawerOpen(true);
     }
-  }, [members]);
+  }, [members, contextualTutorial]);
 
   const handleView = useCallback((id: string) => {
     const member = members.find(m => m.id === id);
