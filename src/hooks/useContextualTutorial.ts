@@ -105,7 +105,7 @@ export function useContextualTutorial(
     if (currentStep === 'link-drag-release' || currentStep === 'link-click-dot') {
       finish();
     }
-  }, [currentStep]);
+  }, [currentStep, finish]);
 
   const finish = useCallback(() => {
     setCurrentStep(null);
