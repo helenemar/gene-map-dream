@@ -13,9 +13,9 @@ export type ContextualTutoStep =
 /**
  * Event-driven contextual tutorial.
  * Steps 1-7: existing flow (card select → edit → parent → link creation)
- * Step 8 (create-select-parent): Re-select parent 1 card.
+ * Step 8 (create-select-pi): Re-select the base member (PI) card.
  * Step 9 (create-click-button): Click "Créer un membre" button.
- * Step 10 (create-pick-parent): Click "Parent" in the dropdown.
+ * Step 10 (create-pick-sibling): Click "Frère/Sœur" in the dropdown.
  */
 export function useContextualTutorial(
   memberCount: number,
