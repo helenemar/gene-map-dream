@@ -92,8 +92,6 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
     return () => cancelAnimationFrame(rafRef.current);
   }, [active, step, firstMember, zoom, pan, canvasRef, currentStep]);
 
-  if (!active || !currentStep) return null;
-
   // Position the tooltip card near the spotlight
   const cardStyle = useMemo((): React.CSSProperties => {
     if (!spotlight) {
