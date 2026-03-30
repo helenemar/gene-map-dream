@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Union, UnionStatus, FAMILY_LINK_TYPES } from '@/types/genogram';
-import {
+import { Trash2 } from 'lucide-react';
   Sheet,
   SheetContent,
   SheetHeader,
