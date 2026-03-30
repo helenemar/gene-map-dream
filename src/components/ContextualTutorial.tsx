@@ -300,7 +300,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && !drawerOpen && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && currentStep !== 'create-member' && currentStep !== 'drag-single' && !drawerOpen && (
           spotlight ? (
             <>
               <button
@@ -386,7 +386,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </svg>
           )}
 
-          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && (
+          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && currentStep !== 'create-member' && currentStep !== 'drag-single' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <mask id="ctx-tuto-mask">
@@ -642,6 +642,101 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
               >
                 Relâchez ici
               </motion.span>
+            </motion.div>
+          )}
+
+          {/* create-member: animated + button with cursor clicking */}
+          {currentStep === 'create-member' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="fixed pointer-events-none z-[102]"
+              style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+            >
+              {/* Simulated mini card with + button */}
+              <div className="relative flex items-center gap-3 px-4 py-3 rounded-xl bg-card/90 border border-border shadow-lg">
+                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                </div>
+                <span className="text-xs font-medium text-muted-foreground">Hélène</span>
+                {/* + button */}
+                <motion.div
+                  animate={{ scale: [1, 1.15, 1], boxShadow: ['0 0 0 0 hsl(var(--primary) / 0)', '0 0 0 8px hsl(var(--primary) / 0.15)', '0 0 0 0 hsl(var(--primary) / 0)'] }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                  className="w-6 h-6 rounded-full bg-primary flex items-center justify-center ml-1"
+                >
+                  <span className="text-primary-foreground text-sm font-bold leading-none">＋</span>
+                </motion.div>
+              </div>
+              {/* Cursor clicking on the + */}
+              <motion.div
+                className="absolute pointer-events-none"
+                style={{ right: -4, bottom: -8 }}
+              >
+                <motion.div
+                  animate={{ y: [0, -4, 0], scale: [1, 0.9, 1] }}
+                  transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 1] }}
+                >
+                  <TutoCursor size={24} />
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {/* drag-single: animated hand dragging a card */}
+          {currentStep === 'drag-single' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="fixed pointer-events-none z-[102]"
+              style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+            >
+              {/* Trail path */}
+              <svg className="absolute overflow-visible" width="1" height="1" style={{ pointerEvents: 'none', top: 24, left: 60 }}>
+                <motion.path
+                  d="M 0,0 C 20,-30 60,-40 100,-15"
+                  fill="none"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  strokeDasharray="5 4"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: [0, 1, 1, 0], opacity: [0, 0.5, 0.5, 0] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.35, 0.65, 1] }}
+                />
+                <motion.circle
+                  cx={100} cy={-15} r={4}
+                  fill="hsl(var(--primary))"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: [0, 0, 0.6, 0.6, 0], scale: [0, 0, 1, 1, 0] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.3, 0.4, 0.65, 1] }}
+                />
+              </svg>
+              {/* Mini card being dragged */}
+              <motion.div
+                animate={{ x: [0, 20, 60, 100, 100, 0], y: [0, -18, -35, -15, -15, 0] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.15, 0.25, 0.35, 0.65, 1] }}
+                className="relative flex items-center gap-2 px-3 py-2 rounded-lg bg-card/90 border border-primary/30 shadow-md"
+              >
+                <div className="w-6 h-6 rounded bg-muted flex items-center justify-center">
+                  <User className="w-3 h-3 text-muted-foreground" />
+                </div>
+                <span className="text-[10px] font-medium text-muted-foreground">Nouveau</span>
+              </motion.div>
+              {/* Hand cursor following */}
+              <motion.div
+                className="absolute pointer-events-none"
+                style={{ top: 20, left: 40 }}
+                animate={{ x: [0, 20, 60, 100, 100, 0], y: [0, -18, -35, -15, -15, 0], rotate: [0, -8, -5, 0, 0, 0] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', times: [0, 0.15, 0.25, 0.35, 0.65, 1] }}
+              >
+                <div className="relative" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.25))' }}>
+                  <Hand className="text-white" style={{ width: 28, height: 28 }} strokeWidth={3.5} />
+                  <Hand className="absolute inset-0 text-foreground" style={{ width: 28, height: 28 }} strokeWidth={2} />
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </motion.div>
