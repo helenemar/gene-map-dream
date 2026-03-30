@@ -31,7 +31,7 @@ export function useContextualTutorial(
   const [done, setDone] = useState(() => !isAllowedUser || localStorage.getItem(doneStorageKey) === '1');
   const startedRef = useRef(false);
   const parentEditFlowRef = useRef(false);
-
+  const siblingEditFlowRef = useRef(false);
   // Reset tutorial state when changing genogram/account scope
   useEffect(() => {
     const alreadyDone = !isAllowedUser || localStorage.getItem(doneStorageKey) === '1';
@@ -39,6 +39,7 @@ export function useContextualTutorial(
     setCurrentStep(null);
     startedRef.current = false;
     parentEditFlowRef.current = false;
+    siblingEditFlowRef.current = false;
   }, [doneStorageKey, isAllowedUser]);
 
   // Start tutorial as soon as first member exists and no drawer is open
@@ -69,7 +70,10 @@ export function useContextualTutorial(
   // Called when the edit drawer is closed
   const onDrawerClosed = useCallback(() => {
     if (currentStep === 'edit-hint') {
-      if (parentEditFlowRef.current) {
+      if (siblingEditFlowRef.current) {
+        siblingEditFlowRef.current = false;
+        setCurrentStep('drag-card');
+      } else if (parentEditFlowRef.current) {
         parentEditFlowRef.current = false;
         setCurrentStep('link-click-dot');
       } else {
@@ -97,6 +101,7 @@ export function useContextualTutorial(
     setCurrentStep(null);
     setDone(true);
     parentEditFlowRef.current = false;
+    siblingEditFlowRef.current = false;
     localStorage.setItem(doneStorageKey, '1');
   }, [doneStorageKey]);
 
@@ -132,7 +137,8 @@ export function useContextualTutorial(
   // Called when user picks "Frère/Sœur" in the dropdown → move to drag step
   const onCreateSiblingPicked = useCallback(() => {
     if (currentStep === 'create-pick-sibling') {
-      setCurrentStep('drag-card');
+      siblingEditFlowRef.current = true;
+      setCurrentStep('edit-hint');
     }
   }, [currentStep]);
 
@@ -170,6 +176,7 @@ export function useContextualTutorial(
     setCurrentStep(null);
     startedRef.current = false;
     parentEditFlowRef.current = false;
+    siblingEditFlowRef.current = false;
   }, [doneStorageKey]);
 
   const active = currentStep !== null;
