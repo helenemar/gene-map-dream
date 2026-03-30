@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Union, UnionStatus, FAMILY_LINK_TYPES } from '@/types/genogram';
+import { Trash2 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   Select,
   SelectContent,
@@ -30,6 +35,7 @@ interface UnionEditDrawerProps {
   open: boolean;
   onClose: () => void;
   onUpdate: (updated: Union) => void;
+  onDelete?: (unionId: string) => void;
   getMemberName: (id: string) => string;
 }
 
@@ -59,8 +65,10 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
   open,
   onClose,
   onUpdate,
+  onDelete,
   getMemberName,
 }) => {
+  const [confirmDelete, setConfirmDelete] = useState(false);
   if (!union) return null;
 
   const eff = getEffectiveYears(union);
@@ -215,8 +223,48 @@ const UnionEditDrawer: React.FC<UnionEditDrawerProps> = ({
               onChange={(e) => onUpdate({ ...union, notes: e.target.value })}
             />
           </div>
+
+          {/* Delete union */}
+          {onDelete && (
+            <div className="pt-4 border-t border-border/50">
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                className="flex items-center gap-2 text-sm text-destructive hover:text-destructive/80 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                Supprimer cette union
+              </button>
+            </div>
+          )}
         </div>
       </SheetContent>
+
+      {/* Confirmation dialog */}
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer l'union ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              L'union entre {getMemberName(union.partner1)} et {getMemberName(union.partner2)} sera supprimée.
+              Le membre non rattaché au reste de la famille sera également supprimé.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                onDelete(union.id);
+                setConfirmDelete(false);
+                onClose();
+              }}
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Sheet>
   );
 };
