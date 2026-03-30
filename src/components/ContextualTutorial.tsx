@@ -105,16 +105,16 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Tracez un rectangle sur le canevas avec la souris, ou maintenez ⇧ Shift et cliquez sur plusieurs cartes pour les sélectionner.',
     padding: 14,
   },
-  'union-select-both': {
-    icon: <Link2 className="w-5 h-5" />,
-    title: 'Sélectionnez les deux parents',
-    description: 'Cliquez sur le parent 1, puis maintenez ⇧ Shift et cliquez sur le parent 2.',
+  'multi-drag': {
+    icon: <Move className="w-5 h-5" />,
+    title: 'Déplacez le groupe',
+    description: 'Glissez une des cartes sélectionnées pour déplacer tout le groupe en même temps.',
     padding: 14,
   },
-  'union-click-button': {
-    icon: <Link2 className="w-5 h-5" />,
-    title: 'Créer l\'union',
-    description: 'Cliquez sur le bouton « Créer une union » qui apparaît entre les deux cartes.',
+  'search-bar': {
+    icon: <BoxSelect className="w-5 h-5" />,
+    title: 'Barre de recherche',
+    description: 'Tapez un nom, une profession ou une pathologie dans la barre de recherche pour filtrer les membres du génogramme.',
     padding: 8,
   },
 };
