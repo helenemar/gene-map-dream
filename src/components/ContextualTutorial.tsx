@@ -836,9 +836,9 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </div>
             <button
               onClick={() => setTipHidden(true)}
-              className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors z-10"
+              className={`absolute flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors z-10 ${currentStep === 'edit-hint' ? 'top-3 right-3 w-7 h-7' : 'top-2 right-2 w-5 h-5'}`}
             >
-              <X className="w-4 h-4" />
+              <X className={currentStep === 'edit-hint' ? 'w-4 h-4' : 'w-3 h-3'} />
             </button>
 
             <div className={currentStep === 'edit-hint' ? 'px-5 pb-5 pt-2' : 'px-3 pb-3 pt-1'}>
