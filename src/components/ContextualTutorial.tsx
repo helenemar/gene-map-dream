@@ -115,32 +115,35 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
           const childEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
           if (fatherEl && childEl) {
-            const fatherRect = fatherEl.getBoundingClientRect();
             const childRect = childEl.getBoundingClientRect();
-            // Find the dot (edge midpoint) closest to the child card center
             const childCx = childRect.left + childRect.width / 2;
             const childCy = childRect.top + childRect.height / 2;
-            const dots = [
-              { x: fatherRect.left + fatherRect.width / 2, y: fatherRect.top },           // top
-              { x: fatherRect.right,                        y: fatherRect.top + fatherRect.height / 2 }, // right
-              { x: fatherRect.left + fatherRect.width / 2, y: fatherRect.bottom },        // bottom
-              { x: fatherRect.left,                         y: fatherRect.top + fatherRect.height / 2 }, // left
-            ];
-            let best = dots[0];
+
+            // Query actual rendered dot elements inside the father card
+            const dotEls = fatherEl.querySelectorAll('.rounded-full.cursor-crosshair');
+            let best: { x: number; y: number } | null = null;
             let bestDist = Infinity;
-            for (const d of dots) {
-              const dist = Math.hypot(d.x - childCx, d.y - childCy);
-              if (dist < bestDist) { bestDist = dist; best = d; }
-            }
-            setClosestDotPos(best);
-            // Spotlight centered on the dot
-            const dotRadius = 24;
-            setSpotlight({
-              top: best.y - dotRadius,
-              left: best.x - dotRadius,
-              width: dotRadius * 2,
-              height: dotRadius * 2,
+            dotEls.forEach((dotEl) => {
+              const dr = dotEl.getBoundingClientRect();
+              const cx = dr.left + dr.width / 2;
+              const cy = dr.top + dr.height / 2;
+              const dist = Math.hypot(cx - childCx, cy - childCy);
+              if (dist < bestDist) { bestDist = dist; best = { x: cx, y: cy }; }
             });
+
+            if (best) {
+              setClosestDotPos(best);
+              const dotRadius = 24;
+              setSpotlight({
+                top: best.y - dotRadius,
+                left: best.x - dotRadius,
+                width: dotRadius * 2,
+                height: dotRadius * 2,
+              });
+            } else {
+              setSpotlight(null);
+              setClosestDotPos(null);
+            }
           } else {
             setSpotlight(null);
             setClosestDotPos(null);
