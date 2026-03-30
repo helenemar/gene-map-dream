@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Pencil, CheckCircle, MousePointerClick, UserRound, Link2 } from 'lucide-react';
+import { X, Pencil, CheckCircle, MousePointerClick, UserRound, Link2, UserPlus, User } from 'lucide-react';
 import { FamilyMember } from '@/types/genogram';
 import type { ContextualTutoStep } from '@/hooks/useContextualTutorial';
 import {
@@ -59,6 +59,24 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Maintenez le clic et glissez vers la carte de l\'enfant, puis relâchez pour créer le lien émotionnel.',
     padding: 24,
   },
+  'create-select-parent': {
+    icon: <UserRound className="w-5 h-5" />,
+    title: 'Sélectionnez le parent 1',
+    description: 'Cliquez sur la carte du parent 1 pour le sélectionner.',
+    padding: 14,
+  },
+  'create-click-button': {
+    icon: <UserPlus className="w-5 h-5" />,
+    title: 'Créer un membre',
+    description: 'Cliquez sur le bouton « Créer un membre » sous la carte.',
+    padding: 8,
+  },
+  'create-pick-parent': {
+    icon: <User className="w-5 h-5" />,
+    title: 'Choisissez « Parent »',
+    description: 'Sélectionnez « Parent » dans le menu déroulant pour ajouter un parent 2.',
+    padding: 8,
+  },
 };
 
 interface ContextualTutorialProps {
@@ -82,7 +100,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   const tip = currentStep ? TIPS[currentStep] : null;
 
   // Determine which member to target based on step
-  const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected')
+  const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected' || currentStep === 'create-select-parent' || currentStep === 'create-click-button' || currentStep === 'create-pick-parent')
     ? fatherMember
     : firstMember;
 
@@ -168,6 +186,53 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           } else {
             setSpotlight(null);
           }
+        }
+        setEditBtnPos(null);
+        setLinkDragPositions(null);
+      } else if (currentStep === 'create-click-button') {
+        // Spotlight the "Créer un membre" button under the father card
+        if (fatherMember) {
+          const el = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
+          if (el) {
+            // Find the "Créer un membre" button (it's the one with UserPlus icon)
+            const btns = el.parentElement?.querySelectorAll('button');
+            let createBtn: Element | null = null;
+            btns?.forEach(b => {
+              if (b.textContent?.includes('Créer')) createBtn = b;
+            });
+            if (createBtn) {
+              const btnRect = (createBtn as HTMLElement).getBoundingClientRect();
+              setSpotlight({
+                top: btnRect.top - padding,
+                left: btnRect.left - padding,
+                width: btnRect.width + padding * 2,
+                height: btnRect.height + padding * 2,
+              });
+              setEditBtnPos({ top: btnRect.top + btnRect.height / 2, left: btnRect.left + btnRect.width / 2 });
+            } else {
+              // Fallback: highlight the card
+              const rect = el.getBoundingClientRect();
+              setSpotlight({ top: rect.top - padding, left: rect.left - padding, width: rect.width + padding * 2, height: rect.height + padding * 2 });
+              setEditBtnPos(null);
+            }
+          } else {
+            setSpotlight(null);
+          }
+        }
+        setLinkDragPositions(null);
+      } else if (currentStep === 'create-pick-parent') {
+        // Spotlight the dropdown menu content
+        const dropdownContent = document.querySelector('[role="menu"]');
+        if (dropdownContent) {
+          const rect = dropdownContent.getBoundingClientRect();
+          setSpotlight({
+            top: rect.top - padding,
+            left: rect.left - padding,
+            width: rect.width + padding * 2,
+            height: rect.height + padding * 2,
+          });
+        } else {
+          setSpotlight(null);
         }
         setEditBtnPos(null);
         setLinkDragPositions(null);
@@ -277,7 +342,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && !drawerOpen && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-parent' && !drawerOpen && (
           spotlight ? (
             <>
               <button
@@ -341,7 +406,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-[100] pointer-events-none"
         >
-          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && (
+          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-parent' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <mask id="ctx-tuto-mask">
@@ -409,7 +474,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           )}
 
           {/* Animated pointing cursor for card-intro and parent-intro */}
-          {spotlight && (currentStep === 'card-intro' || currentStep === 'parent-intro') && (
+          {spotlight && (currentStep === 'card-intro' || currentStep === 'parent-intro' || currentStep === 'create-select-parent') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -430,7 +495,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           )}
 
           {/* Animated pointing cursor for card-selected / parent-selected → points at edit button */}
-          {editBtnPos && (currentStep === 'card-selected' || currentStep === 'parent-selected') && (
+          {editBtnPos && (currentStep === 'card-selected' || currentStep === 'parent-selected' || currentStep === 'create-click-button') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}

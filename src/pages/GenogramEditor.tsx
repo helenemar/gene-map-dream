@@ -1125,6 +1125,9 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     }
 
     // ── Non-child relationships (spouse, parent, sibling) ──
+    if (relationship === 'parent') {
+      contextualTutorial.onCreateParentPicked();
+    }
     const pos = getViewportCenter();
     const source = members.find(m => m.id === sourceId);
     const currentYear = new Date().getFullYear();
@@ -1850,6 +1853,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 isAdopted={isMemberAdopted(member.id)}
                 onboardingPulse={false}
                 zoom={zoom}
+                onCreateDropdownOpen={(open) => { if (open) contextualTutorial.onCreateMemberClicked(); }}
               />
               );
             })}

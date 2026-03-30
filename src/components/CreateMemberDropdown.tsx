@@ -82,6 +82,8 @@ interface CreateMemberDropdownProps {
   disabledOptions?: DisabledOptions;
   /** Show split parent options (bio/adoptive) instead of single "Parent" */
   showParentSplit?: boolean;
+  /** Called when the dropdown opens */
+  onOpenChange?: (open: boolean) => void;
 }
 
 const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
@@ -89,6 +91,7 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
   children,
   disabledOptions,
   showParentSplit = false,
+  onOpenChange,
 }) => {
   const [perinatalOpen, setPerinatalOpen] = useState(false);
   // Build option list: replace 'parent' with sub-options when split is active
@@ -130,7 +133,7 @@ const CreateMemberDropdown: React.FC<CreateMemberDropdownProps> = ({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={onOpenChange}>
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
         <DropdownMenuContent align="center" sideOffset={4} collisionPadding={16} className="w-56">
           {showParentSplit && (

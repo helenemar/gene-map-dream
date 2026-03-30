@@ -6,17 +6,15 @@ export type ContextualTutoStep =
   | 'card-intro' | 'card-selected' | 'edit-hint'
   | 'parent-intro' | 'parent-selected'
   | 'link-click-dot' | 'link-drag-release'
+  | 'create-select-parent' | 'create-click-button' | 'create-pick-parent'
   | null;
 
 /**
  * Event-driven contextual tutorial.
- * Step 1 (card-intro): Highlight PI card → user clicks to select.
- * Step 2 (card-selected): Card selected → user clicks edit button.
- * Step 3 (edit-hint): Edit drawer open → user fills info & closes drawer.
- * Step 4 (parent-intro): Highlight father card → user clicks to select.
- * Step 5 (parent-selected): Father selected → user double-clicks or clicks edit.
- * Step 6 (link-click-dot): Show user to click on an anchor dot of parent 1.
- * Step 7 (link-drag-release): Show drag animation to child and tell user to release.
+ * Steps 1-7: existing flow (card select → edit → parent → link creation)
+ * Step 8 (create-select-parent): Re-select parent 1 card.
+ * Step 9 (create-click-button): Click "Créer un membre" button.
+ * Step 10 (create-pick-parent): Click "Parent" in the dropdown.
  */
 export function useContextualTutorial(
   memberCount: number,
@@ -83,6 +81,10 @@ export function useContextualTutorial(
     if (currentStep === 'parent-intro') {
       setCurrentStep('parent-selected');
     }
+    // Step 8: re-select parent 1 for member creation flow
+    if (currentStep === 'create-select-parent') {
+      setCurrentStep('create-click-button');
+    }
   }, [currentStep]);
 
   // Called when user opens edit on the father (step 5)
@@ -110,6 +112,21 @@ export function useContextualTutorial(
   // Called when user creates their first emotional link (released on target)
   const onLinkCreated = useCallback(() => {
     if (currentStep === 'link-drag-release' || currentStep === 'link-click-dot') {
+      // Move to member creation flow instead of finishing
+      setCurrentStep('create-select-parent');
+    }
+  }, [currentStep, finish]);
+
+  // Called when user clicks the "Créer un membre" button (step 9)
+  const onCreateMemberClicked = useCallback(() => {
+    if (currentStep === 'create-click-button') {
+      setCurrentStep('create-pick-parent');
+    }
+  }, [currentStep]);
+
+  // Called when user picks "Parent" in the dropdown (step 10)
+  const onCreateParentPicked = useCallback(() => {
+    if (currentStep === 'create-pick-parent') {
       finish();
     }
   }, [currentStep, finish]);
@@ -129,6 +146,7 @@ export function useContextualTutorial(
     onCardSelected, onEditClicked, onDrawerClosed,
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
+    onCreateMemberClicked, onCreateParentPicked,
     finish, restart,
   };
 }
