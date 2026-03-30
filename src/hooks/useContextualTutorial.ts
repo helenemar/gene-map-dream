@@ -31,7 +31,7 @@ export function useContextualTutorial(
   const [done, setDone] = useState(() => !isAllowedUser || localStorage.getItem(doneStorageKey) === '1');
   const startedRef = useRef(false);
   const parentEditFlowRef = useRef(false);
-
+  const siblingEditFlowRef = useRef(false);
   // Reset tutorial state when changing genogram/account scope
   useEffect(() => {
     const alreadyDone = !isAllowedUser || localStorage.getItem(doneStorageKey) === '1';
