@@ -525,6 +525,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </div>
           </div>
         </motion.div>
+        )}
       </React.Fragment>
 
       {/* Confirmation dialog */}
