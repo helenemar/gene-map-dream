@@ -27,7 +27,7 @@ const HeroSection: React.FC<Props> = ({ onAuth }) => {
           >
             <img src={gogyIcon} alt="" className="w-12 h-12 sm:w-[64px] sm:h-[64px] mb-4 sm:mb-6" />
 
-            <h1 className="text-[1.3rem] sm:text-[1.6rem] lg:text-[2rem] font-extrabold leading-[1.12] tracking-[-0.01em] mb-3 sm:mb-4">
+            <h1 className="text-[1.5rem] sm:text-[1.85rem] lg:text-[2.3rem] font-extrabold leading-[1.12] tracking-[-0.01em] mb-3 sm:mb-4">
               {t.landing.heroTitle1}
               <br />
               {t.landing.heroTitle2}{' '}
