@@ -132,6 +132,7 @@ interface ContextualTutorialProps {
 const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   currentStep, firstMember, fatherMember, drawerOpen = false, onFinish,
 }) => {
+  const [tipHidden, setTipHidden] = useState(false);
   const [spotlight, setSpotlight] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [editBtnPos, setEditBtnPos] = useState<{ top: number; left: number } | null>(null);
   const [linkDragPositions, setLinkDragPositions] = useState<{ fromX: number; fromY: number; toX: number; toY: number } | null>(null);
@@ -140,6 +141,15 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   const rafRef = useRef(0);
 
   const tip = currentStep ? TIPS[currentStep] : null;
+
+  // Reset tipHidden when step changes
+  const prevStepRef = useRef(currentStep);
+  useEffect(() => {
+    if (currentStep !== prevStepRef.current) {
+      setTipHidden(false);
+      prevStepRef.current = currentStep;
+    }
+  }, [currentStep]);
 
   // Determine which member to target based on step
   const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected')
@@ -801,7 +811,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         </motion.div>
 
         {/* Tooltip — hidden during link-drag-release (only spotlight on child) */}
-        {currentStep !== 'link-drag-release' && (
+        {currentStep !== 'link-drag-release' && !tipHidden && (
         <motion.div
           initial={{ opacity: 0, scale: 0.92, y: 8 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -813,7 +823,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         >
           <div className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
             <button
-              onClick={onFinish}
+              onClick={() => setTipHidden(true)}
               className="absolute top-3 right-3 w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors z-10"
             >
               <X className="w-4 h-4" />
