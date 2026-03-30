@@ -1873,6 +1873,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 isAdopted={isMemberAdopted(member.id)}
                 onboardingPulse={false}
                 zoom={zoom}
+                snapAnchorSide={linkDrag?.snapTargetId === member.id ? linkDrag.snapAnchorSide : null}
                 onCreateDropdownOpen={(open) => { if (open) contextualTutorial.onCreateMemberClicked(); }}
               />
               );
