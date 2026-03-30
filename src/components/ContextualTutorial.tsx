@@ -47,6 +47,12 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Double-cliquez sur la carte ou cliquez sur l\'icône ✏️ pour modifier ses informations.',
     padding: 14,
   },
+  'link-demo': {
+    icon: <Link2 className="w-5 h-5" />,
+    title: 'Créer un lien émotionnel',
+    description: 'Cliquez sur un point d\'ancrage (●) d\'un membre, maintenez et glissez vers un autre membre pour créer un lien émotionnel.',
+    padding: 24,
+  },
 };
 
 interface ContextualTutorialProps {
