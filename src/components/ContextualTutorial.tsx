@@ -15,7 +15,13 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
   'card-intro': {
     icon: <MousePointerClick className="w-5 h-5" />,
     title: 'Sélectionnez le membre',
-    description: 'Cliquez sur la carte pour la sélectionner, puis sur le bouton ✏️ pour modifier ses informations.',
+    description: 'Cliquez sur la carte pour la sélectionner.',
+    padding: 14,
+  },
+  'card-selected': {
+    icon: <Pencil className="w-5 h-5" />,
+    title: 'Modifier les informations',
+    description: 'Cliquez sur le bouton ✏️ pour ouvrir le panneau d\'édition.',
     padding: 14,
   },
   'edit-hint': {
