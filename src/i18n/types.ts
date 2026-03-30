@@ -187,4 +187,15 @@ export interface Translations {
     categoryRelational: string; categoryViolence: string;
     alreadyUsed: string; deleteLink: string;
   };
+  contextualTutorial: {
+    cardIntroTitle: string; cardIntroDesc: string;
+    cardSelectedTitle: string; cardSelectedDesc: string;
+    editHintTitle: string; editHintDesc: string;
+    parentIntroTitle: string; parentIntroDesc: string;
+    parentSelectedTitle: string; parentSelectedDesc: string;
+    linkClickDotTitle: string; linkClickDotDesc: string;
+    linkDragReleaseTitle: string; linkDragReleaseDesc: string;
+    multiSelectTitle: string; multiSelectDesc: string;
+    multiDragTitle: string; multiDragDesc: string;
+  };
 }
