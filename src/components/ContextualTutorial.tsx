@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MousePointer, UserPlus, Link2 } from 'lucide-react';
+import { X, Pencil, CheckCircle } from 'lucide-react';
 import { FamilyMember } from '@/types/genogram';
 import type { ContextualTutoStep } from '@/hooks/useContextualTutorial';
 
@@ -13,22 +13,16 @@ interface TipConfig {
 
 const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
   'card-intro': {
-    icon: <MousePointer className="w-5 h-5" />,
-    title: 'Votre premier membre',
-    description: 'Cliquez sur la carte pour la sélectionner et découvrir les actions disponibles.',
+    icon: <Pencil className="w-5 h-5" />,
+    title: 'Modifier les informations',
+    description: 'Cliquez sur le bouton ✏️ pour ouvrir le panneau d\'édition et compléter les informations du membre.',
     padding: 14,
   },
-  'card-selected': {
-    icon: <UserPlus className="w-5 h-5" />,
-    title: 'Actions disponibles',
-    description: 'Utilisez ✏️ pour modifier les informations ou ➕ pour ajouter un parent, enfant ou conjoint.',
+  'edit-hint': {
+    icon: <CheckCircle className="w-5 h-5" />,
+    title: 'Panneau d\'édition',
+    description: 'Complétez les informations ici : prénom, dates, pathologies… Fermez le panneau quand vous avez terminé.',
     padding: 14,
-  },
-  'anchor-hint': {
-    icon: <Link2 className="w-5 h-5" />,
-    title: 'Liens émotionnels',
-    description: 'Cliquez sur 🔗 pour activer les points d\'ancrage, puis glissez vers un autre membre pour créer un lien.',
-    padding: 24,
   },
 };
 
@@ -53,17 +47,33 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
     const padding = tip?.padding ?? 14;
 
     const update = () => {
-      const el = document.querySelector(`[data-member-card="${firstMember.id}"]`);
-      if (el) {
-        const rect = el.getBoundingClientRect();
-        setSpotlight({
-          top: rect.top - padding,
-          left: rect.left - padding,
-          width: rect.width + padding * 2,
-          height: rect.height + padding * 2,
-        });
+      // For edit-hint step, highlight the drawer/sidesheet
+      if (currentStep === 'edit-hint') {
+        const drawer = document.querySelector('[data-member-edit-drawer]');
+        if (drawer) {
+          const rect = drawer.getBoundingClientRect();
+          setSpotlight({
+            top: rect.top - 4,
+            left: rect.left - 4,
+            width: rect.width + 8,
+            height: rect.height + 8,
+          });
+        } else {
+          setSpotlight(null);
+        }
       } else {
-        setSpotlight(null);
+        const el = document.querySelector(`[data-member-card="${firstMember.id}"]`);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          setSpotlight({
+            top: rect.top - padding,
+            left: rect.left - padding,
+            width: rect.width + padding * 2,
+            height: rect.height + padding * 2,
+          });
+        } else {
+          setSpotlight(null);
+        }
       }
       rafRef.current = requestAnimationFrame(update);
     };
@@ -76,6 +86,16 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
     if (!spotlight) {
       return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
     }
+    
+    // For edit-hint, position tooltip to the left of the drawer
+    if (currentStep === 'edit-hint') {
+      return {
+        right: spotlight.width + 32,
+        top: Math.max(16, spotlight.top + 60),
+        transform: 'none',
+      };
+    }
+
     const rightSpace = window.innerWidth - (spotlight.left + spotlight.width);
     if (rightSpace > 370) {
       return {
@@ -89,7 +109,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       top: spotlight.top + spotlight.height + 16,
       transform: 'none',
     };
-  }, [spotlight]);
+  }, [spotlight, currentStep]);
 
   if (!currentStep || !tip) return null;
 
@@ -125,7 +145,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             <rect width="100%" height="100%" fill="rgba(0,0,0,0.5)" mask="url(#ctx-tuto-mask)" />
           </svg>
 
-          {/* Tutorial-specific highlight — dashed animated border, distinct from selection */}
+          {/* Tutorial-specific highlight — dashed animated border */}
           {spotlight && (
             <motion.div
               key={`ring-${currentStep}`}
@@ -140,7 +160,6 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                 borderRadius: 18,
               }}
             >
-              {/* Dashed border — visually distinct from purple selection ring */}
               <svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible' }}>
                 <rect
                   x={1} y={1}
@@ -161,7 +180,6 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                   />
                 </rect>
               </svg>
-              {/* Soft glow */}
               <motion.div
                 animate={{ opacity: [0.3, 0.12, 0.3] }}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
