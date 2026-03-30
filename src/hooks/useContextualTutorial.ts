@@ -69,7 +69,14 @@ export function useContextualTutorial(
     localStorage.setItem(doneStorageKey, '1');
   }, [doneStorageKey]);
 
+  const restart = useCallback(() => {
+    localStorage.removeItem(doneStorageKey);
+    setDone(false);
+    setCurrentStep(null);
+    startedRef.current = false;
+  }, [doneStorageKey]);
+
   const active = currentStep !== null;
 
-  return { active, currentStep, onCardSelected, onEditClicked, onDrawerClosed, finish };
+  return { active, currentStep, onCardSelected, onEditClicked, onDrawerClosed, finish, restart };
 }
