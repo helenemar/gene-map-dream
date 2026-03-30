@@ -580,7 +580,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                   animate={{ x: [-2, 2, -2], y: [-2, 2, -2] }}
                   transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  <MousePointerClick className="w-8 h-8 text-primary drop-shadow-lg" strokeWidth={2.2} />
+                  <TutoCursor size={32} />
                 </motion.div>
               </motion.div>
             </>
