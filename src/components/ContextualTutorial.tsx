@@ -75,22 +75,16 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Maintenez le clic et glissez vers la carte de l\'enfant, puis relâchez pour créer le lien émotionnel.',
     padding: 24,
   },
-  'create-select-pi': {
-    icon: <UserRound className="w-5 h-5" />,
-    title: 'Sélectionnez le membre de base',
-    description: 'Cliquez sur la carte du membre de base pour le sélectionner.',
+  'multi-select': {
+    icon: <BoxSelect className="w-5 h-5" />,
+    title: 'Sélection multiple',
+    description: 'Tracez un rectangle sur le canevas ou maintenez ⇧ Shift et cliquez sur plusieurs cartes.',
     padding: 14,
   },
-  'create-click-button': {
-    icon: <UserPlus className="w-5 h-5" />,
-    title: 'Créer un membre',
-    description: 'Cliquez sur « Créer un membre » puis choisissez le type de relation souhaité.',
-    padding: 8,
-  },
-  'drag-card': {
+  'multi-drag': {
     icon: <Move className="w-5 h-5" />,
-    title: 'Déplacez la carte',
-    description: 'Cliquez et maintenez sur la carte du nouveau membre, puis glissez-la pour la repositionner.',
+    title: 'Déplacez le groupe',
+    description: 'Glissez une des cartes sélectionnées pour déplacer tout le groupe.',
     padding: 14,
   },
 };
@@ -132,9 +126,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   // Determine which member to target based on step
   const targetMember = (currentStep === 'parent-intro' || currentStep === 'parent-selected')
     ? fatherMember
-    : (currentStep === 'drag-card' && siblingMember)
-      ? siblingMember
-      : firstMember;
+    : firstMember;
 
   // Track DOM element position
   useEffect(() => {
@@ -446,7 +438,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           )}
 
           {/* Animated pointing cursor for card-intro and parent-intro */}
-          {spotlight && (currentStep === 'card-intro' || currentStep === 'parent-intro' || currentStep === 'create-select-pi') && (
+          {spotlight && (currentStep === 'card-intro' || currentStep === 'parent-intro') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -467,7 +459,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           )}
 
           {/* Animated drag cursor for drag-card step */}
-          {currentStep === 'drag-card' && spotlight && (
+          {currentStep === 'multi-drag' && spotlight && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -541,7 +533,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           )}
 
           {/* Animated pointing cursor for card-selected / parent-selected → points at edit button */}
-          {editBtnPos && (currentStep === 'card-selected' || currentStep === 'parent-selected' || currentStep === 'create-click-button') && (
+          {editBtnPos && (currentStep === 'card-selected' || currentStep === 'parent-selected') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
