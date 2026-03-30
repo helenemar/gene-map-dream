@@ -35,6 +35,7 @@ interface UnionEditDrawerProps {
   open: boolean;
   onClose: () => void;
   onUpdate: (updated: Union) => void;
+  onDelete?: (unionId: string) => void;
   getMemberName: (id: string) => string;
 }
 
