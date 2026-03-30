@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { UserPlus, GitBranch, Share2 } from 'lucide-react';
+import { UserPlus, GitBranch, Share2, ArrowRight } from 'lucide-react';
 
 const STEP_ICONS = [
   <UserPlus className="w-6 h-6" />,
@@ -53,6 +54,22 @@ const StepsSection: React.FC = () => {
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="text-center mt-12"
+        >
+          <Link
+            to="/comment-faire-un-genogramme"
+            className="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:underline underline-offset-4 transition-colors group"
+          >
+            {t.landing.stepsGuideLink}
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

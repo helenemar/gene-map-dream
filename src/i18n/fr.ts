@@ -53,6 +53,7 @@ export const fr: Translations = {
     ],
     stepsTitle: 'Comment faire un génogramme en ligne ?',
     stepsSub: 'Créez votre premier génogramme en 3 étapes simples.',
+    stepsGuideLink: 'Voir le guide complet : Comment faire un génogramme',
     steps: [
       { title: 'Créez votre compte', desc: 'Inscrivez-vous en quelques secondes et accédez immédiatement à l\'éditeur de génogrammes. Gratuit pendant la bêta.' },
       { title: 'Construisez votre génogramme', desc: 'Ajoutez les membres de la famille, définissez les unions, les enfants, les pathologies et les liens émotionnels.' },

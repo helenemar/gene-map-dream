@@ -53,6 +53,7 @@ export const en: Translations = {
     ],
     stepsTitle: 'How to make a genogram online?',
     stepsSub: 'Create your first genogram in 3 simple steps.',
+    stepsGuideLink: 'Read the full guide: How to create a genogram',
     steps: [
       { title: 'Create your account', desc: 'Sign up in seconds and get immediate access to the genogram editor. Free during beta.' },
       { title: 'Build your genogram', desc: 'Add family members, define unions and children, then enrich with emotional links, pathologies and clinical notes.' },

@@ -53,6 +53,7 @@ export const de: Translations = {
     ],
     stepsTitle: 'Wie erstellt man ein Genogramm online?',
     stepsSub: 'Erstellen Sie Ihr erstes Genogramm in 3 einfachen Schritten.',
+    stepsGuideLink: 'Vollständige Anleitung lesen: Wie erstellt man ein Genogramm',
     steps: [
       { title: 'Konto erstellen', desc: 'Registrieren Sie sich in Sekunden und erhalten Sie sofortigen Zugang zum Genogramm-Editor. Kostenlos während der Beta.' },
       { title: 'Genogramm aufbauen', desc: 'Fügen Sie Familienmitglieder hinzu, definieren Sie Verbindungen und Kinder, dann bereichern Sie mit emotionalen Verbindungen, Pathologien und klinischen Notizen.' },
