@@ -1305,6 +1305,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       setEditingNewMember(newMember);
       setDrawerEditing(true);
       setNewMemberDrawerOpen(true);
+      contextualTutorial.onMemberCreated();
       setTimeout(() => centerOnMember(newMember), 100);
       return;
     }
