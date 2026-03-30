@@ -138,6 +138,8 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   const [linkDragPositions, setLinkDragPositions] = useState<{ fromX: number; fromY: number; toX: number; toY: number } | null>(null);
   const [closestDotPos, setClosestDotPos] = useState<{ x: number; y: number } | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [tipDragOffset, setTipDragOffset] = useState<{ x: number; y: number } | null>(null);
+  const tipDragRef = useRef<{ startX: number; startY: number; origLeft: number; origTop: number } | null>(null);
   const rafRef = useRef(0);
 
   const tip = currentStep ? TIPS[currentStep] : null;
