@@ -471,7 +471,24 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </>
           )}
 
-          {/* link-drag-release: no animation, only spotlight on child card */}
+          {/* link-drag-release: label above child card spotlight */}
+          {currentStep === 'link-drag-release' && spotlight && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 20 }}
+              className="absolute pointer-events-none z-[102] flex items-center justify-center"
+              style={{
+                left: spotlight.left + spotlight.width / 2,
+                top: spotlight.top - 12,
+                transform: 'translate(-50%, -100%)',
+              }}
+            >
+              <span className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium shadow-lg">
+                Relâchez ici
+              </span>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Tooltip — hidden during link-drag-release (only spotlight on child) */}
