@@ -755,6 +755,8 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     if (dragInfo) {
       if (dragInfo.groupOffsets && Object.keys(dragInfo.groupOffsets).length > 1) {
         contextualTutorial.onMultiDragged();
+      } else {
+        contextualTutorial.onCardDragged();
       }
     }
     setSmartGuides([]);
