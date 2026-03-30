@@ -203,8 +203,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
                 : 'translate(-50%, -50%)';
 
           return (
+          <React.Fragment key={side}>
           <div
-            key={side}
             className={`absolute rounded-full border-[1.5px] cursor-crosshair transition-all duration-150 ${
               isSnappedDot
                 ? 'w-4 h-4 bg-primary border-primary shadow-[0_0_12px_hsl(var(--primary)/0.6)] scale-125'
@@ -224,7 +224,6 @@ const MemberCard: React.FC<MemberCardProps> = ({
           />
           {isSnappedDot && (
             <div
-              key={`${side}-ring`}
               className="absolute rounded-full border-2 border-primary/40 animate-ping"
               style={{
                 ...pos,
@@ -235,6 +234,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
               }}
             />
           )}
+          </React.Fragment>
           );
         })}
 
