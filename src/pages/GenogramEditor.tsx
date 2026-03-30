@@ -785,8 +785,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       return new Set([id]);
     });
     setAnchorActiveMember(null);
-    contextualTutorialRef.current?.onCardSelected();
-  }, [contextualTutorial]);
+  }, []);
 
   const getMemberState = useCallback((memberId: string) => {
     if (anchorActiveMember === memberId) return 'anchor-active' as const;
