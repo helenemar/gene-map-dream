@@ -14,6 +14,8 @@ import LinkTypeModal from '@/components/LinkTypeModal';
 import FloatingControls from '@/components/FloatingControls';
 import OnboardingTutorial from '@/components/OnboardingTutorial';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import ContextualTutorial from '@/components/ContextualTutorial';
+import { useContextualTutorial } from '@/hooks/useContextualTutorial';
 import UnionEditDrawer from '@/components/UnionEditDrawer';
 import MemberEditDrawer from '@/components/MemberEditDrawer';
 import { RelationshipChoice } from '@/components/CreateMemberDropdown';
@@ -795,6 +797,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   // ─── New member state ───
   const [editingNewMember, setEditingNewMember] = useState<FamilyMember | null>(null);
   const [newMemberDrawerOpen, setNewMemberDrawerOpen] = useState(false);
+  const contextualTutorial = useContextualTutorial(members.length, newMemberDrawerOpen);
 
   // ─── Parent picker state (for child creation with multiple unions) ───
   const [parentPickerState, setParentPickerState] = useState<{
@@ -2015,6 +2018,21 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
               onPrev={onboarding.prev}
               onFinish={onboarding.finish}
               onDismiss={onboarding.dismiss}
+            />
+          )}
+
+          {!isMobileReadOnly && (
+            <ContextualTutorial
+              active={contextualTutorial.active}
+              step={contextualTutorial.step}
+              totalSteps={contextualTutorial.totalSteps}
+              firstMember={members[0] || null}
+              zoom={zoom}
+              pan={pan}
+              canvasRef={canvasRef as React.RefObject<HTMLDivElement>}
+              onNext={contextualTutorial.next}
+              onPrev={contextualTutorial.prev}
+              onFinish={contextualTutorial.finish}
             />
           )}
 
