@@ -32,7 +32,7 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
   'edit-hint': {
     icon: <CheckCircle className="w-5 h-5" />,
     title: 'Panneau d\'édition',
-    description: 'Complétez les informations ici : prénom, dates, pathologies… Fermez le panneau quand vous avez terminé.',
+    description: 'Complétez les informations ici : prénom, dates, pathologies… Fermez le panneau (✕) pour passer à l\'étape suivante.',
     padding: 14,
   },
   'parent-intro': {
