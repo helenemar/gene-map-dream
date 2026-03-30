@@ -829,7 +829,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             window.addEventListener('mouseup', onUp);
           }}
         >
-          <div className={`backdrop-blur-xl border overflow-hidden ${currentStep === 'edit-hint' ? 'bg-card/85 border-border rounded-2xl shadow-2xl' : 'bg-white/60 dark:bg-card/50 border-white/40 dark:border-white/15 rounded-lg shadow-md'}`}>
+          <div className={`backdrop-blur-xl border overflow-hidden ${currentStep === 'edit-hint' ? 'bg-card/85 border-border rounded-2xl shadow-2xl' : 'bg-white/80 dark:bg-card/75 border-white/50 dark:border-white/20 rounded-lg shadow-md'}`}>
             {/* Drag handle indicator */}
             <div className="flex justify-center pt-2 pb-0">
               <div className="w-8 h-1 rounded-full bg-muted-foreground/20" />
