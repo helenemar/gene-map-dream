@@ -179,20 +179,25 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       };
     }
 
+    // When the sidesheet is open, keep tooltip away from the right panel (~400px)
+    const sheetWidth = drawerOpen ? 400 : 0;
+    const availableWidth = window.innerWidth - sheetWidth;
+
     const rightSpace = window.innerWidth - (spotlight.left + spotlight.width);
-    if (rightSpace > 370) {
+    if (rightSpace - sheetWidth > 370) {
       return {
         left: spotlight.left + spotlight.width + 16,
         top: Math.max(16, spotlight.top),
         transform: 'none',
       };
     }
+    // Place below the spotlight, but clamp horizontally to avoid overlapping the sidesheet
     return {
-      left: Math.max(16, spotlight.left),
+      left: Math.max(16, Math.min(spotlight.left, availableWidth - 340)),
       top: spotlight.top + spotlight.height + 16,
       transform: 'none',
     };
-  }, [spotlight, currentStep]);
+  }, [spotlight, currentStep, drawerOpen]);
 
   if (!currentStep || !tip) return null;
 
