@@ -69,6 +69,8 @@ interface MemberCardProps {
   onCreateDropdownOpen?: (open: boolean) => void;
   /** Whether a link drag is currently in progress from this card */
   isLinkDragging?: boolean;
+  /** Force a simple click to select even for draft/placeholder cards */
+  forceSelectOnClick?: boolean;
 }
 
 const EDGE_DOTS: { side: AnchorSide; pos: React.CSSProperties }[] = [
@@ -110,6 +112,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   snapAnchorSide = null,
   onCreateDropdownOpen,
   isLinkDragging = false,
+  forceSelectOnClick = false,
 }) => {
   const { t } = useLanguage();
   const isDeceased = !!member.deathYear;
@@ -431,7 +434,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       onClick={(e) => {
         if (presentationMode) {
           if (!isPlaceholder && !isDraft) onView?.(member.id);
-        } else if (isPlaceholder || isDraft) {
+        } else if ((isPlaceholder || isDraft) && !forceSelectOnClick) {
           onEdit?.(member.id);
         } else {
           onSelect?.(member.id, e);
