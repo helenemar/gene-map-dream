@@ -1298,8 +1298,16 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     if (newMemberDrawerOpen && drawerEditing) contextualTutorial.onEditClicked();
   }, [newMemberDrawerOpen, drawerEditing]);
 
+  const drawerClosedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (!newMemberDrawerOpen) contextualTutorial.onDrawerClosed();
+    if (drawerClosedTimerRef.current) clearTimeout(drawerClosedTimerRef.current);
+    if (!newMemberDrawerOpen) {
+      // Debounce: popovers inside the drawer can briefly toggle the sheet closed
+      drawerClosedTimerRef.current = setTimeout(() => {
+        if (!newMemberDrawerOpen) contextualTutorial.onDrawerClosed();
+      }, 300);
+    }
+    return () => { if (drawerClosedTimerRef.current) clearTimeout(drawerClosedTimerRef.current); };
   }, [newMemberDrawerOpen]);
 
 
