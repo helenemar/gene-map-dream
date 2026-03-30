@@ -82,10 +82,6 @@ export function useContextualTutorial(
     if (currentStep === 'parent-intro') {
       setCurrentStep('parent-selected');
     }
-    // Step 8: re-select parent 1 for member creation flow
-    if (currentStep === 'create-select-parent') {
-      setCurrentStep('create-click-button');
-    }
   }, [currentStep]);
 
   // Called when user opens edit on the father (step 5)
