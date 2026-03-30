@@ -754,6 +754,10 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     }
     if (dragInfo) {
       contextualTutorial.onCardDragged();
+      // If multi-dragging (group), advance tutorial
+      if (dragInfo.groupOffsets && Object.keys(dragInfo.groupOffsets).length > 1) {
+        contextualTutorial.onMultiDragged();
+      }
     }
     setSmartGuides([]);
     setDragInfo(null);
@@ -835,7 +839,6 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     }
     if (selectedMembers.size >= 2) {
       contextualTutorial.onMultiSelected();
-      contextualTutorial.onTwoMembersSelected();
     }
   }, [selectedMembers, members, contextualTutorial.currentStep]);
 
@@ -1673,7 +1676,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     <div className="flex flex-col h-screen bg-background">
       <EditorHeader
         searchQuery={search.query}
-        onSearchChange={search.setQuery}
+        onSearchChange={(q) => { search.setQuery(q); if (q.length > 0) contextualTutorial.onSearchUsed(); }}
         onSearchClear={search.clear}
         suggestions={search.suggestions}
         isSearchActive={search.isActive}
@@ -2182,7 +2185,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                   };
                   setUnions(prev => [...prev, newUnion]);
                   setSelectedMembers(new Set());
-                  contextualTutorial.onUnionCreated();
+                  // union created (no tutorial step for this anymore)
                   toast('Union créée', { duration: 2000 });
                 }}
               >

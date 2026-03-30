@@ -105,16 +105,16 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Tracez un rectangle sur le canevas avec la souris, ou maintenez ⇧ Shift et cliquez sur plusieurs cartes pour les sélectionner.',
     padding: 14,
   },
-  'union-select-both': {
-    icon: <Link2 className="w-5 h-5" />,
-    title: 'Sélectionnez les deux parents',
-    description: 'Cliquez sur le parent 1, puis maintenez ⇧ Shift et cliquez sur le parent 2.',
+  'multi-drag': {
+    icon: <Move className="w-5 h-5" />,
+    title: 'Déplacez le groupe',
+    description: 'Glissez une des cartes sélectionnées pour déplacer tout le groupe en même temps.',
     padding: 14,
   },
-  'union-click-button': {
-    icon: <Link2 className="w-5 h-5" />,
-    title: 'Créer l\'union',
-    description: 'Cliquez sur le bouton « Créer une union » qui apparaît entre les deux cartes.',
+  'search-bar': {
+    icon: <BoxSelect className="w-5 h-5" />,
+    title: 'Barre de recherche',
+    description: 'Tapez un nom, une profession ou une pathologie dans la barre de recherche pour filtrer les membres du génogramme.',
     padding: 8,
   },
 };
@@ -292,46 +292,41 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
         }
         setEditBtnPos(null);
         setLinkDragPositions(null);
-      } else if (currentStep === 'union-select-both') {
-        // Highlight both parent cards
+      } else if (currentStep === 'multi-drag') {
+        // Highlight all member cards (same as multi-select but waiting for drag)
         if (firstMember && fatherMember) {
-          const piEl = document.querySelector(`[data-member-card="${firstMember.id}"]`);
-          const fatherEl = document.querySelector(`[data-member-card="${fatherMember.id}"]`);
-          if (piEl && fatherEl) {
-            const piRect = piEl.getBoundingClientRect();
-            const fatherRect = fatherEl.getBoundingClientRect();
-            const minX = Math.min(piRect.left, fatherRect.left) - padding;
-            const minY = Math.min(piRect.top, fatherRect.top) - padding;
-            const maxX = Math.max(piRect.right, fatherRect.right) + padding;
-            const maxY = Math.max(piRect.bottom, fatherRect.bottom) + padding;
-            setSpotlight({ top: minY, left: minX, width: maxX - minX, height: maxY - minY });
+          const allCards = document.querySelectorAll('[data-member-card]');
+          let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+          allCards.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.left < minX) minX = rect.left;
+            if (rect.top < minY) minY = rect.top;
+            if (rect.right > maxX) maxX = rect.right;
+            if (rect.bottom > maxY) maxY = rect.bottom;
+          });
+          if (minX < Infinity) {
+            setSpotlight({ top: minY - padding, left: minX - padding, width: maxX - minX + padding * 2, height: maxY - minY + padding * 2 });
           } else {
             setSpotlight(null);
           }
         }
         setEditBtnPos(null);
         setLinkDragPositions(null);
-      } else if (currentStep === 'union-click-button') {
-        // Highlight the floating "Créer une union" button
-        // It's a fixed-position button with text "Créer une union"
-        const allBtns = document.querySelectorAll('button');
-        let unionBtn: Element | null = null;
-        allBtns.forEach(b => {
-          if (b.textContent?.includes('Créer une union') || b.textContent?.includes("Modifier l'union")) unionBtn = b;
-        });
-        if (unionBtn) {
-          const rect = (unionBtn as HTMLElement).getBoundingClientRect();
+      } else if (currentStep === 'search-bar') {
+        // Highlight the search bar
+        const searchEl = document.querySelector('[data-onboarding="search-bar"]');
+        if (searchEl) {
+          const rect = searchEl.getBoundingClientRect();
           setSpotlight({
             top: rect.top - padding,
             left: rect.left - padding,
             width: rect.width + padding * 2,
             height: rect.height + padding * 2,
           });
-          setEditBtnPos({ top: rect.top + rect.height / 2, left: rect.left + rect.width / 2 });
         } else {
           setSpotlight(null);
-          setEditBtnPos(null);
         }
+        setEditBtnPos(null);
         setLinkDragPositions(null);
       } else {
         if (!targetMember) { setSpotlight(null); setEditBtnPos(null); return; }
@@ -401,7 +396,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'multi-select' && currentStep !== 'union-click-button' && !drawerOpen && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && currentStep !== 'search-bar' && !drawerOpen && (
           spotlight ? (
             <>
               <button
@@ -487,7 +482,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
             </svg>
           )}
 
-          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'multi-select' && currentStep !== 'union-click-button' && (
+          {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && currentStep !== 'search-bar' && (
             <svg className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <mask id="ctx-tuto-mask">
@@ -715,7 +710,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           )}
 
           {/* Animated pointing cursor for card-selected / parent-selected → points at edit button */}
-          {editBtnPos && (currentStep === 'card-selected' || currentStep === 'parent-selected' || currentStep === 'create-click-button' || currentStep === 'union-click-button') && (
+          {editBtnPos && (currentStep === 'card-selected' || currentStep === 'parent-selected' || currentStep === 'create-click-button') && (
             <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}

@@ -7,16 +7,13 @@ export type ContextualTutoStep =
   | 'parent-intro' | 'parent-selected'
   | 'link-click-dot' | 'link-drag-release'
   | 'create-select-pi' | 'create-click-button' | 'create-pick-sibling'
-  | 'drag-card' | 'multi-select'
-  | 'union-select-both' | 'union-click-button'
+  | 'drag-card' | 'multi-select' | 'multi-drag' | 'search-bar'
   | null;
 
 /**
  * Event-driven contextual tutorial.
- * Steps 1-7: existing flow (card select → edit → parent → link creation)
- * Step 8 (create-select-pi): Re-select the base member (PI) card.
- * Step 9 (create-click-button): Click "Créer un membre" button.
- * Step 10 (create-pick-sibling): Click "Frère/Sœur" in the dropdown.
+ * Flow: card select → edit → parent → link creation → sibling creation →
+ *       drag card → multi-select → multi-drag → search bar
  */
 export function useContextualTutorial(
   memberCount: number,
@@ -32,6 +29,7 @@ export function useContextualTutorial(
   const startedRef = useRef(false);
   const parentEditFlowRef = useRef(false);
   const siblingEditFlowRef = useRef(false);
+
   // Reset tutorial state when changing genogram/account scope
   useEffect(() => {
     const alreadyDone = !isAllowedUser || localStorage.getItem(doneStorageKey) === '1';
@@ -52,14 +50,10 @@ export function useContextualTutorial(
     setCurrentStep('card-intro');
   }, [done, currentStep, memberCount, drawerOpen]);
 
-  // Called when user selects the PI card (step 1)
   const onCardSelected = useCallback(() => {
-    if (currentStep === 'card-intro') {
-      setCurrentStep('card-selected');
-    }
+    if (currentStep === 'card-intro') setCurrentStep('card-selected');
   }, [currentStep]);
 
-  // Called when user clicks the edit button on the PI card (step 2)
   const onEditClicked = useCallback(() => {
     if (currentStep === 'card-selected') {
       parentEditFlowRef.current = false;
@@ -77,7 +71,6 @@ export function useContextualTutorial(
     });
   }, []);
 
-  // Called when the edit drawer is closed
   const onDrawerClosed = useCallback(() => {
     if (currentStep === 'edit-hint') {
       if (siblingEditFlowRef.current) {
@@ -92,14 +85,10 @@ export function useContextualTutorial(
     }
   }, [currentStep]);
 
-  // Called when user selects the father card (step 4)
   const onParentSelected = useCallback(() => {
-    if (currentStep === 'parent-intro') {
-      setCurrentStep('parent-selected');
-    }
+    if (currentStep === 'parent-intro') setCurrentStep('parent-selected');
   }, [currentStep]);
 
-  // Called when user opens edit on the father (step 5)
   const onParentEditClicked = useCallback(() => {
     if (currentStep === 'parent-selected') {
       parentEditFlowRef.current = true;
@@ -125,36 +114,24 @@ export function useContextualTutorial(
     localStorage.setItem(doneStorageKey, '1');
   }, [doneStorageKey]);
 
-  // Called when user starts a link drag (clicked on a dot)
   const onLinkDragStarted = useCallback(() => {
-    if (currentStep === 'link-click-dot') {
-      setCurrentStep('link-drag-release');
-    }
+    if (currentStep === 'link-click-dot') setCurrentStep('link-drag-release');
   }, [currentStep]);
 
-  // Called when user creates their first emotional link (released on target)
   const onLinkCreated = useCallback(() => {
     if (currentStep === 'link-drag-release' || currentStep === 'link-click-dot') {
-      // Move to sibling creation flow: select the PI card
       setCurrentStep('create-select-pi');
     }
   }, [currentStep]);
 
-  // Called when PI card is selected during sibling creation flow
   const onPiSelectedForCreation = useCallback(() => {
-    if (currentStep === 'create-select-pi') {
-      setCurrentStep('create-click-button');
-    }
+    if (currentStep === 'create-select-pi') setCurrentStep('create-click-button');
   }, [currentStep]);
 
-  // Called when user clicks the "Créer un membre" button (step 9)
   const onCreateMemberClicked = useCallback(() => {
-    if (currentStep === 'create-click-button') {
-      setCurrentStep('create-pick-sibling');
-    }
+    if (currentStep === 'create-click-button') setCurrentStep('create-pick-sibling');
   }, [currentStep]);
 
-  // Called when user picks "Frère/Sœur" in the dropdown → move to drag step
   const onCreateSiblingPicked = useCallback(() => {
     if (currentStep === 'create-pick-sibling') {
       siblingEditFlowRef.current = true;
@@ -162,32 +139,24 @@ export function useContextualTutorial(
     }
   }, [currentStep]);
 
-  // Called when user drags a card → move to union flow
+  // drag-card → multi-select
   const onCardDragged = useCallback(() => {
-    if (currentStep === 'drag-card') {
-      setCurrentStep('multi-select');
-    }
+    if (currentStep === 'drag-card') setCurrentStep('multi-select');
   }, [currentStep]);
 
-  // Called when 2+ members are selected via marquee or shift-click
+  // multi-select → multi-drag (user did a marquee or shift-click selection)
   const onMultiSelected = useCallback(() => {
-    if (currentStep === 'multi-select') {
-      setCurrentStep('union-select-both');
-    }
+    if (currentStep === 'multi-select') setCurrentStep('multi-drag');
   }, [currentStep]);
 
-  // Called when 2 members are selected (step 11)
-  const onTwoMembersSelected = useCallback(() => {
-    if (currentStep === 'union-select-both') {
-      setCurrentStep('union-click-button');
-    }
+  // multi-drag → search-bar (user dragged the group)
+  const onMultiDragged = useCallback(() => {
+    if (currentStep === 'multi-drag') setCurrentStep('search-bar');
   }, [currentStep]);
 
-  // Called when user clicks "Créer une union" (step 12)
-  const onUnionCreated = useCallback(() => {
-    if (currentStep === 'union-click-button') {
-      finish();
-    }
+  // search-bar → finish (user typed something in search)
+  const onSearchUsed = useCallback(() => {
+    if (currentStep === 'search-bar') finish();
   }, [currentStep, finish]);
 
   const restart = useCallback(() => {
@@ -207,8 +176,7 @@ export function useContextualTutorial(
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
     onPiSelectedForCreation, onCreateMemberClicked, onCreateSiblingPicked,
-    onCardDragged, onMultiSelected,
-    onTwoMembersSelected, onUnionCreated,
+    onCardDragged, onMultiSelected, onMultiDragged, onSearchUsed,
     openPrimaryEditHint, openParentEditHint,
     finish, restart,
   };
