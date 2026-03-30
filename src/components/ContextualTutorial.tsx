@@ -853,7 +853,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                   <motion.h3
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className={currentStep === 'edit-hint' ? 'text-sm font-semibold text-foreground mb-1' : 'text-xs font-semibold text-foreground mb-0.5'}
+                    className={currentStep === 'edit-hint' ? 'text-sm font-semibold text-foreground mb-1' : 'text-[13px] font-semibold text-foreground mb-0.5'}
                   >
                     {tip.title}
                   </motion.h3>
@@ -861,7 +861,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.05 }}
-                    className={currentStep === 'edit-hint' ? 'text-[13px] text-muted-foreground leading-relaxed' : 'text-xs text-muted-foreground/80 leading-snug'}
+                    className={currentStep === 'edit-hint' ? 'text-[13px] text-muted-foreground leading-relaxed' : 'text-[12px] text-muted-foreground/80 leading-snug'}
                   >
                     {tip.description}
                   </motion.p>
