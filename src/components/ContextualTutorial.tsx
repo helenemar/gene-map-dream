@@ -851,7 +851,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                   {currentStep === 'edit-hint' ? tip.icon : <span className="scale-75">{tip.icon}</span>}
                 </motion.div>
                 <div className={`flex-1 min-w-0 ${currentStep === 'edit-hint' ? 'pr-6' : 'pr-4'}`}>
-                  <span className="text-[9px] uppercase tracking-widest font-semibold text-primary/60 mb-1 block">Tutoriel</span>
+                  <span className="text-[11px] uppercase tracking-widest font-semibold text-primary/60 mb-1 block">Tutoriel</span>
                   <motion.h3
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
