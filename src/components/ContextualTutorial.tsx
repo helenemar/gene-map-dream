@@ -806,7 +806,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.92, y: 8 }}
           transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-          className="fixed z-[101] w-[320px] max-w-[90vw] pointer-events-auto cursor-grab active:cursor-grabbing"
+          className={`fixed z-[101] max-w-[90vw] pointer-events-auto cursor-grab active:cursor-grabbing ${currentStep === 'edit-hint' ? 'w-[320px]' : 'w-[280px]'}`}
           style={tipDragOffset ? { left: tipDragOffset.x, top: tipDragOffset.y, transform: 'none' } : cardStyle}
           onClick={e => e.stopPropagation()}
           onMouseDown={(e) => {
