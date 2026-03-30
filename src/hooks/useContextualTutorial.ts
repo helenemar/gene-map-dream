@@ -139,6 +139,13 @@ export function useContextualTutorial(
   // Called when user drags a card → move to union flow
   const onCardDragged = useCallback(() => {
     if (currentStep === 'drag-card') {
+      setCurrentStep('multi-select');
+    }
+  }, [currentStep]);
+
+  // Called when 2+ members are selected via marquee or shift-click
+  const onMultiSelected = useCallback(() => {
+    if (currentStep === 'multi-select') {
       setCurrentStep('union-select-both');
     }
   }, [currentStep]);
