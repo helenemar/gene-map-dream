@@ -588,6 +588,8 @@ export const de: Translations = {
     multiSelectDesc: 'Zeichnen Sie ein Rechteck oder halten Sie ⇧ Shift und klicken Sie auf mehrere Karten.',
     multiDragTitle: 'Gruppe verschieben',
     multiDragDesc: 'Ziehen Sie eine der ausgewählten Karten, um die gesamte Gruppe zu verschieben.',
+    selectForCreateTitle: 'Hauptmitglied auswählen',
+    selectForCreateDesc: 'Klicken Sie auf das Hauptmitglied, um die Erstellungsoptionen anzuzeigen.',
     createMemberTitle: 'Neues Mitglied erstellen',
     createMemberDesc: 'Klicken Sie auf ＋ eines Mitglieds, um Eltern, Partner oder Geschwister hinzuzufügen.',
     dragSingleTitle: 'Karte verschieben',

@@ -158,6 +158,7 @@ export function useContextualTutorial(
     onCardSelected, onEditClicked, onDrawerClosed,
     onParentSelected, onParentEditClicked,
     onLinkDragStarted, onLinkCreated,
+    onCardSelectedForCreate,
     onMemberCreated, onCardDragged,
     onMultiSelected, onMultiDragged,
     openPrimaryEditHint, openParentEditHint,

@@ -592,6 +592,8 @@ export const fr: Translations = {
     multiSelectDesc: 'Tracez un rectangle sur le canevas ou maintenez ⇧ Shift et cliquez sur plusieurs cartes.',
     multiDragTitle: 'Déplacez le groupe',
     multiDragDesc: 'Glissez une des cartes sélectionnées pour déplacer tout le groupe.',
+    selectForCreateTitle: 'Sélectionnez le membre principal',
+    selectForCreateDesc: 'Cliquez sur Hélène pour afficher ses options de création.',
     createMemberTitle: 'Créer un nouveau membre',
     createMemberDesc: 'Cliquez sur le bouton ＋ d\'un membre pour ajouter un parent, conjoint ou frère/sœur.',
     dragSingleTitle: 'Déplacez la carte',
