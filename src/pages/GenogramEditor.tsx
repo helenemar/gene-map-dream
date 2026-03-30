@@ -1325,8 +1325,12 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
 
   const [drawerEditing, setDrawerEditing] = useState(true);
 
+  const prevDrawerOpenRef = useRef(false);
   useEffect(() => {
-    if (!newMemberDrawerOpen || !drawerEditing || !editingNewMember) return;
+    const justOpened = newMemberDrawerOpen && !prevDrawerOpenRef.current;
+    prevDrawerOpenRef.current = newMemberDrawerOpen;
+
+    if (!justOpened || !drawerEditing || !editingNewMember) return;
 
     if (members[0] && editingNewMember.id === members[0].id) {
       contextualTutorial.openPrimaryEditHint();
