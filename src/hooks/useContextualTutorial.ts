@@ -114,16 +114,23 @@ export function useContextualTutorial(
     }
   }, [currentStep]);
 
-  // Called when user clicks the "Créer un membre" button (step 9)
-  const onCreateMemberClicked = useCallback(() => {
-    if (currentStep === 'create-click-button') {
-      setCurrentStep('create-pick-parent');
+  // Called when PI card is selected during sibling creation flow
+  const onPiSelectedForCreation = useCallback(() => {
+    if (currentStep === 'create-select-pi') {
+      setCurrentStep('create-click-button');
     }
   }, [currentStep]);
 
-  // Called when user picks "Parent" in the dropdown (step 10) → move to union flow
-  const onCreateParentPicked = useCallback(() => {
-    if (currentStep === 'create-pick-parent') {
+  // Called when user clicks the "Créer un membre" button (step 9)
+  const onCreateMemberClicked = useCallback(() => {
+    if (currentStep === 'create-click-button') {
+      setCurrentStep('create-pick-sibling');
+    }
+  }, [currentStep]);
+
+  // Called when user picks "Frère/Sœur" in the dropdown (step 10) → move to union flow
+  const onCreateSiblingPicked = useCallback(() => {
+    if (currentStep === 'create-pick-sibling') {
       setCurrentStep('union-select-both');
     }
   }, [currentStep]);
