@@ -3,49 +3,44 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight, ChevronLeft, MousePointer2, UserPlus, Link2, Pencil } from 'lucide-react';
 import { FamilyMember } from '@/types/genogram';
 
-const CARD_W = 220;
-const CARD_H = 64;
-
 interface StepConfig {
   icon: React.ReactNode;
   title: string;
   description: string;
-  getRect: (member: FamilyMember, zoom: number, pan: { x: number; y: number }, canvasRect: DOMRect) => DOMRect | null;
-}
-
-function worldToScreen(wx: number, wy: number, ww: number, wh: number, zoom: number, pan: { x: number; y: number }, canvasRect: DOMRect): DOMRect {
-  const sx = wx * zoom + pan.x + canvasRect.left;
-  const sy = wy * zoom + pan.y + canvasRect.top;
-  return new DOMRect(sx, sy, ww * zoom, wh * zoom);
+  /** Extra padding around the DOM element spotlight */
+  padding: number;
+  /** If true, use the real DOM card element for positioning */
+  useDom: boolean;
 }
 
 const STEPS: StepConfig[] = [
   {
     icon: <Pencil className="w-5 h-5" />,
     title: 'Votre premier membre',
-    description: 'Voici votre carte membre ! Double-cliquez dessus pour modifier ses informations (prénom, nom, date de naissance…).',
-    getRect: (m, z, p, cr) => worldToScreen(m.x - 8, m.y - 8, CARD_W + 16, CARD_H + 16, z, p, cr),
+    description: 'Voici votre carte membre ! Cliquez dessus puis sur l\'icône ✏️ pour modifier ses informations, ou double-cliquez directement sur la carte.',
+    padding: 12,
+    useDom: true,
   },
   {
     icon: <UserPlus className="w-5 h-5" />,
     title: 'Créer un proche',
     description: 'Sélectionnez le membre puis cliquez sur le bouton ➕ sous la carte pour ajouter un parent, enfant ou conjoint.',
-    getRect: (m, z, p, cr) => worldToScreen(m.x - 8, m.y - 8, CARD_W + 16, CARD_H + 70, z, p, cr),
+    padding: 12,
+    useDom: true,
   },
   {
     icon: <Link2 className="w-5 h-5" />,
     title: 'Créer un lien émotionnel',
-    description: 'Passez en mode ancrage (🔗) puis glissez depuis un point d\'ancrage de la carte vers un autre membre. Un menu de types de liens apparaîtra.',
-    getRect: (m, z, p, cr) => {
-      // Highlight the card with extra margin to show anchor dots
-      return worldToScreen(m.x - 20, m.y - 20, CARD_W + 40, CARD_H + 40, z, p, cr);
-    },
+    description: 'Cliquez sur 🔗 sous la carte pour activer les points d\'ancrage, puis glissez depuis un point vers un autre membre. Un menu de types de liens apparaîtra.',
+    padding: 24,
+    useDom: true,
   },
   {
     icon: <MousePointer2 className="w-5 h-5" />,
     title: 'Naviguer sur le canevas',
-    description: 'Maintenez Espace + clic pour déplacer le canevas. Utilisez Ctrl + molette pour zoomer. Glissez les cartes pour les repositionner.',
-    getRect: () => null, // No spotlight — general tip
+    description: 'Défilement à deux doigts pour déplacer le canevas. Pincez pour zoomer. Glissez les cartes pour les repositionner.',
+    padding: 0,
+    useDom: false,
   },
 ];
 
@@ -71,17 +66,22 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   const isLastStep = step >= totalSteps - 1;
   const currentStep = STEPS[step];
 
-  // Continuously update spotlight position
+  // Find the actual DOM element of the first member card and track its position
   useEffect(() => {
     if (!active || !firstMember) { setSpotlight(null); return; }
+    if (!currentStep?.useDom) { setSpotlight(null); return; }
 
     const update = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const cr = canvas.getBoundingClientRect();
-      const rect = currentStep?.getRect(firstMember, zoom, pan, cr);
-      if (rect) {
-        setSpotlight({ top: rect.y, left: rect.x, width: rect.width, height: rect.height });
+      const el = document.querySelector(`[data-member-card="${firstMember.id}"]`);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const pad = currentStep.padding;
+        setSpotlight({
+          top: rect.top - pad,
+          left: rect.left - pad,
+          width: rect.width + pad * 2,
+          height: rect.height + pad * 2,
+        });
       } else {
         setSpotlight(null);
       }
@@ -90,24 +90,23 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
     update();
 
     return () => cancelAnimationFrame(rafRef.current);
-  }, [active, step, firstMember, zoom, pan, canvasRef, currentStep]);
+  }, [active, step, firstMember, currentStep]);
 
   // Position the tooltip card near the spotlight
   const cardStyle = useMemo((): React.CSSProperties => {
     if (!spotlight) {
       return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
     }
-    // Position to the right of the spotlight if room, otherwise below
     const rightSpace = window.innerWidth - (spotlight.left + spotlight.width);
     if (rightSpace > 380) {
       return {
         left: spotlight.left + spotlight.width + 16,
-        top: spotlight.top,
+        top: Math.max(16, spotlight.top),
         transform: 'none',
       };
     }
     return {
-      left: spotlight.left,
+      left: Math.max(16, spotlight.left),
       top: spotlight.top + spotlight.height + 16,
       transform: 'none',
     };
@@ -139,7 +138,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                       y={spotlight.top}
                       width={spotlight.width}
                       height={spotlight.height}
-                      rx={14}
+                      rx={16}
                       fill="black"
                     />
                   )}
@@ -160,7 +159,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                   left: spotlight.left - 3,
                   width: spotlight.width + 6,
                   height: spotlight.height + 6,
-                  borderRadius: 16,
+                  borderRadius: 18,
                   border: '2px solid hsl(var(--primary) / 0.5)',
                   boxShadow: '0 0 24px 6px hsl(var(--primary) / 0.15)',
                 }}
@@ -168,7 +167,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
                 <motion.div
                   animate={{ scale: [1, 1.03, 1], opacity: [0.5, 0.2, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute inset-0 rounded-[16px] border-2 border-primary/30"
+                  className="absolute inset-0 rounded-[18px] border-2 border-primary/30"
                 />
               </motion.div>
             )}
