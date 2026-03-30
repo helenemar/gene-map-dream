@@ -95,6 +95,18 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
     description: 'Sélectionnez « Parent » dans le menu déroulant pour ajouter un parent 2.',
     padding: 8,
   },
+  'union-select-both': {
+    icon: <Link2 className="w-5 h-5" />,
+    title: 'Sélectionnez les deux parents',
+    description: 'Cliquez sur le parent 1, puis maintenez ⇧ Shift et cliquez sur le parent 2.',
+    padding: 14,
+  },
+  'union-click-button': {
+    icon: <Link2 className="w-5 h-5" />,
+    title: 'Créer l\'union',
+    description: 'Cliquez sur le bouton « Créer une union » qui apparaît entre les deux cartes.',
+    padding: 8,
+  },
 };
 
 interface ContextualTutorialProps {
