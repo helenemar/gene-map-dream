@@ -76,9 +76,9 @@ export function useContextualTutorial(
         setCurrentStep('parent-intro');
       }
     }
-    // After creating a new member, advance to drag-single
+    // After creating a new member, finish the tutorial
     if (currentStep === 'create-member') {
-      setCurrentStep('drag-single');
+      finish();
     }
   }, [currentStep]);
 
