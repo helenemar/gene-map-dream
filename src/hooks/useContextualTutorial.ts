@@ -2,52 +2,70 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 const CONTEXTUAL_TUTO_DONE_KEY = 'genogy-contextual-tuto-done';
 
+export type ContextualTutoStep = 'card-intro' | 'card-selected' | 'anchor-hint' | null;
+
 /**
- * Contextual mini-tutorial that triggers once after the user creates their
- * very first member (members goes from 0 to ≥1).  It never shows again once
- * completed or dismissed.
+ * Event-driven contextual tutorial. Advances based on user actions,
+ * not manual "next" buttons.
  */
-export function useContextualTutorial(memberCount: number, drawerOpen: boolean, userEmail?: string | null) {
-  // Only enable for the test account during beta
+export function useContextualTutorial(
+  memberCount: number,
+  drawerOpen: boolean,
+  userEmail?: string | null,
+) {
   const isAllowedUser = userEmail === 'contact@genogy.fr';
 
-  const [active, setActive] = useState(false);
-  const [step, setStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState<ContextualTutoStep>(null);
   const [done, setDone] = useState(() => !isAllowedUser || localStorage.getItem(CONTEXTUAL_TUTO_DONE_KEY) === '1');
   const prevCount = useRef(memberCount);
   const waitingForDrawerClose = useRef(false);
 
-  // Detect first member creation: memberCount goes from 0 to ≥1
+  // Detect first member creation
   useEffect(() => {
     if (done) return;
     if (prevCount.current === 0 && memberCount >= 1) {
-      // Wait for the drawer to close before starting
       waitingForDrawerClose.current = true;
     }
     prevCount.current = memberCount;
   }, [memberCount, done]);
 
-  // Start the tutorial once the drawer closes after first member creation
+  // Start tutorial once drawer closes
   useEffect(() => {
     if (!waitingForDrawerClose.current) return;
     if (!drawerOpen) {
       waitingForDrawerClose.current = false;
-      setActive(true);
-      setStep(0);
+      setCurrentStep('card-intro');
     }
   }, [drawerOpen]);
 
-  const next = useCallback(() => setStep(s => s + 1), []);
-  const prev = useCallback(() => setStep(s => Math.max(0, s - 1)), []);
+  // Called when user selects the first card
+  const onCardSelected = useCallback(() => {
+    if (currentStep === 'card-intro') {
+      setCurrentStep('card-selected');
+    }
+  }, [currentStep]);
+
+  // Called when user clicks edit, view, or create on the card
+  const onCardAction = useCallback(() => {
+    if (currentStep === 'card-selected') {
+      setCurrentStep('anchor-hint');
+    }
+  }, [currentStep]);
+
+  // Called when user starts a link drag or after anchor hint is seen
+  const onLinkAction = useCallback(() => {
+    if (currentStep === 'anchor-hint') {
+      finish();
+    }
+  }, [currentStep]);
 
   const finish = useCallback(() => {
-    setActive(false);
-    setStep(0);
+    setCurrentStep(null);
     setDone(true);
     localStorage.setItem(CONTEXTUAL_TUTO_DONE_KEY, '1');
   }, []);
 
-  const totalSteps = 4;
+  const active = currentStep !== null;
 
-  return { active, step, totalSteps, next, prev, finish };
+  return { active, currentStep, onCardSelected, onCardAction, onLinkAction, finish };
 }
