@@ -149,6 +149,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
   useEffect(() => {
     if (currentStep !== prevStepRef.current) {
       setTipHidden(false);
+      setTipDragOffset(null);
       prevStepRef.current = currentStep;
     }
   }, [currentStep]);
