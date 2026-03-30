@@ -396,7 +396,7 @@ const ContextualTutorial: React.FC<ContextualTutorialProps> = ({
       <React.Fragment key={currentStep}>
         {/* Overlay with spotlight cutout — skip dark overlay during edit-hint to keep drawer interactive */}
         {/* Click-outside catchers (without blocking spotlight target) */}
-        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'multi-select' && currentStep !== 'union-click-button' && !drawerOpen && (
+        {currentStep !== 'edit-hint' && currentStep !== 'link-click-dot' && currentStep !== 'link-drag-release' && currentStep !== 'create-click-button' && currentStep !== 'create-pick-sibling' && currentStep !== 'drag-card' && currentStep !== 'multi-select' && currentStep !== 'multi-drag' && currentStep !== 'search-bar' && !drawerOpen && (
           spotlight ? (
             <>
               <button
