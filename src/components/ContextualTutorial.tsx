@@ -84,7 +84,7 @@ const TIPS: Record<Exclude<ContextualTutoStep, null>, TipConfig> = {
   'create-click-button': {
     icon: <UserPlus className="w-5 h-5" />,
     title: 'Créer un membre',
-    description: 'Cliquez sur le bouton « Créer un membre » sous la carte.',
+    description: 'Cliquez sur « Créer un membre » puis choisissez le type de relation souhaité.',
     padding: 8,
   },
   'drag-card': {
