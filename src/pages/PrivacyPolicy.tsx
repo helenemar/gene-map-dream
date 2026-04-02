@@ -73,6 +73,10 @@ const PrivacyPolicy: React.FC = () => {
         <title>Politique de confidentialité — Genogy</title>
         <meta name="description" content="Politique de confidentialité et protection des données personnelles de Genogy, conforme au RGPD." />
         <link rel="canonical" href="https://genogy-app.com/privacy" />
+        <link rel="alternate" hrefLang="fr" href="https://genogy-app.com/" />
+        <link rel="alternate" hrefLang="en" href="https://genogy-app.com/en" />
+        <link rel="alternate" hrefLang="de" href="https://genogy-app.com/de" />
+        <link rel="alternate" hrefLang="x-default" href="https://genogy-app.com/" />
         <meta property="og:title" content="Politique de confidentialité — Genogy" />
         <meta property="og:description" content="Politique de confidentialité et protection des données personnelles de Genogy, conforme au RGPD." />
         <meta property="og:url" content="https://genogy-app.com/privacy" />

@@ -33,6 +33,10 @@ const HowToGenogram: React.FC = () => {
         <title>{h.metaTitle}</title>
         <meta name="description" content={h.metaDesc} />
         <link rel="canonical" href="https://genogy-app.com/comment-faire-un-genogramme" />
+        <link rel="alternate" hrefLang="fr" href="https://genogy-app.com/" />
+        <link rel="alternate" hrefLang="en" href="https://genogy-app.com/en" />
+        <link rel="alternate" hrefLang="de" href="https://genogy-app.com/de" />
+        <link rel="alternate" hrefLang="x-default" href="https://genogy-app.com/" />
         <meta property="og:title" content={h.metaTitle} />
         <meta property="og:description" content={h.metaDesc} />
         <meta property="og:url" content="https://genogy-app.com/comment-faire-un-genogramme" />

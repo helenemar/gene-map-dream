@@ -62,6 +62,10 @@ const LegalNotice: React.FC = () => {
         <title>Mentions légales — Genogy</title>
         <meta name="description" content="Mentions légales du site Genogy, éditeur, hébergement, propriété intellectuelle et droit applicable." />
         <link rel="canonical" href="https://genogy-app.com/legal" />
+        <link rel="alternate" hrefLang="fr" href="https://genogy-app.com/" />
+        <link rel="alternate" hrefLang="en" href="https://genogy-app.com/en" />
+        <link rel="alternate" hrefLang="de" href="https://genogy-app.com/de" />
+        <link rel="alternate" hrefLang="x-default" href="https://genogy-app.com/" />
         <meta property="og:title" content="Mentions légales — Genogy" />
         <meta property="og:description" content="Mentions légales du site Genogy." />
         <meta property="og:url" content="https://genogy-app.com/legal" />
