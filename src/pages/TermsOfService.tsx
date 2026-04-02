@@ -76,6 +76,10 @@ const TermsOfService: React.FC = () => {
         <title>Conditions Générales d'Utilisation — Genogy</title>
         <meta name="description" content="Conditions Générales d'Utilisation de Genogy. Modalités d'accès, obligations et responsabilités des utilisateurs." />
         <link rel="canonical" href="https://genogy-app.com/terms" />
+        <link rel="alternate" hrefLang="fr" href="https://genogy-app.com/" />
+        <link rel="alternate" hrefLang="en" href="https://genogy-app.com/en" />
+        <link rel="alternate" hrefLang="de" href="https://genogy-app.com/de" />
+        <link rel="alternate" hrefLang="x-default" href="https://genogy-app.com/" />
         <meta property="og:title" content="CGU — Genogy" />
         <meta property="og:description" content="Conditions Générales d'Utilisation de Genogy." />
         <meta property="og:url" content="https://genogy-app.com/terms" />
