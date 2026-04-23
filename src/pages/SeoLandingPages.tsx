@@ -27,6 +27,50 @@ const dedupeFaqItems = (items: FaqItem[]) => {
   });
 };
 
+const buildWebPageJsonLd = (title: string, canonicalPath: string, pageDescription: string) => ({
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  '@id': `${baseUrl}${canonicalPath}#webpage`,
+  url: `${baseUrl}${canonicalPath}`,
+  name: title,
+  description: pageDescription,
+  inLanguage: 'fr-FR',
+  isPartOf: {
+    '@type': 'WebSite',
+    '@id': `${baseUrl}/#website`,
+    name: 'Genogy',
+    url: `${baseUrl}/`,
+  },
+  breadcrumb: { '@id': `${baseUrl}${canonicalPath}#breadcrumb` },
+  primaryImageOfPage: `${baseUrl}/og-image.webp`,
+});
+
+const buildBreadcrumbJsonLd = (canonicalPath: string, currentName: string) => ({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  '@id': `${baseUrl}${canonicalPath}#breadcrumb`,
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Accueil',
+      item: `${baseUrl}/`,
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Ressources',
+      item: `${baseUrl}/ressources`,
+    },
+    ...(canonicalPath === '/ressources' ? [] : [{
+      '@type': 'ListItem',
+      position: 3,
+      name: currentName,
+      item: `${baseUrl}${canonicalPath}`,
+    }]),
+  ],
+});
+
 const SeoShell: React.FC<{
   title: string;
   canonicalPath: string;
@@ -122,6 +166,12 @@ const ArticleLayout: React.FC<{
   <SeoShell title={`${title} | Genogy`} canonicalPath={canonicalPath}>
     <Helmet>
       <script type="application/ld+json">
+        {JSON.stringify(buildWebPageJsonLd(title, canonicalPath, intro))}
+      </script>
+      <script type="application/ld+json">
+        {JSON.stringify(buildBreadcrumbJsonLd(canonicalPath, title))}
+      </script>
+      <script type="application/ld+json">
         {JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'FAQPage',
@@ -167,6 +217,14 @@ const resources = [
 
 export const ResourcesPage: React.FC = () => (
   <SeoShell title="Ressources génogramme — guides pratiques | Genogy" canonicalPath="/ressources">
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(buildWebPageJsonLd('Ressources génogramme — guides pratiques', '/ressources', 'Guides pratiques Genogy pour créer, lire et utiliser un génogramme clinique en ligne.'))}
+      </script>
+      <script type="application/ld+json">
+        {JSON.stringify(buildBreadcrumbJsonLd('/ressources', 'Ressources'))}
+      </script>
+    </Helmet>
     <Hero
       eyebrow="Ressources"
       icon={<BookOpen className="h-5 w-5" />}
