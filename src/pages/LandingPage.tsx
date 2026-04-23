@@ -57,19 +57,39 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
+    '@id': 'https://www.genogy-app.com/#softwareapplication',
     name: 'Genogy',
     url: 'https://www.genogy-app.com/',
     applicationCategory: 'HealthApplication',
+    applicationSubCategory: 'Clinical genogram software',
     operatingSystem: 'Web',
     description: t.landing.metaDesc,
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+    isAccessibleForFree: true,
+    audience: {
+      '@type': 'Audience',
+      audienceType: 'Psychologues, thérapeutes, travailleurs sociaux et professionnels médico-sociaux',
+    },
+    featureList: [
+      'Création de génogrammes cliniques en ligne',
+      'Symboles McGoldrick',
+      'Liens émotionnels et pathologies',
+      'Export PDF et PNG',
+      'Partage sécurisé par lien',
+    ],
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'EUR',
+      availability: 'https://schema.org/InStock',
+      description: 'Accès gratuit pendant la phase bêta',
+    },
     screenshot: 'https://www.genogy-app.com/og-image.webp',
-    aggregateRating: undefined,
   };
 
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
+    '@id': 'https://www.genogy-app.com/#faq',
     mainEntity: t.landing.faq.map(item => ({
       '@type': 'Question',
       name: item.q,
