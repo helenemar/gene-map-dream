@@ -16,6 +16,17 @@ import Footer from '@/components/Footer';
 
 const AuthModal = lazy(() => import('@/components/AuthModal'));
 
+const dedupeFaqItems = <T extends { q: string; a: string }>(items: T[]) => {
+  const seen = new Set<string>();
+
+  return items.filter((item) => {
+    const key = `${item.q.trim().toLocaleLowerCase('fr-FR')}::${item.a.trim().toLocaleLowerCase('fr-FR')}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
 interface LandingPageProps {
   forceLang?: 'en' | 'de';
 }
@@ -90,7 +101,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     '@id': 'https://www.genogy-app.com/#faq',
-    mainEntity: t.landing.faq.map(item => ({
+    mainEntity: dedupeFaqItems(t.landing.faq).map(item => ({
       '@type': 'Question',
       name: item.q,
       acceptedAnswer: {

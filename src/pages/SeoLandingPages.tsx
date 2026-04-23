@@ -16,6 +16,17 @@ type AuthView = 'login' | 'signup';
 type FaqItem = { q: string; a: string };
 type ExampleItem = { title: string; text: string };
 
+const dedupeFaqItems = (items: FaqItem[]) => {
+  const seen = new Set<string>();
+
+  return items.filter((item) => {
+    const key = `${item.q.trim().toLocaleLowerCase('fr-FR')}::${item.a.trim().toLocaleLowerCase('fr-FR')}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
 const SeoShell: React.FC<{
   title: string;
   canonicalPath: string;
@@ -115,7 +126,7 @@ const ArticleLayout: React.FC<{
           '@context': 'https://schema.org',
           '@type': 'FAQPage',
           '@id': `${baseUrl}${canonicalPath}#faq`,
-          mainEntity: faq.map((item) => ({
+          mainEntity: dedupeFaqItems(faq).map((item) => ({
             '@type': 'Question',
             name: item.q,
             acceptedAnswer: {
