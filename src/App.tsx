@@ -26,6 +26,7 @@ const LegalNotice = lazy(() => import("./pages/LegalNotice"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const Disclaimer = lazy(() => import("./pages/Disclaimer"));
 const SerpPreview = lazy(() => import("./pages/SerpPreview"));
+const TranslationAudit = lazy(() => import("./pages/TranslationAudit"));
 const ResourcesPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.ResourcesPage })));
 const SymbolsGenogramPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.SymbolsGenogramPage })));
 const GenogramPsychologyPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.GenogramPsychologyPage })));
@@ -101,6 +102,7 @@ const App = () => {
                     <Route path="/terms" element={<TermsOfService />} />
                     <Route path="/disclaimer" element={<Disclaimer />} />
                     <Route path="/serp-preview" element={<SerpPreview />} />
+                    <Route path="/translation-audit" element={<TranslationAudit />} />
                     <Route path="/genogramme" element={<GenogramDefinition />} />
                     <Route path="/comment-faire-un-genogramme" element={<HowToGenogram />} />
                     <Route path="/ressources" element={<ResourcesPage />} />
