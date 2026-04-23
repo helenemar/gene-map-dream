@@ -137,6 +137,57 @@ const TranslationAudit: React.FC = () => {
         </section>
 
         <section className="mb-8 rounded-lg border border-border bg-card p-6 shadow-sm">
+          <h2 className="mb-2 text-2xl font-bold">Plan de traduction priorisé SEO</h2>
+          <p className="mb-5 text-sm text-muted-foreground">Priorisation estimée selon potentiel SEO, intention de recherche et rôle dans le maillage interne.</p>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[860px] text-left text-sm">
+              <thead className="border-b border-border text-muted-foreground">
+                <tr>
+                  <th className="py-3 pr-4 font-semibold">Ordre</th>
+                  <th className="py-3 pr-4 font-semibold">Priorité</th>
+                  <th className="py-3 pr-4 font-semibold">Page</th>
+                  <th className="py-3 pr-4 font-semibold">Score SEO</th>
+                  <th className="py-3 pr-4 font-semibold">Correction attendue</th>
+                </tr>
+              </thead>
+              <tbody>
+                {audit.priorityPlan.map((route, index) => {
+                  const missingLocales = [!route.en ? 'EN' : null, !route.de ? 'DE' : null].filter(Boolean).join(', ');
+
+                  return (
+                    <tr key={`plan-${route.fr}`} className="border-b border-border/60 align-top">
+                      <td className="py-3 pr-4 font-semibold">{index + 1}</td>
+                      <td className="py-3 pr-4">
+                        <span className="rounded-md bg-primary/10 px-2 py-1 text-xs font-bold text-primary">{route.priority}</span>
+                      </td>
+                      <td className="py-3 pr-4">
+                        <p className="font-medium">{route.label}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{route.reason}</p>
+                      </td>
+                      <td className="py-3 pr-4 font-semibold">{route.seoWeight}/100</td>
+                      <td className="py-3 pr-4 text-muted-foreground">{missingLocales ? `Créer les URLs ${missingLocales}` : 'Vérifier contenu, title, meta description et hreflang'}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="mb-8 rounded-lg border border-border bg-card p-6 shadow-sm">
+          <h2 className="mb-2 text-2xl font-bold">Ordre de correction des clés i18n</h2>
+          <p className="mb-5 text-sm text-muted-foreground">Corriger d’abord les clés visibles dans les SERP et les premières sections, puis descendre vers les contenus secondaires.</p>
+          <ol className="grid gap-3 md:grid-cols-2">
+            {i18nCorrectionOrder.map((item, index) => (
+              <li key={item} className="flex gap-3 rounded-md bg-page-bg p-4 text-sm">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground text-xs font-bold">{index + 1}</span>
+                <span className="text-muted-foreground">{item}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="mb-8 rounded-lg border border-border bg-card p-6 shadow-sm">
           <h2 className="mb-5 text-2xl font-bold">Pages publiques non traduites</h2>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] text-left text-sm">
