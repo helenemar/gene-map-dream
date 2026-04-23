@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import gogyIcon from '@/assets/genogy-icon.svg';
+import gogyIcon from '@/assets/genogy-icon.webp';
 import { useAuth } from '@/contexts/AuthContext';
 import { Mail, KeyRound, Wand2, ArrowLeft } from 'lucide-react';
 import { lovable } from '@/integrations/lovable/index';

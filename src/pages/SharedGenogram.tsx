@@ -7,7 +7,7 @@ import FamilyLinkLines from '@/components/FamilyLinkLines';
 import EmotionalLinkLine from '@/components/EmotionalLinkLine';
 import FloatingControls from '@/components/FloatingControls';
 import { Eye, Pencil, AlertCircle } from 'lucide-react';
-import gogyIcon from '@/assets/genogy-icon.svg';
+import gogyIcon from '@/assets/genogy-icon.webp';
 
 const CARD_W = 220;
 const CARD_H = 64;

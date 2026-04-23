@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import gogyIcon from '@/assets/genogy-icon.svg';
+import gogyIcon from '@/assets/genogy-icon.webp';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Bell, MoreVertical, ArrowUpDown, Atom, ChevronDown, FileText, MessageSquarePlus, Rocket, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';

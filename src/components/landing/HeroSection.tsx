@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import gogyIcon from '@/assets/genogy-icon.svg';
+import gogyIcon from '@/assets/genogy-icon.webp';
 import heroComposition from '@/assets/hero-mockup-composition.webp';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
