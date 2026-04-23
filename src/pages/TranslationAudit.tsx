@@ -13,23 +13,36 @@ type RouteAudit = {
   de?: string;
   label: string;
   section: string;
+  priority: 'P0' | 'P1' | 'P2';
+  seoWeight: number;
+  reason: string;
 };
 
 const publicRoutes: RouteAudit[] = [
-  { label: 'Accueil', section: 'Landing', fr: '/', en: '/en', de: '/de' },
-  { label: 'Définition du génogramme', section: 'Guides', fr: '/genogramme', en: '/en/what-is-a-genogram', de: '/de/was-ist-ein-genogramm' },
-  { label: 'Comment faire un génogramme', section: 'Guides', fr: '/comment-faire-un-genogramme', en: '/en/how-to-create-a-genogram', de: '/de/genogramm-erstellen' },
-  { label: 'Ressources', section: 'Ressources', fr: '/ressources', en: '/en/resources', de: '/de/ressourcen' },
-  { label: 'Article première séance', section: 'Ressources', fr: '/ressources/genogramme-premiere-seance', en: '/en/resources/first-session-genogram', de: '/de/ressourcen/genogramm-erste-sitzung' },
-  { label: 'Article exemple clinique', section: 'Ressources', fr: '/ressources/exemple-genogramme-clinique', en: '/en/resources/clinical-genogram-example', de: '/de/ressourcen/klinisches-genogramm-beispiel' },
-  { label: 'Article cas travail social', section: 'Ressources', fr: '/ressources/genogramme-travail-social-cas-pratique', en: '/en/resources/social-work-genogram-case-study', de: '/de/ressourcen/genogramm-sozialarbeit-fallbeispiel' },
-  { label: 'Symboles McGoldrick', section: 'Pages SEO', fr: '/symboles-genogramme', en: '/en/genogram-symbols', de: '/de/genogramm-symbole' },
-  { label: 'Psychologie', section: 'Pages SEO', fr: '/genogramme-psychologie', en: '/en/genogram-psychology', de: '/de/genogramm-psychologie' },
-  { label: 'Travail social', section: 'Pages SEO', fr: '/genogramme-travail-social', en: '/en/genogram-social-work', de: '/de/genogramm-sozialarbeit' },
-  { label: 'Mentions légales', section: 'Légal', fr: '/legal' },
-  { label: 'Confidentialité', section: 'Légal', fr: '/privacy' },
-  { label: 'Conditions d’utilisation', section: 'Légal', fr: '/terms' },
-  { label: 'Avertissement légal', section: 'Légal', fr: '/disclaimer' },
+  { label: 'Accueil', section: 'Landing', fr: '/', en: '/en', de: '/de', priority: 'P0', seoWeight: 100, reason: 'Page d’entrée principale, requêtes marque + génogrammes en ligne.' },
+  { label: 'Définition du génogramme', section: 'Guides', fr: '/genogramme', en: '/en/what-is-a-genogram', de: '/de/was-ist-ein-genogramm', priority: 'P0', seoWeight: 95, reason: 'Intention informationnelle forte sur la définition du génogramme.' },
+  { label: 'Comment faire un génogramme', section: 'Guides', fr: '/comment-faire-un-genogramme', en: '/en/how-to-create-a-genogram', de: '/de/genogramm-erstellen', priority: 'P0', seoWeight: 92, reason: 'Requête tutorielle à fort potentiel de conversion vers l’outil.' },
+  { label: 'Symboles McGoldrick', section: 'Pages SEO', fr: '/symboles-genogramme', en: '/en/genogram-symbols', de: '/de/genogramm-symbole', priority: 'P0', seoWeight: 88, reason: 'Recherche spécialisée avec intention clinique et longue traîne.' },
+  { label: 'Psychologie', section: 'Pages SEO', fr: '/genogramme-psychologie', en: '/en/genogram-psychology', de: '/de/genogramm-psychologie', priority: 'P1', seoWeight: 78, reason: 'Audience professionnelle pertinente, volume estimé intermédiaire.' },
+  { label: 'Travail social', section: 'Pages SEO', fr: '/genogramme-travail-social', en: '/en/genogram-social-work', de: '/de/genogramm-sozialarbeit', priority: 'P1', seoWeight: 76, reason: 'Segment métier qualifié, utile pour capter les usages institutionnels.' },
+  { label: 'Ressources', section: 'Ressources', fr: '/ressources', en: '/en/resources', de: '/de/ressourcen', priority: 'P1', seoWeight: 70, reason: 'Hub interne qui redistribue l’autorité vers les articles.' },
+  { label: 'Article exemple clinique', section: 'Ressources', fr: '/ressources/exemple-genogramme-clinique', en: '/en/resources/clinical-genogram-example', de: '/de/ressourcen/klinisches-genogramm-beispiel', priority: 'P1', seoWeight: 66, reason: 'Longue traîne clinique avec forte pertinence métier.' },
+  { label: 'Article première séance', section: 'Ressources', fr: '/ressources/genogramme-premiere-seance', en: '/en/resources/first-session-genogram', de: '/de/ressourcen/genogramm-erste-sitzung', priority: 'P2', seoWeight: 58, reason: 'Contenu de soutien pour thérapeutes, potentiel plus ciblé.' },
+  { label: 'Article cas travail social', section: 'Ressources', fr: '/ressources/genogramme-travail-social-cas-pratique', en: '/en/resources/social-work-genogram-case-study', de: '/de/ressourcen/genogramm-sozialarbeit-fallbeispiel', priority: 'P2', seoWeight: 55, reason: 'Cas pratique utile, mais moins prioritaire que les pages piliers.' },
+  { label: 'Confidentialité', section: 'Légal', fr: '/privacy', priority: 'P2', seoWeight: 25, reason: 'Important pour la confiance, faible acquisition SEO directe.' },
+  { label: 'Conditions d’utilisation', section: 'Légal', fr: '/terms', priority: 'P2', seoWeight: 22, reason: 'Nécessaire pour cohérence publique, faible trafic organique estimé.' },
+  { label: 'Avertissement légal', section: 'Légal', fr: '/disclaimer', priority: 'P2', seoWeight: 20, reason: 'Critique conformité, faible potentiel d’entrée SEO.' },
+  { label: 'Mentions légales', section: 'Légal', fr: '/legal', priority: 'P2', seoWeight: 18, reason: 'Page obligatoire, priorité SEO basse.' },
+];
+
+const i18nCorrectionOrder = [
+  'landing.seo, landing.hero, landing.cta',
+  'guides.*.seo, guides.*.title, guides.*.sections',
+  'seoPages.*.metaTitle, seoPages.*.metaDescription, seoPages.*.h1',
+  'resources.index, resources.articles.*.seo, resources.articles.*.content',
+  'navigation, footer, common CTAs',
+  'legal.*.title, legal.*.metaDescription, legal.*.body',
+  'Messages d’erreur, formulaires publics et libellés secondaires',
 ];
 
 const isRecord = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -69,8 +82,16 @@ const TranslationAudit: React.FC = () => {
     };
 
     const untranslatedRoutes = publicRoutes.filter((route) => !route.en || !route.de);
+    const priorityPlan = [...publicRoutes].sort((a, b) => b.seoWeight - a.seoWeight);
+    const i18nIssues = (['en', 'de'] as Locale[]).flatMap((locale) => {
+      const result = localeResults[locale];
+      return [
+        ...result.missing.map((key) => ({ locale, key, type: 'Manquante' as const })),
+        ...result.empty.map((key) => ({ locale, key, type: 'Vide' as const })),
+      ];
+    });
 
-    return { localeResults, untranslatedRoutes };
+    return { localeResults, untranslatedRoutes, priorityPlan, i18nIssues };
   }, []);
 
   return (
