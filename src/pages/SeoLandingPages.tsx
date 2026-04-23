@@ -109,6 +109,23 @@ const ArticleLayout: React.FC<{
   faq: FaqItem[];
 }> = ({ title, canonicalPath, eyebrow, intro, sections, examples, faq }) => (
   <SeoShell title={`${title} | Genogy`} canonicalPath={canonicalPath}>
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          '@id': `${baseUrl}${canonicalPath}#faq`,
+          mainEntity: faq.map((item) => ({
+            '@type': 'Question',
+            name: item.q,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: item.a,
+            },
+          })),
+        })}
+      </script>
+    </Helmet>
     <Hero eyebrow={eyebrow} icon={<BookOpen className="h-5 w-5" />} title={title} intro={intro} />
     <main className="mx-auto max-w-4xl px-6 py-14">
       <article className="space-y-10">
