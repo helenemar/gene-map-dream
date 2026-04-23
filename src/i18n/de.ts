@@ -29,7 +29,7 @@ export const de: Translations = {
   // ── Landing page ──
   landing: {
     metaTitle: 'Genogramm online erstellen — Professionelles Genogramm-Tool | Genogy',
-    metaDesc: 'Erstellen Sie ein Genogramm online mit Genogy. Das einfachste Tool für Psychologen, Therapeuten und Sozialarbeiter. Kostenlos während der Beta. Familiäre und emotionale Beziehungen abbilden.',
+    metaDesc: 'Erstellen Sie Online-Genogramme mit Genogy und visualisieren Sie familiäre und emotionale Beziehungen klar.',
     login: 'Anmelden',
     signup: 'Registrieren',
     heroTitle1: 'Erstellen Sie Ihr Genogramm online',
