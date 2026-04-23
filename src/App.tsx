@@ -25,6 +25,10 @@ const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const LegalNotice = lazy(() => import("./pages/LegalNotice"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const Disclaimer = lazy(() => import("./pages/Disclaimer"));
+const ResourcesPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.ResourcesPage })));
+const SymbolsGenogramPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.SymbolsGenogramPage })));
+const GenogramPsychologyPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.GenogramPsychologyPage })));
+const GenogramSocialWorkPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.GenogramSocialWorkPage })));
 
 const queryClient = new QueryClient();
 
@@ -58,6 +62,11 @@ const App = () => {
                     <Route path="/disclaimer" element={<Disclaimer />} />
                     <Route path="/genogramme" element={<GenogramDefinition />} />
                     <Route path="/comment-faire-un-genogramme" element={<HowToGenogram />} />
+                    <Route path="/ressources" element={<ResourcesPage />} />
+                    <Route path="/blog" element={<Navigate to="/ressources" replace />} />
+                    <Route path="/symboles-genogramme" element={<SymbolsGenogramPage />} />
+                    <Route path="/genogramme-psychologie" element={<GenogramPsychologyPage />} />
+                    <Route path="/genogramme-travail-social" element={<GenogramSocialWorkPage />} />
                     <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
