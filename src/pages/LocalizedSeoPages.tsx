@@ -1,9 +1,10 @@
-import React, { lazy, Suspense, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, Brain, BriefcaseBusiness, GitFork, HelpCircle, ListChecks, Users } from 'lucide-react';
 import LandingHeader from '@/components/landing/LandingHeader';
 import Footer from '@/components/Footer';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const AuthModal = lazy(() => import('@/components/AuthModal'));
 
@@ -167,9 +168,14 @@ const buildBreadcrumb = (page: LocalizedPage, lang: Lang) => ({
 });
 
 const LocalizedShell: React.FC<{ page: LocalizedPage; lang: Lang; children: React.ReactNode }> = ({ page, lang, children }) => {
+  const { setLang } = useLanguage();
   const [authModal, setAuthModal] = useState<{ open: boolean; view: AuthView }>({ open: false, view: 'login' });
   const locale = lang === 'en' ? 'en_US' : 'de_DE';
   const pageUrl = `${baseUrl}${page.path}`;
+
+  useEffect(() => {
+    setLang(lang);
+  }, [lang, setLang]);
 
   return (
     <div className="min-h-screen bg-page-bg text-foreground">
