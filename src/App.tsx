@@ -29,6 +29,9 @@ const ResourcesPage = lazy(() => import("./pages/SeoLandingPages").then((module)
 const SymbolsGenogramPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.SymbolsGenogramPage })));
 const GenogramPsychologyPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.GenogramPsychologyPage })));
 const GenogramSocialWorkPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.GenogramSocialWorkPage })));
+const FirstSessionGenogramArticle = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.FirstSessionGenogramArticle })));
+const ClinicalExampleArticle = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.ClinicalExampleArticle })));
+const SocialWorkCaseArticle = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.SocialWorkCaseArticle })));
 
 const queryClient = new QueryClient();
 
@@ -63,6 +66,9 @@ const App = () => {
                     <Route path="/genogramme" element={<GenogramDefinition />} />
                     <Route path="/comment-faire-un-genogramme" element={<HowToGenogram />} />
                     <Route path="/ressources" element={<ResourcesPage />} />
+                    <Route path="/ressources/genogramme-premiere-seance" element={<FirstSessionGenogramArticle />} />
+                    <Route path="/ressources/exemple-genogramme-clinique" element={<ClinicalExampleArticle />} />
+                    <Route path="/ressources/genogramme-travail-social-cas-pratique" element={<SocialWorkCaseArticle />} />
                     <Route path="/blog" element={<Navigate to="/ressources" replace />} />
                     <Route path="/symboles-genogramme" element={<SymbolsGenogramPage />} />
                     <Route path="/genogramme-psychologie" element={<GenogramPsychologyPage />} />
