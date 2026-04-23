@@ -113,6 +113,10 @@ export const fr: Translations = {
     madeWith: 'Conçu avec soin pour les professionnels de santé.',
     whatIsGenogram: 'Qu\'est-ce qu\'un génogramme ?',
     howToGenogram: 'Comment faire un génogramme',
+    resources: 'Ressources',
+    genogramSymbols: 'Symboles du génogramme',
+    genogramPsychology: 'Génogramme en psychologie',
+    genogramSocialWork: 'Génogramme travail social',
     disclaimer: 'Avertissement légal',
   },
 
