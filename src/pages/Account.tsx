@@ -14,7 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { getRedirectOrigin } from '@/utils/redirectUrl';
 import { toast } from 'sonner';
-import gogyIcon from '@/assets/genogy-icon.svg';
+import gogyIcon from '@/assets/genogy-icon.webp';
 
 const Account: React.FC = () => {
   const navigate = useNavigate();

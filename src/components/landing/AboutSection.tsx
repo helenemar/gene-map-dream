@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import aboutIllustration from '@/assets/about-illustration.png';
+import aboutIllustration from '@/assets/about-illustration.webp';
 
 const AboutSection: React.FC = () => {
   const { t } = useLanguage();

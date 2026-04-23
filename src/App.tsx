@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,23 +8,23 @@ import { AuthProvider } from "@/contexts/AuthContext";
 
 import ProtectedRoute from "@/components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
-import Dashboard from "./pages/Dashboard";
-import GenogramEditor from "./pages/GenogramEditor";
-import DesignSystemPage from "./pages/DesignSystem";
-import Auth from "./pages/Auth";
-import ResetPassword from "./pages/ResetPassword";
-import SharedGenogram from "./pages/SharedGenogram";
-import SharedEditor from "./pages/SharedEditor";
-import NotFound from "./pages/NotFound";
-import GenogramDefinition from "./pages/GenogramDefinition";
-import HowToGenogram from "./pages/HowToGenogram";
-import Account from "./pages/Account";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import LegalNotice from "./pages/LegalNotice";
-import TermsOfService from "./pages/TermsOfService";
-import Disclaimer from "./pages/Disclaimer";
 import MobileBlocker from "./components/MobileBlocker";
 import CookieBanner from "./components/CookieBanner";
+
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const GenogramEditor = lazy(() => import("./pages/GenogramEditor"));
+const DesignSystemPage = lazy(() => import("./pages/DesignSystem"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const SharedGenogram = lazy(() => import("./pages/SharedGenogram"));
+const SharedEditor = lazy(() => import("./pages/SharedEditor"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const GenogramDefinition = lazy(() => import("./pages/GenogramDefinition"));
+const HowToGenogram = lazy(() => import("./pages/HowToGenogram"));
+const Account = lazy(() => import("./pages/Account"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const LegalNotice = lazy(() => import("./pages/LegalNotice"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const Disclaimer = lazy(() => import("./pages/Disclaimer"));
 
 const queryClient = new QueryClient();
 
@@ -37,29 +38,30 @@ const App = () => {
           <Sonner />
             <BrowserRouter>
               <MobileBlocker>
-                <Routes>
-                
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/en" element={<LandingPage forceLang="en" />} />
-                  <Route path="/de" element={<LandingPage forceLang="de" />} />
-                  <Route path="/auth" element={<Navigate to="/" replace />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                  <Route path="/editor" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
-                  <Route path="/editor/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
-                  <Route path="/tree/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
-                  <Route path="/shared/:token" element={<SharedGenogram />} />
-                  <Route path="/shared-edit/:token" element={<SharedEditor />} />
-                  <Route path="/design-system" element={<DesignSystemPage />} />
-                  <Route path="/privacy" element={<PrivacyPolicy />} />
-                  <Route path="/legal" element={<LegalNotice />} />
-                  <Route path="/terms" element={<TermsOfService />} />
-                  <Route path="/disclaimer" element={<Disclaimer />} />
-                  <Route path="/genogramme" element={<GenogramDefinition />} />
-                  <Route path="/comment-faire-un-genogramme" element={<HowToGenogram />} />
-                  <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
+                <Suspense fallback={null}>
+                  <Routes>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/en" element={<LandingPage forceLang="en" />} />
+                    <Route path="/de" element={<LandingPage forceLang="de" />} />
+                    <Route path="/auth" element={<Navigate to="/" replace />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                    <Route path="/editor" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
+                    <Route path="/editor/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
+                    <Route path="/tree/:id" element={<ProtectedRoute><GenogramEditor /></ProtectedRoute>} />
+                    <Route path="/shared/:token" element={<SharedGenogram />} />
+                    <Route path="/shared-edit/:token" element={<SharedEditor />} />
+                    <Route path="/design-system" element={<DesignSystemPage />} />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/legal" element={<LegalNotice />} />
+                    <Route path="/terms" element={<TermsOfService />} />
+                    <Route path="/disclaimer" element={<Disclaimer />} />
+                    <Route path="/genogramme" element={<GenogramDefinition />} />
+                    <Route path="/comment-faire-un-genogramme" element={<HowToGenogram />} />
+                    <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
                 <CookieBanner />
               </MobileBlocker>
             </BrowserRouter>

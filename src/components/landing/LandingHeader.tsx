@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { ChevronDown, Menu } from 'lucide-react';
-import gogyIcon from '@/assets/genogy-icon.svg';
+import gogyIcon from '@/assets/genogy-icon.webp';
 import { useLanguage, Lang } from '@/contexts/LanguageContext';
 
 const FLAG_FR = (

@@ -17,7 +17,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { SearchSuggestion } from '@/hooks/useFamilySearch';
 import SaveIndicator from '@/components/SaveIndicator';
 import { SaveStatus } from '@/hooks/useAutoSave';
-import gogyIcon from '@/assets/genogy-icon.svg';
+import gogyIcon from '@/assets/genogy-icon.webp';
 
 interface EditorHeaderProps {
   searchQuery: string;

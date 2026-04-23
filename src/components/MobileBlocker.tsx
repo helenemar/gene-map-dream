@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Monitor, Tablet } from 'lucide-react';
-import gogyIcon from '@/assets/genogy-icon.svg';
+import gogyIcon from '@/assets/genogy-icon.webp';
 
 const EDITOR_ROUTES = ['/shared-edit/'];
 

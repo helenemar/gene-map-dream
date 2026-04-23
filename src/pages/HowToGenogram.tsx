@@ -6,7 +6,7 @@ import LandingHeader from '@/components/landing/LandingHeader';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AuthModal from '@/components/AuthModal';
-import heroComposition from '@/assets/hero-mockup-composition.png';
+import heroComposition from '@/assets/hero-mockup-composition.webp';
 import { motion } from 'framer-motion';
 import { UserPlus, GitBranch, Share2, Heart, Stethoscope, FileDown, MousePointerClick, Users, Lightbulb, CheckCircle2, ArrowRight, BookOpen } from 'lucide-react';
 
@@ -40,7 +40,7 @@ const HowToGenogram: React.FC = () => {
         <meta property="og:title" content="Genogy — outil pour créer des génogrammes cliniques professionnels" />
         <meta property="og:description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
         <meta property="og:url" content="https://www.genogy-app.com/" />
-        <meta property="og:image" content="https://www.genogy-app.com/og-image.png" />
+        <meta property="og:image" content="https://www.genogy-app.com/og-image.webp" />
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'HowTo',

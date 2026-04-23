@@ -1,9 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import gogyIcon from '@/assets/genogy-icon.svg';
-import heroComposition from '@/assets/hero-mockup-composition.png';
+import gogyIcon from '@/assets/genogy-icon.webp';
+import heroComposition from '@/assets/hero-mockup-composition.webp';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Props {
   onAuth: (view: 'login' | 'signup') => void;
@@ -11,6 +12,7 @@ interface Props {
 
 const HeroSection: React.FC<Props> = ({ onAuth }) => {
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
 
   return (
     <section className="relative overflow-hidden">
@@ -52,22 +54,24 @@ const HeroSection: React.FC<Props> = ({ onAuth }) => {
             </div>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="hidden lg:block"
-          >
-            <img
-              src={heroComposition}
-              alt={t.landing.heroImgAlt}
-              className="w-full h-auto"
-              style={{
-                filter: 'drop-shadow(0 20px 40px hsl(var(--foreground) / 0.08)) drop-shadow(0 8px 16px hsl(var(--foreground) / 0.04))',
-              }}
-              loading="eager"
-            />
-          </motion.div>
+          {!isMobile && (
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="hidden lg:block"
+            >
+              <img
+                src={heroComposition}
+                alt={t.landing.heroImgAlt}
+                className="w-full h-auto"
+                style={{
+                  filter: 'drop-shadow(0 20px 40px hsl(var(--foreground) / 0.08)) drop-shadow(0 8px 16px hsl(var(--foreground) / 0.04))',
+                }}
+                loading="eager"
+              />
+            </motion.div>
+          )}
         </div>
       </div>
     </section>

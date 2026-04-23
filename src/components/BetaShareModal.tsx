@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { X, Atom } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import sharePreview from '@/assets/share-preview.png';
+import sharePreview from '@/assets/share-preview.webp';
 
 interface Props {
   open: boolean;

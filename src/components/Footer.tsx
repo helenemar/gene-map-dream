@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import gogyIcon from '@/assets/genogy-icon.svg';
+import gogyIcon from '@/assets/genogy-icon.webp';
 import { Mail, Twitter, Linkedin } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 

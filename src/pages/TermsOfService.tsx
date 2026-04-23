@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import gogyIcon from '@/assets/genogy-icon.svg';
+import gogyIcon from '@/assets/genogy-icon.webp';
 import Footer from '@/components/Footer';
 
 const SECTIONS = [
@@ -83,7 +83,7 @@ const TermsOfService: React.FC = () => {
         <meta property="og:title" content="Genogy — outil pour créer des génogrammes cliniques professionnels" />
         <meta property="og:description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
         <meta property="og:url" content="https://www.genogy-app.com/" />
-        <meta property="og:image" content="https://www.genogy-app.com/og-image.png" />
+        <meta property="og:image" content="https://www.genogy-app.com/og-image.webp" />
       </Helmet>
 
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
