@@ -6,7 +6,7 @@ import LandingHeader from '@/components/landing/LandingHeader';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AuthModal from '@/components/AuthModal';
-import heroComposition from '@/assets/hero-mockup-composition.png';
+import heroComposition from '@/assets/hero-mockup-composition.webp';
 import { motion } from 'framer-motion';
 import { UserPlus, GitBranch, Share2, Heart, Stethoscope, FileDown, MousePointerClick, Users, Lightbulb, CheckCircle2, ArrowRight, BookOpen } from 'lucide-react';
 
