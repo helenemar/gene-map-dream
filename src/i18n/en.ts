@@ -29,7 +29,7 @@ export const en: Translations = {
   // ── Landing page ──
   landing: {
     metaTitle: 'Online genogram maker — Create professional genograms | Genogy',
-    metaDesc: 'Create genograms online with Genogy. The easiest tool for psychologists, therapists and social workers. Free during beta. Map family relationships, emotional bonds and pathologies.',
+    metaDesc: 'Create online genograms with Genogy to clearly map family and emotional relationships.',
     login: 'Log in',
     signup: 'Sign up',
     heroTitle1: 'Create your genogram online',
