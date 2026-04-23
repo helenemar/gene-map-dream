@@ -74,21 +74,25 @@ const buildBreadcrumbJsonLd = (canonicalPath: string, currentName: string) => ({
 const SeoShell: React.FC<{
   title: string;
   canonicalPath: string;
+  metaDescription?: string;
+  ogImage?: string;
   children: React.ReactNode;
-}> = ({ title, canonicalPath, children }) => {
+}> = ({ title, canonicalPath, metaDescription = description, ogImage = '/og-image.webp', children }) => {
   const [authModal, setAuthModal] = useState<{ open: boolean; view: AuthView }>({ open: false, view: 'login' });
   const canonical = `${baseUrl}${canonicalPath}`;
+  const imageUrl = ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`;
 
   return (
     <div className="min-h-screen bg-page-bg text-foreground">
       <Helmet>
         <title>{title}</title>
-        <meta name="description" content={description} />
+        <meta name="description" content={metaDescription} />
         <link rel="canonical" href={canonical} />
         <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
+        <meta property="og:description" content={metaDescription} />
         <meta property="og:url" content={canonical} />
-        <meta property="og:image" content={`${baseUrl}/og-image.webp`} />
+        <meta property="og:image" content={imageUrl} />
+        <meta property="og:type" content="article" />
       </Helmet>
       <LandingHeader onAuth={(view) => setAuthModal({ open: true, view })} />
       {children}
