@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
-import AuthModal from '@/components/AuthModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LandingHeader from '@/components/landing/LandingHeader';
@@ -14,6 +13,8 @@ import AudienceSection from '@/components/landing/AudienceSection';
 import FaqSection from '@/components/landing/FaqSection';
 import CtaSection from '@/components/landing/CtaSection';
 import Footer from '@/components/Footer';
+
+const AuthModal = lazy(() => import('@/components/AuthModal'));
 
 interface LandingPageProps {
   forceLang?: 'en' | 'de';
@@ -123,11 +124,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
       <CtaSection onAuth={openAuth} />
       <Footer />
 
-      <AuthModal
-        open={authModal.open}
-        onClose={() => setAuthModal({ ...authModal, open: false })}
-        defaultView={authModal.view}
-      />
+      {authModal.open && (
+        <Suspense fallback={null}>
+          <AuthModal
+            open={authModal.open}
+            onClose={() => setAuthModal({ ...authModal, open: false })}
+            defaultView={authModal.view}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };
