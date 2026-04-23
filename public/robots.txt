@@ -19,4 +19,4 @@ Disallow: /shared/
 Disallow: /shared-edit/
 Disallow: /design-system
 
-Sitemap: https://genogy-app.com/sitemap.xml
+Sitemap: https://www.genogy-app.com/sitemap.xml

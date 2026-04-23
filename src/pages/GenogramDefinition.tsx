@@ -17,15 +17,16 @@ const GenogramDefinition: React.FC = () => {
     <div className="min-h-screen bg-page-bg text-foreground">
       <Helmet>
         <title>Qu'est-ce qu'un génogramme ? Définition, symboles et exemples | Genogy</title>
-        <meta name="description" content="Découvrez ce qu'est un génogramme : définition, symboles standardisés McGoldrick, différences avec l'arbre généalogique, et comment créer un génogramme en ligne avec Genogy." />
-        <link rel="canonical" href="https://genogy-app.com/genogramme" />
-        <link rel="alternate" hrefLang="fr" href="https://genogy-app.com/" />
-        <link rel="alternate" hrefLang="en" href="https://genogy-app.com/en" />
-        <link rel="alternate" hrefLang="de" href="https://genogy-app.com/de" />
-        <link rel="alternate" hrefLang="x-default" href="https://genogy-app.com/" />
-        <meta property="og:title" content="Qu'est-ce qu'un génogramme ? Définition et symboles | Genogy" />
-        <meta property="og:description" content="Tout savoir sur le génogramme : définition, symboles, utilisation en psychologie et travail social. Créez le vôtre en ligne avec Genogy." />
-        <meta property="og:url" content="https://genogy-app.com/genogramme" />
+        <meta name="description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
+        <link rel="canonical" href="https://www.genogy-app.com/" />
+        <link rel="alternate" hrefLang="fr" href="https://www.genogy-app.com/" />
+        <link rel="alternate" hrefLang="en" href="https://www.genogy-app.com/en" />
+        <link rel="alternate" hrefLang="de" href="https://www.genogy-app.com/de" />
+        <link rel="alternate" hrefLang="x-default" href="https://www.genogy-app.com/" />
+        <meta property="og:title" content="Genogy — outil pour créer des génogrammes cliniques professionnels" />
+        <meta property="og:description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
+        <meta property="og:url" content="https://www.genogy-app.com/" />
+        <meta property="og:image" content="https://www.genogy-app.com/og-image.png" />
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'Article',
@@ -35,7 +36,7 @@ const GenogramDefinition: React.FC = () => {
           publisher: { '@type': 'Organization', name: 'Genogy', url: 'https://genogy-app.com' },
           datePublished: '2025-01-15',
           dateModified: '2026-03-30',
-          mainEntityOfPage: 'https://genogy-app.com/genogramme',
+          mainEntityOfPage: 'https://www.genogy-app.com/genogramme',
         })}</script>
       </Helmet>
 
