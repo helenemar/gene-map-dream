@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { fr } from '@/i18n/fr';
+import { en } from '@/i18n/en';
+import { de } from '@/i18n/de';
 
 type Device = 'desktop' | 'mobile';
 
@@ -19,6 +21,12 @@ const getStatus = (value: string, limit: number) => {
   if (length > limit - 15) return 'Optimal';
   return 'Peut être plus précis';
 };
+
+const languagePreviews = [
+  { code: 'FR', url: 'https://www.genogy-app.com/', title: fr.landing.metaTitle, description: fr.landing.metaDesc },
+  { code: 'EN', url: 'https://www.genogy-app.com/en', title: en.landing.metaTitle, description: en.landing.metaDesc },
+  { code: 'DE', url: 'https://www.genogy-app.com/de', title: de.landing.metaTitle, description: de.landing.metaDesc },
+];
 
 const SerpPreview: React.FC = () => {
   const [device, setDevice] = useState<Device>('desktop');
@@ -101,6 +109,44 @@ const SerpPreview: React.FC = () => {
             </div>
           </section>
         </div>
+
+        <section className="mt-10">
+          <div className="mb-5">
+            <h2 className="text-2xl font-bold tracking-tight">Aperçu par langue</h2>
+          </div>
+          <div className="grid gap-5 lg:grid-cols-3">
+            {languagePreviews.map((item) => {
+              const currentTitleStatus = getStatus(item.title, titleLimits[device]);
+              const currentDescriptionStatus = getStatus(item.description, descriptionLimits[device]);
+
+              return (
+                <article key={item.code} className="rounded-lg border border-border bg-card p-5 shadow-sm">
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <span className="text-sm font-bold text-primary">{item.code}</span>
+                    <span className="text-xs text-muted-foreground">
+                      Title : {currentTitleStatus} · Meta : {currentDescriptionStatus}
+                    </span>
+                  </div>
+                  <div className={device === 'mobile' ? 'max-w-[390px]' : 'max-w-[650px]'}>
+                    <div className="mb-3 flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-page-bg text-xs font-bold text-primary">G</div>
+                      <div className="min-w-0">
+                        <div className="truncate text-sm text-foreground">Genogy</div>
+                        <div className="truncate text-xs text-muted-foreground">{item.url.replace(/^https?:\/\//, '')}</div>
+                      </div>
+                    </div>
+                    <h3 className="line-clamp-2 text-[18px] leading-snug text-primary">{item.title}</h3>
+                    <p className="mt-1 line-clamp-2 text-[14px] leading-6 text-muted-foreground">{item.description}</p>
+                  </div>
+                  <div className="mt-4 grid grid-cols-2 gap-3 text-xs text-muted-foreground">
+                    <span>Title {item.title.length}/{titleLimits[device]}</span>
+                    <span>Meta {item.description.length}/{descriptionLimits[device]}</span>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
       </div>
     </main>
   );
