@@ -29,7 +29,7 @@ export const fr: Translations = {
   // ── Landing page ──
   landing: {
     metaTitle: 'Genogy',
-    metaDesc: 'Créez facilement des génogrammes en ligne avec Genogy, l’outil simple et complet pour visualiser les liens familiaux, émotionnels et cliniques.',
+    metaDesc: 'Créez des génogrammes en ligne avec Genogy pour visualiser simplement les liens familiaux et émotionnels.',
     login: 'Connexion',
     signup: 'Inscription',
     heroTitle1: 'Créez votre génogramme en ligne',
