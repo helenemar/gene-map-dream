@@ -166,6 +166,12 @@ const ArticleLayout: React.FC<{
   <SeoShell title={`${title} | Genogy`} canonicalPath={canonicalPath}>
     <Helmet>
       <script type="application/ld+json">
+        {JSON.stringify(buildWebPageJsonLd(title, canonicalPath, intro))}
+      </script>
+      <script type="application/ld+json">
+        {JSON.stringify(buildBreadcrumbJsonLd(canonicalPath, title))}
+      </script>
+      <script type="application/ld+json">
         {JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'FAQPage',
@@ -211,6 +217,14 @@ const resources = [
 
 export const ResourcesPage: React.FC = () => (
   <SeoShell title="Ressources génogramme — guides pratiques | Genogy" canonicalPath="/ressources">
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(buildWebPageJsonLd('Ressources génogramme — guides pratiques', '/ressources', 'Guides pratiques Genogy pour créer, lire et utiliser un génogramme clinique en ligne.'))}
+      </script>
+      <script type="application/ld+json">
+        {JSON.stringify(buildBreadcrumbJsonLd('/ressources', 'Ressources'))}
+      </script>
+    </Helmet>
     <Hero
       eyebrow="Ressources"
       icon={<BookOpen className="h-5 w-5" />}
