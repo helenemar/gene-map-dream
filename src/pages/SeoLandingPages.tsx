@@ -27,6 +27,50 @@ const dedupeFaqItems = (items: FaqItem[]) => {
   });
 };
 
+const buildWebPageJsonLd = (title: string, canonicalPath: string, pageDescription: string) => ({
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  '@id': `${baseUrl}${canonicalPath}#webpage`,
+  url: `${baseUrl}${canonicalPath}`,
+  name: title,
+  description: pageDescription,
+  inLanguage: 'fr-FR',
+  isPartOf: {
+    '@type': 'WebSite',
+    '@id': `${baseUrl}/#website`,
+    name: 'Genogy',
+    url: `${baseUrl}/`,
+  },
+  breadcrumb: { '@id': `${baseUrl}${canonicalPath}#breadcrumb` },
+  primaryImageOfPage: `${baseUrl}/og-image.webp`,
+});
+
+const buildBreadcrumbJsonLd = (canonicalPath: string, currentName: string) => ({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  '@id': `${baseUrl}${canonicalPath}#breadcrumb`,
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Accueil',
+      item: `${baseUrl}/`,
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Ressources',
+      item: `${baseUrl}/ressources`,
+    },
+    ...(canonicalPath === '/ressources' ? [] : [{
+      '@type': 'ListItem',
+      position: 3,
+      name: currentName,
+      item: `${baseUrl}${canonicalPath}`,
+    }]),
+  ],
+});
+
 const SeoShell: React.FC<{
   title: string;
   canonicalPath: string;
