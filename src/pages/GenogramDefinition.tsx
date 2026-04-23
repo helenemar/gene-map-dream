@@ -33,7 +33,7 @@ const GenogramDefinition: React.FC = () => {
           headline: "Qu'est-ce qu'un génogramme ? Définition, symboles et exemples",
           description: "Guide complet sur le génogramme : définition, symboles McGoldrick, différences avec l'arbre généalogique, et utilisation en psychologie clinique.",
           author: { '@type': 'Organization', name: 'Genogy' },
-          publisher: { '@type': 'Organization', name: 'Genogy', url: 'https://genogy-app.com' },
+          publisher: { '@type': 'Organization', name: 'Genogy', url: 'https://www.genogy-app.com' },
           datePublished: '2025-01-15',
           dateModified: '2026-03-30',
           mainEntityOfPage: 'https://www.genogy-app.com/genogramme',

@@ -37,8 +37,8 @@ const HowToGenogram: React.FC = () => {
         <link rel="alternate" hrefLang="en" href="https://www.genogy-app.com/en" />
         <link rel="alternate" hrefLang="de" href="https://www.genogy-app.com/de" />
         <link rel="alternate" hrefLang="x-default" href="https://www.genogy-app.com/" />
-        <meta property="og:title" content={h.metaTitle} />
-        <meta property="og:description" content={h.metaDesc} />
+        <meta property="og:title" content="Genogy — outil pour créer des génogrammes cliniques professionnels" />
+        <meta property="og:description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
         <meta property="og:url" content="https://www.genogy-app.com/" />
         <meta property="og:image" content="https://www.genogy-app.com/og-image.png" />
         <script type="application/ld+json">{JSON.stringify({
