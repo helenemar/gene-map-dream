@@ -74,21 +74,25 @@ const buildBreadcrumbJsonLd = (canonicalPath: string, currentName: string) => ({
 const SeoShell: React.FC<{
   title: string;
   canonicalPath: string;
+  metaDescription?: string;
+  ogImage?: string;
   children: React.ReactNode;
-}> = ({ title, canonicalPath, children }) => {
+}> = ({ title, canonicalPath, metaDescription = description, ogImage = '/og-image.webp', children }) => {
   const [authModal, setAuthModal] = useState<{ open: boolean; view: AuthView }>({ open: false, view: 'login' });
   const canonical = `${baseUrl}${canonicalPath}`;
+  const imageUrl = ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`;
 
   return (
     <div className="min-h-screen bg-page-bg text-foreground">
       <Helmet>
         <title>{title}</title>
-        <meta name="description" content={description} />
+        <meta name="description" content={metaDescription} />
         <link rel="canonical" href={canonical} />
         <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
+        <meta property="og:description" content={metaDescription} />
         <meta property="og:url" content={canonical} />
-        <meta property="og:image" content={`${baseUrl}/og-image.webp`} />
+        <meta property="og:image" content={imageUrl} />
+        <meta property="og:type" content="article" />
       </Helmet>
       <LandingHeader onAuth={(view) => setAuthModal({ open: true, view })} />
       {children}
@@ -163,7 +167,7 @@ const ArticleLayout: React.FC<{
   examples: ExampleItem[];
   faq: FaqItem[];
 }> = ({ title, canonicalPath, eyebrow, intro, sections, examples, faq }) => (
-  <SeoShell title={`${title} | Genogy`} canonicalPath={canonicalPath}>
+  <SeoShell title={`${title} | Genogy`} canonicalPath={canonicalPath} metaDescription={intro}>
     <Helmet>
       <script type="application/ld+json">
         {JSON.stringify(buildWebPageJsonLd(title, canonicalPath, intro))}
@@ -216,7 +220,11 @@ const resources = [
 ];
 
 export const ResourcesPage: React.FC = () => (
-  <SeoShell title="Ressources génogramme — guides pratiques | Genogy" canonicalPath="/ressources">
+  <SeoShell
+    title="Ressources génogramme — guides pratiques | Genogy"
+    canonicalPath="/ressources"
+    metaDescription="Guides pratiques Genogy pour créer, lire et utiliser un génogramme clinique en ligne."
+  >
     <Helmet>
       <script type="application/ld+json">
         {JSON.stringify(buildWebPageJsonLd('Ressources génogramme — guides pratiques', '/ressources', 'Guides pratiques Genogy pour créer, lire et utiliser un génogramme clinique en ligne.'))}
