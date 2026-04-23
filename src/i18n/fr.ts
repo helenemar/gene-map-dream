@@ -28,8 +28,8 @@ export const fr: Translations = {
 
   // ── Landing page ──
   landing: {
-    metaTitle: 'Genogy — meilleur outil de génogramme en ligne',
-    metaDesc: 'Créez des génogrammes en ligne avec Genogy, le meilleur outil simple et complet pour psychologues, thérapeutes et travailleurs sociaux.',
+    metaTitle: 'Genogy : créez des génogrammes en ligne',
+    metaDesc: 'Créez facilement des génogrammes en ligne avec Genogy, l’outil simple et complet pour visualiser les liens familiaux, émotionnels et cliniques.',
     login: 'Connexion',
     signup: 'Inscription',
     heroTitle1: 'Créez votre génogramme en ligne',
