@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { fr } from '@/i18n/fr';
+import { en } from '@/i18n/en';
+import { de } from '@/i18n/de';
 
 type Device = 'desktop' | 'mobile';
 
@@ -19,6 +21,12 @@ const getStatus = (value: string, limit: number) => {
   if (length > limit - 15) return 'Optimal';
   return 'Peut être plus précis';
 };
+
+const languagePreviews = [
+  { code: 'FR', url: 'https://www.genogy-app.com/', title: fr.landing.metaTitle, description: fr.landing.metaDesc },
+  { code: 'EN', url: 'https://www.genogy-app.com/en', title: en.landing.metaTitle, description: en.landing.metaDesc },
+  { code: 'DE', url: 'https://www.genogy-app.com/de', title: de.landing.metaTitle, description: de.landing.metaDesc },
+];
 
 const SerpPreview: React.FC = () => {
   const [device, setDevice] = useState<Device>('desktop');
