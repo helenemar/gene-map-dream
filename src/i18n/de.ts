@@ -103,7 +103,7 @@ export const de: Translations = {
     features: 'Funktionen',
     pricing: 'Preise',
     pricingBeta: 'Beta',
-    faq: 'FAQ',
+    faq: 'Häufige Fragen',
     legal: 'Rechtliches',
     legalNotice: 'Impressum',
     privacy: 'Datenschutzrichtlinie (DSGVO)',
