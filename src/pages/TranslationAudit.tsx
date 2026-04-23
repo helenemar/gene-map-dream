@@ -218,7 +218,7 @@ const TranslationAudit: React.FC = () => {
         <section className="grid gap-8 lg:grid-cols-2">
           {(['en', 'de'] as Locale[]).map((locale) => {
             const result = audit.localeResults[locale];
-            const issues = [...result.missing.map((key) => `Manquante : ${key}`), ...result.empty.map((key) => `Vide : ${key}`)];
+            const issues = audit.i18nIssues.filter((issue) => issue.locale === locale);
 
             return (
               <article key={locale} className="rounded-lg border border-border bg-card p-6 shadow-sm">
@@ -227,7 +227,7 @@ const TranslationAudit: React.FC = () => {
                   <p className="text-sm text-muted-foreground">Aucune clé manquante détectée par rapport au français.</p>
                 ) : (
                   <ul className="max-h-[420px] space-y-2 overflow-auto pr-2 text-sm text-muted-foreground">
-                    {issues.map((issue) => <li key={issue} className="rounded-md bg-page-bg px-3 py-2">{issue}</li>)}
+                    {issues.map((issue) => <li key={`${issue.locale}-${issue.type}-${issue.key}`} className="rounded-md bg-page-bg px-3 py-2">{issue.type} : {issue.key}</li>)}
                   </ul>
                 )}
               </article>
