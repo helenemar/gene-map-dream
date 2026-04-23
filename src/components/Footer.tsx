@@ -48,6 +48,26 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/ressources" className="text-sm hover:text-primary transition-colors">
+                  Ressources
+                </Link>
+              </li>
+              <li>
+                <Link to="/symboles-genogramme" className="text-sm hover:text-primary transition-colors">
+                  Symboles du génogramme
+                </Link>
+              </li>
+              <li>
+                <Link to="/genogramme-psychologie" className="text-sm hover:text-primary transition-colors">
+                  Génogramme en psychologie
+                </Link>
+              </li>
+              <li>
+                <Link to="/genogramme-travail-social" className="text-sm hover:text-primary transition-colors">
+                  Génogramme travail social
+                </Link>
+              </li>
+              <li>
                 <span className="text-sm inline-flex items-center gap-1.5">
                   {t.footer.pricing}
                   <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/20 text-primary px-1.5 py-0.5 rounded">
