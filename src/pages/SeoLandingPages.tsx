@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import { ArrowRight, BookOpen, Brain, BriefcaseBusiness, GitFork, HeartPulse, Users } from 'lucide-react';
+import { ArrowRight, BookOpen, Brain, BriefcaseBusiness, CheckCircle2, GitFork, HeartPulse, HelpCircle, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import LandingHeader from '@/components/landing/LandingHeader';
 import Footer from '@/components/Footer';
@@ -12,6 +12,9 @@ const baseUrl = 'https://www.genogy-app.com';
 const description = "Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta.";
 
 type AuthView = 'login' | 'signup';
+
+type FaqItem = { q: string; a: string };
+type ExampleItem = { title: string; text: string };
 
 const SeoShell: React.FC<{
   title: string;
@@ -61,21 +64,90 @@ const Hero: React.FC<{ eyebrow: string; title: string; intro: string; icon: Reac
   </section>
 );
 
+const FaqAndExamples: React.FC<{ examples: ExampleItem[]; faq: FaqItem[] }> = ({ examples, faq }) => (
+  <section className="mx-auto max-w-5xl px-6 pb-16">
+    <div className="grid gap-8 lg:grid-cols-2">
+      <div>
+        <div className="mb-5 flex items-center gap-2 text-primary">
+          <CheckCircle2 className="h-5 w-5" />
+          <h2 className="text-2xl font-bold text-foreground">Exemples concrets</h2>
+        </div>
+        <div className="space-y-4">
+          {examples.map((example) => (
+            <article key={example.title} className="rounded-lg border border-border bg-card p-5">
+              <h3 className="mb-2 font-bold text-foreground">{example.title}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{example.text}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+      <div>
+        <div className="mb-5 flex items-center gap-2 text-primary">
+          <HelpCircle className="h-5 w-5" />
+          <h2 className="text-2xl font-bold text-foreground">Questions fréquentes</h2>
+        </div>
+        <div className="space-y-4">
+          {faq.map((item) => (
+            <article key={item.q} className="rounded-lg border border-border bg-card p-5">
+              <h3 className="mb-2 font-bold text-foreground">{item.q}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{item.a}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+const ArticleLayout: React.FC<{
+  title: string;
+  canonicalPath: string;
+  eyebrow: string;
+  intro: string;
+  sections: Array<{ heading: string; body: string[] }>;
+  examples: ExampleItem[];
+  faq: FaqItem[];
+}> = ({ title, canonicalPath, eyebrow, intro, sections, examples, faq }) => (
+  <SeoShell title={`${title} | Genogy`} canonicalPath={canonicalPath}>
+    <Hero eyebrow={eyebrow} icon={<BookOpen className="h-5 w-5" />} title={title} intro={intro} />
+    <main className="mx-auto max-w-4xl px-6 py-14">
+      <article className="space-y-10">
+        {sections.map((section) => (
+          <section key={section.heading}>
+            <h2 className="mb-4 text-2xl font-bold text-foreground">{section.heading}</h2>
+            <div className="space-y-4 text-muted-foreground">
+              {section.body.map((paragraph) => (
+                <p key={paragraph} className="leading-relaxed">{paragraph}</p>
+              ))}
+            </div>
+          </section>
+        ))}
+      </article>
+    </main>
+    <FaqAndExamples examples={examples} faq={faq} />
+  </SeoShell>
+);
+
+const resources = [
+  { title: 'Comment préparer un génogramme avant un entretien ?', path: '/comment-faire-un-genogramme', text: 'Les informations à recueillir, les générations à représenter et les pièges à éviter au démarrage.' },
+  { title: 'Symboles McGoldrick : les bases à connaître', path: '/symboles-genogramme', text: 'Carrés, cercles, unions, séparations, décès, liens émotionnels et pathologies : le socle visuel du génogramme.' },
+  { title: 'Génogramme clinique : usages en psychologie et travail social', path: '/genogramme-psychologie', text: 'Pourquoi la représentation familiale aide à formuler des hypothèses et à clarifier les dynamiques relationnelles.' },
+  { title: 'Construire un génogramme en première séance', path: '/ressources/genogramme-premiere-seance', text: 'Une méthode étape par étape pour démarrer sans surcharger l’entretien ni perdre la dimension clinique.' },
+  { title: 'Exemple de génogramme clinique commenté', path: '/ressources/exemple-genogramme-clinique', text: 'Un cas fictif détaillé pour comprendre comment lire les alliances, ruptures, ressources et répétitions.' },
+  { title: 'Génogramme en travail social : cas pratique', path: '/ressources/genogramme-travail-social-cas-pratique', text: 'Comment structurer une situation familiale complexe pour une synthèse, une réunion ou une transmission.' },
+];
+
 export const ResourcesPage: React.FC = () => (
   <SeoShell title="Ressources génogramme — guides pratiques | Genogy" canonicalPath="/ressources">
     <Hero
       eyebrow="Ressources"
       icon={<BookOpen className="h-5 w-5" />}
       title="Guides pour comprendre et créer un génogramme en ligne"
-      intro="Retrouvez les premiers articles Genogy pour apprendre à structurer un génogramme clinique, choisir les bons symboles et présenter une carte familiale exploitable en entretien."
+      intro="Retrouvez les articles Genogy pour apprendre à structurer un génogramme clinique, choisir les bons symboles et présenter une carte familiale exploitable en entretien."
     />
     <main className="mx-auto max-w-5xl px-6 py-14 lg:py-18">
       <div className="grid gap-6 md:grid-cols-3">
-        {[
-          { title: 'Comment préparer un génogramme avant un entretien ?', path: '/comment-faire-un-genogramme', text: 'Les informations à recueillir, les générations à représenter et les pièges à éviter au démarrage.' },
-          { title: 'Symboles McGoldrick : les bases à connaître', path: '/symboles-genogramme', text: 'Carrés, cercles, unions, séparations, décès, liens émotionnels et pathologies : le socle visuel du génogramme.' },
-          { title: 'Génogramme clinique : usages en psychologie et travail social', path: '/genogramme-psychologie', text: 'Pourquoi la représentation familiale aide à formuler des hypothèses et à clarifier les dynamiques relationnelles.' },
-        ].map((article) => (
+        {resources.map((article) => (
           <article key={article.path} className="rounded-lg border border-border bg-card p-6 shadow-sm">
             <h2 className="mb-3 text-xl font-bold leading-snug">{article.title}</h2>
             <p className="mb-5 text-sm leading-relaxed text-muted-foreground">{article.text}</p>
@@ -118,6 +190,18 @@ export const SymbolsGenogramPage: React.FC = () => (
         </section>
       </div>
     </main>
+    <FaqAndExamples
+      examples={[
+        { title: 'Séparation puis recomposition', text: 'Une première union est barrée par un marqueur de séparation, puis une seconde union est dessinée avec les enfants issus de chaque branche pour éviter toute confusion.' },
+        { title: 'Décès et événement marquant', text: 'La personne décédée garde sa place générationnelle avec une croix, ce qui permet de visualiser son rôle dans l’histoire familiale malgré son absence actuelle.' },
+        { title: 'Relation conflictuelle', text: 'Un lien émotionnel conflictuel peut être ajouté entre deux membres sans modifier la filiation, afin de distinguer structure familiale et dynamique relationnelle.' },
+      ]}
+      faq={[
+        { q: 'Faut-il suivre strictement les symboles McGoldrick ?', a: 'Ils constituent une base commune utile entre professionnels. L’essentiel est de rester cohérent et de documenter les choix lorsque la situation clinique exige une adaptation.' },
+        { q: 'Comment représenter une adoption ?', a: 'L’adoption se note par une filiation distincte de la filiation biologique, afin de préserver la lisibilité de l’histoire familiale et des appartenances.' },
+        { q: 'Peut-on mélanger pathologies et liens émotionnels ?', a: 'Oui, car ils ne décrivent pas le même niveau d’information : les pathologies concernent les personnes, les liens émotionnels concernent les relations.' },
+      ]}
+    />
   </SeoShell>
 );
 
@@ -142,6 +226,18 @@ export const GenogramPsychologyPage: React.FC = () => (
         </section>
       ))}
     </main>
+    <FaqAndExamples
+      examples={[
+        { title: 'Première consultation adulte', text: 'Le praticien cartographie trois générations, puis ajoute les ruptures et deuils évoqués spontanément pour soutenir l’anamnèse sans interrompre le récit.' },
+        { title: 'Thérapie familiale', text: 'Le génogramme devient un support commun : chacun peut situer les alliances, conflits, distances et personnes ressources avant d’explorer les hypothèses.' },
+        { title: 'Supervision clinique', text: 'Un export lisible permet de présenter rapidement une situation complexe, en séparant faits, liens émotionnels et pistes d’analyse.' },
+      ]}
+      faq={[
+        { q: 'Le génogramme remplace-t-il les notes cliniques ?', a: 'Non. Il complète les notes en offrant une vue d’ensemble structurée, particulièrement utile pour repérer les répétitions et organiser les informations familiales.' },
+        { q: 'Combien de générations représenter ?', a: 'Trois générations suffisent souvent pour commencer. Une quatrième peut être utile si le récit fait apparaître des transmissions ou événements anciens importants.' },
+        { q: 'Peut-on l’utiliser en visio ?', a: 'Oui, un outil en ligne permet de construire progressivement la carte familiale et de l’exporter ensuite pour le dossier ou la supervision.' },
+      ]}
+    />
   </SeoShell>
 );
 
@@ -174,5 +270,89 @@ export const GenogramSocialWorkPage: React.FC = () => (
         </section>
       </div>
     </main>
+    <FaqAndExamples
+      examples={[
+        { title: 'Protection de l’enfance', text: 'Le génogramme clarifie les détenteurs de l’autorité parentale, les fratries, les placements, les personnes ressources et les ruptures de lien.' },
+        { title: 'Coordination médico-sociale', text: 'Une carte partagée aide plusieurs professionnels à parler de la même situation sans multiplier les reformulations ou les schémas improvisés.' },
+        { title: 'Synthèse d’équipe', text: 'L’export sert de support visuel pour distinguer les faits établis, les hypothèses et les informations à vérifier.' },
+      ]}
+      faq={[
+        { q: 'Le génogramme est-il adapté aux situations très complexes ?', a: 'Oui, à condition de hiérarchiser les informations : structure familiale d’abord, puis événements, ressources, fragilités et liens relationnels.' },
+        { q: 'Peut-on le partager en réunion ?', a: 'Un export clair facilite la transmission, mais les informations sensibles doivent toujours être partagées selon les règles de confidentialité applicables.' },
+        { q: 'Quelle différence avec un arbre généalogique ?', a: 'Le génogramme ne se limite pas à la parenté : il intègre événements, ruptures, liens émotionnels, ressources et éléments cliniques ou sociaux.' },
+      ]}
+    />
   </SeoShell>
+);
+
+export const FirstSessionGenogramArticle: React.FC = () => (
+  <ArticleLayout
+    title="Construire un génogramme en première séance"
+    canonicalPath="/ressources/genogramme-premiere-seance"
+    eyebrow="Article pratique"
+    intro="Une méthode simple pour commencer un génogramme dès le premier entretien, sans transformer la séance en questionnaire administratif."
+    sections={[
+      { heading: 'Commencer par la structure, pas par les détails', body: ['En première séance, l’objectif n’est pas de tout documenter. Il s’agit d’obtenir une carte suffisamment claire pour situer la personne, ses proches, les générations principales et les événements qui organisent le récit.', 'Commencez par le patient index, puis remontez vers les parents et grands-parents lorsque les informations sont disponibles. Les détails incertains peuvent rester ouverts : un génogramme clinique se précise souvent au fil des séances.'] },
+      { heading: 'Choisir les informations vraiment utiles', body: ['Les noms, années approximatives, unions, séparations, décès et membres significatifs suffisent souvent pour créer une première base. Les pathologies, migrations, placements ou ruptures de lien peuvent être ajoutés ensuite lorsqu’ils éclairent la demande.', 'Cette progression évite de saturer l’entretien et laisse la personne raconter ce qui fait sens pour elle.'] },
+      { heading: 'Transformer la carte en support clinique', body: ['Une fois la structure posée, le génogramme devient un support de relance : répétitions, absences, alliances, conflits, ressources et événements marquants apparaissent plus facilement.', 'Le praticien peut alors distinguer les faits établis des hypothèses, ce qui rend l’outil utile pour la suite de l’accompagnement.'] },
+    ]}
+    examples={[
+      { title: 'Entretien de 45 minutes', text: 'Limiter la saisie à trois générations et noter les incertitudes permet d’obtenir une carte lisible sans ralentir la séance.' },
+      { title: 'Demande centrée sur un conflit', text: 'Après la structure familiale, ajoutez seulement les liens émotionnels directement liés à la demande initiale.' },
+      { title: 'Informations manquantes', text: 'Un parent inconnu ou une date approximative peut rester vide : l’absence d’information est parfois une donnée clinique en soi.' },
+    ]}
+    faq={[
+      { q: 'Faut-il terminer le génogramme en une séance ?', a: 'Non. Un génogramme fiable se construit progressivement, surtout lorsque l’histoire familiale est complexe ou douloureuse.' },
+      { q: 'Que faire si le patient ne connaît pas certaines informations ?', a: 'Laisser l’information vide ou incertaine. Il vaut mieux une carte honnête qu’un schéma artificiellement complet.' },
+      { q: 'Quand ajouter les liens émotionnels ?', a: 'Après la structure de base, lorsque les relations évoquées sont suffisamment claires pour ne pas mélanger faits et interprétations.' },
+    ]}
+  />
+);
+
+export const ClinicalExampleArticle: React.FC = () => (
+  <ArticleLayout
+    title="Exemple de génogramme clinique commenté"
+    canonicalPath="/ressources/exemple-genogramme-clinique"
+    eyebrow="Cas fictif"
+    intro="Un exemple commenté pour comprendre comment lire un génogramme au-delà de la simple représentation familiale."
+    sections={[
+      { heading: 'Situation de départ', body: ['Imaginons une personne qui consulte pour une difficulté à se positionner dans sa famille. Le génogramme met en évidence une fratrie nombreuse, une séparation parentale ancienne et un grand-parent très présent dans l’éducation.', 'La carte ne donne pas une explication immédiate, mais elle organise les informations et rend visibles les zones à explorer.'] },
+      { heading: 'Lecture des répétitions et ruptures', body: ['Plusieurs séparations apparaissent sur deux générations, associées à des périodes de silence familial. Ces éléments peuvent orienter l’entretien vers les modes de résolution des conflits et les loyautés familiales.', 'Il reste important de formuler ces observations comme des hypothèses, jamais comme des conclusions automatiques.'] },
+      { heading: 'Repérer les ressources', body: ['Un génogramme clinique ne sert pas seulement à identifier les difficultés. Il permet aussi de repérer les liens soutenants, les figures protectrices et les continuités positives dans l’histoire familiale.', 'Ces ressources peuvent devenir des points d’appui pour le travail thérapeutique ou l’accompagnement social.'] },
+    ]}
+    examples={[
+      { title: 'Répétition transgénérationnelle', text: 'Deux séparations à des âges proches peuvent ouvrir une question clinique, sans suffire à établir une causalité.' },
+      { title: 'Personne ressource', text: 'Une tante ou un grand-parent très présent peut être représenté pour ne pas réduire la carte aux seuls parents.' },
+      { title: 'Lien coupé', text: 'Une rupture de contact est dessinée comme une dynamique relationnelle, distincte de la filiation qui reste inchangée.' },
+    ]}
+    faq={[
+      { q: 'Un exemple fictif suffit-il pour apprendre ?', a: 'Il aide à comprendre la méthode, mais chaque situation réelle demande une lecture contextualisée et prudente.' },
+      { q: 'Comment éviter la surinterprétation ?', a: 'En séparant clairement les faits, les ressentis exprimés et les hypothèses formulées pendant l’accompagnement.' },
+      { q: 'Pourquoi noter les ressources ?', a: 'Parce qu’elles montrent les appuis disponibles et évitent une lecture uniquement centrée sur les fragilités.' },
+    ]}
+  />
+);
+
+export const SocialWorkCaseArticle: React.FC = () => (
+  <ArticleLayout
+    title="Génogramme en travail social : cas pratique"
+    canonicalPath="/ressources/genogramme-travail-social-cas-pratique"
+    eyebrow="Cas pratique"
+    intro="Un cas d’usage pour structurer une situation familiale complexe et faciliter la coordination entre professionnels."
+    sections={[
+      { heading: 'Clarifier qui fait partie de la situation', body: ['En travail social, la première difficulté est souvent de savoir qui intervient réellement dans la vie de la personne ou de l’enfant : parents, beaux-parents, fratrie, grands-parents, proches aidants, institutions.', 'Le génogramme permet de poser cette structure visuellement et d’éviter les confusions lors des transmissions.'] },
+      { heading: 'Distinguer faits, ressources et points de vigilance', body: ['Les unions, séparations, décès ou placements relèvent de la structure. Les soutiens réguliers, conflits, absences ou fragilités relèvent d’une lecture plus dynamique.', 'Cette distinction aide à construire un support utile en réunion sans mélanger les informations vérifiées et les interprétations.'] },
+      { heading: 'Préparer une synthèse', body: ['Avant une réunion, un génogramme propre permet de présenter rapidement la situation, puis de concentrer l’échange sur les décisions ou actions à mener.', 'Il devient aussi un repère commun lorsque plusieurs professionnels accompagnent la même famille.'] },
+    ]}
+    examples={[
+      { title: 'Famille recomposée', text: 'Représenter séparément les unions successives permet de comprendre les liens entre demi-frères, beaux-parents et enfants vivant dans différents foyers.' },
+      { title: 'Placement ou relais familial', text: 'La personne qui héberge ou soutient l’enfant peut être visible comme ressource, même si elle n’est pas titulaire de l’autorité parentale.' },
+      { title: 'Réunion pluridisciplinaire', text: 'Un export du génogramme sert de support neutre pour partager une base commune avant d’aborder les décisions.' },
+    ]}
+    faq={[
+      { q: 'Peut-on utiliser un génogramme dans un rapport ?', a: 'Oui, si les règles de confidentialité et de finalité sont respectées, et si les informations sensibles sont limitées au nécessaire.' },
+      { q: 'Comment représenter les personnes ressources non apparentées ?', a: 'Elles peuvent être ajoutées comme figures significatives lorsque leur rôle est important dans l’accompagnement.' },
+      { q: 'Le génogramme doit-il être exhaustif ?', a: 'Non. Il doit être suffisamment complet pour comprendre la situation, mais rester lisible pour l’équipe et les personnes concernées.' },
+    ]}
+  />
 );

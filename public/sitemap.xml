@@ -37,6 +37,24 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.genogy-app.com/ressources/genogramme-premiere-seance</loc>
+    <lastmod>2026-04-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://www.genogy-app.com/ressources/exemple-genogramme-clinique</loc>
+    <lastmod>2026-04-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://www.genogy-app.com/ressources/genogramme-travail-social-cas-pratique</loc>
+    <lastmod>2026-04-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
     <loc>https://www.genogy-app.com/symboles-genogramme</loc>
     <lastmod>2026-04-23</lastmod>
     <changefreq>monthly</changefreq>
