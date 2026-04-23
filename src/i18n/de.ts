@@ -28,7 +28,7 @@ export const de: Translations = {
 
   // ── Landing page ──
   landing: {
-    metaTitle: 'Genogramm online erstellen — Professionelles Genogramm-Tool | Genogy',
+    metaTitle: 'Genogy — Online-Genogramme erstellen',
     metaDesc: 'Erstellen Sie Online-Genogramme mit Genogy und visualisieren Sie familiäre und emotionale Beziehungen klar.',
     login: 'Anmelden',
     signup: 'Registrieren',

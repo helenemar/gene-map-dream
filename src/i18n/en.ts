@@ -28,7 +28,7 @@ export const en: Translations = {
 
   // ── Landing page ──
   landing: {
-    metaTitle: 'Online genogram maker — Create professional genograms | Genogy',
+    metaTitle: 'Genogy — online genogram maker',
     metaDesc: 'Create online genograms with Genogy to clearly map family and emotional relationships.',
     login: 'Log in',
     signup: 'Sign up',
