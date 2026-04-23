@@ -71,15 +71,16 @@ const PrivacyPolicy: React.FC = () => {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Helmet>
         <title>Politique de confidentialité — Genogy</title>
-        <meta name="description" content="Politique de confidentialité et protection des données personnelles de Genogy, conforme au RGPD." />
-        <link rel="canonical" href="https://genogy-app.com/privacy" />
-        <link rel="alternate" hrefLang="fr" href="https://genogy-app.com/" />
-        <link rel="alternate" hrefLang="en" href="https://genogy-app.com/en" />
-        <link rel="alternate" hrefLang="de" href="https://genogy-app.com/de" />
-        <link rel="alternate" hrefLang="x-default" href="https://genogy-app.com/" />
-        <meta property="og:title" content="Politique de confidentialité — Genogy" />
-        <meta property="og:description" content="Politique de confidentialité et protection des données personnelles de Genogy, conforme au RGPD." />
-        <meta property="og:url" content="https://genogy-app.com/privacy" />
+        <meta name="description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
+        <link rel="canonical" href="https://www.genogy-app.com/" />
+        <link rel="alternate" hrefLang="fr" href="https://www.genogy-app.com/" />
+        <link rel="alternate" hrefLang="en" href="https://www.genogy-app.com/en" />
+        <link rel="alternate" hrefLang="de" href="https://www.genogy-app.com/de" />
+        <link rel="alternate" hrefLang="x-default" href="https://www.genogy-app.com/" />
+        <meta property="og:title" content="Genogy — outil pour créer des génogrammes cliniques professionnels" />
+        <meta property="og:description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
+        <meta property="og:url" content="https://www.genogy-app.com/" />
+        <meta property="og:image" content="https://www.genogy-app.com/og-image.png" />
       </Helmet>
 
       {/* Header */}

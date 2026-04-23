@@ -57,12 +57,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: 'Genogy',
-    url: 'https://genogy-app.com/',
+    url: 'https://www.genogy-app.com/',
     applicationCategory: 'HealthApplication',
     operatingSystem: 'Web',
     description: t.landing.metaDesc,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
-    screenshot: 'https://genogy-app.com/og-image.png',
+    screenshot: 'https://www.genogy-app.com/og-image.png',
     aggregateRating: undefined,
   };
 
@@ -96,16 +96,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
     <div className="min-h-screen bg-page-bg text-foreground">
       <Helmet>
         <title>{t.landing.metaTitle}</title>
-        <meta name="description" content={t.landing.metaDesc} />
+        <meta name="description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
         <meta name="keywords" content="génogramme, génogramme en ligne, faire un génogramme, comment faire un génogramme, outil génogramme, génogramme site web, génogramme psychologie, arbre familial émotionnel, genogram online" />
-        <link rel="canonical" href={`https://genogy-app.com${forceLang ? `/${forceLang}` : '/'}`} />
-        <link rel="alternate" hrefLang="fr" href="https://genogy-app.com/" />
-        <link rel="alternate" hrefLang="en" href="https://genogy-app.com/en" />
-        <link rel="alternate" hrefLang="de" href="https://genogy-app.com/de" />
-        <link rel="alternate" hrefLang="x-default" href="https://genogy-app.com/" />
-        <meta property="og:title" content={t.landing.metaTitle} />
-        <meta property="og:description" content={t.landing.metaDesc} />
-        <meta property="og:url" content={`https://genogy-app.com${forceLang ? `/${forceLang}` : '/'}`} />
+        <link rel="canonical" href="https://www.genogy-app.com/" />
+        <link rel="alternate" hrefLang="fr" href="https://www.genogy-app.com/" />
+        <link rel="alternate" hrefLang="en" href="https://www.genogy-app.com/en" />
+        <link rel="alternate" hrefLang="de" href="https://www.genogy-app.com/de" />
+        <link rel="alternate" hrefLang="x-default" href="https://www.genogy-app.com/" />
+        <meta property="og:title" content="Genogy — outil pour créer des génogrammes cliniques professionnels" />
+        <meta property="og:description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
+        <meta property="og:url" content="https://www.genogy-app.com/" />
+        <meta property="og:image" content="https://www.genogy-app.com/og-image.png" />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(howToJsonLd)}</script>
