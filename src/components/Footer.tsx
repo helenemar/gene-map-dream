@@ -5,7 +5,17 @@ import { Mail, Twitter, Linkedin } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const Footer: React.FC = () => {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+
+  const localizedPaths = {
+    home: lang === 'fr' ? '/' : `/${lang}`,
+    whatIsGenogram: lang === 'en' ? '/en/what-is-a-genogram' : lang === 'de' ? '/de/was-ist-ein-genogramm' : '/genogramme',
+    howToGenogram: lang === 'en' ? '/en/how-to-create-a-genogram' : lang === 'de' ? '/de/genogramm-erstellen' : '/comment-faire-un-genogramme',
+    resources: lang === 'en' ? '/en/resources' : lang === 'de' ? '/de/ressourcen' : '/ressources',
+    symbols: lang === 'en' ? '/en/genogram-symbols' : lang === 'de' ? '/de/genogramm-symbole' : '/symboles-genogramme',
+    psychology: lang === 'en' ? '/en/genogram-psychology' : lang === 'de' ? '/de/genogramm-psychologie' : '/genogramme-psychologie',
+    socialWork: lang === 'en' ? '/en/genogram-social-work' : lang === 'de' ? '/de/genogramm-sozialarbeit' : '/genogramme-travail-social',
+  };
 
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -17,7 +27,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
           {/* Column 1 – Branding */}
           <div className="space-y-4">
-            <Link to="/" className="flex items-center gap-2.5">
+            <Link to={localizedPaths.home} className="flex items-center gap-2.5">
               <img src={gogyIcon} alt="Genogy" className="w-7 h-7 brightness-0 invert opacity-80" />
               <span className="text-[15px] font-semibold text-background tracking-tight">Genogy</span>
             </Link>
@@ -38,33 +48,33 @@ const Footer: React.FC = () => {
                 </button>
               </li>
               <li>
-                <Link to="/genogramme" className="text-sm hover:text-primary transition-colors">
+                <Link to={localizedPaths.whatIsGenogram} className="text-sm hover:text-primary transition-colors">
                   {t.footer.whatIsGenogram}
                 </Link>
               </li>
               <li>
-                <Link to="/comment-faire-un-genogramme" className="text-sm hover:text-primary transition-colors">
+                <Link to={localizedPaths.howToGenogram} className="text-sm hover:text-primary transition-colors">
                   {t.footer.howToGenogram}
                 </Link>
               </li>
               <li>
-                <Link to="/ressources" className="text-sm hover:text-primary transition-colors">
-                  Ressources
+                <Link to={localizedPaths.resources} className="text-sm hover:text-primary transition-colors">
+                  {t.footer.resources}
                 </Link>
               </li>
               <li>
-                <Link to="/symboles-genogramme" className="text-sm hover:text-primary transition-colors">
-                  Symboles du génogramme
+                <Link to={localizedPaths.symbols} className="text-sm hover:text-primary transition-colors">
+                  {t.footer.genogramSymbols}
                 </Link>
               </li>
               <li>
-                <Link to="/genogramme-psychologie" className="text-sm hover:text-primary transition-colors">
-                  Génogramme en psychologie
+                <Link to={localizedPaths.psychology} className="text-sm hover:text-primary transition-colors">
+                  {t.footer.genogramPsychology}
                 </Link>
               </li>
               <li>
-                <Link to="/genogramme-travail-social" className="text-sm hover:text-primary transition-colors">
-                  Génogramme travail social
+                <Link to={localizedPaths.socialWork} className="text-sm hover:text-primary transition-colors">
+                  {t.footer.genogramSocialWork}
                 </Link>
               </li>
               <li>

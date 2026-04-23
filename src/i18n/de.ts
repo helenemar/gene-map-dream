@@ -113,6 +113,10 @@ export const de: Translations = {
     madeWith: 'Mit Sorgfalt für Gesundheitsfachkräfte entwickelt.',
     whatIsGenogram: 'Was ist ein Genogramm?',
     howToGenogram: 'Wie erstellt man ein Genogramm',
+    resources: 'Ressourcen',
+    genogramSymbols: 'Genogramm-Symbole',
+    genogramPsychology: 'Genogramm in der Psychologie',
+    genogramSocialWork: 'Genogramm in der Sozialarbeit',
     disclaimer: 'Haftungsausschluss',
   },
 
