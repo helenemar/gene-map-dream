@@ -42,18 +42,41 @@ const GenogramDefinition: React.FC = () => {
 
       <LandingHeader onAuth={openAuth} />
 
-      <article className="max-w-3xl mx-auto px-6 py-16 lg:py-24">
-        <header className="mb-12">
-          <p className="text-primary text-sm font-medium mb-3">Guide complet</p>
-          <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight mb-4">
-            Qu'est-ce qu'un génogramme ?
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b border-border">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/5 via-transparent to-brand-orange/5" />
+        <div className="absolute inset-0 -z-10 [background-image:radial-gradient(hsl(var(--primary)/0.08)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
+        <div className="max-w-5xl mx-auto px-6 py-20 lg:py-28">
+          <nav aria-label="Fil d'ariane" className="mb-6 text-sm text-muted-foreground">
+            <Link to="/" className="hover:text-primary transition-colors">Accueil</Link>
+            <span className="mx-2">/</span>
+            <span className="text-foreground">Qu'est-ce qu'un génogramme ?</span>
+          </nav>
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-5">
+            <span className="size-1.5 rounded-full bg-primary" />
+            Guide complet · 8 min de lecture
+          </span>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-[1.05]">
+            Qu'est-ce qu'un <span className="text-primary">génogramme</span> ?
           </h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            Définition, symboles standardisés, différences avec l'arbre généalogique et comment créer un génogramme en ligne.
+          <p className="text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-2xl">
+            Définition, symboles standardisés McGoldrick, différences avec l'arbre généalogique et méthode pour créer un génogramme en ligne.
           </p>
-        </header>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button variant="brand" size="lg" onClick={() => openAuth('signup')} className="rounded-full px-7">
+              Créer mon génogramme
+            </Button>
+            <Link to="/comment-faire-un-genogramme">
+              <Button variant="outline" size="lg" className="rounded-full px-7">
+                Guide pas à pas →
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
 
-        <figure className="mb-12 rounded-2xl overflow-hidden border border-border shadow-sm bg-card">
+      <article className="max-w-3xl mx-auto px-6 py-16 lg:py-20">
+        <figure className="mb-14 -mt-32 lg:-mt-40 rounded-2xl overflow-hidden border border-border shadow-2xl bg-card">
           <img
             src={genogramOverview}
             alt="Aperçu d'un génogramme clinique réalisé avec Genogy : trois générations, liens familiaux, pathologies et liens émotionnels"
@@ -65,7 +88,19 @@ const GenogramDefinition: React.FC = () => {
           </figcaption>
         </figure>
 
-        <div className="prose prose-lg max-w-none dark:prose-invert">
+        {/* Sommaire */}
+        <aside className="mb-14 rounded-2xl border border-border bg-card/50 p-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Au sommaire</p>
+          <ol className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+            <li><a href="#definition" className="text-foreground hover:text-primary transition-colors">1. Définition du génogramme</a></li>
+            <li><a href="#symboles" className="text-foreground hover:text-primary transition-colors">2. Symboles McGoldrick</a></li>
+            <li><a href="#difference" className="text-foreground hover:text-primary transition-colors">3. vs Arbre généalogique</a></li>
+            <li><a href="#usages" className="text-foreground hover:text-primary transition-colors">4. À quoi ça sert ?</a></li>
+            <li><a href="#creer" className="text-foreground hover:text-primary transition-colors">5. Créer en ligne</a></li>
+          </ol>
+        </aside>
+
+        <div className="prose prose-lg max-w-none dark:prose-invert prose-headings:scroll-mt-24 prose-headings:font-extrabold prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-6 prose-h2:tracking-tight prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-table:overflow-hidden prose-table:rounded-xl prose-table:border prose-table:border-border prose-th:bg-muted/40 prose-th:text-foreground prose-td:border-border">
           <h2>Définition du génogramme</h2>
           <p>
             Un <strong>génogramme</strong> est une représentation graphique de la structure familiale d'un individu, étendue sur au moins trois générations. Développé par <strong>Monica McGoldrick</strong> et Randy Gerson dans les années 1980, le génogramme va bien au-delà d'un simple <em>arbre généalogique</em>.
