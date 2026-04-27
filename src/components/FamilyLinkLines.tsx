@@ -607,6 +607,25 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
             </g>
           );
         })}
+
+        {/* Immigration double-wave on filiation drop above each immigrant member */}
+        {members.filter(m => m.hasImmigration).map(m => {
+          const cx = m.x + CARD_W / 2;
+          const topY = m.y;
+          // Two waves stacked, just above the card
+          const waveColor = isSharedVariant ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))';
+          const waveOpacity = isSharedVariant ? 0.85 : 0.55;
+          const w = 18; // half-width of wave
+          const wave = (yOffset: number) =>
+            `M ${cx - w} ${topY - yOffset} Q ${cx - w / 2} ${topY - yOffset - 6}, ${cx} ${topY - yOffset} T ${cx + w} ${topY - yOffset}`;
+          return (
+            <g key={`immig-${m.id}`} aria-label="Immigration">
+              <title>Immigration{m.immigrationNotes ? ` — ${m.immigrationNotes}` : ''}</title>
+              <path d={wave(8)} fill="none" stroke={waveColor} strokeWidth={1.75} strokeOpacity={waveOpacity} strokeLinecap="round" />
+              <path d={wave(18)} fill="none" stroke={waveColor} strokeWidth={1.75} strokeOpacity={waveOpacity} strokeLinecap="round" />
+            </g>
+          );
+        })}
       </svg>
 
       {/* Union badges layer */}
