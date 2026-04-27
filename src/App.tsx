@@ -52,6 +52,9 @@ const DeSocialWorkPage = lazy(() => import("./pages/LocalizedSeoPages").then((mo
 const DeFirstSessionArticle = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.DeFirstSessionArticle })));
 const DeClinicalExampleArticle = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.DeClinicalExampleArticle })));
 const DeSocialCaseArticle = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.DeSocialCaseArticle })));
+const BlogJusticeArticleFr = lazy(() => import("./pages/BlogJusticeArticle").then((module) => ({ default: module.BlogJusticeArticleFr })));
+const BlogJusticeArticleEn = lazy(() => import("./pages/BlogJusticeArticle").then((module) => ({ default: module.BlogJusticeArticleEn })));
+const BlogJusticeArticleDe = lazy(() => import("./pages/BlogJusticeArticle").then((module) => ({ default: module.BlogJusticeArticleDe })));
 
 const queryClient = new QueryClient();
 
@@ -110,6 +113,9 @@ const App = () => {
                     <Route path="/ressources/exemple-genogramme-clinique" element={<ClinicalExampleArticle />} />
                     <Route path="/ressources/genogramme-travail-social-cas-pratique" element={<SocialWorkCaseArticle />} />
                     <Route path="/blog" element={<Navigate to="/ressources" replace />} />
+                    <Route path="/blog/genogramme-professionnels-justice" element={<BlogJusticeArticleFr />} />
+                    <Route path="/blog/genogram-justice-professionals" element={<BlogJusticeArticleEn />} />
+                    <Route path="/blog/genogramm-justizfachkraefte" element={<BlogJusticeArticleDe />} />
                     <Route path="/symboles-genogramme" element={<SymbolsGenogramPage />} />
                     <Route path="/genogramme-psychologie" element={<GenogramPsychologyPage />} />
                     <Route path="/genogramme-travail-social" element={<GenogramSocialWorkPage />} />
