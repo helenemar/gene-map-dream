@@ -197,6 +197,48 @@ export type Database = {
         }
         Relationships: []
       }
+      trauma_catalog: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          label: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          label: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          label?: string
+        }
+        Relationships: []
+      }
+      user_trauma_catalog: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
