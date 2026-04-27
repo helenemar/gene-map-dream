@@ -265,6 +265,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
 
   const renderLine = () => {
     switch (type) {
+      case 'close':
+        return <path d={mainPath} fill="none" stroke="hsl(var(--link-fusional))" strokeWidth={2} />;
       case 'fusional':
         return (
           <>
