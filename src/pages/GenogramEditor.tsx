@@ -18,6 +18,7 @@ import ContextualTutorial from '@/components/ContextualTutorial';
 import { useContextualTutorial } from '@/hooks/useContextualTutorial';
 import UnionEditDrawer from '@/components/UnionEditDrawer';
 import MemberEditDrawer from '@/components/MemberEditDrawer';
+import ImmigrationNotesDrawer from '@/components/ImmigrationNotesDrawer';
 import { RelationshipChoice } from '@/components/CreateMemberDropdown';
 import type { DisabledOptions } from '@/components/CreateMemberDropdown';
 import ParentPicker from '@/components/ParentPicker';
