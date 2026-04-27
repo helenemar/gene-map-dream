@@ -7,6 +7,8 @@ import Footer from '@/components/Footer';
 import SeoLinks from '@/components/SeoLinks';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
+import genogramOverview from '@/assets/screens/genogram-overview.png';
+import memberRelations from '@/assets/screens/member-relations.png';
 
 const AuthModal = lazy(() => import('@/components/AuthModal'));
 
