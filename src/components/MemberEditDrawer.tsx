@@ -104,6 +104,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [hasTrauma, setHasTrauma] = useState(false);
   const [traumaNotes, setTraumaNotes] = useState('');
   const [traumas, setTraumas] = useState<string[]>([]);
+  const [hasImmigration, setHasImmigration] = useState(false);
+  const [immigrationNotes, setImmigrationNotes] = useState('');
   const [isUnknown, setIsUnknown] = useState(false);
 
   const [birthYearUnsure, setBirthYearUnsure] = useState(false);
@@ -164,6 +166,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setHasTrauma(!!member.hasTrauma);
       setTraumaNotes(member.traumaNotes || '');
       setTraumas(member.traumas || []);
+      setHasImmigration(!!member.hasImmigration);
+      setImmigrationNotes(member.immigrationNotes || '');
       setIsUnknown(!!member.isUnknown);
     }
   }, [member]);
@@ -209,6 +213,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
         hasTrauma: undefined,
         traumaNotes: undefined,
         traumas: undefined,
+        hasImmigration: undefined,
+        immigrationNotes: undefined,
         isUnknown: true,
         isDraft: false,
         isPlaceholder: false,
@@ -243,17 +249,19 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       hasTrauma: hasTrauma || undefined,
       traumaNotes: hasTrauma && traumaNotes ? traumaNotes : undefined,
       traumas: hasTrauma && traumas.length > 0 ? traumas : undefined,
+      hasImmigration: hasImmigration || undefined,
+      immigrationNotes: hasImmigration && immigrationNotes ? immigrationNotes : undefined,
       isUnknown: undefined,
       isDraft: false,
     };
-  }, [member, isUnknown, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, currentYear]);
+  }, [member, isUnknown, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, hasImmigration, immigrationNotes, currentYear]);
 
   useEffect(() => {
     if (open && member && onLiveUpdate) {
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, isUnknown]);
+  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, hasImmigration, immigrationNotes, isUnknown]);
 
   if (!member) return null;
 
