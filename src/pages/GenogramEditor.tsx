@@ -1885,13 +1885,18 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                     pairMap.get(key)!.push(i);
                   });
 
-                  // Pre-compute anchors once per pair so all links share the same endpoints
-                  const pairAnchors = new Map<string, { x1: number; y1: number; x2: number; y2: number }>();
+                  // Pre-compute anchors once per pair so all links share the same endpoints.
+                  // Store the source id used to compute the anchors so we can flip x1/x2 when
+                  // a specific link's from/to direction differs from the sorted pair key.
+                  const pairAnchors = new Map<string, { x1: number; y1: number; x2: number; y2: number; sourceId: string }>();
                   for (const key of pairMap.keys()) {
                     const [idA, idB] = key.split('|');
                     const mA = members.find(m => m.id === idA);
                     const mB = members.find(m => m.id === idB);
-                    if (mA && mB) pairAnchors.set(key, getEmotionalAnchors(mA, mB));
+                    if (mA && mB) {
+                      const a = getEmotionalAnchors(mA, mB);
+                      pairAnchors.set(key, { ...a, sourceId: mA.id });
+                    }
                   }
 
                   return emotionalLinks.map((link, globalIdx) => {
@@ -1909,11 +1914,18 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                     if (!emotionalLinksVisible) return null;
                     const isSoloHidden = soloEmotionalType !== null && link.type !== soloEmotionalType;
                     if (isSoloHidden) return null;
+                    // Flip endpoints when this link's `from` doesn't match the anchor's source id,
+                    // so directional arrows (neglect, controlling) point the right way.
+                    const flip = anchors.sourceId !== link.from;
+                    const x1 = flip ? anchors.x2 : anchors.x1;
+                    const y1 = flip ? anchors.y2 : anchors.y1;
+                    const x2 = flip ? anchors.x1 : anchors.x2;
+                    const y2 = flip ? anchors.y1 : anchors.y2;
                     return (
                       <EmotionalLinkLine
                         key={link.id}
-                        x1={anchors.x1} y1={anchors.y1}
-                        x2={anchors.x2} y2={anchors.y2}
+                        x1={x1} y1={y1}
+                        x2={x2} y2={y2}
                         type={link.type}
                         linkIndex={linkIndex}
                         linkCount={group.length}
