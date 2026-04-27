@@ -294,9 +294,9 @@ const MemberCard: React.FC<MemberCardProps> = ({
               aria-label="Trauma"
               title={member.traumaNotes || 'Vécu d\u2019événement(s) traumatogène(s)'}
               className="absolute z-10 flex items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-[#E24B4A]/30 pointer-events-none"
-              style={{ top: -6, right: -6, width: 18, height: 18 }}
+              style={{ top: -8, right: -8, width: 24, height: 24 }}
             >
-              <Zap className="w-3.5 h-3.5" style={{ color: '#E24B4A', fill: '#E24B4A' }} strokeWidth={1.5} />
+              <Zap style={{ color: '#E24B4A', fill: '#E24B4A', width: 18, height: 18 }} strokeWidth={1.5} />
             </div>
           )}
         </div>
