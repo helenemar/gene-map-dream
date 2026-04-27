@@ -110,7 +110,7 @@ export interface Relationship {
 }
 
 export type EmotionalLinkType = 
-  | 'fusional' | 'distant' | 'conflictual' | 'ambivalent' 
+  | 'close' | 'fusional' | 'distant' | 'conflictual' | 'ambivalent' 
   | 'cutoff' | 'violence' | 'emotional_abuse' | 'physical_violence' 
   | 'sexual_abuse' | 'neglect' | 'controlling';
 
