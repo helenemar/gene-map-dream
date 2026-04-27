@@ -654,7 +654,7 @@ export const fr: Translations = {
       { label: 'Coupé / Rompu', color: 'bg-red-500' },
       { label: 'Ambivalent', color: 'bg-emerald-500' },
       { label: 'Violent', color: 'bg-red-500' },
-      { label: 'Violences psychologiques', color: 'bg-blue-500' },
+      { label: 'Violence psychologique', color: 'bg-blue-500' },
       { label: 'Abus sexuel', color: 'bg-purple-500' },
     ],
     pathologyTags: ['Cardiovasculaires', 'Cancers', 'Dépression', 'Addictions', 'Neurodégénératives', 'Troubles alimentaires'],
