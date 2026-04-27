@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Crosshair, Eye, EyeOff, Pencil, Plus } from 'lucide-react';
+import { ArrowLeft, Crosshair, Eye, EyeOff, Pencil, Plus, Zap } from 'lucide-react';
 import AddPathologyModal from '@/components/AddPathologyModal';
 import {
   FamilyMember, Union, EmotionalLink,
