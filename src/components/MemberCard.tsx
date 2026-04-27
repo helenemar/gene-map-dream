@@ -109,6 +109,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   onCreateRelated,
   onEdit,
   onToggleLock,
+  onToggleTrauma,
   onView,
   onHover,
   onLinkDragStart,
