@@ -35,6 +35,7 @@ const GenogramDefinition: React.FC = () => {
           mainEntityOfPage: 'https://www.genogy-app.com/genogramme',
         })}</script>
       </Helmet>
+      <SeoLinks pageKey="whatIs" locale="fr" />
 
       <LandingHeader onAuth={openAuth} />
 
