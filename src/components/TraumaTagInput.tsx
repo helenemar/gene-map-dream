@@ -23,7 +23,7 @@ const TraumaTagInput: React.FC<TraumaTagInputProps> = ({
 
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return entries.filter(e => !values.includes(e.label)).slice(0, 8);
+    if (q.length < 2) return [];
     return entries
       .filter(e => e.label.toLowerCase().includes(q) && !values.includes(e.label))
       .slice(0, 8);
