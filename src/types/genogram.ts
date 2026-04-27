@@ -61,6 +61,8 @@ export interface FamilyMember {
   hasTrauma?: boolean;
   /** Free-text description of the traumatic event(s) experienced */
   traumaNotes?: string;
+  /** List of trauma labels (from global catalog or user catalog or free text) */
+  traumas?: string[];
 }
 
 export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed' | 'love_affair';
