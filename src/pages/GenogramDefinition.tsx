@@ -124,27 +124,149 @@ const GenogramDefinition: React.FC = () => {
           </div>
 
           <h2 id="symboles">Symboles standardisés (McGoldrick)</h2>
-          <p>Le génogramme utilise un système de symboles codifiés internationalement.</p>
+          <p>Le génogramme utilise un système de symboles codifiés internationalement. Voici les principaux :</p>
 
-          <div className="not-prose grid grid-cols-2 sm:grid-cols-3 gap-3 my-8">
+          <h3 className="!text-base !mt-8 !mb-3 uppercase tracking-wider !text-muted-foreground !font-semibold">Personnes & événements</h3>
+          <div className="not-prose grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { symbol: <div className="size-8 border-2 border-foreground" />, label: 'Homme' },
-              { symbol: <div className="size-8 rounded-full border-2 border-foreground" />, label: 'Femme' },
-              { symbol: <div className="size-8 border-2 border-foreground rotate-45" />, label: 'Genre non spécifié' },
-              { symbol: <div className="relative size-8 border-2 border-foreground"><div className="absolute inset-0 flex items-center justify-center text-foreground text-xl font-bold">×</div></div>, label: 'Personne décédée' },
-              { symbol: <div className="w-10 h-0.5 bg-foreground" />, label: 'Union' },
-              { symbol: <div className="relative w-10 h-0.5 bg-foreground"><div className="absolute -top-1.5 left-3 w-0.5 h-3 bg-foreground" /><div className="absolute -top-1.5 right-3 w-0.5 h-3 bg-foreground" /></div>, label: 'Divorce' },
+              {
+                label: 'Homme',
+                svg: (
+                  <svg viewBox="0 0 40 40" className="size-12"><rect x="6" y="6" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2.5" /></svg>
+                ),
+              },
+              {
+                label: 'Femme',
+                svg: (
+                  <svg viewBox="0 0 40 40" className="size-12"><circle cx="20" cy="20" r="14" fill="none" stroke="currentColor" strokeWidth="2.5" /></svg>
+                ),
+              },
+              {
+                label: 'Genre non spécifié',
+                svg: (
+                  <svg viewBox="0 0 40 40" className="size-12"><polygon points="20,4 36,20 20,36 4,20" fill="none" stroke="currentColor" strokeWidth="2.5" /></svg>
+                ),
+              },
+              {
+                label: 'Personne décédée',
+                svg: (
+                  <svg viewBox="0 0 40 40" className="size-12"><rect x="6" y="6" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2.5" /><line x1="6" y1="6" x2="34" y2="34" stroke="currentColor" strokeWidth="2.5" /><line x1="34" y1="6" x2="6" y2="34" stroke="currentColor" strokeWidth="2.5" /></svg>
+                ),
+              },
+              {
+                label: 'Patient index',
+                svg: (
+                  <svg viewBox="0 0 40 40" className="size-12"><rect x="6" y="6" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="2.5" /><rect x="10" y="10" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" /></svg>
+                ),
+              },
+              {
+                label: 'Grossesse',
+                svg: (
+                  <svg viewBox="0 0 40 40" className="size-12"><polygon points="20,8 33,32 7,32" fill="none" stroke="currentColor" strokeWidth="2.5" /></svg>
+                ),
+              },
+              {
+                label: 'Fausse couche',
+                svg: (
+                  <svg viewBox="0 0 40 40" className="size-12"><polygon points="20,12 30,28 10,28" fill="currentColor" /></svg>
+                ),
+              },
+              {
+                label: 'Mort-né',
+                svg: (
+                  <svg viewBox="0 0 40 40" className="size-12"><rect x="8" y="10" width="24" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" /><line x1="8" y1="10" x2="32" y2="30" stroke="currentColor" strokeWidth="2.5" /><line x1="32" y1="10" x2="8" y2="30" stroke="currentColor" strokeWidth="2.5" /></svg>
+                ),
+              },
             ].map((item) => (
-              <div key={item.label} className="flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-5 aspect-square">
-                <div className="flex items-center justify-center h-10">{item.symbol}</div>
-                <p className="text-xs text-center text-muted-foreground font-medium">{item.label}</p>
+              <div key={item.label} className="flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-5 aspect-square text-foreground">
+                {item.svg}
+                <p className="text-xs text-center text-muted-foreground font-medium leading-tight">{item.label}</p>
               </div>
             ))}
           </div>
 
-          <p className="text-sm text-muted-foreground">
-            Et les liens émotionnels : <strong className="text-foreground">ondulé</strong> (fusionnel), <strong className="text-foreground">zigzag</strong> (conflit), <strong className="text-foreground">pointillé</strong> (distant), <strong className="text-foreground">coupé</strong> (rupture).
-          </p>
+          <h3 className="!text-base !mt-10 !mb-3 uppercase tracking-wider !text-muted-foreground !font-semibold">Liens familiaux</h3>
+          <div className="not-prose grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              {
+                label: 'Union',
+                svg: (
+                  <svg viewBox="0 0 80 30" className="w-20 h-8"><line x1="5" y1="15" x2="75" y2="15" stroke="currentColor" strokeWidth="2.5" /></svg>
+                ),
+              },
+              {
+                label: 'Séparation',
+                svg: (
+                  <svg viewBox="0 0 80 30" className="w-20 h-8"><line x1="5" y1="15" x2="75" y2="15" stroke="currentColor" strokeWidth="2.5" /><line x1="38" y1="6" x2="32" y2="24" stroke="currentColor" strokeWidth="2.5" /></svg>
+                ),
+              },
+              {
+                label: 'Divorce',
+                svg: (
+                  <svg viewBox="0 0 80 30" className="w-20 h-8"><line x1="5" y1="15" x2="75" y2="15" stroke="currentColor" strokeWidth="2.5" /><line x1="34" y1="6" x2="28" y2="24" stroke="currentColor" strokeWidth="2.5" /><line x1="48" y1="6" x2="42" y2="24" stroke="currentColor" strokeWidth="2.5" /></svg>
+                ),
+              },
+              {
+                label: 'Filiation',
+                svg: (
+                  <svg viewBox="0 0 80 50" className="w-20 h-12"><line x1="40" y1="5" x2="40" y2="25" stroke="currentColor" strokeWidth="2.5" /><line x1="20" y1="25" x2="60" y2="25" stroke="currentColor" strokeWidth="2.5" /><line x1="20" y1="25" x2="20" y2="45" stroke="currentColor" strokeWidth="2.5" /><line x1="60" y1="25" x2="60" y2="45" stroke="currentColor" strokeWidth="2.5" /></svg>
+                ),
+              },
+            ].map((item) => (
+              <div key={item.label} className="flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-5 aspect-square text-foreground">
+                {item.svg}
+                <p className="text-xs text-center text-muted-foreground font-medium leading-tight">{item.label}</p>
+              </div>
+            ))}
+          </div>
+
+          <h3 className="!text-base !mt-10 !mb-3 uppercase tracking-wider !text-muted-foreground !font-semibold">Liens émotionnels</h3>
+          <div className="not-prose grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {[
+              {
+                label: 'Fusionnel',
+                svg: (
+                  <svg viewBox="0 0 80 30" className="w-20 h-8"><line x1="5" y1="11" x2="75" y2="11" stroke="hsl(var(--primary))" strokeWidth="2" /><line x1="5" y1="15" x2="75" y2="15" stroke="hsl(var(--primary))" strokeWidth="2" /><line x1="5" y1="19" x2="75" y2="19" stroke="hsl(var(--primary))" strokeWidth="2" /></svg>
+                ),
+              },
+              {
+                label: 'Conflictuel',
+                svg: (
+                  <svg viewBox="0 0 80 30" className="w-20 h-8"><polyline points="5,15 12,8 19,22 26,8 33,22 40,8 47,22 54,8 61,22 68,8 75,15" fill="none" stroke="#dc2626" strokeWidth="2" /></svg>
+                ),
+              },
+              {
+                label: 'Distant',
+                svg: (
+                  <svg viewBox="0 0 80 30" className="w-20 h-8"><line x1="5" y1="15" x2="75" y2="15" stroke="currentColor" strokeWidth="2.5" strokeDasharray="4 4" /></svg>
+                ),
+              },
+              {
+                label: 'Rupture',
+                svg: (
+                  <svg viewBox="0 0 80 30" className="w-20 h-8"><line x1="5" y1="15" x2="32" y2="15" stroke="currentColor" strokeWidth="2.5" /><line x1="48" y1="15" x2="75" y2="15" stroke="currentColor" strokeWidth="2.5" /><line x1="34" y1="6" x2="40" y2="24" stroke="currentColor" strokeWidth="2.5" /><line x1="40" y1="6" x2="46" y2="24" stroke="currentColor" strokeWidth="2.5" /></svg>
+                ),
+              },
+              {
+                label: 'Ambivalent',
+                svg: (
+                  <svg viewBox="0 0 80 30" className="w-20 h-8"><line x1="5" y1="11" x2="75" y2="11" stroke="hsl(var(--primary))" strokeWidth="2" /><polyline points="5,19 12,14 19,24 26,14 33,24 40,14 47,24 54,14 61,24 68,14 75,19" fill="none" stroke="#dc2626" strokeWidth="2" /></svg>
+                ),
+              },
+              {
+                label: 'Violences',
+                svg: (
+                  <svg viewBox="0 0 80 30" className="w-20 h-8"><line x1="5" y1="15" x2="75" y2="15" stroke="#dc2626" strokeWidth="2.5" /><polygon points="62,6 75,15 62,24 65,15" fill="#dc2626" /></svg>
+                ),
+              },
+            ].map((item) => (
+              <div key={item.label} className="flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card p-5 aspect-square text-foreground">
+                {item.svg}
+                <p className="text-xs text-center text-muted-foreground font-medium leading-tight">{item.label}</p>
+              </div>
+            ))}
+          </div>
+
 
           <figure className="not-prose my-10 rounded-2xl overflow-hidden border border-border shadow-sm bg-card">
             <img
