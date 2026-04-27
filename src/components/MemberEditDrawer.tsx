@@ -1056,6 +1056,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     })
                 )}
               </div>
+              </>)}
 
               <Separator className="opacity-50" />
 
