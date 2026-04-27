@@ -112,13 +112,14 @@ const TraumaTagInput: React.FC<TraumaTagInputProps> = ({
             return (
               <span
                 key={v}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium text-foreground"
+                title={v}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium text-foreground max-w-[220px]"
                 style={{
                   backgroundColor: `${color}1A`,
                   border: `1px solid ${color}4D`,
                 }}
               >
-                {v}
+                <span className="truncate">{v}</span>
                 <button
                   type="button"
                   onClick={() => removeValue(v)}
