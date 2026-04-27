@@ -18,6 +18,7 @@ import ContextualTutorial from '@/components/ContextualTutorial';
 import { useContextualTutorial } from '@/hooks/useContextualTutorial';
 import UnionEditDrawer from '@/components/UnionEditDrawer';
 import MemberEditDrawer from '@/components/MemberEditDrawer';
+import ImmigrationNotesDrawer from '@/components/ImmigrationNotesDrawer';
 import { RelationshipChoice } from '@/components/CreateMemberDropdown';
 import type { DisabledOptions } from '@/components/CreateMemberDropdown';
 import ParentPicker from '@/components/ParentPicker';
@@ -815,6 +816,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
 
   // ─── New member state ───
   const [editingNewMember, setEditingNewMember] = useState<FamilyMember | null>(null);
+  const [immigrationMemberId, setImmigrationMemberId] = useState<string | null>(null);
   const [newMemberDrawerOpen, setNewMemberDrawerOpen] = useState(false);
   const [lastCreatedSibling, setLastCreatedSibling] = useState<FamilyMember | null>(null);
   const contextualTutorial = useContextualTutorial(
@@ -1835,7 +1837,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 )}
               </svg>
             )}
-            <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} onDeleteUnion={(id) => { recordSnapshot(); setUnions(prev => prev.filter(u => u.id !== id)); }} searchMatchedUnionIds={search.matchedUnionIds} isSearchActive={search.isActive} highlightedUnionStatus={highlightedUnionStatus} onImmigrationClick={(memberId) => { const m = members.find(mm => mm.id === memberId); if (m) { setEditingNewMember(m); setDrawerEditing(false); setNewMemberDrawerOpen(true); } }} />
+            <FamilyLinkLines members={members} unions={unions} onEditUnion={(id) => setEditingUnionId(id)} onDeleteUnion={(id) => { recordSnapshot(); setUnions(prev => prev.filter(u => u.id !== id)); }} searchMatchedUnionIds={search.matchedUnionIds} isSearchActive={search.isActive} highlightedUnionStatus={highlightedUnionStatus} onImmigrationClick={(memberId) => setImmigrationMemberId(memberId)} />
             {/* All children go through unions now */}
             <svg className="absolute pointer-events-none" style={{ zIndex: 50, overflow: 'visible', top: 0, left: 0, width: 1, height: 1, opacity: presentationMode ? 1 : (search.isActive && search.matchedEmotionalLinkIds.size === 0) ? 0.5 : 1, transition: 'opacity 0.3s' }}>
               {/* Over-card transparency mask: full opacity in void, reduced over cards & union badges */}
@@ -2191,6 +2193,16 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
               setMembers(prev => prev.map(m => m.id === updated.id ? { ...updated, age } : m));
             }}
             genogramId={genogramId}
+          />
+
+          <ImmigrationNotesDrawer
+            member={immigrationMemberId ? (members.find(m => m.id === immigrationMemberId) ?? null) : null}
+            open={!!immigrationMemberId}
+            onClose={() => setImmigrationMemberId(null)}
+            onSave={(memberId, notes) => {
+              recordSnapshot();
+              setMembers(prev => prev.map(m => m.id === memberId ? { ...m, immigrationNotes: notes || undefined } : m));
+            }}
           />
 
           <FloatingControls
