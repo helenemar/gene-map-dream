@@ -104,6 +104,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [hasTrauma, setHasTrauma] = useState(false);
   const [traumaNotes, setTraumaNotes] = useState('');
   const [traumas, setTraumas] = useState<string[]>([]);
+  const [isUnknown, setIsUnknown] = useState(false);
 
   const [birthYearUnsure, setBirthYearUnsure] = useState(false);
   const [deathYearUnsure, setDeathYearUnsure] = useState(false);
@@ -163,6 +164,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setHasTrauma(!!member.hasTrauma);
       setTraumaNotes(member.traumaNotes || '');
       setTraumas(member.traumas || []);
+      setIsUnknown(!!member.isUnknown);
     }
   }, [member]);
 
@@ -178,6 +180,39 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
   const buildMember = useCallback((): FamilyMember | null => {
     if (!member) return null;
+    if (isUnknown && !member.isIndexPatient) {
+      return {
+        ...member,
+        firstName: '',
+        lastName: '',
+        birthName: undefined,
+        birthYear: 0,
+        birthYearUnsure: undefined,
+        deathYear: undefined,
+        deathYearUnsure: undefined,
+        age: 0,
+        profession: '',
+        isRetired: undefined,
+        gender,
+        isGay: false,
+        isBisexual: false,
+        isTransgender: false,
+        genderIdentity: 'cisgender',
+        genderIdentityCustom: undefined,
+        sexualOrientation: 'heterosexual',
+        sexualOrientationCustom: undefined,
+        pathologies: [],
+        twinGroup: undefined,
+        twinType: undefined,
+        notes: undefined,
+        avatar: undefined,
+        hasTrauma: undefined,
+        traumaNotes: undefined,
+        traumas: undefined,
+        isUnknown: true,
+        isDraft: false,
+      };
+    }
     return {
       ...member,
       firstName: firstName || '',
@@ -207,16 +242,17 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       hasTrauma: hasTrauma || undefined,
       traumaNotes: hasTrauma && traumaNotes ? traumaNotes : undefined,
       traumas: hasTrauma && traumas.length > 0 ? traumas : undefined,
+      isUnknown: undefined,
       isDraft: false,
     };
-  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, currentYear]);
+  }, [member, isUnknown, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, currentYear]);
 
   useEffect(() => {
     if (open && member && onLiveUpdate) {
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas]);
+  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, isUnknown]);
 
   if (!member) return null;
 
@@ -389,6 +425,24 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
         <ScrollArea className="flex-1 px-3">
           {isEditing ? (
             <div className="flex flex-col gap-5 py-4 px-3">
+              {/* ── Unknown member toggle ── */}
+              {!member.isIndexPatient && (
+                <label className="flex items-start gap-2.5 p-3 rounded-lg border border-border/60 bg-accent/20 cursor-pointer hover:bg-accent/30 transition-colors">
+                  <Checkbox
+                    checked={isUnknown}
+                    onCheckedChange={(v) => setIsUnknown(v === true)}
+                    className="mt-0.5"
+                  />
+                  <span className="flex flex-col gap-0.5">
+                    <span className="text-sm font-medium text-foreground">Membre inconnu</span>
+                    <span className="text-[11px] text-muted-foreground leading-snug">
+                      Cocher si l'identité de ce membre n'est pas connue. Aucun champ ne sera requis.
+                    </span>
+                  </span>
+                </label>
+              )}
+
+              {!isUnknown && (<>
               {/* ── Photo ── */}
               <div className="flex flex-col gap-1">
                 <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
@@ -1002,6 +1056,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                     })
                 )}
               </div>
+              </>)}
 
               <Separator className="opacity-50" />
 

@@ -57,6 +57,8 @@ export interface FamilyMember {
   locked?: boolean;
   /** Index patient (proposant) — rendered with double border */
   isIndexPatient?: boolean;
+  /** Unknown member — identity is undisclosed; renders as '?' with no details */
+  isUnknown?: boolean;
   /** Trauma indicator — renders a small red lightning bolt on the symbol */
   hasTrauma?: boolean;
   /** Free-text description of the traumatic event(s) experienced */
