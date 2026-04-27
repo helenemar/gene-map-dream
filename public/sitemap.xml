@@ -180,4 +180,34 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://www.genogy-app.com/blog/genogramme-professionnels-justice</loc>
+    <lastmod>2026-04-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.genogy-app.com/blog/genogramme-professionnels-justice"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.genogy-app.com/blog/genogram-justice-professionals"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.genogy-app.com/blog/genogramm-justizfachkraefte"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.genogy-app.com/blog/genogramme-professionnels-justice"/>
+  </url>
+  <url>
+    <loc>https://www.genogy-app.com/blog/genogram-justice-professionals</loc>
+    <lastmod>2026-04-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.genogy-app.com/blog/genogramme-professionnels-justice"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.genogy-app.com/blog/genogram-justice-professionals"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.genogy-app.com/blog/genogramm-justizfachkraefte"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.genogy-app.com/blog/genogramme-professionnels-justice"/>
+  </url>
+  <url>
+    <loc>https://www.genogy-app.com/blog/genogramm-justizfachkraefte</loc>
+    <lastmod>2026-04-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://www.genogy-app.com/blog/genogramme-professionnels-justice"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.genogy-app.com/blog/genogram-justice-professionals"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://www.genogy-app.com/blog/genogramm-justizfachkraefte"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.genogy-app.com/blog/genogramme-professionnels-justice"/>
+  </url>
 </urlset>
