@@ -6,6 +6,7 @@ import LandingHeader from '@/components/landing/LandingHeader';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AuthModal from '@/components/AuthModal';
+import SeoLinks from '@/components/SeoLinks';
 
 const GenogramDefinition: React.FC = () => {
   const { t } = useLanguage();
@@ -17,15 +18,10 @@ const GenogramDefinition: React.FC = () => {
     <div className="min-h-screen bg-page-bg text-foreground">
       <Helmet>
         <title>Qu'est-ce qu'un génogramme ? Définition, symboles et exemples | Genogy</title>
-        <meta name="description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
-        <link rel="canonical" href="https://www.genogy-app.com/" />
-        <link rel="alternate" hrefLang="fr" href="https://www.genogy-app.com/" />
-        <link rel="alternate" hrefLang="en" href="https://www.genogy-app.com/en" />
-        <link rel="alternate" hrefLang="de" href="https://www.genogy-app.com/de" />
-        <link rel="alternate" hrefLang="x-default" href="https://www.genogy-app.com/" />
-        <meta property="og:title" content="Genogy — outil pour créer des génogrammes cliniques professionnels" />
-        <meta property="og:description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
-        <meta property="og:url" content="https://www.genogy-app.com/" />
+        <meta name="description" content="Définition complète du génogramme : symboles McGoldrick, différences avec l'arbre généalogique, usages cliniques en psychologie et travail social." />
+        <meta property="og:title" content="Qu'est-ce qu'un génogramme ? Définition, symboles et exemples | Genogy" />
+        <meta property="og:description" content="Définition complète du génogramme : symboles McGoldrick, différences avec l'arbre généalogique, usages cliniques." />
+        <meta property="og:url" content="https://www.genogy-app.com/genogramme" />
         <meta property="og:image" content="https://www.genogy-app.com/og-image.webp" />
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',
@@ -39,6 +35,7 @@ const GenogramDefinition: React.FC = () => {
           mainEntityOfPage: 'https://www.genogy-app.com/genogramme',
         })}</script>
       </Helmet>
+      <SeoLinks pageKey="whatIs" locale="fr" />
 
       <LandingHeader onAuth={openAuth} />
 

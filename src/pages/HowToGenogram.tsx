@@ -6,6 +6,7 @@ import LandingHeader from '@/components/landing/LandingHeader';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AuthModal from '@/components/AuthModal';
+import SeoLinks from '@/components/SeoLinks';
 import heroComposition from '@/assets/hero-mockup-composition.webp';
 import { motion } from 'framer-motion';
 import { UserPlus, GitBranch, Share2, Heart, Stethoscope, FileDown, MousePointerClick, Users, Lightbulb, CheckCircle2, ArrowRight, BookOpen } from 'lucide-react';
@@ -32,14 +33,9 @@ const HowToGenogram: React.FC = () => {
       <Helmet>
         <title>{h.metaTitle}</title>
         <meta name="description" content={h.metaDesc} />
-        <link rel="canonical" href="https://www.genogy-app.com/" />
-        <link rel="alternate" hrefLang="fr" href="https://www.genogy-app.com/" />
-        <link rel="alternate" hrefLang="en" href="https://www.genogy-app.com/en" />
-        <link rel="alternate" hrefLang="de" href="https://www.genogy-app.com/de" />
-        <link rel="alternate" hrefLang="x-default" href="https://www.genogy-app.com/" />
-        <meta property="og:title" content="Genogy — outil pour créer des génogrammes cliniques professionnels" />
-        <meta property="og:description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
-        <meta property="og:url" content="https://www.genogy-app.com/" />
+        <meta property="og:title" content={h.metaTitle} />
+        <meta property="og:description" content={h.metaDesc} />
+        <meta property="og:url" content="https://www.genogy-app.com/comment-faire-un-genogramme" />
         <meta property="og:image" content="https://www.genogy-app.com/og-image.webp" />
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',
@@ -55,6 +51,7 @@ const HowToGenogram: React.FC = () => {
           })),
         })}</script>
       </Helmet>
+      <SeoLinks pageKey="howTo" locale="fr" />
 
       <LandingHeader onAuth={openAuth} />
 

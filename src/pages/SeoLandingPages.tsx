@@ -5,6 +5,14 @@ import { ArrowRight, BookOpen, Brain, BriefcaseBusiness, CheckCircle2, GitFork, 
 import { Button } from '@/components/ui/button';
 import LandingHeader from '@/components/landing/LandingHeader';
 import Footer from '@/components/Footer';
+import SeoLinks from '@/components/SeoLinks';
+import { PAGE_ALTERNATES, type PageKey as SeoPageKey } from '@/lib/hreflang';
+
+// Map FR canonical paths used by SeoShell to a hreflang group key
+const FR_PATH_TO_PAGE_KEY = Object.entries(PAGE_ALTERNATES).reduce<Record<string, SeoPageKey>>((acc, [key, alts]) => {
+  if (alts.fr) acc[alts.fr] = key as SeoPageKey;
+  return acc;
+}, {});
 
 const AuthModal = lazy(() => import('@/components/AuthModal'));
 
@@ -87,13 +95,15 @@ const SeoShell: React.FC<{
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={metaDescription} />
-        <link rel="canonical" href={canonical} />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={metaDescription} />
         <meta property="og:url" content={canonical} />
         <meta property="og:image" content={imageUrl} />
         <meta property="og:type" content="article" />
       </Helmet>
+      {FR_PATH_TO_PAGE_KEY[canonicalPath] && (
+        <SeoLinks pageKey={FR_PATH_TO_PAGE_KEY[canonicalPath]} locale="fr" />
+      )}
       <LandingHeader onAuth={(view) => setAuthModal({ open: true, view })} />
       {children}
       <Footer />

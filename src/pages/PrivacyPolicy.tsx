@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import gogyIcon from '@/assets/genogy-icon.webp';
 import Footer from '@/components/Footer';
+import SeoLinks from '@/components/SeoLinks';
 
 const SECTIONS = [
   {
@@ -71,17 +72,14 @@ const PrivacyPolicy: React.FC = () => {
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Helmet>
         <title>Politique de confidentialité — Genogy</title>
-        <meta name="description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
-        <link rel="canonical" href="https://www.genogy-app.com/" />
-        <link rel="alternate" hrefLang="fr" href="https://www.genogy-app.com/" />
-        <link rel="alternate" hrefLang="en" href="https://www.genogy-app.com/en" />
-        <link rel="alternate" hrefLang="de" href="https://www.genogy-app.com/de" />
-        <link rel="alternate" hrefLang="x-default" href="https://www.genogy-app.com/" />
-        <meta property="og:title" content="Genogy — outil pour créer des génogrammes cliniques professionnels" />
-        <meta property="og:description" content="Genogy est l'outil en ligne pour créer des génogrammes cliniques professionnels. Conçu pour psychologues, thérapeutes et travailleurs sociaux. Gratuit en bêta." />
-        <meta property="og:url" content="https://www.genogy-app.com/" />
+        <meta name="description" content="Politique de confidentialité de Genogy : données collectées, conservation, droits RGPD et contact du responsable du traitement." />
+        <meta name="robots" content="index,follow" />
+        <meta property="og:title" content="Politique de confidentialité — Genogy" />
+        <meta property="og:description" content="Politique de confidentialité de Genogy : données collectées, conservation, droits RGPD et contact." />
+        <meta property="og:url" content="https://www.genogy-app.com/privacy" />
         <meta property="og:image" content="https://www.genogy-app.com/og-image.webp" />
       </Helmet>
+      <SeoLinks pageKey="privacy" locale="fr" />
 
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
