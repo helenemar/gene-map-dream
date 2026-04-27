@@ -212,7 +212,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar]);
+  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes]);
 
   if (!member) return null;
 
