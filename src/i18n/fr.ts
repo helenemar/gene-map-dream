@@ -556,6 +556,7 @@ export const fr: Translations = {
     learnMore: 'En savoir plus',
   },
   emotionalLinkDescriptions: {
+    close: 'Relation proche',
     fusional: 'Relation très proche, symbiose',
     distant: 'Éloignement émotionnel',
     conflictual: 'Relation conflictuelle',
