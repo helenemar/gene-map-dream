@@ -17,6 +17,7 @@ interface FamilyLinkLinesProps {
   isSearchActive?: boolean;
   highlightedUnionStatus?: UnionStatus | null;
   variant?: 'default' | 'shared';
+  onImmigrationClick?: (memberId: string) => void;
 }
 
 const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') => {
@@ -112,7 +113,7 @@ function buildAvoidingVerticalPath(
   return d;
 }
 
-const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, onDeleteUnion, searchMatchedUnionIds, isSearchActive, highlightedUnionStatus, variant = 'default' }) => {
+const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, onDeleteUnion, searchMatchedUnionIds, isSearchActive, highlightedUnionStatus, variant = 'default', onImmigrationClick }) => {
   const [hoveredUnionId, setHoveredUnionId] = useState<string | null>(null);
   const getMember = (id: string) => members.find(m => m.id === id);
 
@@ -618,11 +619,24 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
           const w = 18; // half-width of wave
           const wave = (yOffset: number) =>
             `M ${cx - w} ${topY - yOffset} Q ${cx - w / 2} ${topY - yOffset - 6}, ${cx} ${topY - yOffset} T ${cx + w} ${topY - yOffset}`;
+          const clickable = !!onImmigrationClick;
           return (
-            <g key={`immig-${m.id}`} aria-label="Immigration">
+            <g
+              key={`immig-${m.id}`}
+              aria-label="Immigration"
+              style={clickable ? { pointerEvents: 'auto', cursor: 'pointer' } : undefined}
+              onClick={clickable ? (e) => { e.stopPropagation(); onImmigrationClick!(m.id); } : undefined}
+            >
               <title>Immigration{m.immigrationNotes ? ` — ${m.immigrationNotes}` : ''}</title>
               <path d={wave(28)} fill="none" stroke={waveColor} strokeWidth={1.75} strokeOpacity={waveOpacity} strokeLinecap="round" />
               <path d={wave(38)} fill="none" stroke={waveColor} strokeWidth={1.75} strokeOpacity={waveOpacity} strokeLinecap="round" />
+              {clickable && (
+                <rect
+                  x={cx - w - 6} y={topY - 44}
+                  width={(w + 6) * 2} height={24}
+                  fill="transparent"
+                />
+              )}
             </g>
           );
         })}
