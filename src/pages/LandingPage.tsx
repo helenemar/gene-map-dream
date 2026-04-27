@@ -13,6 +13,7 @@ import AudienceSection from '@/components/landing/AudienceSection';
 import FaqSection from '@/components/landing/FaqSection';
 import CtaSection from '@/components/landing/CtaSection';
 import Footer from '@/components/Footer';
+import SeoLinks from '@/components/SeoLinks';
 
 const AuthModal = lazy(() => import('@/components/AuthModal'));
 
@@ -149,14 +150,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
   return (
     <div className="min-h-screen bg-page-bg text-foreground">
       <Helmet>
+        <html lang={forceLang ?? 'fr'} />
         <title>{t.landing.metaTitle}</title>
         <meta name="description" content={t.landing.metaDesc} />
         <meta name="keywords" content="génogramme, génogramme en ligne, faire un génogramme, comment faire un génogramme, outil génogramme, génogramme site web, génogramme psychologie, arbre familial émotionnel, genogram online" />
-        <link rel="canonical" href={pageUrl} />
-        <link rel="alternate" hrefLang="fr" href="https://www.genogy-app.com/" />
-        <link rel="alternate" hrefLang="en" href="https://www.genogy-app.com/en" />
-        <link rel="alternate" hrefLang="de" href="https://www.genogy-app.com/de" />
-        <link rel="alternate" hrefLang="x-default" href="https://www.genogy-app.com/" />
         <meta property="og:title" content={t.landing.metaTitle} />
         <meta property="og:description" content={t.landing.metaDesc} />
         <meta property="og:url" content={pageUrl} />
@@ -167,6 +164,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(howToJsonLd)}</script>
       </Helmet>
+      <SeoLinks pageKey="home" locale={forceLang ?? 'fr'} />
 
       <LandingHeader onAuth={openAuth} />
       <HeroSection onAuth={openAuth} />
