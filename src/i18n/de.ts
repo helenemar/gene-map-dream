@@ -531,6 +531,7 @@ export const de: Translations = {
 
   // ── Emotional Link Types ──
   emotionalLinkTypes: {
+    close: 'Nah',
     fusional: 'Fusionell',
     distant: 'Distanziert',
     conflictual: 'Konflikthaft',
@@ -550,6 +551,7 @@ export const de: Translations = {
     learnMore: 'Mehr erfahren',
   },
   emotionalLinkDescriptions: {
+    close: 'Nahe Beziehung',
     fusional: 'Sehr enge Beziehung, Symbiose',
     distant: 'Emotionale Distanz',
     conflictual: 'Konflikthafte Beziehung',

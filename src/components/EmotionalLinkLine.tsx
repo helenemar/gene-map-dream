@@ -265,6 +265,8 @@ const EmotionalLinkLine: React.FC<EmotionalLinkLineProps> = ({
 
   const renderLine = () => {
     switch (type) {
+      case 'close':
+        return <path d={mainPath} fill="none" stroke="hsl(var(--link-fusional))" strokeWidth={2} />;
       case 'fusional':
         return (
           <>
@@ -496,6 +498,8 @@ const EmotionalLinkLineStatic: React.FC<{
   const sw = 2 * strokeScale;
 
   switch (type) {
+    case 'close':
+      return <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="hsl(var(--link-fusional))" strokeWidth={sw} />;
     case 'fusional': {
       const l1 = parallelLine(x1, y1, x2, y2, 2);
       const l2 = parallelLine(x1, y1, x2, y2, -2);

@@ -158,6 +158,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
   };
 
   const emotionalLinkLabels: Record<string, string> = {
+    close: t.emotionalLinkTypes.close,
     fusional: t.emotionalLinkTypes.fusional,
     distant: t.emotionalLinkTypes.distant,
     conflictual: t.emotionalLinkTypes.conflictual,
@@ -182,7 +183,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
   ];
 
   const EMOTIONAL_LINK_IDS: EmotionalLinkType[] = [
-    'fusional', 'distant', 'conflictual', 'ambivalent', 'cutoff',
+    'close', 'fusional', 'distant', 'conflictual', 'ambivalent', 'cutoff',
     'violence', 'emotional_abuse', 'physical_violence', 'sexual_abuse', 'neglect', 'controlling',
   ];
 
