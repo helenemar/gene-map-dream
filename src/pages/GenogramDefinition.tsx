@@ -147,6 +147,8 @@ const GenogramDefinition: React.FC = () => {
               Fiche membre clinique : identité, dates, pathologies et liens émotionnels.
             </figcaption>
           </figure>
+
+          <h2>Comment créer un génogramme en ligne ?</h2>
           <p>
             Avec <strong>Genogy</strong>, créer un génogramme en ligne est simple et rapide :
           </p>
