@@ -551,6 +551,7 @@ export const en: Translations = {
     learnMore: 'Learn more',
   },
   emotionalLinkDescriptions: {
+    close: 'Close relationship',
     fusional: 'Very close relationship, symbiosis',
     distant: 'Emotional distance',
     conflictual: 'Conflictual relationship',
