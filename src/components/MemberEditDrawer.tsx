@@ -731,16 +731,28 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                   />
                 </label>
                 {hasTrauma && (
-                  <div className="flex flex-col gap-1.5 p-3 rounded-lg bg-accent/30 border border-border/50">
-                    <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-                      Description (optionnel)
-                    </Label>
-                    <Textarea
-                      className="text-sm border-border/50 bg-card focus-visible:ring-primary/30 min-h-[80px] resize-y"
-                      placeholder="Nature, contexte, période de l'événement traumatogène..."
-                      value={traumaNotes}
-                      onChange={(e) => setTraumaNotes(e.target.value)}
-                    />
+                  <div className="flex flex-col gap-3 p-3 rounded-lg bg-accent/30 border border-border/50">
+                    <div className="flex flex-col gap-1.5">
+                      <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                        Type d'événement(s)
+                      </Label>
+                      <TraumaTagInput
+                        values={traumas}
+                        onChange={setTraumas}
+                        placeholder="Rechercher ou créer (ex: Deuil, Accident…)"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                        Description (optionnel)
+                      </Label>
+                      <Textarea
+                        className="text-sm border-border/50 bg-card focus-visible:ring-primary/30 min-h-[80px] resize-y"
+                        placeholder="Contexte, période, circonstances…"
+                        value={traumaNotes}
+                        onChange={(e) => setTraumaNotes(e.target.value)}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
