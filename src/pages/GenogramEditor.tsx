@@ -1192,17 +1192,58 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
       setUnions(prev => [...prev, newUnion]);
     }
 
-    // For sibling: find union where source is a child, add new member as sibling
+    // For sibling: find union where source is a child, add new member as sibling.
+    // If source has no parents yet, create a placeholder parent union so the
+    // sibling is still visually linked to the source.
     if (relationship === 'sibling') {
-      setUnions(prev => {
-        const siblingUnion = prev.find(u => u.children.includes(sourceId));
-        if (siblingUnion) {
-          return prev.map(u =>
-            u.id === siblingUnion.id ? { ...u, children: [...u.children, newMember.id] } : u
-          );
+      const existingSiblingUnion = unions.find(u => u.children.includes(sourceId));
+      if (existingSiblingUnion) {
+        // Position sibling next to source under the same union
+        const SIB_GAP = 40;
+        if (source) {
+          newMember.x = source.x + CARD_W + SIB_GAP;
+          newMember.y = source.y;
         }
-        return prev;
-      });
+        setUnions(prev => prev.map(u =>
+          u.id === existingSiblingUnion.id ? { ...u, children: [...u.children, newMember.id] } : u
+        ));
+      } else if (source) {
+        // Create two placeholder parents above the source and a union linking everyone
+        const SPOUSE_GAP = CARD_W + 120;
+        const LEVEL_Y = 250;
+        const SIB_GAP = 40;
+        const parentY = source.y - LEVEL_Y;
+        const parent1: FamilyMember = {
+          id: `m-ph-${Date.now()}-1`,
+          firstName: '', lastName: '', birthYear: 0, age: 0, profession: '',
+          gender: 'male',
+          x: source.x - SPOUSE_GAP / 2,
+          y: parentY,
+          pathologies: [],
+          isPlaceholder: true,
+        };
+        const parent2: FamilyMember = {
+          id: `m-ph-${Date.now()}-2`,
+          firstName: '', lastName: '', birthYear: 0, age: 0, profession: '',
+          gender: 'female',
+          x: source.x + SPOUSE_GAP / 2,
+          y: parentY,
+          pathologies: [],
+          isPlaceholder: true,
+        };
+        // Place sibling next to source
+        newMember.x = source.x + CARD_W + SIB_GAP;
+        newMember.y = source.y;
+        const newParentUnion: Union = {
+          id: `u-${Date.now()}`,
+          partner1: parent1.id,
+          partner2: parent2.id,
+          status: 'love_affair',
+          children: [sourceId, newMember.id],
+        };
+        setMembers(prev => [...prev, parent1, parent2]);
+        setUnions(prev => [...prev, newParentUnion]);
+      }
     }
 
     // For parent / parent_bio / parent_adoptive: duo-parenting with guard clauses
