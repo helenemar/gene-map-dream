@@ -290,9 +290,45 @@ const MemberCard: React.FC<MemberCardProps> = ({
               isIndexPatient={member.isIndexPatient}
             />
           )}
-        </div>
 
-        {/* Info block */}
+          {/* Trauma indicator — red lightning bolt at top-right of symbol */}
+          {member.hasTrauma && !isPlaceholder && !isDraft && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  onClick={(e) => e.stopPropagation()}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  data-trauma-badge="true"
+                  aria-label="Trauma"
+                  title="Trauma"
+                  className="absolute z-10 flex items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-[#E24B4A]/30 hover:scale-110 active:scale-95 transition-transform"
+                  style={{ top: -6, right: -6, width: 18, height: 18 }}
+                >
+                  <Zap className="w-3.5 h-3.5" style={{ color: '#E24B4A', fill: '#E24B4A' }} strokeWidth={1.5} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                side="top"
+                align="center"
+                className="w-auto p-2"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4" style={{ color: '#E24B4A', fill: '#E24B4A' }} strokeWidth={1.5} />
+                  <span className="text-sm font-medium text-foreground">Trauma</span>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); onToggleTrauma?.(member.id); }}
+                    className="ml-2 px-2 py-1 text-xs rounded-md text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    Retirer
+                  </button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+        </div>
         <div className="min-w-0 flex-1">
           {isPlaceholder ? (
             <div className="flex flex-col gap-0.5">
