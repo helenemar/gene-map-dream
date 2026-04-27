@@ -169,7 +169,7 @@ const buildBreadcrumb = (page: LocalizedPage, lang: Lang) => ({
   ],
 });
 
-const LocalizedShell: React.FC<{ page: LocalizedPage; lang: Lang; children: React.ReactNode }> = ({ page, lang, children }) => {
+const LocalizedShell: React.FC<{ page: LocalizedPage; lang: Lang; pageKey: PageKey; children: React.ReactNode }> = ({ page, lang, pageKey, children }) => {
   const { setLang } = useLanguage();
   const [authModal, setAuthModal] = useState<{ open: boolean; view: AuthView }>({ open: false, view: 'login' });
   const locale = lang === 'en' ? 'en_US' : 'de_DE';
@@ -185,7 +185,6 @@ const LocalizedShell: React.FC<{ page: LocalizedPage; lang: Lang; children: Reac
         <html lang={lang} />
         <title>{page.title}</title>
         <meta name="description" content={page.description} />
-        <link rel="canonical" href={pageUrl} />
         <meta property="og:title" content={page.title} />
         <meta property="og:description" content={page.description} />
         <meta property="og:url" content={pageUrl} />
@@ -194,6 +193,7 @@ const LocalizedShell: React.FC<{ page: LocalizedPage; lang: Lang; children: Reac
         <script type="application/ld+json">{JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebPage', '@id': `${pageUrl}#webpage`, url: pageUrl, name: page.title, description: page.description, inLanguage: lang === 'en' ? 'en-US' : 'de-DE', breadcrumb: { '@id': `${pageUrl}#breadcrumb` }, isPartOf: { '@type': 'WebSite', '@id': `${baseUrl}/#website`, name: 'Genogy', url: `${baseUrl}/` } })}</script>
         <script type="application/ld+json">{JSON.stringify(buildBreadcrumb(page, lang))}</script>
       </Helmet>
+      <SeoLinks pageKey={pageKey as SeoPageKey} locale={lang} />
       <LandingHeader onAuth={(view) => setAuthModal({ open: true, view })} />
       {children}
       <Footer />
@@ -218,7 +218,7 @@ const LocalizedPageView: React.FC<{ lang: Lang; pageKey: PageKey }> = ({ lang, p
   const resources = resourcesByLang[lang];
 
   return (
-    <LocalizedShell page={page} lang={lang}>
+    <LocalizedShell page={page} lang={lang} pageKey={pageKey}>
       <Hero page={page} icon={iconByKey[pageKey]} />
       <main className="mx-auto max-w-5xl px-6 py-14">
         {isResources ? (
