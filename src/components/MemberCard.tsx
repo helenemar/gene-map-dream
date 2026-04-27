@@ -461,7 +461,9 @@ const MemberCard: React.FC<MemberCardProps> = ({
     return <div className="relative inline-block">{cardContent}</div>;
   }
 
-  return (
+  const canToggleTrauma = !isPlaceholder && !isDraft && !isPerinatal && !presentationMode && !!onToggleTrauma;
+
+  const motionNode = (
     <motion.div
       data-member-card={member.id}
       className="absolute select-none"
@@ -501,6 +503,20 @@ const MemberCard: React.FC<MemberCardProps> = ({
     >
       {cardContent}
     </motion.div>
+  );
+
+  if (!canToggleTrauma) return motionNode;
+
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger asChild>{motionNode}</ContextMenuTrigger>
+      <ContextMenuContent className="w-56">
+        <ContextMenuItem onClick={() => onToggleTrauma?.(member.id)}>
+          <Zap className="w-4 h-4 mr-2" style={{ color: '#E24B4A', fill: '#E24B4A' }} strokeWidth={1.5} />
+          {member.hasTrauma ? 'Retirer l\u2019indicateur de trauma' : 'Ajouter un indicateur de trauma'}
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 };
 
