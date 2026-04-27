@@ -161,6 +161,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setIsStillborn(member.perinatalType === 'stillborn');
       setHasTrauma(!!member.hasTrauma);
       setTraumaNotes(member.traumaNotes || '');
+      setTraumas(member.traumas || []);
     }
   }, [member]);
 
