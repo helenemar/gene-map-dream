@@ -152,18 +152,19 @@ const TraumaTagInput: React.FC<TraumaTagInputProps> = ({
               <button
                 key={s.label}
                 type="button"
+                title={s.label}
                 onMouseDown={(e) => { e.preventDefault(); handleSelect(i); }}
                 onMouseEnter={() => setHighlight(i)}
                 className={`w-full px-3 py-1.5 text-left text-sm flex items-center justify-between gap-2 transition-colors ${
                   highlight === i ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50 text-foreground'
                 }`}
               >
-                <span className="truncate flex items-center gap-2">
+                <span className="truncate flex items-center gap-2 min-w-0">
                   <span
                     className="w-1.5 h-1.5 rounded-full shrink-0"
                     style={{ backgroundColor: color }}
                   />
-                  {s.label}
+                  <span className="truncate">{s.label}</span>
                 </span>
                 {s.source === 'user' ? (
                   <span className="text-[10px] uppercase tracking-wider text-muted-foreground/60 shrink-0">
