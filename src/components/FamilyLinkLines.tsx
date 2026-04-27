@@ -113,7 +113,7 @@ function buildAvoidingVerticalPath(
   return d;
 }
 
-const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, onDeleteUnion, searchMatchedUnionIds, isSearchActive, highlightedUnionStatus, variant = 'default' }) => {
+const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEditUnion, onDeleteUnion, searchMatchedUnionIds, isSearchActive, highlightedUnionStatus, variant = 'default', onImmigrationClick }) => {
   const [hoveredUnionId, setHoveredUnionId] = useState<string | null>(null);
   const getMember = (id: string) => members.find(m => m.id === id);
 
