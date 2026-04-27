@@ -148,6 +148,7 @@ export const FAMILY_LINK_TYPES: { id: UnionStatus; label: string; icon: string }
 ];
 
 export const EMOTIONAL_LINK_TYPES: { id: EmotionalLinkType; label: string; color: string; description: string; category: 'relational' | 'abusive' }[] = [
+  { id: 'close', label: 'Proche', color: 'link-fusional', description: 'Relation proche', category: 'relational' },
   { id: 'fusional', label: 'Fusionnel', color: 'link-fusional', description: 'Relation très proche, symbiose', category: 'relational' },
   { id: 'distant', label: 'Distant', color: 'link-distant', description: 'Éloignement émotionnel', category: 'relational' },
   { id: 'conflictual', label: 'Conflit', color: 'link-conflictual', description: 'Relation conflictuelle', category: 'relational' },
