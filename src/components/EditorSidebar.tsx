@@ -183,7 +183,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
   ];
 
   const EMOTIONAL_LINK_IDS: EmotionalLinkType[] = [
-    'fusional', 'distant', 'conflictual', 'ambivalent', 'cutoff',
+    'close', 'fusional', 'distant', 'conflictual', 'ambivalent', 'cutoff',
     'violence', 'emotional_abuse', 'physical_violence', 'sexual_abuse', 'neglect', 'controlling',
   ];
 
