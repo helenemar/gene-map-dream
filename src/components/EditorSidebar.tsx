@@ -158,6 +158,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
   };
 
   const emotionalLinkLabels: Record<string, string> = {
+    close: t.emotionalLinkTypes.close,
     fusional: t.emotionalLinkTypes.fusional,
     distant: t.emotionalLinkTypes.distant,
     conflictual: t.emotionalLinkTypes.conflictual,
