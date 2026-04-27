@@ -200,18 +200,21 @@ export type Database = {
       trauma_catalog: {
         Row: {
           category: string | null
+          category_color: string | null
           created_at: string
           id: string
           label: string
         }
         Insert: {
           category?: string | null
+          category_color?: string | null
           created_at?: string
           id?: string
           label: string
         }
         Update: {
           category?: string | null
+          category_color?: string | null
           created_at?: string
           id?: string
           label?: string
