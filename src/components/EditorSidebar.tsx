@@ -248,6 +248,22 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
           </AccordionContent>
         </AccordionItem>
 
+        {members.some(m => m.hasTrauma) && (
+          <AccordionItem value="trauma" className="border-b border-border">
+            <AccordionTrigger className="px-4 py-3 text-sm font-semibold text-foreground hover:bg-accent/50 hover:no-underline">
+              <span className="flex-1 text-left">Événements traumatogènes</span>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-3">
+              <div className="flex items-center gap-2.5 text-sm">
+                <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                  <Zap className="w-3.5 h-3.5" style={{ color: '#E24B4A', fill: '#E24B4A' }} strokeWidth={1.5} />
+                </div>
+                <span className="text-foreground/80">Trauma</span>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        )}
+
         <AccordionItem value="emotional-links" className="border-b border-border">
           <AccordionTrigger className="px-4 py-3 text-sm font-semibold text-foreground hover:bg-accent/50 hover:no-underline">
             <span className="flex-1 text-left">{t.editor.emotionalLinks}</span>
