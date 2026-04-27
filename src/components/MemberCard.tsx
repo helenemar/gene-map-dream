@@ -480,19 +480,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
     </motion.div>
   );
 
-  if (!canToggleTrauma) return motionNode;
-
-  return (
-    <ContextMenu>
-      <ContextMenuTrigger asChild>{motionNode}</ContextMenuTrigger>
-      <ContextMenuContent className="w-56">
-        <ContextMenuItem onClick={() => onToggleTrauma?.(member.id)}>
-          <Zap className="w-4 h-4 mr-2" style={{ color: '#E24B4A', fill: '#E24B4A' }} strokeWidth={1.5} />
-          {member.hasTrauma ? 'Retirer l\u2019indicateur de trauma' : 'Ajouter un indicateur de trauma'}
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
-  );
+  return motionNode;
 };
 
 export default MemberCard;
