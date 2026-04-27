@@ -23,7 +23,11 @@ Disallow: /serp-preview
 Disallow: /translation-audit
 Disallow: /reset-password
 Disallow: /auth
+Allow: /blog/genogramme-professionnels-justice
+Allow: /blog/genogram-justice-professionals
+Allow: /blog/genogramm-justizfachkraefte
 Disallow: /blog
+Disallow: /blog/
 Disallow: /tree/
 
 Sitemap: https://www.genogy-app.com/sitemap.xml
