@@ -1327,6 +1327,10 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     setMembers(prev => prev.map(m => m.id === id ? { ...m, locked: !m.locked } : m));
   }, []);
 
+  const handleToggleTrauma = useCallback((id: string) => {
+    setMembers(prev => prev.map(m => m.id === id ? { ...m, hasTrauma: !m.hasTrauma } : m));
+  }, []);
+
   const [drawerEditing, setDrawerEditing] = useState(true);
 
   const prevDrawerOpenRef = useRef(false);
