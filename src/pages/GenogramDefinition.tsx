@@ -7,6 +7,9 @@ import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AuthModal from '@/components/AuthModal';
 import SeoLinks from '@/components/SeoLinks';
+import genogramOverview from '@/assets/screens/genogram-overview.png';
+import memberSheet from '@/assets/screens/member-sheet.png';
+import emotionalLinkModal from '@/assets/screens/emotional-link-modal.png';
 
 const GenogramDefinition: React.FC = () => {
   const { t } = useLanguage();
@@ -50,6 +53,18 @@ const GenogramDefinition: React.FC = () => {
           </p>
         </header>
 
+        <figure className="mb-12 rounded-2xl overflow-hidden border border-border shadow-sm bg-card">
+          <img
+            src={genogramOverview}
+            alt="Aperçu d'un génogramme clinique réalisé avec Genogy : trois générations, liens familiaux, pathologies et liens émotionnels"
+            className="w-full h-auto"
+            loading="lazy"
+          />
+          <figcaption className="px-5 py-3 text-sm text-muted-foreground border-t border-border bg-card">
+            Exemple de génogramme clinique sur 3 générations dans l'éditeur Genogy.
+          </figcaption>
+        </figure>
+
         <div className="prose prose-lg max-w-none dark:prose-invert">
           <h2>Définition du génogramme</h2>
           <p>
@@ -81,6 +96,18 @@ const GenogramDefinition: React.FC = () => {
             <li><strong>Lignes coupées</strong> — Rupture relationnelle</li>
           </ul>
 
+          <figure className="not-prose my-10 rounded-2xl overflow-hidden border border-border shadow-sm bg-card">
+            <img
+              src={emotionalLinkModal}
+              alt="Sélecteur de types de liens émotionnels dans Genogy : fusionnel, distant, conflit, ambivalent, lien rompu, violences"
+              className="w-full h-auto"
+              loading="lazy"
+            />
+            <figcaption className="px-5 py-3 text-sm text-muted-foreground border-t border-border bg-card">
+              Catalogue des liens émotionnels (standard McGoldrick) disponibles dans Genogy.
+            </figcaption>
+          </figure>
+
           <h2>Différence entre génogramme et arbre généalogique</h2>
           <table>
             <thead>
@@ -108,6 +135,18 @@ const GenogramDefinition: React.FC = () => {
           <p>
             Le génogramme permet de repérer les <strong>transmissions transgénérationnelles</strong>, qu'elles soient positives (résilience, talents) ou problématiques (violence, addictions, schémas d'abandon).
           </p>
+
+          <figure className="not-prose my-10 rounded-2xl overflow-hidden border border-border shadow-sm bg-card">
+            <img
+              src={memberSheet}
+              alt="Fiche membre détaillée dans Genogy : identité, dates, pathologies, relations de couple et liens émotionnels"
+              className="w-full h-auto"
+              loading="lazy"
+            />
+            <figcaption className="px-5 py-3 text-sm text-muted-foreground border-t border-border bg-card">
+              Fiche membre clinique : identité, dates, pathologies et liens émotionnels.
+            </figcaption>
+          </figure>
 
           <h2>Comment créer un génogramme en ligne ?</h2>
           <p>

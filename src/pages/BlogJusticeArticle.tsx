@@ -7,6 +7,8 @@ import Footer from '@/components/Footer';
 import SeoLinks from '@/components/SeoLinks';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
+import genogramOverview from '@/assets/screens/genogram-overview.png';
+import memberRelations from '@/assets/screens/member-relations.png';
 
 const AuthModal = lazy(() => import('@/components/AuthModal'));
 
@@ -378,8 +380,30 @@ interface Props {
   lang: Lang;
 }
 
+const IMG_LABELS: Record<Lang, { heroAlt: string; heroCaption: string; relAlt: string; relCaption: string }> = {
+  fr: {
+    heroAlt: "Génogramme clinique sur trois générations dans Genogy : liens familiaux, pathologies et liens émotionnels",
+    heroCaption: "Vue d'ensemble d'un génogramme clinique réalisé avec Genogy.",
+    relAlt: "Fiche membre Genogy détaillant les pathologies, relations de couple et liens émotionnels d'un sujet",
+    relCaption: "Synthèse des relations et antécédents d'un membre, exportable au PDF de rapport.",
+  },
+  en: {
+    heroAlt: "Three-generation clinical genogram in Genogy with family links, pathologies and emotional bonds",
+    heroCaption: "Overview of a clinical genogram built with Genogy.",
+    relAlt: "Genogy member sheet showing pathologies, couple relationships and emotional bonds of a subject",
+    relCaption: "A member's relationships and history, ready for inclusion in a PDF report.",
+  },
+  de: {
+    heroAlt: "Klinisches Drei-Generationen-Genogramm in Genogy mit Familienverbindungen, Pathologien und emotionalen Beziehungen",
+    heroCaption: "Überblick über ein in Genogy erstelltes klinisches Genogramm.",
+    relAlt: "Genogy-Mitgliedsblatt mit Pathologien, Paarbeziehungen und emotionalen Verbindungen einer Person",
+    relCaption: "Beziehungen und Vorgeschichte einer Person, bereit für den PDF-Bericht.",
+  },
+};
+
 const BlogJusticeArticle: React.FC<Props> = ({ lang }) => {
   const c = CONTENT[lang];
+  const img = IMG_LABELS[lang];
   const { setLang } = useLanguage();
   const [authModal, setAuthModal] = useState<{ open: boolean; view: 'login' | 'signup' }>({
     open: false,
@@ -509,6 +533,17 @@ const BlogJusticeArticle: React.FC<Props> = ({ lang }) => {
               </p>
             ))}
           </div>
+          <figure className="mt-10 overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
+            <img
+              src={genogramOverview}
+              alt={img.heroAlt}
+              className="h-auto w-full"
+              loading="lazy"
+            />
+            <figcaption className="border-t border-border bg-card px-5 py-3 text-sm text-muted-foreground">
+              {img.heroCaption}
+            </figcaption>
+          </figure>
           <div className="mt-8">
             <Button size="lg" onClick={() => setAuthModal({ open: true, view: 'signup' })}>
               {c.cta}
@@ -573,6 +608,17 @@ const BlogJusticeArticle: React.FC<Props> = ({ lang }) => {
                 </li>
               ))}
             </ol>
+            <figure className="mt-8 overflow-hidden rounded-xl border border-border bg-card">
+              <img
+                src={memberRelations}
+                alt={img.relAlt}
+                className="h-auto w-full"
+                loading="lazy"
+              />
+              <figcaption className="border-t border-border bg-card px-5 py-3 text-sm text-muted-foreground">
+                {img.relCaption}
+              </figcaption>
+            </figure>
           </section>
 
           {/* Closing */}
