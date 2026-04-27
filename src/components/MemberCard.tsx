@@ -55,6 +55,7 @@ interface MemberCardProps {
   onCreateRelated?: (id: string, relationship: RelationshipChoice) => void;
   onEdit?: (id: string) => void;
   onToggleLock?: (id: string) => void;
+  onToggleTrauma?: (id: string) => void;
   disabledOptions?: DisabledOptions;
   /** Dynamic pathologies from DB for color resolution */
   dynamicPathologies?: DynamicPathology[];
