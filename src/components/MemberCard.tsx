@@ -329,6 +329,8 @@ const MemberCard: React.FC<MemberCardProps> = ({
             </Popover>
           )}
         </div>
+
+        {/* Info block */}
         <div className="min-w-0 flex-1">
           {isPlaceholder ? (
             <div className="flex flex-col gap-0.5">
