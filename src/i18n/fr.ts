@@ -50,7 +50,6 @@ export const fr: Translations = {
       { title: 'Création de génogramme simplifiée', desc: 'Créez un génogramme complet en quelques clics : ajoutez des membres, des relations et des pathologies sans perdre de temps.' },
       { title: 'Génogramme 100 % en ligne', desc: 'Accédez à votre génogramme en ligne depuis n\'importe quel ordinateur ou tablette. Aucune installation, aucun logiciel à télécharger.' },
       { title: 'Liens émotionnels et pathologies', desc: 'Représentez les liens émotionnels (fusionnel, conflictuel, coupure…), les pathologies médicales et les notes cliniques selon les standards McGoldrick.' },
-      { title: 'Partage et export de génogrammes', desc: 'Exportez vos génogrammes en PDF ou PNG, partagez-les avec vos collègues via un lien sécurisé.' },
     ],
     stepsTitle: 'Comment faire un génogramme en ligne ?',
     stepsSub: 'Créez votre premier génogramme en 3 étapes simples.',

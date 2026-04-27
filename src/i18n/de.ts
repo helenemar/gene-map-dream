@@ -49,7 +49,6 @@ export const de: Translations = {
       { title: 'Einfache Genogramm-Erstellung', desc: 'Erstellen Sie ein vollständiges Genogramm mit wenigen Klicks: Mitglieder, Beziehungen und Pathologien mühelos hinzufügen.' },
       { title: 'Genogramm 100 % online', desc: 'Greifen Sie auf Ihr Genogramm online von jedem Computer oder Tablet zu. Keine Installation, keine Software zum Herunterladen.' },
       { title: 'Emotionale Verbindungen & Pathologien', desc: 'Stellen Sie emotionale Bindungen (fusional, konflikthaft, Abbruch…), medizinische Pathologien und klinische Notizen nach McGoldrick-Standards dar.' },
-      { title: 'Genogramme teilen & exportieren', desc: 'Exportieren Sie Ihre Genogramme als PDF oder PNG, teilen Sie sie mit Kollegen über einen sicheren Link.' },
     ],
     stepsTitle: 'Wie erstellt man ein Genogramm online?',
     stepsSub: 'Erstellen Sie Ihr erstes Genogramm in 3 einfachen Schritten.',

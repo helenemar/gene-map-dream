@@ -49,7 +49,6 @@ export const en: Translations = {
       { title: 'Easy genogram creation', desc: 'Create a complete genogram in a few clicks: add members, relationships and pathologies effortlessly.' },
       { title: '100% online genogram', desc: 'Access your genogram online from any computer or tablet. No installation, no software to download.' },
       { title: 'Emotional links & pathologies', desc: 'Represent emotional bonds (fusional, conflictual, cutoff…), medical pathologies and clinical notes using McGoldrick standards.' },
-      { title: 'Share & export genograms', desc: 'Export your genograms as PDF or PNG, share them with colleagues via a secure link.' },
     ],
     stepsTitle: 'How to make a genogram online?',
     stepsSub: 'Create your first genogram in 3 simple steps.',
