@@ -477,8 +477,6 @@ const MemberCard: React.FC<MemberCardProps> = ({
       {cardContent}
     </motion.div>
   );
-
-  return motionNode;
 };
 
 export default MemberCard;
