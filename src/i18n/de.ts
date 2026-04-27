@@ -538,7 +538,7 @@ export const de: Translations = {
     ambivalent: 'Ambivalent',
     cutoff: 'Abgebrochen',
     violence: 'Gewalt',
-    emotional_abuse: 'Emotionaler Missbrauch',
+    emotional_abuse: 'Psychische Gewalt',
     physical_violence: 'Körperliche Gewalt',
     sexual_abuse: 'Sexueller Missbrauch',
     neglect: 'Vernachlässigung',
