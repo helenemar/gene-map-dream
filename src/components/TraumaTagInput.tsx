@@ -95,26 +95,41 @@ const TraumaTagInput: React.FC<TraumaTagInputProps> = ({
     }
   };
 
+  // Lookup category info for a label (used to color selected tags)
+  const entryByLabel = useMemo(() => {
+    const map = new Map<string, typeof entries[number]>();
+    for (const e of entries) map.set(e.label.toLowerCase(), e);
+    return map;
+  }, [entries]);
+
   return (
     <div ref={containerRef} className="relative flex flex-col gap-2">
       {values.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
-          {values.map(v => (
-            <span
-              key={v}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#E24B4A]/10 border border-[#E24B4A]/30 text-xs font-medium text-foreground"
-            >
-              {v}
-              <button
-                type="button"
-                onClick={() => removeValue(v)}
-                className="hover:text-destructive transition-colors"
-                aria-label={`Retirer ${v}`}
+          {values.map(v => {
+            const entry = entryByLabel.get(v.toLowerCase());
+            const color = entry?.categoryColor || '#E24B4A';
+            return (
+              <span
+                key={v}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium text-foreground"
+                style={{
+                  backgroundColor: `${color}1A`,
+                  border: `1px solid ${color}4D`,
+                }}
               >
-                <X className="w-3 h-3" />
-              </button>
-            </span>
-          ))}
+                {v}
+                <button
+                  type="button"
+                  onClick={() => removeValue(v)}
+                  className="hover:text-destructive transition-colors"
+                  aria-label={`Retirer ${v}`}
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            );
+          })}
         </div>
       )}
 
@@ -130,22 +145,43 @@ const TraumaTagInput: React.FC<TraumaTagInputProps> = ({
 
       {open && (suggestions.length > 0 || showCreateOption) && (
         <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-popover border border-border/60 rounded-lg shadow-lg max-h-56 overflow-y-auto">
-          {suggestions.map((s, i) => (
-            <button
-              key={s.label}
-              type="button"
-              onMouseDown={(e) => { e.preventDefault(); handleSelect(i); }}
-              onMouseEnter={() => setHighlight(i)}
-              className={`w-full px-3 py-1.5 text-left text-sm flex items-center justify-between gap-2 transition-colors ${
-                highlight === i ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50 text-foreground'
-              }`}
-            >
-              <span className="truncate">{s.label}</span>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground/60 shrink-0">
-                {s.source === 'user' ? 'perso' : s.category || ''}
-              </span>
-            </button>
-          ))}
+          {suggestions.map((s, i) => {
+            const color = s.categoryColor || '#E24B4A';
+            return (
+              <button
+                key={s.label}
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); handleSelect(i); }}
+                onMouseEnter={() => setHighlight(i)}
+                className={`w-full px-3 py-1.5 text-left text-sm flex items-center justify-between gap-2 transition-colors ${
+                  highlight === i ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50 text-foreground'
+                }`}
+              >
+                <span className="truncate flex items-center gap-2">
+                  <span
+                    className="w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{ backgroundColor: color }}
+                  />
+                  {s.label}
+                </span>
+                {s.source === 'user' ? (
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground/60 shrink-0">
+                    perso
+                  </span>
+                ) : s.category ? (
+                  <span
+                    className="text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0"
+                    style={{
+                      backgroundColor: `${color}1A`,
+                      color: color,
+                    }}
+                  >
+                    {s.category}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
           {showCreateOption && (
             <button
               type="button"
