@@ -113,6 +113,9 @@ const App = () => {
                     <Route path="/ressources/exemple-genogramme-clinique" element={<ClinicalExampleArticle />} />
                     <Route path="/ressources/genogramme-travail-social-cas-pratique" element={<SocialWorkCaseArticle />} />
                     <Route path="/blog" element={<Navigate to="/ressources" replace />} />
+                    <Route path="/blog/genogramme-professionnels-justice" element={<BlogJusticeArticleFr />} />
+                    <Route path="/blog/genogram-justice-professionals" element={<BlogJusticeArticleEn />} />
+                    <Route path="/blog/genogramm-justizfachkraefte" element={<BlogJusticeArticleDe />} />
                     <Route path="/symboles-genogramme" element={<SymbolsGenogramPage />} />
                     <Route path="/genogramme-psychologie" element={<GenogramPsychologyPage />} />
                     <Route path="/genogramme-travail-social" element={<GenogramSocialWorkPage />} />
