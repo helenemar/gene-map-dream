@@ -164,6 +164,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setHasTrauma(!!member.hasTrauma);
       setTraumaNotes(member.traumaNotes || '');
       setTraumas(member.traumas || []);
+      setIsUnknown(!!member.isUnknown);
     }
   }, [member]);
 
