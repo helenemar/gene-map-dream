@@ -69,6 +69,57 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
   const pagePath = forceLang === 'en' ? '/en' : forceLang === 'de' ? '/de' : '/';
   const pageUrl = `https://www.genogy-app.com${pagePath === '/' ? '/' : pagePath}`;
   const pageLanguage = forceLang === 'en' ? 'en-US' : forceLang === 'de' ? 'de-DE' : 'fr-FR';
+  const inLanguageShort = forceLang === 'en' ? 'en' : forceLang === 'de' ? 'de' : 'fr';
+
+  const jsonLdByLang = {
+    fr: {
+      description:
+        "Genogy est un outil en ligne de création de génogrammes conçu pour les professionnels de la santé mentale. Réalisez des génogrammes cliniques selon les standards McGoldrick. Pensé pour les psychologues, thérapeutes familiaux, travailleurs sociaux et conseillers.",
+      audienceType:
+        'Psychologues, thérapeutes familiaux, travailleurs sociaux, conseillers, professionnels de la santé mentale',
+      featureList: [
+        'Création de génogrammes cliniques en ligne',
+        'Symboles standardisés McGoldrick',
+        'Cartographie des liens émotionnels',
+        'Étiquetage des pathologies médicales et psychiatriques',
+        'Export PDF et PNG',
+        'Partage sécurisé',
+      ],
+      offerDescription: 'Accès gratuit pendant la phase bêta',
+    },
+    en: {
+      description:
+        'Genogy is an online genogram maker built specifically for mental health professionals. Create clinical genograms following McGoldrick standards. Designed for psychologists, family therapists, social workers and counselors.',
+      audienceType:
+        'Psychologists, family therapists, social workers, counselors, mental health professionals',
+      featureList: [
+        'Clinical genogram maker online',
+        'McGoldrick standardized symbols',
+        'Emotional relationship mapping',
+        'Medical and psychiatric condition tagging',
+        'PDF and PNG export',
+        'Secure sharing',
+      ],
+      offerDescription: 'Free during beta',
+    },
+    de: {
+      description:
+        'Genogy ist ein Online-Genogramm-Tool speziell für Fachkräfte der psychischen Gesundheit. Erstellen Sie klinische Genogramme nach den McGoldrick-Standards. Entwickelt für Psychologen, Familientherapeuten, Sozialarbeiter und Berater.',
+      audienceType:
+        'Psychologen, Familientherapeuten, Sozialarbeiter, Berater, Fachkräfte der psychischen Gesundheit',
+      featureList: [
+        'Klinisches Genogramm-Tool online',
+        'McGoldrick-Standardsymbole',
+        'Kartierung emotionaler Beziehungen',
+        'Kennzeichnung medizinischer und psychiatrischer Erkrankungen',
+        'PDF- und PNG-Export',
+        'Sicheres Teilen',
+      ],
+      offerDescription: 'Kostenlos während der Beta-Phase',
+    },
+  } as const;
+
+  const localized = jsonLdByLang[inLanguageShort];
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -79,26 +130,26 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
     applicationCategory: 'HealthApplication',
     applicationSubCategory: 'Clinical genogram software',
     operatingSystem: 'Web',
-    inLanguage: pageLanguage,
-    description: t.landing.metaDesc,
+    browserRequirements: 'Requires JavaScript',
+    inLanguage: inLanguageShort,
+    description: localized.description,
     isAccessibleForFree: true,
     audience: {
       '@type': 'Audience',
-      audienceType: 'Psychologues, thérapeutes, travailleurs sociaux et professionnels médico-sociaux',
+      audienceType: localized.audienceType,
     },
-    featureList: [
-      'Création de génogrammes cliniques en ligne',
-      'Symboles McGoldrick',
-      'Liens émotionnels et pathologies',
-      'Export PDF et PNG',
-      'Partage sécurisé par lien',
-    ],
+    featureList: localized.featureList,
     offers: {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'EUR',
       availability: 'https://schema.org/InStock',
-      description: 'Accès gratuit pendant la phase bêta',
+      description: localized.offerDescription,
+    },
+    creator: {
+      '@type': 'Organization',
+      name: 'Genogy',
+      url: 'https://www.genogy-app.com',
     },
     screenshot: 'https://www.genogy-app.com/og-image.webp',
   };
