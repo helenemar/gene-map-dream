@@ -6,13 +6,9 @@ import MemberIcon from '@/components/MemberIcon';
 import CreateMemberDropdown, { RelationshipChoice, DisabledOptions } from '@/components/CreateMemberDropdown';
 import { Plus, PencilLine, X, Eye, UserPlus, FileText, HeartHandshake, Lock, Unlock, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
+
+
 
 
 /**
