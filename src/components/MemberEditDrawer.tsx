@@ -721,8 +721,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
               {/* ── Vécu d'événement(s) traumatogène(s) ── */}
               <div className="flex flex-col gap-2">
                 <label className="flex items-center justify-between cursor-pointer gap-2">
-                  <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider flex items-center gap-1.5">
-                    <Zap className="w-3 h-3" style={{ color: '#E24B4A', fill: '#E24B4A' }} strokeWidth={1.5} />
+                  <span className="text-xs font-semibold text-foreground uppercase tracking-wide flex items-center gap-2">
+                    <Zap className="w-3.5 h-3.5" style={{ color: '#E24B4A', fill: '#E24B4A' }} strokeWidth={1.5} />
                     Vécu d'événement(s) traumatogène(s)
                   </span>
                   <Switch
