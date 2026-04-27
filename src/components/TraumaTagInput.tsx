@@ -23,7 +23,7 @@ const TraumaTagInput: React.FC<TraumaTagInputProps> = ({
 
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return entries.filter(e => !values.includes(e.label)).slice(0, 8);
+    if (q.length < 2) return [];
     return entries
       .filter(e => e.label.toLowerCase().includes(q) && !values.includes(e.label))
       .slice(0, 8);
@@ -31,7 +31,7 @@ const TraumaTagInput: React.FC<TraumaTagInputProps> = ({
 
   const trimmedQuery = query.trim();
   const exactMatch = entries.some(e => e.label.toLowerCase() === trimmedQuery.toLowerCase());
-  const showCreateOption = trimmedQuery.length > 0 && !exactMatch && !values.includes(trimmedQuery);
+  const showCreateOption = trimmedQuery.length >= 2 && !exactMatch && !values.includes(trimmedQuery);
   const totalOptions = suggestions.length + (showCreateOption ? 1 : 0);
 
   useEffect(() => {
