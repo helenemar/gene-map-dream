@@ -205,16 +205,17 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       avatar: avatar || undefined,
       hasTrauma: hasTrauma || undefined,
       traumaNotes: hasTrauma && traumaNotes ? traumaNotes : undefined,
+      traumas: hasTrauma && traumas.length > 0 ? traumas : undefined,
       isDraft: false,
     };
-  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, currentYear]);
+  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, currentYear]);
 
   useEffect(() => {
     if (open && member && onLiveUpdate) {
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes]);
+  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas]);
 
   if (!member) return null;
 
