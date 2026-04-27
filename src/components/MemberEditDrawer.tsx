@@ -100,6 +100,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [notes, setNotes] = useState('');
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const [isStillborn, setIsStillborn] = useState(false);
+  const [hasTrauma, setHasTrauma] = useState(false);
+  const [traumaNotes, setTraumaNotes] = useState('');
 
   const [birthYearUnsure, setBirthYearUnsure] = useState(false);
   const [deathYearUnsure, setDeathYearUnsure] = useState(false);
