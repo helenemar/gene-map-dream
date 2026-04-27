@@ -211,6 +211,7 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
         traumas: undefined,
         isUnknown: true,
         isDraft: false,
+        isPlaceholder: false,
       };
     }
     return {
