@@ -319,6 +319,25 @@ function renderCardAsSvg(cardEl: HTMLElement, contentRect: DOMRect): string {
     }
   }
 
+  // Trauma indicator (red lightning bolt) — read from data-trauma-badge button
+  const traumaEl = cardEl.querySelector('[data-trauma-badge="true"]') as HTMLElement | null;
+  if (traumaEl) {
+    const tRect = traumaEl.getBoundingClientRect();
+    const tx = tRect.left - contentRect.left;
+    const ty = tRect.top - contentRect.top;
+    const tw = tRect.width || 18;
+    const th = tRect.height || 18;
+    const cx = tx + tw / 2;
+    const cy = ty + th / 2;
+    // White circular background
+    svg += `<circle cx="${cx}" cy="${cy}" r="${tw / 2}" fill="${bgColor}" stroke="#E24B4A" stroke-opacity="0.3" stroke-width="1" />`;
+    // Lightning bolt path (Lucide Zap), scaled to ~14px and centered
+    const boltSize = Math.round(tw * 0.78);
+    const boltX = cx - boltSize / 2;
+    const boltY = cy - boltSize / 2;
+    svg += `<svg x="${boltX}" y="${boltY}" width="${boltSize}" height="${boltSize}" viewBox="0 0 24 24" fill="#E24B4A" stroke="#E24B4A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>`;
+  }
+
   return svg;
 }
 

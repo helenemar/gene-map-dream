@@ -1327,6 +1327,10 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
     setMembers(prev => prev.map(m => m.id === id ? { ...m, locked: !m.locked } : m));
   }, []);
 
+  const handleToggleTrauma = useCallback((id: string) => {
+    setMembers(prev => prev.map(m => m.id === id ? { ...m, hasTrauma: !m.hasTrauma } : m));
+  }, []);
+
   const [drawerEditing, setDrawerEditing] = useState(true);
 
   const prevDrawerOpenRef = useRef(false);
@@ -1891,6 +1895,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 onCreateRelated={isMobileReadOnly ? (() => {}) : handleCreateRelated}
                 onEdit={isMobileReadOnly ? (() => {}) : handleEdit}
                 onToggleLock={isMobileReadOnly ? (() => {}) : handleToggleLock}
+                onToggleTrauma={isMobileReadOnly ? (() => {}) : handleToggleTrauma}
                 onView={isMobileReadOnly ? (() => {}) : handleView}
                 onHover={isMobileReadOnly ? (() => {}) : setHoveredMember}
                 onLinkDragStart={isMobileReadOnly ? (() => {}) : handleLinkDragStart}

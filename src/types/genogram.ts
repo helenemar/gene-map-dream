@@ -57,6 +57,8 @@ export interface FamilyMember {
   locked?: boolean;
   /** Index patient (proposant) — rendered with double border */
   isIndexPatient?: boolean;
+  /** Trauma indicator — renders a small red lightning bolt on the symbol */
+  hasTrauma?: boolean;
 }
 
 export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed' | 'love_affair';

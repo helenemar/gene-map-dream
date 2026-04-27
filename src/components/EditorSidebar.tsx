@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Crosshair, Eye, EyeOff, Pencil, Plus } from 'lucide-react';
+import { ArrowLeft, Crosshair, Eye, EyeOff, Pencil, Plus, Zap } from 'lucide-react';
 import AddPathologyModal from '@/components/AddPathologyModal';
 import {
   FamilyMember, Union, EmotionalLink,
@@ -225,7 +225,15 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                   <span className="text-foreground/80">{t.pathologyNames[p.name] ?? p.name}</span>
                 </div>
               ))}
-              {dynamicPathologies.length === 0 && (
+              {members.some(m => m.hasTrauma) && (
+                <div className="flex items-center gap-2.5 text-sm">
+                  <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                    <Zap className="w-3.5 h-3.5" style={{ color: '#E24B4A', fill: '#E24B4A' }} strokeWidth={1.5} />
+                  </div>
+                  <span className="text-foreground/80">Trauma</span>
+                </div>
+              )}
+              {dynamicPathologies.length === 0 && !members.some(m => m.hasTrauma) && (
                 <p className="text-xs text-muted-foreground italic">{t.editor.noPathologyCreated}</p>
               )}
               <button
