@@ -96,6 +96,18 @@ const GenogramDefinition: React.FC = () => {
             <li><strong>Lignes coupées</strong> — Rupture relationnelle</li>
           </ul>
 
+          <figure className="not-prose my-10 rounded-2xl overflow-hidden border border-border shadow-sm bg-card">
+            <img
+              src={emotionalLinkModal}
+              alt="Sélecteur de types de liens émotionnels dans Genogy : fusionnel, distant, conflit, ambivalent, lien rompu, violences"
+              className="w-full h-auto"
+              loading="lazy"
+            />
+            <figcaption className="px-5 py-3 text-sm text-muted-foreground border-t border-border bg-card">
+              Catalogue des liens émotionnels (standard McGoldrick) disponibles dans Genogy.
+            </figcaption>
+          </figure>
+
           <h2>Différence entre génogramme et arbre généalogique</h2>
           <table>
             <thead>
@@ -124,7 +136,17 @@ const GenogramDefinition: React.FC = () => {
             Le génogramme permet de repérer les <strong>transmissions transgénérationnelles</strong>, qu'elles soient positives (résilience, talents) ou problématiques (violence, addictions, schémas d'abandon).
           </p>
 
-          <h2>Comment créer un génogramme en ligne ?</h2>
+          <figure className="not-prose my-10 rounded-2xl overflow-hidden border border-border shadow-sm bg-card">
+            <img
+              src={memberSheet}
+              alt="Fiche membre détaillée dans Genogy : identité, dates, pathologies, relations de couple et liens émotionnels"
+              className="w-full h-auto"
+              loading="lazy"
+            />
+            <figcaption className="px-5 py-3 text-sm text-muted-foreground border-t border-border bg-card">
+              Fiche membre clinique : identité, dates, pathologies et liens émotionnels.
+            </figcaption>
+          </figure>
           <p>
             Avec <strong>Genogy</strong>, créer un génogramme en ligne est simple et rapide :
           </p>
