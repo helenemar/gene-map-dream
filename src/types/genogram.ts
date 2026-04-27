@@ -59,6 +59,8 @@ export interface FamilyMember {
   isIndexPatient?: boolean;
   /** Trauma indicator — renders a small red lightning bolt on the symbol */
   hasTrauma?: boolean;
+  /** Free-text description of the traumatic event(s) experienced */
+  traumaNotes?: string;
 }
 
 export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed' | 'love_affair';
