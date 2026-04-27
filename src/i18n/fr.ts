@@ -536,6 +536,7 @@ export const fr: Translations = {
 
   // ── Emotional Link Types ──
   emotionalLinkTypes: {
+    close: 'Proche',
     fusional: 'Fusionnel',
     distant: 'Distant',
     conflictual: 'Conflit',
