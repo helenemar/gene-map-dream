@@ -17,6 +17,7 @@ interface FamilyLinkLinesProps {
   isSearchActive?: boolean;
   highlightedUnionStatus?: UnionStatus | null;
   variant?: 'default' | 'shared';
+  onImmigrationClick?: (memberId: string) => void;
 }
 
 const getAnchor = (m: FamilyMember, side: 'top' | 'bottom' | 'left' | 'right') => {
