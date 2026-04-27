@@ -1895,6 +1895,7 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
                 onCreateRelated={isMobileReadOnly ? (() => {}) : handleCreateRelated}
                 onEdit={isMobileReadOnly ? (() => {}) : handleEdit}
                 onToggleLock={isMobileReadOnly ? (() => {}) : handleToggleLock}
+                onToggleTrauma={isMobileReadOnly ? (() => {}) : handleToggleTrauma}
                 onView={isMobileReadOnly ? (() => {}) : handleView}
                 onHover={isMobileReadOnly ? (() => {}) : setHoveredMember}
                 onLinkDragStart={isMobileReadOnly ? (() => {}) : handleLinkDragStart}
