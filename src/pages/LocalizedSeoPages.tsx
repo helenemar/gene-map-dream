@@ -5,6 +5,8 @@ import { ArrowRight, BookOpen, Brain, BriefcaseBusiness, GitFork, HelpCircle, Li
 import LandingHeader from '@/components/landing/LandingHeader';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
+import SeoLinks from '@/components/SeoLinks';
+import type { PageKey as SeoPageKey } from '@/lib/hreflang';
 
 const AuthModal = lazy(() => import('@/components/AuthModal'));
 
