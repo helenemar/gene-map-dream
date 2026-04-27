@@ -49,6 +49,7 @@ import {
   TooltipProvider,
 } from '@/components/ui/tooltip';
 import MemberIcon from '@/components/MemberIcon';
+import TraumaTagInput from '@/components/TraumaTagInput';
 
 interface MemberEditDrawerProps {
   member: FamilyMember | null;
