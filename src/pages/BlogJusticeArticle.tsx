@@ -533,6 +533,17 @@ const BlogJusticeArticle: React.FC<Props> = ({ lang }) => {
               </p>
             ))}
           </div>
+          <figure className="mt-10 overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
+            <img
+              src={genogramOverview}
+              alt={img.heroAlt}
+              className="h-auto w-full"
+              loading="lazy"
+            />
+            <figcaption className="border-t border-border bg-card px-5 py-3 text-sm text-muted-foreground">
+              {img.heroCaption}
+            </figcaption>
+          </figure>
           <div className="mt-8">
             <Button size="lg" onClick={() => setAuthModal({ open: true, view: 'signup' })}>
               {c.cta}
@@ -597,6 +608,17 @@ const BlogJusticeArticle: React.FC<Props> = ({ lang }) => {
                 </li>
               ))}
             </ol>
+            <figure className="mt-8 overflow-hidden rounded-xl border border-border bg-card">
+              <img
+                src={memberRelations}
+                alt={img.relAlt}
+                className="h-auto w-full"
+                loading="lazy"
+              />
+              <figcaption className="border-t border-border bg-card px-5 py-3 text-sm text-muted-foreground">
+                {img.relCaption}
+              </figcaption>
+            </figure>
           </section>
 
           {/* Closing */}
