@@ -7,6 +7,9 @@ import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import AuthModal from '@/components/AuthModal';
 import SeoLinks from '@/components/SeoLinks';
+import genogramOverview from '@/assets/screens/genogram-overview.png';
+import memberSheet from '@/assets/screens/member-sheet.png';
+import emotionalLinkModal from '@/assets/screens/emotional-link-modal.png';
 
 const GenogramDefinition: React.FC = () => {
   const { t } = useLanguage();
