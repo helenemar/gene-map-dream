@@ -213,6 +213,18 @@ const EnGenogramSymbolsPage: React.FC = () => {
             <h3 className="mb-3 text-xl font-semibold text-foreground">Gender symbols</h3>
             <SymbolTable rows={individualGender} />
 
+            <figure className="mt-6 overflow-hidden rounded-xl border border-border bg-card">
+              <img
+                src={memberCardZoom}
+                alt="Close-up of a male individual symbol (square) in Genogy with name, year of birth and profession"
+                className="h-auto w-full"
+                loading="lazy"
+              />
+              <figcaption className="border-t border-border bg-card px-5 py-3 text-sm text-muted-foreground">
+                A male individual node (square) with date and profession, drawn with McGoldrick conventions.
+              </figcaption>
+            </figure>
+
             <h3 className="mb-3 mt-8 text-xl font-semibold text-foreground">Pregnancy and miscarriage</h3>
             <SymbolTable rows={perinatal} />
           </section>
@@ -244,6 +256,18 @@ const EnGenogramSymbolsPage: React.FC = () => {
 
             <h3 className="mb-3 mt-8 text-xl font-semibold text-foreground">Disconnection</h3>
             <SymbolTable rows={disconnection} />
+
+            <figure className="mt-8 overflow-hidden rounded-xl border border-border bg-card">
+              <img
+                src={emotionalLinkModal}
+                alt="Genogy emotional link picker showing fused, distant, conflictual, ambivalent, broken and violence relationship types"
+                className="h-auto w-full"
+                loading="lazy"
+              />
+              <figcaption className="border-t border-border bg-card px-5 py-3 text-sm text-muted-foreground">
+                The emotional relationship picker in Genogy maps directly to McGoldrick's clinical notation.
+              </figcaption>
+            </figure>
           </section>
 
           {/* Medical and Psychiatric Symbols */}
