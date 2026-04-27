@@ -158,6 +158,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setNotes(member.notes || '');
       setAvatar(member.avatar);
       setIsStillborn(member.perinatalType === 'stillborn');
+      setHasTrauma(!!member.hasTrauma);
+      setTraumaNotes(member.traumaNotes || '');
     }
   }, [member]);
 
