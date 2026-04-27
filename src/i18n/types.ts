@@ -177,12 +177,12 @@ export interface Translations {
     widowed: string; love_affair: string;
   };
   emotionalLinkTypes: {
-    fusional: string; distant: string; conflictual: string; ambivalent: string;
+    close: string; fusional: string; distant: string; conflictual: string; ambivalent: string;
     cutoff: string; violence: string; emotional_abuse: string; physical_violence: string;
     sexual_abuse: string; neglect: string; controlling: string;
   };
   emotionalLinkDescriptions: {
-    fusional: string; distant: string; conflictual: string; ambivalent: string;
+    close: string; fusional: string; distant: string; conflictual: string; ambivalent: string;
     cutoff: string; violence: string; emotional_abuse: string; physical_violence: string;
     sexual_abuse: string; neglect: string; controlling: string;
   };
