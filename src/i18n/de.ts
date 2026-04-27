@@ -531,6 +531,7 @@ export const de: Translations = {
 
   // ── Emotional Link Types ──
   emotionalLinkTypes: {
+    close: 'Nah',
     fusional: 'Fusionell',
     distant: 'Distanziert',
     conflictual: 'Konflikthaft',
