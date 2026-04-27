@@ -292,7 +292,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
             <div
               data-trauma-badge="true"
               aria-label="Trauma"
-              title={member.traumaNotes || 'Vécu d\u2019événement(s) traumatogène(s)'}
+              title={[member.traumas?.join(', '), member.traumaNotes].filter(Boolean).join(' — ') || 'Vécu d\u2019événement(s) traumatogène(s)'}
               className="absolute z-10 flex items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-[#E24B4A]/30 pointer-events-none"
               style={{ top: -8, right: -8, width: 24, height: 24 }}
             >
