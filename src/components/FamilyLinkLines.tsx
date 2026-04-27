@@ -621,8 +621,8 @@ const FamilyLinkLines: React.FC<FamilyLinkLinesProps> = ({ members, unions, onEd
           return (
             <g key={`immig-${m.id}`} aria-label="Immigration">
               <title>Immigration{m.immigrationNotes ? ` — ${m.immigrationNotes}` : ''}</title>
-              <path d={wave(8)} fill="none" stroke={waveColor} strokeWidth={1.75} strokeOpacity={waveOpacity} strokeLinecap="round" />
-              <path d={wave(18)} fill="none" stroke={waveColor} strokeWidth={1.75} strokeOpacity={waveOpacity} strokeLinecap="round" />
+              <path d={wave(28)} fill="none" stroke={waveColor} strokeWidth={1.75} strokeOpacity={waveOpacity} strokeLinecap="round" />
+              <path d={wave(38)} fill="none" stroke={waveColor} strokeWidth={1.75} strokeOpacity={waveOpacity} strokeLinecap="round" />
             </g>
           );
         })}
