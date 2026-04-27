@@ -443,12 +443,48 @@ const BlogJusticeArticle: React.FC<Props> = ({ lang }) => {
         <html lang={c.htmlLang} />
         <title>{c.title}</title>
         <meta name="description" content={c.description} />
+
+        {/* Open Graph */}
+        <meta property="og:site_name" content="Genogy" />
         <meta property="og:title" content={c.title} />
         <meta property="og:description" content={c.description} />
         <meta property="og:url" content={pageUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:locale" content={c.ogLocale} />
+        {(['fr_FR', 'en_US', 'de_DE'] as const)
+          .filter((alt) => alt !== c.ogLocale)
+          .map((alt) => (
+            <meta key={alt} property="og:locale:alternate" content={alt} />
+          ))}
         <meta property="og:image" content={`${SITE_URL}/og-image.webp`} />
+        <meta property="og:image:secure_url" content={`${SITE_URL}/og-image.webp`} />
+        <meta property="og:image:type" content="image/webp" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={c.h1} />
+
+        {/* Article-specific Open Graph */}
+        <meta property="article:published_time" content="2026-04-27T00:00:00+00:00" />
+        <meta property="article:modified_time" content="2026-04-27T00:00:00+00:00" />
+        <meta property="article:author" content="Genogy" />
+        <meta property="article:section" content={c.eyebrow} />
+        <meta property="article:tag" content="genogram" />
+        <meta property="article:tag" content="justice" />
+        <meta property="article:tag" content="PJJ" />
+        <meta property="article:tag" content="SPIP" />
+        <meta property="article:tag" content="family assessment" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={c.title} />
+        <meta name="twitter:description" content={c.description} />
+        <meta name="twitter:image" content={`${SITE_URL}/og-image.webp`} />
+        <meta name="twitter:image:alt" content={c.h1} />
+
+        {/* Crawling */}
+        <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
+        <meta name="author" content="Genogy" />
+
         <script type="application/ld+json">{JSON.stringify(articleJsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
