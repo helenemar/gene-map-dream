@@ -425,6 +425,24 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
         <ScrollArea className="flex-1 px-3">
           {isEditing ? (
             <div className="flex flex-col gap-5 py-4 px-3">
+              {/* ── Unknown member toggle ── */}
+              {!member.isIndexPatient && (
+                <label className="flex items-start gap-2.5 p-3 rounded-lg border border-border/60 bg-accent/20 cursor-pointer hover:bg-accent/30 transition-colors">
+                  <Checkbox
+                    checked={isUnknown}
+                    onCheckedChange={(v) => setIsUnknown(v === true)}
+                    className="mt-0.5"
+                  />
+                  <span className="flex flex-col gap-0.5">
+                    <span className="text-sm font-medium text-foreground">Membre inconnu</span>
+                    <span className="text-[11px] text-muted-foreground leading-snug">
+                      Cocher si l'identité de ce membre n'est pas connue. Aucun champ ne sera requis.
+                    </span>
+                  </span>
+                </label>
+              )}
+
+              {!isUnknown && (<>
               {/* ── Photo ── */}
               <div className="flex flex-col gap-1">
                 <Label className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
