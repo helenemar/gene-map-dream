@@ -31,9 +31,6 @@ const StepsSection: React.FC = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8 relative">
-          {/* Connecting line (desktop only) */}
-          <div className="hidden md:block absolute top-12 left-[16.5%] right-[16.5%] h-px bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20" />
-
           {t.landing.steps.map((step, i) => (
             <motion.div
               key={i}
