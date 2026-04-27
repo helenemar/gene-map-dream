@@ -104,6 +104,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
   const [hasTrauma, setHasTrauma] = useState(false);
   const [traumaNotes, setTraumaNotes] = useState('');
   const [traumas, setTraumas] = useState<string[]>([]);
+  const [hasImmigration, setHasImmigration] = useState(false);
+  const [immigrationNotes, setImmigrationNotes] = useState('');
   const [isUnknown, setIsUnknown] = useState(false);
 
   const [birthYearUnsure, setBirthYearUnsure] = useState(false);
@@ -164,6 +166,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       setHasTrauma(!!member.hasTrauma);
       setTraumaNotes(member.traumaNotes || '');
       setTraumas(member.traumas || []);
+      setHasImmigration(!!member.hasImmigration);
+      setImmigrationNotes(member.immigrationNotes || '');
       setIsUnknown(!!member.isUnknown);
     }
   }, [member]);
@@ -209,6 +213,8 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
         hasTrauma: undefined,
         traumaNotes: undefined,
         traumas: undefined,
+        hasImmigration: undefined,
+        immigrationNotes: undefined,
         isUnknown: true,
         isDraft: false,
         isPlaceholder: false,
@@ -243,17 +249,19 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       hasTrauma: hasTrauma || undefined,
       traumaNotes: hasTrauma && traumaNotes ? traumaNotes : undefined,
       traumas: hasTrauma && traumas.length > 0 ? traumas : undefined,
+      hasImmigration: hasImmigration || undefined,
+      immigrationNotes: hasImmigration && immigrationNotes ? immigrationNotes : undefined,
       isUnknown: undefined,
       isDraft: false,
     };
-  }, [member, isUnknown, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, currentYear]);
+  }, [member, isUnknown, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, hasImmigration, immigrationNotes, currentYear]);
 
   useEffect(() => {
     if (open && member && onLiveUpdate) {
       const updated = buildMember();
       if (updated) onLiveUpdate(updated);
     }
-  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, isUnknown]);
+  }, [firstName, lastName, birthName, birthYear, deathYear, birthYearUnsure, deathYearUnsure, profession, isRetired, gender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, hasImmigration, immigrationNotes, isUnknown]);
 
   if (!member) return null;
 
@@ -804,6 +812,34 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
                         onChange={(e) => setTraumaNotes(e.target.value)}
                       />
                     </div>
+                  </div>
+                )}
+              </div>
+
+              <Separator className="opacity-50" />
+
+              {/* ── Immigration ── */}
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center justify-between cursor-pointer gap-2">
+                  <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                    Immigration
+                  </span>
+                  <Switch
+                    checked={hasImmigration}
+                    onCheckedChange={setHasImmigration}
+                  />
+                </label>
+                {hasImmigration && (
+                  <div className="flex flex-col gap-1.5 p-3 rounded-lg bg-accent/30 border border-border/50">
+                    <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                      Description (optionnel)
+                    </Label>
+                    <Textarea
+                      className="text-sm border-border/50 bg-card focus-visible:ring-primary/30 min-h-[80px] resize-y"
+                      placeholder="Pays d'origine, année, contexte…"
+                      value={immigrationNotes}
+                      onChange={(e) => setImmigrationNotes(e.target.value)}
+                    />
                   </div>
                 )}
               </div>
