@@ -436,9 +436,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
     return <div className="relative inline-block">{cardContent}</div>;
   }
 
-  const canToggleTrauma = !isPlaceholder && !isDraft && !isPerinatal && !presentationMode && !!onToggleTrauma;
-
-  const motionNode = (
+  return (
     <motion.div
       data-member-card={member.id}
       className="absolute select-none"
