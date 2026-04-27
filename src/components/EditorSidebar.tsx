@@ -148,7 +148,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
         <EditableFileName value={fileName} onChange={onFileNameChange} />
       </div>
 
-      <Accordion type="multiple" defaultValue={['members', 'pathologies', 'family-links', 'emotional-links']}>
+      <Accordion type="multiple" defaultValue={['members', 'pathologies', 'trauma', 'family-links', 'emotional-links']}>
 
         <AccordionItem value="members" className="border-b border-border">
           <AccordionTrigger className="px-4 py-3 text-sm font-semibold text-foreground hover:bg-accent/50 hover:no-underline">
