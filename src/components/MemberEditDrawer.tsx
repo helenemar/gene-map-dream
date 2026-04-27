@@ -180,6 +180,39 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
 
   const buildMember = useCallback((): FamilyMember | null => {
     if (!member) return null;
+    if (isUnknown && !member.isIndexPatient) {
+      return {
+        ...member,
+        firstName: '',
+        lastName: '',
+        birthName: undefined,
+        birthYear: 0,
+        birthYearUnsure: undefined,
+        deathYear: undefined,
+        deathYearUnsure: undefined,
+        age: 0,
+        profession: '',
+        isRetired: undefined,
+        gender,
+        isGay: false,
+        isBisexual: false,
+        isTransgender: false,
+        genderIdentity: 'cisgender',
+        genderIdentityCustom: undefined,
+        sexualOrientation: 'heterosexual',
+        sexualOrientationCustom: undefined,
+        pathologies: [],
+        twinGroup: undefined,
+        twinType: undefined,
+        notes: undefined,
+        avatar: undefined,
+        hasTrauma: undefined,
+        traumaNotes: undefined,
+        traumas: undefined,
+        isUnknown: true,
+        isDraft: false,
+      };
+    }
     return {
       ...member,
       firstName: firstName || '',
@@ -209,9 +242,10 @@ const MemberEditDrawer: React.FC<MemberEditDrawerProps> = ({
       hasTrauma: hasTrauma || undefined,
       traumaNotes: hasTrauma && traumaNotes ? traumaNotes : undefined,
       traumas: hasTrauma && traumas.length > 0 ? traumas : undefined,
+      isUnknown: undefined,
       isDraft: false,
     };
-  }, [member, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, currentYear]);
+  }, [member, isUnknown, firstName, lastName, birthName, parsedBirthYear, parsedDeathYear, birthYearUnsure, deathYearUnsure, age, profession, isRetired, gender, isGay, isBisexual, isTransgender, genderIdentity, genderIdentityCustom, sexualOrientation, sexualOrientationCustom, selectedPathologies, twinGroup, twinType, isStillborn, notes, avatar, hasTrauma, traumaNotes, traumas, currentYear]);
 
   useEffect(() => {
     if (open && member && onLiveUpdate) {
