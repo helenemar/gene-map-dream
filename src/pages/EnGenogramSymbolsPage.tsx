@@ -193,6 +193,18 @@ const EnGenogramSymbolsPage: React.FC = () => {
       </section>
 
       <main className="mx-auto max-w-4xl px-6 py-14">
+        <figure className="mb-14 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+          <img
+            src={genogramOverview}
+            alt="Three-generation clinical genogram in Genogy with McGoldrick symbols, family links, pathologies and emotional bonds"
+            className="h-auto w-full"
+            loading="lazy"
+          />
+          <figcaption className="border-t border-border bg-card px-5 py-3 text-sm text-muted-foreground">
+            A clinical genogram in Genogy combining structural, medical and emotional symbols.
+          </figcaption>
+        </figure>
+
         <article className="space-y-14">
           {/* Individual Symbols */}
           <section>
