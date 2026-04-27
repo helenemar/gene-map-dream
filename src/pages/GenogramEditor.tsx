@@ -2195,6 +2195,16 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
             genogramId={genogramId}
           />
 
+          <ImmigrationNotesDrawer
+            member={immigrationMemberId ? (members.find(m => m.id === immigrationMemberId) ?? null) : null}
+            open={!!immigrationMemberId}
+            onClose={() => setImmigrationMemberId(null)}
+            onSave={(memberId, notes) => {
+              recordSnapshot();
+              setMembers(prev => prev.map(m => m.id === memberId ? { ...m, immigrationNotes: notes || undefined } : m));
+            }}
+          />
+
           <FloatingControls
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
