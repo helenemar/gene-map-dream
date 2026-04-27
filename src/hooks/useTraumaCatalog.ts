@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 export interface TraumaCatalogEntry {
   label: string;
   category?: string | null;
+  categoryColor?: string | null;
   source: 'global' | 'user';
 }
 
@@ -20,10 +21,15 @@ export function useTraumaCatalog() {
   const load = useCallback(async () => {
     setLoading(true);
     const [{ data: globals }, { data: { user } }] = await Promise.all([
-      supabase.from('trauma_catalog').select('label, category').order('label'),
+      supabase.from('trauma_catalog').select('label, category, category_color').order('category').order('label'),
       supabase.auth.getUser(),
     ]);
-    setGlobalEntries((globals || []).map(g => ({ label: g.label, category: g.category, source: 'global' as const })));
+    setGlobalEntries((globals || []).map((g: any) => ({
+      label: g.label,
+      category: g.category,
+      categoryColor: g.category_color,
+      source: 'global' as const,
+    })));
 
     if (user) {
       const { data: personals } = await supabase
