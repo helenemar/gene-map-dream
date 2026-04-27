@@ -95,7 +95,6 @@ const SeoShell: React.FC<{
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={metaDescription} />
-        <link rel="canonical" href={canonical} />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={metaDescription} />
         <meta property="og:url" content={canonical} />
