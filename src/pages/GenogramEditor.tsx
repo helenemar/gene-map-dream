@@ -1522,65 +1522,87 @@ const GenogramEditor: React.FC<GenogramEditorProps> = ({ shareToken, sharedIniti
   const handleDeleteMember = useCallback((id: string) => {
     recordSnapshot();
 
-    // ── Collect all descendants recursively ──
-    const collectDescendants = (memberId: string, visited: Set<string>): void => {
-      if (visited.has(memberId)) return;
-      visited.add(memberId);
-      // Find unions where this member is a partner
-      const parentUnions = unions.filter(u => u.partner1 === memberId || u.partner2 === memberId);
-      for (const union of parentUnions) {
-        for (const childId of union.children) {
-          collectDescendants(childId, visited);
-        }
-        // Also cascade the other partner if it's a placeholder
-        const otherPartnerId = union.partner1 === memberId ? union.partner2 : union.partner1;
-        const otherPartner = members.find(m => m.id === otherPartnerId);
-        if (otherPartner?.isPlaceholder && !visited.has(otherPartnerId)) {
-          visited.add(otherPartnerId);
-        }
+    const target = members.find(m => m.id === id);
+    if (!target) return;
+
+    // Build the set of members to remove. Start with just the targeted member.
+    const toRemoveSet = new Set<string>([id]);
+
+    // Unions where the deleted member is a partner: replace them with a placeholder
+    // so children remain visually linked. If the other partner is already a placeholder
+    // AND there are no children, drop the whole union + the orphan placeholder.
+    const partnerUnions = unions.filter(u => u.partner1 === id || u.partner2 === id);
+    const placeholderReplacements: { unionId: string; newPartnerId: string; placeholder: FamilyMember }[] = [];
+    const unionsToDrop = new Set<string>();
+
+    for (const u of partnerUnions) {
+      const otherId = u.partner1 === id ? u.partner2 : u.partner1;
+      const other = members.find(m => m.id === otherId);
+      const hasChildren = u.children.length > 0;
+      if (!hasChildren && other?.isPlaceholder) {
+        // No children and other partner is just a placeholder: drop union + placeholder
+        unionsToDrop.add(u.id);
+        toRemoveSet.add(otherId);
+      } else {
+        // Replace deleted partner with a placeholder to preserve filiation
+        const ph: FamilyMember = {
+          id: `m-ph-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          firstName: '', lastName: '', birthYear: 0, age: 0, profession: '',
+          gender: target.gender,
+          x: target.x,
+          y: target.y,
+          pathologies: [],
+          isPlaceholder: true,
+        };
+        placeholderReplacements.push({ unionId: u.id, newPartnerId: ph.id, placeholder: ph });
       }
-    };
+    }
 
-    const toRemoveSet = new Set<string>();
-    collectDescendants(id, toRemoveSet);
-
-    // Also clean up placeholder parents from unions where deleted member was a child
+    // Also handle the case where the deleted member was a child in a union:
+    // if removing them leaves the union with no children and both parents are placeholders,
+    // clean up that orphan union + placeholders.
     const childUnions = unions.filter(u => u.children.includes(id));
-    for (const union of childUnions) {
-      const remainingChildren = union.children.filter(c => !toRemoveSet.has(c));
-      if (remainingChildren.length === 0) {
-        const p1 = members.find(m => m.id === union.partner1);
-        const p2 = members.find(m => m.id === union.partner2);
-        if (p1?.isPlaceholder) toRemoveSet.add(p1.id);
-        if (p2?.isPlaceholder) toRemoveSet.add(p2.id);
+    for (const u of childUnions) {
+      const remaining = u.children.filter(c => c !== id);
+      if (remaining.length === 0) {
+        const p1 = members.find(m => m.id === u.partner1);
+        const p2 = members.find(m => m.id === u.partner2);
+        if (p1?.isPlaceholder && p2?.isPlaceholder) {
+          unionsToDrop.add(u.id);
+          toRemoveSet.add(p1.id);
+          toRemoveSet.add(p2.id);
+        }
       }
     }
 
-    if (toRemoveSet.size > 1) {
-      // Animate fade-out for cascading deletion
-      setFadingOutIds(toRemoveSet);
-      setTimeout(() => {
-        setFadingOutIds(new Set());
-        setMembers(prev => prev.filter(m => !toRemoveSet.has(m.id)));
-        setUnions(prev => prev
-          .map(u => ({ ...u, children: u.children.filter(c => !toRemoveSet.has(c)) }))
-          .filter(u => !toRemoveSet.has(u.partner1) && !toRemoveSet.has(u.partner2))
-        );
-        setEmotionalLinks(prev => prev.filter(l => !toRemoveSet.has(l.from) && !toRemoveSet.has(l.to)));
-        setSelectedMembers(new Set());
-        setEditingNewMember(null);
-      }, 350);
-    } else {
-      // Single member delete
-      setMembers(prev => prev.filter(m => !toRemoveSet.has(m.id)));
-      setUnions(prev => prev
-        .map(u => ({ ...u, children: u.children.filter(c => !toRemoveSet.has(c)) }))
-        .filter(u => u.partner1 !== id && u.partner2 !== id)
-      );
-      setEmotionalLinks(prev => prev.filter(l => !toRemoveSet.has(l.from) && !toRemoveSet.has(l.to)));
-      setSelectedMembers(new Set());
-      setEditingNewMember(null);
-    }
+    // Apply changes
+    setMembers(prev => {
+      const filtered = prev.filter(m => !toRemoveSet.has(m.id));
+      return [...filtered, ...placeholderReplacements.map(r => r.placeholder)];
+    });
+    setUnions(prev => prev
+      .filter(u => !unionsToDrop.has(u.id))
+      .map(u => {
+        let next = u;
+        // Replace partner reference if needed
+        const repl = placeholderReplacements.find(r => r.unionId === u.id);
+        if (repl) {
+          next = {
+            ...next,
+            partner1: next.partner1 === id ? repl.newPartnerId : next.partner1,
+            partner2: next.partner2 === id ? repl.newPartnerId : next.partner2,
+          };
+        }
+        // Remove deleted member from children lists
+        if (next.children.includes(id) || next.children.some(c => toRemoveSet.has(c))) {
+          next = { ...next, children: next.children.filter(c => !toRemoveSet.has(c)) };
+        }
+        return next;
+      })
+    );
+    setEmotionalLinks(prev => prev.filter(l => !toRemoveSet.has(l.from) && !toRemoveSet.has(l.to)));
+    setSelectedMembers(new Set());
+    setEditingNewMember(null);
   }, [members, unions]);
 
   const handleCancelAnchor = useCallback((id: string) => {
