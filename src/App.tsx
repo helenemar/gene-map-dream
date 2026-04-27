@@ -37,7 +37,7 @@ const SocialWorkCaseArticle = lazy(() => import("./pages/SeoLandingPages").then(
 const EnResourcesPage = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.EnResourcesPage })));
 const EnWhatIsGenogramPage = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.EnWhatIsGenogramPage })));
 const EnHowToGenogramPage = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.EnHowToGenogramPage })));
-const EnSymbolsPage = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.EnSymbolsPage })));
+const EnSymbolsPage = lazy(() => import("./pages/EnGenogramSymbolsPage"));
 const EnPsychologyPage = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.EnPsychologyPage })));
 const EnSocialWorkPage = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.EnSocialWorkPage })));
 const EnFirstSessionArticle = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.EnFirstSessionArticle })));
