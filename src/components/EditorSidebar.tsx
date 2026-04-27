@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ArrowLeft, Crosshair, Eye, EyeOff, Pencil, Plus, Zap } from 'lucide-react';
 import AddPathologyModal from '@/components/AddPathologyModal';
 import {
@@ -15,6 +15,54 @@ import {
 import { EmotionalLinkPreview } from '@/components/EmotionalLinkLine';
 import { StatusIcon } from '@/components/UnionBadge';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTraumaCatalog } from '@/hooks/useTraumaCatalog';
+
+/** Lists distinct trauma labels selected across all members, with their category color. */
+const TraumaLegendList: React.FC<{ members: FamilyMember[] }> = ({ members }) => {
+  const { entries } = useTraumaCatalog();
+
+  const entryByLabel = useMemo(() => {
+    const map = new Map<string, typeof entries[number]>();
+    for (const e of entries) map.set(e.label.toLowerCase(), e);
+    return map;
+  }, [entries]);
+
+  const labels = useMemo(() => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const m of members) {
+      if (!m.hasTrauma) continue;
+      for (const t of m.traumas || []) {
+        const key = t.toLowerCase().trim();
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        out.push(t);
+      }
+    }
+    return out.sort((a, b) => a.localeCompare(b));
+  }, [members]);
+
+  if (labels.length === 0) {
+    return (
+      <p className="text-xs text-muted-foreground italic">Aucun événement renseigné</p>
+    );
+  }
+
+  return (
+    <div className="space-y-1.5">
+      {labels.map(label => {
+        const entry = entryByLabel.get(label.toLowerCase());
+        const color = entry?.categoryColor || '#E24B4A';
+        return (
+          <div key={label} className="flex items-center gap-2.5 text-sm">
+            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+            <span className="text-foreground/80 truncate" title={label}>{label}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 interface EditorSidebarProps {
   members: FamilyMember[];
@@ -251,15 +299,13 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
         {members.some(m => m.hasTrauma) && (
           <AccordionItem value="trauma" className="border-b border-border">
             <AccordionTrigger className="px-4 py-3 text-sm font-semibold text-foreground hover:bg-accent/50 hover:no-underline">
-              <span className="flex-1 text-left">Événements traumatogènes</span>
+              <span className="flex-1 text-left flex items-center gap-2">
+                <Zap className="w-3.5 h-3.5 shrink-0" style={{ color: '#E24B4A', fill: '#E24B4A' }} strokeWidth={1.5} />
+                Événements traumatogènes
+              </span>
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-3">
-              <div className="flex items-center gap-2.5 text-sm">
-                <div className="w-4 h-4 flex items-center justify-center shrink-0">
-                  <Zap className="w-3.5 h-3.5" style={{ color: '#E24B4A', fill: '#E24B4A' }} strokeWidth={1.5} />
-                </div>
-                <span className="text-foreground/80">Trauma</span>
-              </div>
+              <TraumaLegendList members={members} />
             </AccordionContent>
           </AccordionItem>
         )}
