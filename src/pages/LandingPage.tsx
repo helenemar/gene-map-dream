@@ -11,6 +11,7 @@ import GuideBlock from '@/components/landing/GuideBlock';
 import AboutSection from '@/components/landing/AboutSection';
 import AudienceSection from '@/components/landing/AudienceSection';
 import FaqSection from '@/components/landing/FaqSection';
+import WhyWeCreatedSection from '@/components/landing/WhyWeCreatedSection';
 import CtaSection from '@/components/landing/CtaSection';
 import Footer from '@/components/Footer';
 import SeoLinks from '@/components/SeoLinks';
@@ -224,6 +225,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ forceLang }) => {
       <StepsSection />
       <AboutSection />
       <AudienceSection />
+      {!forceLang && <WhyWeCreatedSection />}
       <FaqSection />
       <CtaSection onAuth={openAuth} />
       <Footer />
