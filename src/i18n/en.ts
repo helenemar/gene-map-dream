@@ -649,7 +649,7 @@ export const en: Translations = {
       { label: 'Cut-off', color: 'bg-red-500' },
       { label: 'Ambivalent', color: 'bg-emerald-500' },
       { label: 'Violent', color: 'bg-red-500' },
-      { label: 'Emotional abuse', color: 'bg-blue-500' },
+      { label: 'Psychological violence', color: 'bg-blue-500' },
       { label: 'Sexual abuse', color: 'bg-purple-500' },
     ],
     pathologyTags: ['Cardiovascular', 'Cancers', 'Depression', 'Addictions', 'Neurodegenerative', 'Eating disorders'],
