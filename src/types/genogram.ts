@@ -155,9 +155,9 @@ export const EMOTIONAL_LINK_TYPES: { id: EmotionalLinkType; label: string; color
   { id: 'ambivalent', label: 'Ambivalent', color: 'link-ambivalent', description: 'Proche et conflictuel à la fois', category: 'relational' },
   { id: 'cutoff', label: 'Lien rompu', color: 'link-cutoff', description: 'Rupture totale de contact', category: 'relational' },
   { id: 'violence', label: 'Violence', color: 'link-violence', description: 'Relation violente', category: 'abusive' },
-  { id: 'emotional_abuse', label: 'Violences psychologiques', color: 'link-emotional-abuse', description: 'Manipulation, emprise psychologique', category: 'abusive' },
-  { id: 'physical_violence', label: 'Violences physiques', color: 'link-physical-violence', description: 'Violences corporelles', category: 'abusive' },
-  { id: 'sexual_abuse', label: 'Violences sexuelles', color: 'link-sexual-abuse', description: 'Violences à caractère sexuel', category: 'abusive' },
+  { id: 'emotional_abuse', label: 'Violence psychologique', color: 'link-emotional-abuse', description: 'Manipulation, emprise psychologique', category: 'abusive' },
+  { id: 'physical_violence', label: 'Violence physique', color: 'link-physical-violence', description: 'Violence corporelle', category: 'abusive' },
+  { id: 'sexual_abuse', label: 'Violence sexuelle', color: 'link-sexual-abuse', description: 'Violence à caractère sexuel', category: 'abusive' },
   { id: 'neglect', label: 'Négligence', color: 'link-neglect', description: 'Manque de soins ou d\'attention', category: 'abusive' },
   { id: 'controlling', label: 'Contrôlant', color: 'link-controlling', description: 'Comportement de contrôle', category: 'abusive' },
 ];
