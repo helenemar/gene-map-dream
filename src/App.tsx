@@ -52,6 +52,9 @@ const DeSocialWorkPage = lazy(() => import("./pages/LocalizedSeoPages").then((mo
 const DeFirstSessionArticle = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.DeFirstSessionArticle })));
 const DeClinicalExampleArticle = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.DeClinicalExampleArticle })));
 const DeSocialCaseArticle = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.DeSocialCaseArticle })));
+const BlogJusticeArticleFr = lazy(() => import("./pages/BlogJusticeArticle").then((module) => ({ default: module.BlogJusticeArticleFr })));
+const BlogJusticeArticleEn = lazy(() => import("./pages/BlogJusticeArticle").then((module) => ({ default: module.BlogJusticeArticleEn })));
+const BlogJusticeArticleDe = lazy(() => import("./pages/BlogJusticeArticle").then((module) => ({ default: module.BlogJusticeArticleDe })));
 
 const queryClient = new QueryClient();
 
