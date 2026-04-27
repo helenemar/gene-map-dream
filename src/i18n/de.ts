@@ -649,7 +649,7 @@ export const de: Translations = {
       { label: 'Abgebrochen', color: 'bg-red-500' },
       { label: 'Ambivalent', color: 'bg-emerald-500' },
       { label: 'Gewalttätig', color: 'bg-red-500' },
-      { label: 'Emotionaler Missbrauch', color: 'bg-blue-500' },
+      { label: 'Psychische Gewalt', color: 'bg-blue-500' },
       { label: 'Sexueller Missbrauch', color: 'bg-purple-500' },
     ],
     pathologyTags: ['Herz-Kreislauf', 'Krebs', 'Depression', 'Sucht', 'Neurodegenerativ', 'Essstörungen'],
