@@ -53,6 +53,18 @@ const GenogramDefinition: React.FC = () => {
           </p>
         </header>
 
+        <figure className="mb-12 rounded-2xl overflow-hidden border border-border shadow-sm bg-card">
+          <img
+            src={genogramOverview}
+            alt="Aperçu d'un génogramme clinique réalisé avec Genogy : trois générations, liens familiaux, pathologies et liens émotionnels"
+            className="w-full h-auto"
+            loading="lazy"
+          />
+          <figcaption className="px-5 py-3 text-sm text-muted-foreground border-t border-border bg-card">
+            Exemple de génogramme clinique sur 3 générations dans l'éditeur Genogy.
+          </figcaption>
+        </figure>
+
         <div className="prose prose-lg max-w-none dark:prose-invert">
           <h2>Définition du génogramme</h2>
           <p>
