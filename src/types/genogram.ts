@@ -65,6 +65,10 @@ export interface FamilyMember {
   traumaNotes?: string;
   /** List of trauma labels (from global catalog or user catalog or free text) */
   traumas?: string[];
+  /** Immigration indicator — renders a double wave on the filiation line above this member */
+  hasImmigration?: boolean;
+  /** Free-text notes about the immigration context */
+  immigrationNotes?: string;
 }
 
 export type UnionStatus = 'married' | 'common_law' | 'separated' | 'divorced' | 'widowed' | 'love_affair';
