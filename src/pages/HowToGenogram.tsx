@@ -51,6 +51,7 @@ const HowToGenogram: React.FC = () => {
           })),
         })}</script>
       </Helmet>
+      <SeoLinks pageKey="howTo" locale="fr" />
 
       <LandingHeader onAuth={openAuth} />
 
