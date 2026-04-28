@@ -216,9 +216,8 @@ const AboutPage: React.FC = () => {
 
       <AuthModal
         open={authModal.open}
-        onOpenChange={(open) => setAuthModal((s) => ({ ...s, open }))}
-        view={authModal.view}
-        onViewChange={(view) => setAuthModal((s) => ({ ...s, view }))}
+        onClose={() => setAuthModal((s) => ({ ...s, open: false }))}
+        defaultView={authModal.view}
       />
     </div>
   );
