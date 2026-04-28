@@ -7,3 +7,9 @@
   RewriteCond %{REQUEST_FILENAME} !-l
   RewriteRule . /index.html [L]
 </IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "^(favicon\.ico|favicon-[0-9]+x[0-9]+\.png|favicon-genogy-v[0-9]+\.png|apple-touch-icon\.png|icon-[0-9]+(-genogy-v[0-9]+)?\.(png|webp)|site\.webmanifest)$">
+    Header set Cache-Control "public, max-age=300, must-revalidate"
+  </FilesMatch>
+</IfModule>

@@ -26,6 +26,9 @@ describe("logo and favicon assets", () => {
     expect(existsSync(join(root, "public/favicon.svg"))).toBe(false);
     expect(existsSync(join(root, "src/assets/genogy-icon.webp"))).toBe(true);
     expect(existsSync(join(root, "public/icon-192.webp"))).toBe(true);
+    expect(existsSync(join(root, "public/favicon-48x48.png"))).toBe(true);
+    expect(existsSync(join(root, "public/favicon-genogy-v4.png"))).toBe(true);
+    expect(existsSync(join(root, "public/icon-512-genogy-v4.png"))).toBe(true);
     expect(existsSync(join(root, "public/favicon-16x16.png"))).toBe(true);
     expect(existsSync(join(root, "public/favicon-32x32.png"))).toBe(true);
     expect(existsSync(join(root, "public/apple-touch-icon.png"))).toBe(true);
