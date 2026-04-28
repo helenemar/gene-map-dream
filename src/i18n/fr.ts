@@ -28,8 +28,8 @@ export const fr: Translations = {
 
   // ── Landing page ──
   landing: {
-    metaTitle: 'Genogy',
-    metaDesc: 'Créez des génogrammes en ligne avec Genogy pour visualiser simplement les liens familiaux et émotionnels.',
+    metaTitle: 'Genogy — Logiciel de génogramme en ligne pour cliniciens',
+    metaDesc: 'Genogy est le logiciel en ligne pour créer vos génogrammes cliniques : symboles McGoldrick, liens émotionnels, pathologies, export PDF. Gratuit en bêta.',
     login: 'Connexion',
     signup: 'Inscription',
     heroTitle1: 'Genogy — Le génogramme clinique, enfin pensé par ceux qui l\'utilisent',
