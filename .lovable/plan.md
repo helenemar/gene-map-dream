@@ -1,14 +1,27 @@
+Je comprends la frustration. Dans le projet, les fichiers favicon sont bien ceux de Genogy, mais Google affiche encore l’ancienne icône Lovable dans le résultat de recherche. Ce n’est pas le navigateur du site : c’est probablement le cache de Google, et/ou le fait que plusieurs balises favicon se concurrencent.
 
+Plan de correction :
 
-## Problème
+1. Simplifier les favicons dans `index.html`
+   - Garder une déclaration claire pour le favicon principal Genogy.
+   - Supprimer ou réordonner les références ambiguës qui peuvent faire choisir `/favicon.ico` en priorité.
+   - Ajouter une version cache-bustée, par exemple `/favicon-32x32.png?v=genogy-2`, pour forcer les crawlers à revoir l’icône.
 
-Le `CORNER_INSET = 10` décale les points d'ancrage de 10px **à l'intérieur** de la carte. Comme les cartes ont un `z-index: 2` et le SVG un `z-index: 1`, les extrémités des lignes sont cachées sous la carte, créant un espace visible entre la fin de la courbe et le bord de la carte.
+2. Régénérer/remplacer proprement toutes les icônes publiques
+   - `public/favicon.ico`
+   - `public/favicon-16x16.png`
+   - `public/favicon-32x32.png`
+   - `public/apple-touch-icon.png`
+   - `public/icon-192.webp`
+   
+   Elles partiront toutes du logo Genogy actuel, pour qu’aucun fallback ne puisse afficher Lovable.
 
-Pour `rounded-xl` (rayon de 12px), le point où la bordure arrondie rejoint le coin mathématique est à environ 3.5px du coin. Mettre `CORNER_INSET = 0` ferait que les lignes terminent exactement au coin géométrique de la carte — le point le plus externe — ce qui donne l'impression visuelle qu'elles touchent la carte.
+3. Ajouter/mettre à jour un manifeste web si nécessaire
+   - Créer `public/site.webmanifest` avec le nom Genogy et les icônes Genogy.
+   - Le référencer dans `index.html` pour renforcer l’identité du site auprès des navigateurs et moteurs.
 
-## Plan
+4. Vérification technique
+   - Vérifier que le domaine public renvoie bien les fichiers Genogy.
+   - Vérifier que `/favicon.ico` n’est plus une source possible de confusion.
 
-**Un seul changement dans `src/pages/GenogramEditor.tsx` ligne 31 :**
-
-Passer `CORNER_INSET` de `10` à `0` pour que les ancres correspondent exactement aux coins de la bounding box de la carte.
-
+Point important : même après correction, Google peut mettre plusieurs jours ou semaines à remplacer l’icône dans ses résultats. La correction côté site sera immédiate après publication, mais l’affichage dans Google dépend de leur recrawl/cache. Une fois fait, il faudra demander une réindexation dans Google Search Console si tu veux accélérer.
