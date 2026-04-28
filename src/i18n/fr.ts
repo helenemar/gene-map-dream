@@ -28,8 +28,8 @@ export const fr: Translations = {
 
   // ── Landing page ──
   landing: {
-    metaTitle: 'Genogy',
-    metaDesc: 'Créez des génogrammes en ligne avec Genogy pour visualiser simplement les liens familiaux et émotionnels.',
+    metaTitle: 'Genogy — Logiciel de génogramme en ligne pour cliniciens',
+    metaDesc: 'Genogy est le logiciel en ligne pour créer vos génogrammes cliniques : symboles McGoldrick, liens émotionnels, pathologies, export PDF. Gratuit en bêta.',
     login: 'Connexion',
     signup: 'Inscription',
     heroTitle1: 'Genogy — Le génogramme clinique, enfin pensé par ceux qui l\'utilisent',
@@ -618,8 +618,8 @@ export const fr: Translations = {
     'Trouble psychotique': 'Trouble psychotique',
   },
   howToGenogram: {
-    metaTitle: 'Comment faire un génogramme en ligne ? Guide étape par étape | Genogy',
-    metaDesc: 'Apprenez comment faire un génogramme en ligne étape par étape avec Genogy. Guide complet pour psychologues et travailleurs sociaux : symboles, relations, pathologies.',
+    metaTitle: 'Créer un génogramme en ligne — Logiciel clinique | Genogy',
+    metaDesc: 'Créez vos génogrammes cliniques en ligne avec Genogy. Logiciel pour psychologues et thérapeutes : symboles McGoldrick, pathologies, export PDF. Gratuit en bêta.',
     badge: 'Guide pratique',
     heroTitle: 'Comment faire un génogramme\nen ligne ?',
     heroDesc: 'Guide étape par étape pour créer votre premier génogramme professionnel avec Genogy. De l\'inscription à l\'export, tout ce qu\'il faut savoir.',
