@@ -90,6 +90,13 @@ const Footer: React.FC = () => {
                   {t.footer.faq}
                 </button>
               </li>
+              {lang === 'fr' && (
+                <li>
+                  <Link to="/a-propos" className="text-sm hover:text-primary transition-colors">
+                    À propos
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 
