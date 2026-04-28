@@ -10,7 +10,7 @@ import genogyIcon from '@/assets/genogy-icon.webp';
 import genogramOverview from '@/assets/screens/genogram-overview.png';
 
 const PAGE_URL = 'https://www.genogy-app.com/a-propos';
-const OG_IMAGE = 'https://www.genogy-app.com/og-image.png?v=genogy-3';
+const OG_IMAGE = 'https://www.genogy-app.com/og-image.png?v=genogy-4';
 
 const AboutPage: React.FC = () => {
   const [authModal, setAuthModal] = React.useState<{ open: boolean; view: 'login' | 'signup' }>({ open: false, view: 'signup' });
@@ -46,7 +46,7 @@ const AboutPage: React.FC = () => {
             operatingSystem: 'Web',
             description: "Logiciel en ligne pour créer des génogrammes cliniques selon les standards McGoldrick.",
             url: 'https://www.genogy-app.com/',
-            image: 'https://www.genogy-app.com/icon-512.webp?v=genogy-3',
+            image: 'https://www.genogy-app.com/icon-512-genogy-v4.png?v=genogy-4',
             offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR', availability: 'https://schema.org/InStock' },
             featureList: [
               'Symboles McGoldrick standardisés',
