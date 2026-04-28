@@ -4,7 +4,7 @@
  * All <link rel="icon">, <link rel="apple-touch-icon"> and <link rel="manifest">
  * tags will be re-pointed at boot to ?v=<ICON_VERSION>, forcing browsers to refetch.
  */
-export const ICON_VERSION = "genogy-3";
+export const ICON_VERSION = "genogy-4";
 
 export const withIconVersion = (path: string): string => {
   const sep = path.includes("?") ? "&" : "?";
@@ -19,6 +19,7 @@ type IconSpec = {
 };
 
 const ICON_SPECS: IconSpec[] = [
+  { rel: "icon", href: "/favicon-genogy-v4.png", type: "image/png", sizes: "48x48" },
   { rel: "icon", href: "/favicon.ico", sizes: "any" },
   { rel: "icon", href: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
   { rel: "icon", href: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
