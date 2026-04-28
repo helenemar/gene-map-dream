@@ -20,6 +20,7 @@ const SharedEditor = lazy(() => import("./pages/SharedEditor"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const GenogramDefinition = lazy(() => import("./pages/GenogramDefinition"));
 const HowToGenogram = lazy(() => import("./pages/HowToGenogram"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
 const Account = lazy(() => import("./pages/Account"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const LegalNotice = lazy(() => import("./pages/LegalNotice"));
@@ -108,6 +109,7 @@ const App = () => {
                     <Route path="/translation-audit" element={<TranslationAudit />} />
                     <Route path="/genogramme" element={<GenogramDefinition />} />
                     <Route path="/comment-faire-un-genogramme" element={<HowToGenogram />} />
+                    <Route path="/a-propos" element={<AboutPage />} />
                     <Route path="/ressources" element={<ResourcesPage />} />
                     <Route path="/ressources/genogramme-premiere-seance" element={<FirstSessionGenogramArticle />} />
                     <Route path="/ressources/exemple-genogramme-clinique" element={<ClinicalExampleArticle />} />
