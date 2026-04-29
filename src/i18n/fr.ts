@@ -618,8 +618,8 @@ export const fr: Translations = {
     'Trouble psychotique': 'Trouble psychotique',
   },
   howToGenogram: {
-    metaTitle: 'Créer un génogramme en ligne — Logiciel clinique | Genogy',
-    metaDesc: 'Créez vos génogrammes cliniques en ligne avec Genogy. Logiciel pour psychologues et thérapeutes : symboles McGoldrick, pathologies, export PDF. Gratuit en bêta.',
+    metaTitle: 'Genogy — Créez vos génogrammes en ligne',
+    metaDesc: 'Outil simple et professionnel pour créer vos génogrammes en ligne. Conçu pour psychologues et thérapeutes : standards McGoldrick, export PDF, partage sécurisé.',
     badge: 'Guide pratique',
     heroTitle: 'Comment faire un génogramme\nen ligne ?',
     heroDesc: 'Guide étape par étape pour créer votre premier génogramme professionnel avec Genogy. De l\'inscription à l\'export, tout ce qu\'il faut savoir.',
@@ -639,7 +639,7 @@ export const fr: Translations = {
     stepsSub: 'Suivez ce guide pas à pas pour réaliser un génogramme complet et professionnel.',
     stepLabel: 'Étape',
     steps: [
-      { title: 'Créer votre compte Genogy', content: 'Rendez-vous sur genogy-app.com et inscrivez-vous en quelques secondes avec votre email ou votre compte Google. L\'accès est gratuit pendant la phase bêta. Depuis votre tableau de bord, cliquez sur « Nouveau génogramme » pour commencer.' },
+      { title: 'Créer votre compte Genogy', content: 'Avec Genogy, créez un génogramme clinique en ligne en quelques minutes : ajoutez les membres, visualisez les liens familiaux et émotionnels, puis exportez votre travail en PDF. Inscription en quelques secondes avec email ou compte Google, accès gratuit pendant la bêta.' },
       { title: 'Identifier le patient index', content: 'Le patient index (ou personne index) est la personne au centre du génogramme, celle pour laquelle vous réalisez l\'analyse clinique. Renseignez les informations de base : nom, prénom, date de naissance, profession.' },
       { title: 'Ajouter les membres de la famille', content: 'Un génogramme couvre généralement au moins trois générations. Ajoutez progressivement :', listItems: ['Les parents du patient index', 'Les grands-parents maternels et paternels', 'La fratrie (frères et sœurs)', 'Le/la conjoint(e) et les enfants', 'Les oncles, tantes, cousins si pertinent'] },
       { title: 'Définir les unions et filiations', content: 'Reliez les membres entre eux avec les différents types d\'unions. Les enfants sont reliés aux unions par des lignes verticales descendantes. Genogy gère automatiquement le positionnement des générations.', gridItems: [{ label: 'Mariage', desc: 'Ligne horizontale pleine' }, { label: 'Concubinage', desc: 'Ligne horizontale pointillée' }, { label: 'Séparation', desc: 'Une barre oblique' }, { label: 'Divorce', desc: 'Deux barres obliques' }] },
