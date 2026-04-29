@@ -1,27 +1,24 @@
-Je comprends la frustration. Dans le projet, les fichiers favicon sont bien ceux de Genogy, mais Google affiche encore l’ancienne icône Lovable dans le résultat de recherche. Ce n’est pas le navigateur du site : c’est probablement le cache de Google, et/ou le fait que plusieurs balises favicon se concurrencent.
+Le résultat montré dans la capture ne correspond pas à la page d’accueil : Google affiche la page `/comment-faire-un-genogramme`. C’est donc normal que la modification du `<title>` principal n’ait pas changé ce résultat précis.
 
 Plan de correction :
 
-1. Simplifier les favicons dans `index.html`
-   - Garder une déclaration claire pour le favicon principal Genogy.
-   - Supprimer ou réordonner les références ambiguës qui peuvent faire choisir `/favicon.ico` en priorité.
-   - Ajouter une version cache-bustée, par exemple `/favicon-32x32.png?v=genogy-2`, pour forcer les crawlers à revoir l’icône.
+1. Mettre à jour les métadonnées SEO de la page `/comment-faire-un-genogramme`
+   - Remplacer le titre actuel par un titre aligné avec votre demande, par exemple :
+     `Genogy — Créez vos génogrammes en ligne`
+   - Remplacer la meta description actuelle par :
+     `Outil simple et professionnel pour créer vos génogrammes en ligne. Conçu pour psychologues et thérapeutes : standards McGoldrick, export PDF, partage sécurisé.`
+   - Appliquer la même version aux balises Open Graph/Twitter de cette page.
 
-2. Régénérer/remplacer proprement toutes les icônes publiques
-   - `public/favicon.ico`
-   - `public/favicon-16x16.png`
-   - `public/favicon-32x32.png`
-   - `public/apple-touch-icon.png`
-   - `public/icon-192.webp`
-   
-   Elles partiront toutes du logo Genogy actuel, pour qu’aucun fallback ne puisse afficher Lovable.
+2. Corriger le texte que Google extrait dans le snippet
+   - Le snippet de votre capture vient du contenu de l’étape 1 :
+     `Rendez-vous sur genogy-app.com et inscrivez-vous...`
+   - Je remplacerai ce passage par un texte moins “mode d’emploi inscription” et plus orienté valeur produit, par exemple :
+     `Avec Genogy, créez un génogramme clinique en ligne en quelques minutes : ajoutez les membres, visualisez les liens familiaux et émotionnels, puis exportez votre travail en PDF.`
 
-3. Ajouter/mettre à jour un manifeste web si nécessaire
-   - Créer `public/site.webmanifest` avec le nom Genogy et les icônes Genogy.
-   - Le référencer dans `index.html` pour renforcer l’identité du site auprès des navigateurs et moteurs.
+3. Harmoniser les sources SEO internes
+   - Mettre à jour `src/i18n/fr.ts`, car la page guide tire son titre, sa description et son contenu depuis ce fichier.
+   - Vérifier que la page d’accueil, la preview SERP et le guide n’envoient pas de signaux contradictoires pour le texte principal.
 
-4. Vérification technique
-   - Vérifier que le domaine public renvoie bien les fichiers Genogy.
-   - Vérifier que `/favicon.ico` n’est plus une source possible de confusion.
-
-Point important : même après correction, Google peut mettre plusieurs jours ou semaines à remplacer l’icône dans ses résultats. La correction côté site sera immédiate après publication, mais l’affichage dans Google dépend de leur recrawl/cache. Une fois fait, il faudra demander une réindexation dans Google Search Console si tu veux accélérer.
+4. Clarifier la limite Google
+   - Une fois corrigé, Google peut encore afficher l’ancien texte pendant plusieurs jours/semaines, jusqu’au prochain crawl.
+   - Mais la source HTML servie par le site sera correcte après publication, ce qui permettra à Google de remplacer progressivement l’ancien résultat.
