@@ -460,3 +460,222 @@ export const SocialWorkCaseArticle: React.FC = () => (
     ]}
   />
 );
+
+// -----------------------------------------------------------------------------
+// SEO pages cibles: "exemples génogramme", "génogramme vierge / gratuit", "écocarte"
+// -----------------------------------------------------------------------------
+
+const exampleCases = [
+  {
+    title: 'Famille recomposée',
+    text: 'Deux unions successives, des enfants issus de chaque branche et un beau-parent impliqué : le génogramme distingue clairement filiations, alliances actuelles et liens éducatifs.',
+  },
+  {
+    title: 'Antécédents d’addiction',
+    text: 'Plusieurs membres concernés sur deux ou trois générations apparaissent par couleur (pathologie). La répétition devient visible sans surcharger la carte.',
+  },
+  {
+    title: 'Deuil périnatal',
+    text: 'Une grossesse interrompue ou une mortinaissance est représentée à sa place générationnelle, ce qui permet de reconnaître l’événement dans l’histoire familiale.',
+  },
+  {
+    title: 'Protection de l’enfance',
+    text: 'Autorité parentale, fratrie, placements, personnes ressources et ruptures de lien sont distingués pour clarifier la situation en réunion pluridisciplinaire.',
+  },
+  {
+    title: 'Migration et exil',
+    text: 'Une double vague sur la filiation marque la migration. Les membres restés au pays restent visibles, ce qui maintient la continuité de l’histoire familiale.',
+  },
+  {
+    title: 'Couple LGBTQ+ avec PMA',
+    text: 'Filiations biologique et sociale sont représentées distinctement, ce qui évite les approximations et respecte la structure familiale réelle.',
+  },
+];
+
+export const ExamplesGenogramPage: React.FC = () => (
+  <SeoShell
+    title="Exemples de génogramme — 6 cas cliniques commentés | Genogy"
+    canonicalPath="/exemples-genogramme"
+    metaDescription="6 exemples de génogramme commentés (famille recomposée, addiction, deuil périnatal, protection de l’enfance, migration, PMA). Inspirez-vous pour créer le vôtre en ligne avec Genogy."
+  >
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(buildWebPageJsonLd(
+          'Exemples de génogramme — 6 cas cliniques commentés',
+          '/exemples-genogramme',
+          'Six exemples concrets de génogramme pour comprendre comment représenter une famille en clinique.'
+        ))}
+      </script>
+      <script type="application/ld+json">
+        {JSON.stringify(buildBreadcrumbJsonLd('/exemples-genogramme', 'Exemples de génogramme'))}
+      </script>
+    </Helmet>
+    <Hero
+      eyebrow="Exemples"
+      icon={<BookOpen className="h-5 w-5" />}
+      title="Exemples de génogramme : 6 cas cliniques commentés"
+      intro="Six exemples de génogramme tirés de situations cliniques courantes — famille recomposée, addiction, deuil périnatal, protection de l’enfance, migration, parentalité PMA. Chaque cas montre comment structurer la carte familiale pour qu’elle reste lisible et exploitable."
+    />
+    <main className="mx-auto max-w-5xl px-6 py-14">
+      <div className="grid gap-6 md:grid-cols-2">
+        {exampleCases.map((c) => (
+          <article key={c.title} className="rounded-lg border border-border bg-card p-6 shadow-sm">
+            <h2 className="mb-3 text-xl font-bold leading-snug text-foreground">{c.title}</h2>
+            <p className="text-sm leading-relaxed text-muted-foreground">{c.text}</p>
+          </article>
+        ))}
+      </div>
+      <div className="mt-12 rounded-lg border border-border bg-card p-8 text-center">
+        <h2 className="mb-3 text-2xl font-bold">Créez votre propre génogramme en ligne</h2>
+        <p className="mb-6 text-muted-foreground">Partez d’un canvas vierge ou inspirez-vous des cas ci-dessus. L’éditeur Genogy gère filiations, unions, liens émotionnels et pathologies aux standards McGoldrick.</p>
+        <Button asChild variant="brand" className="rounded-full px-7">
+          <Link to="/">Commencer un génogramme</Link>
+        </Button>
+      </div>
+    </main>
+    <FaqAndExamples
+      examples={[
+        { title: 'Lire un exemple sans le sur-interpréter', text: 'Un exemple aide à comprendre la méthode, mais chaque situation réelle demande une lecture contextualisée et prudente.' },
+        { title: 'Adapter un exemple à votre pratique', text: 'Les modèles ci-dessus se transposent à la psychologie, au travail social, à la médiation familiale ou à l’éducation spécialisée.' },
+        { title: 'Construire à partir de zéro', text: 'Plutôt que de copier un exemple, démarrez d’un génogramme vierge et ajoutez seulement les éléments cliniquement utiles.' },
+      ]}
+      faq={[
+        { q: 'Où trouver d’autres exemples de génogramme ?', a: 'Les guides académiques de McGoldrick proposent une base solide. Les exemples Genogy ci-dessus illustrent les cas les plus fréquemment rencontrés en cabinet et en équipe médico-sociale.' },
+        { q: 'Un exemple de génogramme suffit-il pour se former ?', a: 'Non. Les exemples servent de repères. La pratique régulière, la supervision et la lecture des standards cliniques restent indispensables.' },
+        { q: 'Puis-je utiliser ces exemples avec mes patients ?', a: 'Vous pouvez vous en inspirer pour structurer vos entretiens, mais le génogramme doit toujours refléter la situation réelle de la personne accompagnée.' },
+      ]}
+    />
+  </SeoShell>
+);
+
+export const BlankGenogramPage: React.FC = () => (
+  <SeoShell
+    title="Génogramme vierge à compléter en ligne | Genogy"
+    canonicalPath="/genogramme-vierge"
+    metaDescription="Démarrez un génogramme vierge en ligne en un clic. Modèle prêt à compléter aux standards McGoldrick : filiations, unions, liens émotionnels, pathologies. Accès gratuit en bêta."
+  >
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(buildWebPageJsonLd(
+          'Génogramme vierge à compléter en ligne',
+          '/genogramme-vierge',
+          'Modèle de génogramme vierge à compléter directement en ligne, sans téléchargement.'
+        ))}
+      </script>
+      <script type="application/ld+json">
+        {JSON.stringify(buildBreadcrumbJsonLd('/genogramme-vierge', 'Génogramme vierge'))}
+      </script>
+    </Helmet>
+    <Hero
+      eyebrow="Modèle vierge"
+      icon={<GitFork className="h-5 w-5" />}
+      title="Génogramme vierge à compléter en ligne"
+      intro="Plutôt qu’un PDF à imprimer, démarrez d’un génogramme vierge directement dans l’éditeur Genogy. Ajoutez le patient index, les parents, les fratries et les unions au fur et à mesure de l’entretien. Aucun logiciel à installer."
+    />
+    <main className="mx-auto max-w-4xl px-6 py-14 space-y-12 text-muted-foreground">
+      <section>
+        <h2 className="mb-4 text-2xl font-bold text-foreground">Pourquoi partir d’un génogramme vierge plutôt que d’un modèle figé</h2>
+        <p className="leading-relaxed">Un modèle de génogramme vierge imprimé fige la structure familiale avant même de connaître la personne. Avec Genogy, le canvas vierge s’adapte en temps réel : famille recomposée, fratrie nombreuse, parents inconnus ou plusieurs unions successives sont gérés sans repenser la mise en page.</p>
+      </section>
+      <section>
+        <h2 className="mb-4 text-2xl font-bold text-foreground">Ce qui est déjà préparé pour vous</h2>
+        <ul className="space-y-2 list-disc pl-6">
+          <li>Le patient index est créé d’office avec son double contour caractéristique.</li>
+          <li>Deux parents en placeholder sont prêts à recevoir prénoms, dates et pathologies.</li>
+          <li>Tous les symboles McGoldrick (carré, cercle, losange, croix de décès, unions, séparations) sont accessibles en un clic.</li>
+          <li>Les liens émotionnels (fusionnel, conflictuel, distant, coupé, violences) et les pathologies par couleur sont disponibles.</li>
+        </ul>
+      </section>
+      <section>
+        <h2 className="mb-4 text-2xl font-bold text-foreground">Génogramme vierge gratuit — sans installation</h2>
+        <p className="leading-relaxed">L’accès à l’éditeur Genogy est <strong className="text-foreground">gratuit pendant la bêta</strong>. Vous créez un compte avec votre email ou Google, et votre génogramme vierge est immédiatement modifiable. Vos cartes sont sauvegardées automatiquement et exportables en PDF, PNG ou SVG.</p>
+      </section>
+      <div className="rounded-lg border border-border bg-card p-8 text-center">
+        <h2 className="mb-3 text-2xl font-bold text-foreground">Ouvrir un génogramme vierge maintenant</h2>
+        <p className="mb-6">Un clic suffit pour démarrer la carte familiale.</p>
+        <Button asChild variant="brand" className="rounded-full px-7">
+          <Link to="/">Démarrer un génogramme vierge</Link>
+        </Button>
+      </div>
+    </main>
+    <FaqAndExamples
+      examples={[
+        { title: 'Première séance', text: 'Le canvas vierge accompagne l’entretien : ajoutez seulement les membres évoqués, sans saturer la séance.' },
+        { title: 'Reprise d’un dossier', text: 'Repartez d’un génogramme vierge et reconstituez la structure en quelques minutes à partir des notes existantes.' },
+        { title: 'Formation et démonstration', text: 'Le modèle vierge sert de support pédagogique pour expliquer les symboles à un étudiant ou à un collègue.' },
+      ]}
+      faq={[
+        { q: 'Existe-t-il un PDF de génogramme vierge à télécharger ?', a: 'Un PDF fige la structure avant l’entretien et oblige à tout recommencer si la famille ne tient pas dans le gabarit. Un canvas vierge en ligne s’ajuste à la situation réelle.' },
+        { q: 'Le génogramme vierge est-il gratuit ?', a: 'Oui, l’éditeur Genogy est gratuit pendant la bêta. Vous créez un compte et accédez immédiatement au canvas vierge.' },
+        { q: 'Peut-on imprimer le génogramme une fois rempli ?', a: 'Oui. L’export PDF, PNG ou SVG produit un document propre, partageable en dossier patient ou en réunion pluridisciplinaire.' },
+      ]}
+    />
+  </SeoShell>
+);
+
+export const GenogramEcomapPage: React.FC = () => (
+  <SeoShell
+    title="Génogramme et écocarte — différences et complémentarité | Genogy"
+    canonicalPath="/genogramme-ecocarte"
+    metaDescription="Génogramme vs écocarte : à quoi sert chaque outil, comment les combiner dans une situation clinique ou sociale, quels symboles utiliser. Guide pratique Genogy."
+  >
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(buildWebPageJsonLd(
+          'Génogramme et écocarte — différences et complémentarité',
+          '/genogramme-ecocarte',
+          'Comprendre la différence entre génogramme et écocarte, et comment ces deux outils se complètent.'
+        ))}
+      </script>
+      <script type="application/ld+json">
+        {JSON.stringify(buildBreadcrumbJsonLd('/genogramme-ecocarte', 'Génogramme et écocarte'))}
+      </script>
+    </Helmet>
+    <Hero
+      eyebrow="Génogramme + écocarte"
+      icon={<Users className="h-5 w-5" />}
+      title="Génogramme et écocarte : deux cartes complémentaires"
+      intro="Le génogramme représente la famille ; l’écocarte représente l’environnement social autour de la personne (école, travail, services, voisinage, soins, loisirs). En clinique et en travail social, les deux outils se complètent."
+    />
+    <main className="mx-auto max-w-4xl px-6 py-14 space-y-12 text-muted-foreground">
+      <section>
+        <h2 className="mb-4 text-2xl font-bold text-foreground">Génogramme vs écocarte : la différence en une phrase</h2>
+        <p className="leading-relaxed"><strong className="text-foreground">Le génogramme</strong> cartographie la <strong className="text-foreground">structure familiale</strong> sur plusieurs générations (filiations, unions, ruptures, décès, pathologies). <strong className="text-foreground">L’écocarte</strong> cartographie les <strong className="text-foreground">liens entre la personne et son environnement</strong> à un instant donné (institutions, professionnels, proches non apparentés, ressources et tensions).</p>
+      </section>
+      <section>
+        <h2 className="mb-4 text-2xl font-bold text-foreground">Quand utiliser l’écocarte plutôt que le génogramme</h2>
+        <ul className="space-y-2 list-disc pl-6">
+          <li>Pour une coordination médico-sociale où plusieurs services accompagnent la même personne.</li>
+          <li>Pour clarifier les ressources extérieures à la famille (école, employeur, club, association).</li>
+          <li>Pour repérer un isolement social ou au contraire un réseau de soutien dense.</li>
+          <li>Pour préparer une synthèse de situation où l’environnement compte autant que la famille.</li>
+        </ul>
+      </section>
+      <section>
+        <h2 className="mb-4 text-2xl font-bold text-foreground">Comment les combiner</h2>
+        <p className="leading-relaxed">Dans la pratique, beaucoup de professionnels construisent d’abord le génogramme (structure familiale sur 3 générations), puis ajoutent une écocarte centrée sur la personne accompagnée. L’écocarte vient se greffer autour du génogramme sans le remplacer.</p>
+        <p className="leading-relaxed mt-3">Genogy se concentre aujourd’hui sur la partie génogramme avec les symboles McGoldrick complets. L’ajout d’une vue écocarte fait partie des évolutions prévues — n’hésitez pas à le demander via le bouton « Feedback » du tableau de bord.</p>
+      </section>
+      <div className="rounded-lg border border-border bg-card p-8 text-center">
+        <h2 className="mb-3 text-2xl font-bold text-foreground">Commencer par le génogramme</h2>
+        <p className="mb-6">La structure familiale d’abord, l’environnement ensuite : la démarche la plus solide en pratique clinique.</p>
+        <Button asChild variant="brand" className="rounded-full px-7">
+          <Link to="/">Créer un génogramme</Link>
+        </Button>
+      </div>
+    </main>
+    <FaqAndExamples
+      examples={[
+        { title: 'Protection de l’enfance', text: 'Le génogramme situe la fratrie et l’autorité parentale ; l’écocarte ajoute école, AEMO, médecin traitant et personne de confiance.' },
+        { title: 'Santé mentale adulte', text: 'Le génogramme repère antécédents et ressources familiales ; l’écocarte précise psychiatre, CMP, employeur et groupe de pairs.' },
+        { title: 'Accompagnement personne âgée', text: 'Le génogramme montre les aidants familiaux ; l’écocarte cartographie auxiliaires, médecin, voisinage et services à domicile.' },
+      ]}
+      faq={[
+        { q: 'Faut-il toujours faire les deux ?', a: 'Non. Pour une demande purement clinique, le génogramme suffit souvent. L’écocarte devient précieuse dès que la coordination ou l’environnement social pèsent dans l’accompagnement.' },
+        { q: 'Quels symboles utiliser dans une écocarte ?', a: 'Cercle central pour la personne, ovales autour pour chaque entité (école, services, proches), traits pleins pour liens forts, pointillés pour liens faibles, flèches pour le sens du soutien.' },
+        { q: 'Genogy propose-t-il déjà une écocarte ?', a: 'La fonction écocarte intégrée est en réflexion. Vous pouvez d’ores et déjà construire votre génogramme dans Genogy, qui suffit dans la majorité des usages cliniques.' },
+      ]}
+    />
+  </SeoShell>
+);
+
