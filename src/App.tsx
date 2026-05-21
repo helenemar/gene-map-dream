@@ -35,6 +35,9 @@ const GenogramSocialWorkPage = lazy(() => import("./pages/SeoLandingPages").then
 const FirstSessionGenogramArticle = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.FirstSessionGenogramArticle })));
 const ClinicalExampleArticle = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.ClinicalExampleArticle })));
 const SocialWorkCaseArticle = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.SocialWorkCaseArticle })));
+const ExamplesGenogramPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.ExamplesGenogramPage })));
+const BlankGenogramPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.BlankGenogramPage })));
+const GenogramEcomapPage = lazy(() => import("./pages/SeoLandingPages").then((module) => ({ default: module.GenogramEcomapPage })));
 const EnResourcesPage = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.EnResourcesPage })));
 const EnWhatIsGenogramPage = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.EnWhatIsGenogramPage })));
 const EnHowToGenogramPage = lazy(() => import("./pages/LocalizedSeoPages").then((module) => ({ default: module.EnHowToGenogramPage })));
