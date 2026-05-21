@@ -124,6 +124,9 @@ const App = () => {
                     <Route path="/symboles-genogramme" element={<SymbolsGenogramPage />} />
                     <Route path="/genogramme-psychologie" element={<GenogramPsychologyPage />} />
                     <Route path="/genogramme-travail-social" element={<GenogramSocialWorkPage />} />
+                    <Route path="/exemples-genogramme" element={<ExamplesGenogramPage />} />
+                    <Route path="/genogramme-vierge" element={<BlankGenogramPage />} />
+                    <Route path="/genogramme-ecocarte" element={<GenogramEcomapPage />} />
                     <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
