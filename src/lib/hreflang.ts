@@ -23,6 +23,9 @@ export const PAGE_ALTERNATES: Record<string, LocaleAlternates> = {
   firstSession: { fr: '/ressources/genogramme-premiere-seance', en: '/en/resources/first-session-genogram', de: '/de/ressourcen/genogramm-erste-sitzung' },
   clinicalExample: { fr: '/ressources/exemple-genogramme-clinique', en: '/en/resources/clinical-genogram-example', de: '/de/ressourcen/klinisches-genogramm-beispiel' },
   socialCase: { fr: '/ressources/genogramme-travail-social-cas-pratique', en: '/en/resources/social-work-genogram-case-study', de: '/de/ressourcen/genogramm-sozialarbeit-fallbeispiel' },
+  examples: { fr: '/exemples-genogramme' },
+  blank: { fr: '/genogramme-vierge' },
+  ecomap: { fr: '/genogramme-ecocarte' },
   blogJustice: {
     fr: '/blog/genogramme-professionnels-justice',
     en: '/blog/genogram-justice-professionals',
