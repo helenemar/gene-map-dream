@@ -223,6 +223,9 @@ const ArticleLayout: React.FC<{
 const resources = [
   { title: 'Comment préparer un génogramme avant un entretien ?', path: '/comment-faire-un-genogramme', text: 'Les informations à recueillir, les générations à représenter et les pièges à éviter au démarrage.' },
   { title: 'Symboles McGoldrick : les bases à connaître', path: '/symboles-genogramme', text: 'Carrés, cercles, unions, séparations, décès, liens émotionnels et pathologies : le socle visuel du génogramme.' },
+  { title: '6 exemples de génogramme commentés', path: '/exemples-genogramme', text: 'Famille recomposée, addiction, deuil périnatal, protection de l’enfance, migration, PMA : six cas pour s’inspirer.' },
+  { title: 'Génogramme vierge à compléter en ligne', path: '/genogramme-vierge', text: 'Démarrez d’un canvas vide en un clic, sans modèle figé ni installation. Gratuit en bêta.' },
+  { title: 'Génogramme et écocarte : différences et complémentarité', path: '/genogramme-ecocarte', text: 'Quand utiliser l’un, l’autre ou les deux pour cartographier famille et environnement social.' },
   { title: 'Génogramme clinique : usages en psychologie et travail social', path: '/genogramme-psychologie', text: 'Pourquoi la représentation familiale aide à formuler des hypothèses et à clarifier les dynamiques relationnelles.' },
   { title: 'Construire un génogramme en première séance', path: '/ressources/genogramme-premiere-seance', text: 'Une méthode étape par étape pour démarrer sans surcharger l’entretien ni perdre la dimension clinique.' },
   { title: 'Exemple de génogramme clinique commenté', path: '/ressources/exemple-genogramme-clinique', text: 'Un cas fictif détaillé pour comprendre comment lire les alliances, ruptures, ressources et répétitions.' },
