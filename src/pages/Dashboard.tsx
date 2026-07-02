@@ -205,14 +205,9 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const MAX_GENOGRAMS = 2;
+  const MAX_GENOGRAMS = Infinity;
 
   const handleCreate = () => {
-    const ownCount = (ownGenograms || []).length;
-    if (ownCount >= MAX_GENOGRAMS) {
-      setBetaLimitOpen(true);
-      return;
-    }
     setCreateModalOpen(true);
   };
 
