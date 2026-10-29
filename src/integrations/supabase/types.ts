@@ -221,6 +221,24 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_trauma_catalog: {
         Row: {
           created_at: string
@@ -247,6 +265,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_user_stats: {
+        Args: never
+        Returns: {
+          email: string
+          genogram_count: number
+          last_edit: string
+          last_sign_in: string
+          member_count: number
+          signed_up: string
+        }[]
+      }
       claim_shared_genogram: { Args: { p_token: string }; Returns: boolean }
       get_shared_genogram: {
         Args: { p_token: string }
@@ -256,6 +285,13 @@ export type Database = {
           genogram_id: string
           genogram_name: string
         }[]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
       owns_genogram: {
         Args: { _genogram_id: string; _user_id: string }
@@ -267,6 +303,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "admin" | "user"
       share_access_level: "reader" | "editor"
     }
     CompositeTypes: {
@@ -395,6 +432,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "user"],
       share_access_level: ["reader", "editor"],
     },
   },

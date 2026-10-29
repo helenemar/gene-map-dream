@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 
+import AdminStats from "@/pages/AdminStats";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import MobileBlocker from "./components/MobileBlocker";
@@ -113,6 +114,7 @@ const App = () => {
                     <Route path="/genogramme" element={<GenogramDefinition />} />
                     <Route path="/comment-faire-un-genogramme" element={<HowToGenogram />} />
                     <Route path="/a-propos" element={<AboutPage />} />
+                    <Route path="/admin/stats" element={<ProtectedRoute><AdminStats /></ProtectedRoute>} />
                     <Route path="/ressources" element={<ResourcesPage />} />
                     <Route path="/ressources/genogramme-premiere-seance" element={<FirstSessionGenogramArticle />} />
                     <Route path="/ressources/exemple-genogramme-clinique" element={<ClinicalExampleArticle />} />
